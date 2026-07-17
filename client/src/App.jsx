@@ -1,27 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import AuthPage from "./pages/AuthPage";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import StudentDashboard from "./pages/StudentDashboard";
-import StudentAssignmentPage from "./pages/StudentAssignmentPage";
-import TeacherAssignmentPage from "./pages/TeacherAssignmentPage";
-import TeacherAttendancePage from "./pages/TeacherAttendancePage";
-import StudentAttendancePage from "./pages/StudentAttendancePage";
-import TeacherExamPage from "./pages/TeacherExamPage";
-import StudentExamPage from "./pages/StudentExamPage";
-import CourseListPage from "./pages/CourseListPage";
-import CourseDashboard from "./pages/CourseDashboard";
-import CommunityHub from "./pages/CommunityHub";
-import PublicPostDetailPage from "./pages/PublicPostDetailPage";
-import MessagePage from "./pages/MessagePage";
-import CourseCommunity from "./pages/CourseCommunity";
-import CourseCommunityPostDetail from "./pages/CourseCommunityPostDetail";
-import TeacherAssessmentPage from "./pages/TeacherAssessmentPage";
-import StudentAssessmentPage from "./pages/StudentAssessmentPage";
-import SettingsPage from "./pages/SettingsPage";
-import CourseAnalyticsPage from "./pages/CourseAnalyticsPage";
+import SkeletonLoader from "./components/SkeletonLoader";
+
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
+const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
+const StudentAssignmentPage = lazy(() => import("./pages/StudentAssignmentPage"));
+const TeacherAssignmentPage = lazy(() => import("./pages/TeacherAssignmentPage"));
+const TeacherAttendancePage = lazy(() => import("./pages/TeacherAttendancePage"));
+const StudentAttendancePage = lazy(() => import("./pages/StudentAttendancePage"));
+const TeacherExamPage = lazy(() => import("./pages/TeacherExamPage"));
+const StudentExamPage = lazy(() => import("./pages/StudentExamPage"));
+const CourseListPage = lazy(() => import("./pages/CourseListPage"));
+const CourseDashboard = lazy(() => import("./pages/CourseDashboard"));
+const CommunityHub = lazy(() => import("./pages/CommunityHub"));
+const PublicPostDetailPage = lazy(() => import("./pages/PublicPostDetailPage"));
+const MessagePage = lazy(() => import("./pages/MessagePage"));
+const CourseCommunity = lazy(() => import("./pages/CourseCommunity"));
+const CourseCommunityPostDetail = lazy(() => import("./pages/CourseCommunityPostDetail"));
+const TeacherAssessmentPage = lazy(() => import("./pages/TeacherAssessmentPage"));
+const StudentAssessmentPage = lazy(() => import("./pages/StudentAssessmentPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const CourseAnalyticsPage = lazy(() => import("./pages/CourseAnalyticsPage"));
 
 // Fixed ProtectedRoute - checks token and user state
 function ProtectedRoute({ children }) {
@@ -124,8 +126,9 @@ function AppContent() {
           <GlobalSettingsPortal />
         </>
       )}
-      <Routes>
-        <Route path="/auth" element={<AuthPage />} />
+      <Suspense fallback={<SkeletonLoader />}>
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
 
           {/* Teacher Routes */}
           <Route
@@ -381,30 +384,31 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/courses" replace />} />
           <Route path="*" element={<Navigate to="/auth" replace />} />
         </Routes>
-      </>
-    );
-  }
-  
-  function App() {
-    return (
-      <AuthProvider>
-        <BrowserRouter>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                borderRadius: "12px",
-                background: "#FFFFFF",
-                color: "#2C4B66",
-                boxShadow: "0 4px 16px rgba(59, 141, 179, 0.12)",
-              },
-            }}
-          />
-          <AppContent />
-        </BrowserRouter>
-      </AuthProvider>
-    );
-  }
-  
-  export default App;
+      </Suspense>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              borderRadius: "12px",
+              background: "#FFFFFF",
+              color: "#2C4B66",
+              boxShadow: "0 4px 16px rgba(59, 141, 179, 0.12)",
+            },
+          }}
+        />
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;

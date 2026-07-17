@@ -1037,7 +1037,9 @@ exports.createContactRequest = async (req, res) => {
 
     // Notify teacher via system notification & socket
     const studentUser = await User.findById(studentId);
+    const teacherUser = await User.findById(teacherId);
     const studentName = studentUser ? studentUser.name : "A student";
+    const teacherName = teacherUser ? teacherUser.name : "Teacher";
     const io = getIO();
 
     try {
@@ -1058,8 +1060,19 @@ exports.createContactRequest = async (req, res) => {
         });
         io.to(`user_${teacherId}`).emit("newContactRequest", request);
       }
+
+      // Send email notification to teacher
+      if (teacherUser && teacherUser.email) {
+        const emailData = emailTemplates.contactRequestNotification(
+          teacherName,
+          studentName,
+          subject,
+          topic || ""
+        );
+        queueEmail(teacherUser.email, emailData.subject, emailData.html);
+      }
     } catch (err) {
-      console.error("Failed to create request notification:", err);
+      console.error("Failed to create request notification/email:", err);
     }
 
     res.status(201).json({ message: "Contact request submitted successfully", request });
@@ -1151,6 +1164,21 @@ exports.respondToContactRequest = async (req, res) => {
           link: `/community/messages`
         });
         io.to(`user_${request.student}`).emit("contactRequestResponse", request);
+      }
+
+      // Send email notification to student
+      const studentUser = await User.findById(request.student);
+      if (studentUser && studentUser.email) {
+        const studentName = studentUser.name || "Student";
+        const emailData = emailTemplates.contactRequestResponseNotification(
+          studentName,
+          teacherName,
+          status,
+          request.subject || "Contact Request",
+          request.scheduleStart,
+          request.scheduleEnd
+        );
+        queueEmail(studentUser.email, emailData.subject, emailData.html);
       }
     } catch (err) {
       console.error("Failed to notify contact request response:", err);

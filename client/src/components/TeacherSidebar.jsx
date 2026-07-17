@@ -81,7 +81,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             {user?.email || ""}
           </p>
         </div>
-        <nav className="sidebar-nav">
+        <div className="sidebar-nav-scrollable">
           <button
             className={`nav-item ${currentPage === "my-courses" || currentPage === "courses" ? "active" : ""}`}
             onClick={() => navigate("/courses")}
@@ -103,20 +103,18 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             <FiFileText size={18} />
             <span>Assessment Marksheet</span>
           </button>
-
+        </div>
+        <div className="sidebar-footer-fixed">
           {/* Static Notification Portal Container */}
           <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
-
-          <div className="nav-divider"></div>
-
+          <div className="nav-divider" style={{ margin: "2px 0" }}></div>
           {/* Static Settings Portal Container */}
           <div id="sidebar-settings-portal" style={{ width: "100%" }}></div>
-
           <button className="nav-item logout-btn" onClick={logout}>
             <FiLogOut size={18} />
             <span>Logout</span>
           </button>
-        </nav>
+        </div>
       </div>
     );
   }
@@ -158,7 +156,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           {user?.email || ""}
         </p>
       </div>
-      <nav className="sidebar-nav">
+      <div className="sidebar-nav-scrollable">
         <button
           className={`nav-item ${currentPage === "dashboard" ? "active" : ""}`}
           onClick={() => navigate(`/course/${cid}`)}
@@ -194,7 +192,6 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           <FiMessageSquare size={18} />
           <span>Community</span>
         </button>
-
         <button
           className={`nav-item ${currentPage === "analytics" ? "active" : ""}`}
           onClick={() => navigate(`/teacher/analytics/${cid}`)}
@@ -235,25 +232,23 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             </button>
           </div>
         )}
-
+      </div>
+      <div className="sidebar-footer-fixed">
         {/* Static Notification Portal Container */}
         <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
-
-        <div className="nav-divider"></div>
+        <div className="nav-divider" style={{ margin: "2px 0" }}></div>
         <button className="nav-item" onClick={() => navigate("/courses")}>
           <FiArrowLeft size={18} />
           <span>Back to Courses</span>
         </button>
-        <div className="nav-divider"></div>
-
+        <div className="nav-divider" style={{ margin: "2px 0" }}></div>
         {/* Static Settings Portal Container */}
         <div id="sidebar-settings-portal" style={{ width: "100%" }}></div>
-
         <button className="nav-item logout-btn" onClick={logout}>
           <FiLogOut size={18} />
           <span>Logout</span>
         </button>
-      </nav>
+      </div>
     </div>
   );
 }

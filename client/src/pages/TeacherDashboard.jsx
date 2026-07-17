@@ -706,13 +706,16 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                 <div style={{ textAlign: "center", padding: "40px 20px" }}>
                   <FiX size={48} color="#ef4444" style={{ marginBottom: "16px" }} />
                   <h4 style={{ color: "#2c4b66", marginBottom: "8px" }}>
-                    Failed to load preview
+                    Unable to Preview File
                   </h4>
-                  <p style={{ color: "#6b89a0", marginBottom: "20px" }}>
-                    An error occurred while fetching the preview data.
+                  <p style={{ color: "#6b89a0", marginBottom: "10px", fontSize: "14px" }}>
+                    The preview data could not be fetched from the server.
+                  </p>
+                  <p style={{ color: "#94a3b8", marginBottom: "20px", fontSize: "12px", fontStyle: "italic" }}>
+                    Note: If this file was uploaded before a server restart/redeploy, please re-upload the file.
                   </p>
                   <a
-                    href={previewFile.downloadUrl}
+                    href={previewFile.downloadUrl || previewFile.fileURL}
                     className="btn-primary"
                     style={{
                       padding: "10px 20px",
@@ -721,10 +724,11 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "8px",
+                      borderRadius: "8px"
                     }}
                     download
                   >
-                    <FiDownload size={16} /> Download File
+                    <FiDownload size={16} /> Direct Download
                   </a>
                 </div>
               ) : previewType === "docx" ? (

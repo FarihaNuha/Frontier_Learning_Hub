@@ -240,6 +240,59 @@ const emailTemplates = {
       `
     };
   },
+
+  // Contact request from student to teacher
+  contactRequestNotification: (teacherName, studentName, subject, topic) => ({
+    subject: `📞 New Contact Request from ${studentName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
+          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
+          <h3 style="color: #2C4B66;">Hello ${teacherName},</h3>
+          <p>You have received a new contact request from <strong>${studentName}</strong>:</p>
+          <div style="background: #E8F4FD; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Subject / Course:</strong> ${subject}</p>
+            ${topic ? `<p style="margin: 5px 0;"><strong>Topic Details:</strong> ${topic}</p>` : ""}
+          </div>
+          <p>Please login to your dashboard to accept or decline this request and assign a scheduled slot.</p>
+          <a href="${clientUrl}/community/messages" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Contact Requests</a>
+        </div>
+      </div>
+    `,
+  }),
+
+  // Contact request response from teacher to student
+  contactRequestResponseNotification: (studentName, teacherName, status, subject, scheduleStart, scheduleEnd) => {
+    const isAccepted = status === "accepted";
+    const startStr = safeFormatDate(scheduleStart);
+    const endStr = safeFormatDate(scheduleEnd);
+    return {
+      subject: isAccepted ? `✅ Contact Request Approved by ${teacherName}` : `❌ Contact Request Declined by ${teacherName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, ${isAccepted ? "#10B981, #059669" : "#EF4444, #DC2626"}); padding: 20px; border-radius: 10px 10px 0 0;">
+            <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
+            <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
+            <p>Your contact request regarding <strong>${subject}</strong> has been <strong>${status}</strong> by <strong>${teacherName}</strong>.</p>
+            ${isAccepted ? `
+              <div style="background: #E8F4FD; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p style="margin: 5px 0; color: #10b981;"><strong>Scheduled Slot Start:</strong> ${startStr}</p>
+                <p style="margin: 5px 0; color: #10b981;"><strong>Scheduled Slot End:</strong> ${endStr}</p>
+              </div>
+              <p>You can now message this teacher during your scheduled slot.</p>
+            ` : `
+              <p style="color: #ef4444;">Unfortunately, the teacher was unable to approve this request at this time.</p>
+            `}
+            <a href="${clientUrl}/community/messages" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Messages</a>
+          </div>
+        </div>
+      `
+    };
+  },
 };
 
 // ==================== EMAIL QUEUE ====================

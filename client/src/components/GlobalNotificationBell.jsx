@@ -42,26 +42,8 @@ export default function GlobalNotificationBell() {
   // Monitor DOM for .sidebar-nav and inject Portal container
   useEffect(() => {
     const findNav = () => {
-      const el = document.querySelector(".sidebar-nav");
-      if (el) {
-        let portalContainer = el.querySelector("#sidebar-notification-portal");
-        if (!portalContainer) {
-          portalContainer = document.createElement("div");
-          portalContainer.id = "sidebar-notification-portal";
-          portalContainer.style.width = "100%";
-          
-          // Insert below marksheet section, right before the first nav-divider
-          const divider = el.querySelector(".nav-divider");
-          if (divider) {
-            el.insertBefore(portalContainer, divider);
-          } else {
-            el.appendChild(portalContainer);
-          }
-        }
-        setSidebarNavEl(portalContainer);
-      } else {
-        setSidebarNavEl(null);
-      }
+      const el = document.getElementById("sidebar-notification-portal");
+      setSidebarNavEl(el);
     };
 
     findNav();

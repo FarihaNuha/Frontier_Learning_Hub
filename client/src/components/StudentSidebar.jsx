@@ -102,7 +102,14 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <span>Assessment Marksheet</span>
           </button>
 
+          {/* Static Notification Portal Container */}
+          <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
+
           <div className="nav-divider"></div>
+
+          {/* Static Settings Portal Container */}
+          <div id="sidebar-settings-portal" style={{ width: "100%" }}></div>
+
           <button className="nav-item logout-btn" onClick={logout}>
             <FiLogOut size={18} />
             <span>Logout</span>
@@ -194,12 +201,19 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           <span>Activity Analytics</span>
         </button>
         
+        {/* Static Notification Portal Container */}
+        <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
+
         <div className="nav-divider"></div>
         <button className="nav-item" onClick={() => navigate("/courses")}>
           <FiArrowLeft size={18} />
           <span>Back to Courses</span>
         </button>
         <div className="nav-divider"></div>
+
+        {/* Static Settings Portal Container */}
+        <div id="sidebar-settings-portal" style={{ width: "100%" }}></div>
+
         <button className="nav-item logout-btn" onClick={logout}>
           <FiLogOut size={18} />
           <span>Logout</span>

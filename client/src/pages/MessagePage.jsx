@@ -279,7 +279,11 @@ export default function MessagePage() {
       toast.error("Please set a schedule window first."); return;
     }
     try {
-      await communityApi.respondToContactRequest(requestId, { status, scheduleStart, scheduleEnd });
+      await communityApi.respondToContactRequest(requestId, { 
+        status, 
+        scheduleStart: new Date(scheduleStart).toISOString(), 
+        scheduleEnd: new Date(scheduleEnd).toISOString() 
+      });
       toast.success(status === "accepted" ? "Request accepted & schedule set!" : "Request declined.");
       setRespondingId(null); setScheduleStart(""); setScheduleEnd("");
       fetchContactRequests();

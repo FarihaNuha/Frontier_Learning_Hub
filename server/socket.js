@@ -13,7 +13,15 @@ const initSocket = (server) => {
 
   io = new Server(server, {
     cors: {
-      origin: allowedOrigins,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+        try {
+          const url = new URL(origin);
+          if (url.hostname.endsWith(".vercel.app")) return callback(null, true);
+        } catch (e) {}
+        callback(new Error("Not allowed by CORS"));
+      },
       methods: ["GET", "POST"],
     },
   });

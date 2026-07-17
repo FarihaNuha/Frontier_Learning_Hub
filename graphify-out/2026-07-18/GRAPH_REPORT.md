@@ -1,11 +1,11 @@
 # Graph Report - UFTB_Moodle  (2026-07-18)
 
 ## Corpus Check
-- 105 files · ~82,845 words
+- 105 files · ~82,945 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 667 nodes · 1093 edges · 39 communities (30 shown, 9 thin omitted)
+- 667 nodes · 1089 edges · 39 communities (30 shown, 9 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
@@ -58,9 +58,9 @@
 4. `queueEmail()` - 19 edges
 5. `CommunityPost` - 17 edges
 6. `verifyToken()` - 11 edges
-7. `StudentSidebar()` - 10 edges
-8. `TeacherSidebar()` - 10 edges
-9. `Lecture` - 10 edges
+7. `Lecture` - 10 edges
+8. `StudentSidebar()` - 9 edges
+9. `TeacherSidebar()` - 9 edges
 10. `CommunityComment` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -201,7 +201,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin` to the rest of the system?**
   _301 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `App.jsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.07737260402057036 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07643758765778401 - nodes in this community are weakly interconnected._
 - **Should `authMiddleware.js` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `dependencies` be split into smaller, more focused modules?**

@@ -144,7 +144,7 @@ exports.joinCourse = async (req, res) => {
                 <p style="margin: 5px 0;"><strong>Course:</strong> ${course.name} (${course.displayCode})</p>
               </div>
               <p>Please login and visit your settings page to approve or reject this request.</p>
-              <a href="http://localhost:3000/settings" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Settings</a>
+              <a href="${(process.env.CLIENT_URL || "http://localhost:3000").replace(/\/$/, "")}/settings" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Settings</a>
             </div>
           </div>
         `;

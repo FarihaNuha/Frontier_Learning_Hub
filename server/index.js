@@ -1,8 +1,19 @@
 require("dotenv").config();
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const path = require("path");
+const fs = require("fs");
+
+// Ensure uploads folder exists in production/Render filesystem
+const uploadsDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("📁 Created uploads directory at:", uploadsDir);
+}
+
 const connectDB = require("./config/db");
 const { initSocket } = require("./socket");
 const startScheduler = require("./scheduler/deadlineReminder");
@@ -21,11 +32,21 @@ if (process.env.CLIENT_URL) {
   process.env.CLIENT_URL.split(",").forEach(url => allowedOrigins.push(url.trim()));
 }
 
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.indexOf(origin) !== -1) return true;
+  try {
+    const url = new URL(origin);
+    if (url.hostname.endsWith(".vercel.app")) return true;
+  } catch (e) {}
+  return false;
+};
+
 // CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      if (isOriginAllowed(origin)) {
         callback(null, true);
       } else {
         callback(new Error(`Origin ${origin} not allowed by CORS`));

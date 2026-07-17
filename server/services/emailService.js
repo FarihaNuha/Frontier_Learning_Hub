@@ -1,5 +1,7 @@
 const nodemailer = require("nodemailer");
 
+const clientUrl = (process.env.CLIENT_URL || "http://localhost:3000").replace(/\/$/, "");
+
 // Create transporter with timeouts to prevent hanging sockets
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -50,7 +52,7 @@ const emailTemplates = {
   newExam: (studentName, examTitle, course, duration, totalMarks, scheduledAt, deadline, courseId, examId) => {
     const startStr = safeFormatDate(scheduledAt);
     const endStr = safeFormatDate(deadline);
-    const resultsLink = courseId ? `http://localhost:3000/student/exams/${courseId}?examId=${examId}` : `http://localhost:3000/student/dashboard`;
+    const resultsLink = courseId ? `${clientUrl}/student/exams/${courseId}?examId=${examId}` : `${clientUrl}/student/dashboard`;
     return {
       subject: `New Exam Assigned: ${examTitle}`,
       html: `
@@ -93,7 +95,7 @@ const emailTemplates = {
             <p style="margin: 5px 0;"><strong>Course:</strong> ${course}</p>
           </div>
           <p>Please login to your dashboard to view and download the lecture material.</p>
-          <a href="http://localhost:3000/student/dashboard" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Dashboard</a>
+          <a href="${clientUrl}/student/dashboard" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Dashboard</a>
         </div>
       </div>
     `,
@@ -116,7 +118,7 @@ const emailTemplates = {
             <p style="margin: 5px 0;"><strong>Deadline:</strong> ${safeFormatDate(deadline)}</p>
           </div>
           <p style="color: #EF4444;"><strong>Don't forget to submit before the deadline!</strong></p>
-          <a href="http://localhost:3000/student/assignments" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Assignment</a>
+          <a href="${clientUrl}/student/assignments" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Assignment</a>
         </div>
       </div>
     `,
@@ -138,7 +140,7 @@ const emailTemplates = {
             <p style="margin: 5px 0;"><strong>Marks:</strong> ${marks}</p>
             ${feedback ? `<p style="margin: 5px 0;"><strong>Feedback:</strong> ${feedback}</p>` : ""}
           </div>
-          <a href="http://localhost:3000/student/assignments" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Details</a>
+          <a href="${clientUrl}/student/assignments" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Details</a>
         </div>
       </div>
     `,
@@ -163,7 +165,7 @@ const emailTemplates = {
             <hr style="border: 0; border-top: 1px solid #cce2f0; margin: 10px 0;" />
             <p style="margin: 5px 0; font-size: 16px; color: #10b981;"><strong>Total Marks:</strong> ${totalMarks}</p>
           </div>
-          <a href="http://localhost:3000/student/assessment" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Marksheet</a>
+          <a href="${clientUrl}/student/assessment" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Marksheet</a>
         </div>
       </div>
     `,
@@ -184,7 +186,7 @@ const emailTemplates = {
             <p style="margin: 5px 0;"><strong>Post Title:</strong> ${postTitle}</p>
             <p style="margin: 5px 0;"><strong>Posted By:</strong> ${authorName}</p>
           </div>
-          <a href="http://localhost:3000/community" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Community Hub</a>
+          <a href="${clientUrl}/community" style="display: inline-block; background: linear-gradient(135deg, #7EC8E3, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Community Hub</a>
         </div>
       </div>
     `,
@@ -192,7 +194,7 @@ const emailTemplates = {
 
   // New private message
   newPrivateMessage: (recipientName, senderName, messageContent, senderId) => {
-    const chatLink = `http://localhost:3000/community/messages/${senderId}`;
+    const chatLink = `${clientUrl}/community/messages/${senderId}`;
     return {
       subject: `New Message from ${senderName}`,
       html: `
@@ -215,7 +217,7 @@ const emailTemplates = {
 
   // Exam results published
   examResultsPublished: (studentName, examTitle, course, totalMarks, scoreText, courseId, examId) => {
-    const resultsLink = courseId ? `http://localhost:3000/student/exams/${courseId}?examId=${examId}` : `http://localhost:3000/student/dashboard`;
+    const resultsLink = courseId ? `${clientUrl}/student/exams/${courseId}?examId=${examId}` : `${clientUrl}/student/dashboard`;
     return {
       subject: `Exam Results Published: ${examTitle}`,
       html: `

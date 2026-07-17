@@ -10,25 +10,8 @@ export default function GlobalSettingsPortal() {
 
   useEffect(() => {
     const findNav = () => {
-      const el = document.querySelector(".sidebar-nav");
-      if (el) {
-        let portalContainer = el.querySelector("#sidebar-settings-portal");
-        if (!portalContainer) {
-          portalContainer = document.createElement("div");
-          portalContainer.id = "sidebar-settings-portal";
-          portalContainer.style.width = "100%";
-          
-          const logoutBtn = el.querySelector(".logout-btn");
-          if (logoutBtn) {
-            el.insertBefore(portalContainer, logoutBtn);
-          } else {
-            el.appendChild(portalContainer);
-          }
-        }
-        setSidebarNavEl(portalContainer);
-      } else {
-        setSidebarNavEl(null);
-      }
+      const el = document.getElementById("sidebar-settings-portal");
+      setSidebarNavEl(el);
     };
 
     findNav();

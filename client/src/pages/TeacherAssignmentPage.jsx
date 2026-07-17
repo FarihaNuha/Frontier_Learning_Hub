@@ -192,7 +192,7 @@ export default function TeacherAssignmentPage({
         fd.append("course", courseInfo?.displayCode || finalCourseCode);
         fd.append("courseId", finalCourseId);
         fd.append("department", formData.department);
-        fd.append("deadline", formData.deadline);
+        fd.append("deadline", new Date(formData.deadline).toISOString());
         fd.append("totalMarks", formData.totalMarks);
         await api.post("/assignments/create", fd, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -200,6 +200,7 @@ export default function TeacherAssignmentPage({
       } else {
         await api.post("/assignments/create", {
           ...formData,
+          deadline: new Date(formData.deadline).toISOString(),
           course: courseInfo?.displayCode || finalCourseCode,
           courseId: finalCourseId,
         });

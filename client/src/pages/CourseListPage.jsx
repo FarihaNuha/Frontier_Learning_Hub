@@ -18,6 +18,8 @@ import {
   FiMessageSquare,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
+import TeacherSidebar from "../components/TeacherSidebar";
+import StudentSidebar from "../components/StudentSidebar";
 
 const getCourseBanner = (course) => {
   const name = (course.name || "").toLowerCase();
@@ -582,57 +584,8 @@ export default function CourseListPage() {
 
 // Sidebar Component
 function Sidebar({ user, logout }) {
-  const navigate = useNavigate();
-  return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <h2>UFTB Moodle</h2>
-        <span className={`badge ${user?.role}`}>{user?.role}</span>
-      </div>
-      <div className="user-info">
-        <div className="avatar">
-          {user?.profilePicture ? (
-            <img 
-              src={user.profilePicture} 
-              alt="Profile" 
-              style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--pastel-blue-deep)", display: "block", margin: "0 auto 12px auto" }} 
-            />
-          ) : (
-            <FiUser size={48} color="#2C4B66" />
-          )}
-        </div>
-        <h3>{user?.name}</h3>
-        <p>{user?.department}</p>
-        <p className="user-email">{user?.email}</p>
-      </div>
-      <nav className="sidebar-nav">
-        <button className="nav-item active">
-          <FiBook size={18} />
-          <span>My Courses</span>
-        </button>
-        <button className="nav-item" onClick={() => navigate("/community")}>
-          <FiMessageSquare size={18} />
-          <span>Community Hub</span>
-        </button>
-        <button
-          className="nav-item"
-          onClick={() => {
-            if (user?.role === "teacher") {
-              navigate("/teacher/assessment");
-            } else {
-              navigate("/student/assessment");
-            }
-          }}
-        >
-          <FiBookOpen size={18} />
-          <span>Assessment Marksheet</span>
-        </button>
-        <div className="nav-divider"></div>
-        <button className="nav-item logout-btn" onClick={logout}>
-          <FiLogOut size={18} />
-          <span>Logout</span>
-        </button>
-      </nav>
-    </div>
-  );
+  if (user?.role === "teacher") {
+    return <TeacherSidebar currentPage="courses" />;
+  }
+  return <StudentSidebar currentPage="courses" />;
 }

@@ -1,0 +1,245 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../services/api";
+import {
+  FiBook,
+  FiFileText,
+  FiCalendar,
+  FiUser,
+  FiLogOut,
+  FiArrowLeft,
+  FiBookOpen,
+  FiMessageSquare,
+  FiActivity,
+  FiCopy,
+} from "react-icons/fi";
+import toast from "react-hot-toast";
+
+export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const cid = courseId || courseInfo?._id;
+
+  const [course, setCourse] = useState(courseInfo || null);
+
+  useEffect(() => {
+    if (courseInfo) {
+      setCourse(courseInfo);
+      return;
+    }
+    if (!cid) return;
+
+    // Check sessionStorage cache to prevent duplicate loads
+    const cacheKey = `course_details_${cid}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        setCourse(JSON.parse(cached));
+        return;
+      } catch (e) {}
+    }
+
+    api.get(`/courses/${cid}`)
+      .then(res => {
+        if (res.data?.course) {
+          setCourse(res.data.course);
+          sessionStorage.setItem(cacheKey, JSON.stringify(res.data.course));
+        }
+      })
+      .catch(err => {
+        console.error("TeacherSidebar course fetch error:", err);
+      });
+  }, [courseInfo, cid]);
+
+  if (!cid) {
+    return (
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h2>UFTB Moodle</h2>
+          <span className="badge teacher">Teacher</span>
+        </div>
+        <div className="user-info">
+          <div className="avatar">
+            {user?.profilePicture ? (
+              <img 
+                src={user.profilePicture} 
+                alt="Profile" 
+                style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--pastel-blue-deep)", display: "block", margin: "0 auto 12px auto" }} 
+              />
+            ) : (
+              <FiUser size={48} color="#2C4B66" />
+            )}
+          </div>
+          <h3>{user?.name || "Teacher"}</h3>
+          {user?.department && (
+            <p style={{ fontWeight: 600, color: "#3B8DB3" }}>
+              {user.department}
+            </p>
+          )}
+          <p className="user-email" style={{ fontSize: 12, color: "#6B89A0", marginTop: 4 }}>
+            {user?.email || ""}
+          </p>
+        </div>
+        <nav className="sidebar-nav">
+          <button
+            className={`nav-item ${currentPage === "my-courses" || currentPage === "courses" ? "active" : ""}`}
+            onClick={() => navigate("/courses")}
+          >
+            <FiBookOpen size={18} />
+            <span>My Courses</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
+            onClick={() => navigate("/community")}
+          >
+            <FiMessageSquare size={18} />
+            <span>Community Hub</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
+            onClick={() => navigate("/teacher/assessment")}
+          >
+            <FiFileText size={18} />
+            <span>Assessment Marksheet</span>
+          </button>
+
+          <div className="nav-divider"></div>
+          <button className="nav-item logout-btn" onClick={logout}>
+            <FiLogOut size={18} />
+            <span>Logout</span>
+          </button>
+        </nav>
+      </div>
+    );
+  }
+
+  return (
+    <div className="sidebar">
+      <div className="sidebar-header">
+        <h2>UFTB Moodle</h2>
+        <span className="badge teacher">Teacher</span>
+      </div>
+      <div className="user-info">
+        <div className="avatar">
+          {user?.profilePicture ? (
+            <img 
+              src={user.profilePicture} 
+              alt="Profile" 
+              style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--pastel-blue-deep)", display: "block", margin: "0 auto 12px auto" }} 
+            />
+          ) : (
+            <FiUser size={48} color="#2C4B66" />
+          )}
+        </div>
+        <h3>{user?.name || "Teacher"}</h3>
+        <p style={{ fontWeight: 600, color: "#3B8DB3" }}>
+          {course?.displayCode || ""}
+        </p>
+        <p style={{ fontSize: 12, color: "#6B89A0" }}>
+          {course?.name || ""}
+        </p>
+        {user?.department && (
+          <p style={{ fontSize: 12, fontWeight: 600, color: "var(--pastel-blue-deep)", marginTop: 2 }}>
+            {user.department}
+          </p>
+        )}
+        <p
+          className="user-email"
+          style={{ fontSize: 12, color: "#6B89A0", marginTop: 4 }}
+        >
+          {user?.email || ""}
+        </p>
+      </div>
+      <nav className="sidebar-nav">
+        <button
+          className={`nav-item ${currentPage === "dashboard" ? "active" : ""}`}
+          onClick={() => navigate(`/course/${cid}`)}
+        >
+          <FiBook size={18} />
+          <span>Course Materials</span>
+        </button>
+        <button
+          className={`nav-item ${currentPage === "assignments" ? "active" : ""}`}
+          onClick={() => navigate(`/teacher/assignments/${cid}`)}
+        >
+          <FiFileText size={18} />
+          <span>Assignments</span>
+        </button>
+        <button
+          className={`nav-item ${currentPage === "exams" ? "active" : ""}`}
+          onClick={() => navigate(`/teacher/exams/${cid}`)}
+        >
+          <FiFileText size={18} />
+          <span>Exams</span>
+        </button>
+        <button
+          className={`nav-item ${currentPage === "attendance" ? "active" : ""}`}
+          onClick={() => navigate(`/teacher/attendance/${cid}`)}
+        >
+          <FiCalendar size={18} />
+          <span>Attendance</span>
+        </button>
+        <button
+          className={`nav-item ${currentPage === "community" ? "active" : ""}`}
+          onClick={() => navigate(`/community/courses/${cid}`)}
+        >
+          <FiMessageSquare size={18} />
+          <span>Community</span>
+        </button>
+
+        <button
+          className={`nav-item ${currentPage === "analytics" ? "active" : ""}`}
+          onClick={() => navigate(`/teacher/analytics/${cid}`)}
+        >
+          <FiActivity size={18} />
+          <span>Activity Analytics</span>
+        </button>
+        
+        {course?.joinCode && (
+          <div
+            style={{
+              padding: "10px 16px",
+              fontSize: 11,
+              color: "#6B89A0",
+              background: "#E8F4FD",
+              borderRadius: 8,
+              margin: "4px 0",
+              textAlign: "center"
+            }}
+          >
+            <span>Join Code: </span>
+            <strong style={{ letterSpacing: 2, fontSize: 14, color: "#3B8DB3" }}>
+              {course.joinCode}
+            </strong>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(course.joinCode);
+                toast.success("Copied!");
+              }}
+              style={{
+                marginLeft: 6,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <FiCopy size={12} color="#3B8DB3" />
+            </button>
+          </div>
+        )}
+
+        <div className="nav-divider"></div>
+        <button className="nav-item" onClick={() => navigate("/courses")}>
+          <FiArrowLeft size={18} />
+          <span>Back to Courses</span>
+        </button>
+        <div className="nav-divider"></div>
+        <button className="nav-item logout-btn" onClick={logout}>
+          <FiLogOut size={18} />
+          <span>Logout</span>
+        </button>
+      </nav>
+    </div>
+  );
+}

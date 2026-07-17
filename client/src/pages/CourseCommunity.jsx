@@ -1,0 +1,1194 @@
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../services/api";
+import { communityApi } from "../services/communityApi";
+import toast from "react-hot-toast";
+import ShareModal from "../components/ShareModal";
+import {
+  FiMessageSquare,
+  FiPlus,
+  FiThumbsUp,
+  FiThumbsDown,
+  FiMessageCircle,
+  FiUser,
+  FiClock,
+  FiSend,
+  FiX,
+  FiHelpCircle,
+  FiBookOpen,
+  FiBell,
+  FiArrowLeft,
+  FiShare2,
+  FiMoreVertical,
+  FiEdit3,
+  FiTrash2,
+  FiLogOut,
+  FiMail,
+} from "react-icons/fi";
+import "../styles/community.css";
+
+const renderContentWithLinks = (text) => {
+  if (!text) return "";
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          style={{ color: "#3b8db3", textDecoration: "underline", fontWeight: "600", wordBreak: "break-all" }}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
+export default function CourseCommunity() {
+  const { courseId } = useParams();
+  const { user, logout, socket, onlineUsers } = useAuth();
+  const navigate = useNavigate();
+  const [course, setCourse] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const fetchUnreadMessageCount = async () => {
+    try {
+      const res = await communityApi.getUnreadMessagesCount();
+      setUnreadCount(res.data.unreadCount || 0);
+    } catch (err) {
+      console.error("Failed to fetch unread messages count:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnreadMessageCount();
+  }, []);
+
+  useEffect(() => {
+    if (socket) {
+      const handleNewMessage = () => {
+        fetchUnreadMessageCount();
+      };
+      socket.on("newPrivateMessage", handleNewMessage);
+      return () => {
+        socket.off("newPrivateMessage", handleNewMessage);
+      };
+    }
+  }, [socket]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [newPost, setNewPost] = useState({
+    content: "",
+    category: "general",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
+  useEffect(() => {
+    fetchCourse();
+    fetchPosts();
+  }, [courseId, selectedCategory]);
+
+  const fetchCourse = async () => {
+    try {
+      const res = await api.get(`/courses/${courseId}`);
+      setCourse(res.data.course);
+    } catch (error) {
+      console.error(error);
+      navigate("/courses");
+    }
+  };
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get(
+        `/community/courses/${courseId}/posts?category=${selectedCategory}`,
+      );
+      setPosts(res.data.posts);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load discussions");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreatePost = async (e) => {
+    e.preventDefault();
+    if (!newPost.content) {
+      toast.error("Please write something");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append("content", newPost.content);
+      formData.append("category", newPost.category);
+      selectedFiles.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      await api.post(`/community/courses/${courseId}/posts`, formData);
+      toast.success("Post created!");
+      setShowCreateModal(false);
+      setNewPost({ content: "", category: "general" });
+      setSelectedFiles([]);
+      fetchPosts();
+    } catch (error) {
+      toast.error("Failed to create post");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleLike = async (postId) => {
+    try {
+      const res = await api.post(
+        `/community/courses/${courseId}/posts/${postId}/like`,
+      );
+      setPosts(
+        posts.map((post) =>
+          post._id === postId
+            ? { ...post, likes: res.data.likes, hasLiked: res.data.hasLiked }
+            : post,
+        ),
+      );
+    } catch (error) {
+      toast.error("Failed to like post");
+    }
+  };
+
+  const getCategoryIcon = (category) => {
+    switch (category) {
+      case "question":
+        return <FiHelpCircle size={14} />;
+      case "announcement":
+        return <FiBell size={14} />;
+      case "resource":
+        return <FiBookOpen size={14} />;
+      default:
+        return <FiMessageSquare size={14} />;
+    }
+  };
+
+  const getCategoryClass = (category) => {
+    switch (category) {
+      case "question":
+        return "category-question";
+      case "announcement":
+        return "category-announcement";
+      case "resource":
+        return "category-resource";
+      default:
+        return "category-general";
+    }
+  };
+
+  if (!course) return null;
+
+  return (
+    <div className="community-container">
+      <div className="community-sidebar">
+        <div className="sidebar-header">
+          <h2>UFTB Moodle</h2>
+          <span className={`badge ${user?.role}`}>{user?.role?.toUpperCase()}</span>
+        </div>
+
+        <div className="sidebar-user">
+          <div className="avatar">
+            {user?.profilePicture ? (
+              <img 
+                src={user.profilePicture} 
+                alt="Profile" 
+                style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", display: "block" }} 
+              />
+            ) : (
+              <FiUser size={32} />
+            )}
+          </div>
+          <h3>{user?.name}</h3>
+          <p style={{ fontWeight: 600, color: "#3b8db3", fontSize: "13px", marginBottom: "2px" }}>
+            {course?.displayCode}
+          </p>
+          <p style={{ fontSize: "12px", color: "#6b89a0", marginBottom: "2px" }}>
+            {course?.name}
+          </p>
+          {user?.department && (
+            <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--pastel-blue-deep)", marginBottom: "4px" }}>
+              {user.department}
+            </p>
+          )}
+          <p style={{ fontSize: "11px", color: "#6b89a0", marginTop: "4px", wordBreak: "break-all" }}>
+            {user?.email}
+          </p>
+        </div>
+
+        <nav className="sidebar-nav">
+          <button className="nav-item active">
+            <FiMessageSquare size={18} />
+            <span>Discussions</span>
+          </button>
+          <button
+            className="nav-item"
+            onClick={() => navigate(`/community/messages?courseId=${courseId}`)}
+            style={{ position: "relative", width: "100%", display: "flex", alignItems: "center" }}
+          >
+            <FiMail size={18} />
+            <span>Messages</span>
+            {unreadCount > 0 && (
+              <span 
+                style={{ 
+                  background: "#EF4444", 
+                  color: "#FFFFFF", 
+                  marginLeft: "auto", 
+                  borderRadius: "50%", 
+                  minWidth: "18px", 
+                  height: "18px", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  fontSize: "11px", 
+                  fontWeight: "700",
+                  padding: "0 4px"
+                }}
+              >
+                {unreadCount}
+              </span>
+            )}
+          </button>
+          <button
+            className="nav-item"
+            onClick={() => navigate(`/course/${courseId}`)}
+          >
+            <FiArrowLeft size={18} />
+            <span>Back to Course</span>
+          </button>
+          <div className="nav-divider"></div>
+          <button className="nav-item logout-btn" onClick={logout}>
+            <FiLogOut size={18} />
+            <span>Logout</span>
+          </button>
+        </nav>
+      </div>
+
+      <div className="community-main">
+        <div className="feed-header">
+          <div>
+            <h1>Course Discussions</h1>
+            <p>Ask questions, share resources, and connect with classmates</p>
+          </div>
+          <button
+            className="create-post-btn"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <FiPlus size={18} /> New Discussion
+          </button>
+        </div>
+
+        <div className="category-filters">
+          <button
+            className={`filter-chip ${selectedCategory === "all" ? "active" : ""}`}
+            onClick={() => setSelectedCategory("all")}
+          >
+            All
+          </button>
+          <button
+            className={`filter-chip ${selectedCategory === "general" ? "active" : ""}`}
+            onClick={() => setSelectedCategory("general")}
+          >
+            <FiMessageSquare size={12} /> General
+          </button>
+          <button
+            className={`filter-chip ${selectedCategory === "question" ? "active" : ""}`}
+            onClick={() => setSelectedCategory("question")}
+          >
+            <FiHelpCircle size={12} /> Questions
+          </button>
+          <button
+            className={`filter-chip ${selectedCategory === "announcement" ? "active" : ""}`}
+            onClick={() => setSelectedCategory("announcement")}
+          >
+            <FiBell size={12} /> Announcements
+          </button>
+          <button
+            className={`filter-chip ${selectedCategory === "resource" ? "active" : ""}`}
+            onClick={() => setSelectedCategory("resource")}
+          >
+            <FiBookOpen size={12} /> Resources
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading discussions...</p>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">💬</div>
+            <h3>No discussions yet</h3>
+            <p>Be the first to start a discussion!</p>
+            <button
+              className="btn-primary"
+              onClick={() => setShowCreateModal(true)}
+            >
+              Start a Discussion
+            </button>
+          </div>
+        ) : (
+          <div className="posts-feed">
+            {posts.map((post) => (
+              <CoursePostCard
+                key={post._id}
+                post={post}
+                user={user}
+                courseId={courseId}
+                onlineUsers={onlineUsers}
+                onPostDeleted={(deletedId) => {
+                  setPosts(posts.filter((p) => p._id !== deletedId));
+                }}
+                onPostUpdated={(updatedPost) => {
+                  setPosts(posts.map((p) => p._id === updatedPost._id ? updatedPost : p));
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Create Post Modal */}
+      {showCreateModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>New Discussion</h2>
+              <button
+                className="close-btn"
+                onClick={() => setShowCreateModal(false)}
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreatePost}>
+              <div className="form-group">
+                <label>Category</label>
+                <div className="category-select">
+                  <button
+                    type="button"
+                    className={`category-option ${newPost.category === "general" ? "selected" : ""}`}
+                    onClick={() =>
+                      setNewPost({ ...newPost, category: "general" })
+                    }
+                  >
+                    <FiMessageSquare size={14} /> General
+                  </button>
+                  <button
+                    type="button"
+                    className={`category-option ${newPost.category === "question" ? "selected" : ""}`}
+                    onClick={() =>
+                      setNewPost({ ...newPost, category: "question" })
+                    }
+                  >
+                    <FiHelpCircle size={14} /> Question
+                  </button>
+                  <button
+                    type="button"
+                    className={`category-option ${newPost.category === "announcement" ? "selected" : ""}`}
+                    onClick={() =>
+                      setNewPost({ ...newPost, category: "announcement" })
+                    }
+                  >
+                    <FiBell size={14} /> Announcement
+                  </button>
+                  <button
+                    type="button"
+                    className={`category-option ${newPost.category === "resource" ? "selected" : ""}`}
+                    onClick={() =>
+                      setNewPost({ ...newPost, category: "resource" })
+                    }
+                  >
+                    <FiBookOpen size={14} /> Resource
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Content</label>
+                <textarea
+                  value={newPost.content}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, content: e.target.value })
+                  }
+                  rows={6}
+                  placeholder="Write your post here..."
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Attachments (Images, Audio, Video, PDF, Docs)</label>
+                <div className="file-upload-zone">
+                  <label htmlFor="modal-file-upload" className="file-upload-label">
+                    <FiPlus size={20} />
+                    <span>Choose Files</span>
+                  </label>
+                  <input
+                    id="modal-file-upload"
+                    type="file"
+                    multiple
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        setSelectedFiles([...selectedFiles, ...Array.from(e.target.files)]);
+                      }
+                    }}
+                    style={{ display: "none" }}
+                  />
+                </div>
+                
+                {selectedFiles.length > 0 && (
+                  <div className="selected-files-list">
+                    {selectedFiles.map((file, idx) => (
+                      <div key={idx} className="selected-file-item">
+                        <span className="file-name">{file.name}</span>
+                        <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        <button
+                          type="button"
+                          className="remove-file-btn"
+                          onClick={() => {
+                            setSelectedFiles(selectedFiles.filter((_, i) => i !== idx));
+                          }}
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={submitting}
+                >
+                  {submitting ? "Posting..." : "📢 Post"}
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowCreateModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const getFileUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return `http://${window.location.hostname}:5000${url}`;
+  }
+  return `${window.location.origin}${url}`;
+};
+
+const renderAttachments = (attachments) => {
+  if (!attachments || attachments.length === 0) return null;
+
+  return (
+    <div className="post-attachments-container">
+      {attachments.map((file, idx) => {
+        const isImage = file.fileType?.startsWith("image/") || /\.(jpg|jpeg|png|gif)$/i.test(file.fileName);
+        const isVideo = file.fileType?.startsWith("video/") || /\.(mp4|webm|ogg)$/i.test(file.fileName);
+        const isAudio = file.fileType?.startsWith("audio/") || /\.(mp3|wav|ogg)$/i.test(file.fileName);
+        const absoluteUrl = getFileUrl(file.fileUrl);
+
+        if (isImage) {
+          return (
+            <div key={idx} className="attachment-preview-wrapper image-preview">
+              <img src={absoluteUrl} alt={file.fileName} className="attachment-image" />
+              <div className="attachment-file-info">
+                <span>🖼️ {file.fileName}</span>
+                <a href={absoluteUrl} download={file.fileName} className="btn-download-link" target="_blank" rel="noopener noreferrer">Download</a>
+              </div>
+            </div>
+          );
+        }
+
+        if (isVideo) {
+          return (
+            <div key={idx} className="attachment-preview-wrapper video-preview">
+              <video src={absoluteUrl} controls className="attachment-video" />
+              <div className="attachment-file-info">
+                <span>🎥 {file.fileName}</span>
+                <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
+              </div>
+            </div>
+          );
+        }
+
+        if (isAudio) {
+          return (
+            <div key={idx} className="attachment-preview-wrapper audio-preview">
+              <audio src={absoluteUrl} controls className="attachment-audio" />
+              <div className="attachment-file-info">
+                <span>🎵 {file.fileName}</span>
+                <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div key={idx} className="attachment-file-card">
+            <div className="file-icon">📁</div>
+            <div className="file-details">
+              <span className="file-name">{file.fileName}</span>
+              <span className="file-type">{file.fileType || "Document"}</span>
+            </div>
+            <a
+              href={absoluteUrl}
+              download={file.fileName}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-download-link"
+            >
+              ⬇️ Download
+            </a>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const renderLectureAttachment = (lecture) => {
+  if (!lecture) return null;
+  const file = {
+    fileName: lecture.originalName || lecture.title,
+    fileUrl: lecture.fileURL,
+    fileType: lecture.fileType
+  };
+  return renderAttachments([file]);
+};
+
+function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPostUpdated }) {
+  const isOnline = post.author ? onlineUsers?.includes(post.author._id || post.author.id) : false;
+  const authorName = post.author?.name || "Deleted User";
+  const authorRole = post.author?.role || "";
+  const authorPic = post.author?.profilePicture || null;
+
+  const [isLiked, setIsLiked] = useState(post.likes?.includes(user?.id || user?._id));
+  const [isDisliked, setIsDisliked] = useState(post.dislikes?.includes(user?.id || user?._id));
+  const [likeCount, setLikeCount] = useState(post.likes?.length || 0);
+  const [dislikeCount, setDislikeCount] = useState(post.dislikes?.length || 0);
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [localCommentCount, setLocalCommentCount] = useState(post.commentCount || 0);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showActionsDropdown, setShowActionsDropdown] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  useEffect(() => {
+    if (!showActionsDropdown) return;
+    const closeMenu = () => setShowActionsDropdown(false);
+    window.addEventListener("click", closeMenu);
+    return () => window.removeEventListener("click", closeMenu);
+  }, [showActionsDropdown]);
+
+  const handleUpdatePost = async (postId, formData) => {
+    try {
+      const res = await communityApi.updatePost(postId, formData);
+      toast.success("Post updated successfully!");
+      if (onPostUpdated) onPostUpdated(res.data.post);
+    } catch (error) {
+      toast.error("Failed to update post");
+    }
+  };
+
+  useEffect(() => {
+    setIsLiked(post.likes?.includes(user?.id || user?._id));
+    setIsDisliked(post.dislikes?.includes(user?.id || user?._id));
+    setLikeCount(post.likes?.length || 0);
+    setDislikeCount(post.dislikes?.length || 0);
+    setLocalCommentCount(post.commentCount || 0);
+  }, [post, user]);
+
+  const handleLike = async (e) => {
+    e.stopPropagation();
+    try {
+      const res = await communityApi.likeCoursePost(courseId, post._id);
+      setLikeCount(res.data.likes);
+      setIsLiked(res.data.hasLiked);
+      if (res.data.dislikes !== undefined) {
+        setDislikeCount(res.data.dislikes);
+        setIsDisliked(res.data.hasDisliked);
+      }
+    } catch (err) {
+      toast.error("Failed to like post");
+    }
+  };
+
+  const handleDislike = async (e) => {
+    e.stopPropagation();
+    try {
+      const res = await communityApi.dislikeCoursePost(courseId, post._id);
+      setDislikeCount(res.data.dislikes);
+      setIsDisliked(res.data.hasDisliked);
+      if (res.data.likes !== undefined) {
+        setLikeCount(res.data.likes);
+        setIsLiked(res.data.hasLiked);
+      }
+    } catch (err) {
+      toast.error("Failed to dislike post");
+    }
+  };
+
+  const toggleComments = async () => {
+    if (!showComments) {
+      setLoadingComments(true);
+      try {
+        const res = await communityApi.getCoursePost(courseId, post._id);
+        setComments(res.data.comments || []);
+      } catch (err) {
+        toast.error("Failed to load comments");
+      } finally {
+        setLoadingComments(false);
+      }
+    }
+    setShowComments(!showComments);
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    try {
+      const res = await communityApi.addCourseComment(courseId, post._id, { content: commentText });
+      const newCommentObj = {
+        ...res.data.comment,
+        author: {
+          _id: user.id || user._id,
+          name: user.name,
+          role: user.role
+        }
+      };
+      setComments([...comments, newCommentObj]);
+      setCommentText("");
+      setLocalCommentCount(prev => prev + 1);
+      toast.success("Comment added!");
+    } catch (err) {
+      toast.error("Failed to add comment");
+    }
+  };
+
+  const getCategoryClass = (category) => {
+    switch (category) {
+      case "question":
+        return "category-question";
+      case "announcement":
+        return "category-announcement";
+      case "resource":
+        return "category-resource";
+      default:
+        return "category-general";
+    }
+  };
+
+  const getCategoryIcon = (category) => {
+    switch (category) {
+      case "question":
+        return <FiHelpCircle size={14} />;
+      case "announcement":
+        return <FiBell size={14} />;
+      case "resource":
+        return <FiBookOpen size={14} />;
+      default:
+        return <FiMessageSquare size={14} />;
+    }
+  };
+
+  const isOwner = post.author?._id === (user?.id || user?._id) || post.author === (user?.id || user?._id);
+  const canDelete = isOwner || user?.role === "admin" || (user?.role === "teacher" && post.author?.role === "student");
+
+  const shareUrl = `${window.location.origin}/community/courses/${courseId}/posts/${post._id}`;
+
+  return (
+    <div className="post-card" style={{ cursor: "default" }}>
+      <div className="post-header">
+        <div className="post-author">
+          <div className="author-avatar" style={{ position: "relative" }}>
+            {authorPic ? (
+              <img 
+                src={authorPic} 
+                alt="Avatar" 
+                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
+              />
+            ) : (
+              authorName.charAt(0).toUpperCase()
+            )}
+            {isOnline && (
+              <span 
+                style={{
+                  position: "absolute",
+                  bottom: -1,
+                  right: -1,
+                  width: 11,
+                  height: 11,
+                  borderRadius: "50%",
+                  backgroundColor: "#10b981",
+                  border: "2px solid var(--border-light, #ffffff)",
+                  zIndex: 2
+                }}
+                title="Online"
+              />
+            )}
+          </div>
+          <div className="author-info">
+            <strong>{authorName}</strong>
+            {authorRole && <span className="author-badge">{authorRole}</span>}
+          </div>
+        </div>
+        <div className="post-header-right">
+          <div className={`post-category ${getCategoryClass(post.category)}`}>
+            {getCategoryIcon(post.category)} {post.category}
+          </div>
+
+          {(isOwner || canDelete) && (
+            <div className="post-actions-dropdown-wrapper">
+              <button
+                type="button"
+                className="btn-post-actions-trigger"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowActionsDropdown(!showActionsDropdown);
+                }}
+              >
+                <FiMoreVertical size={16} />
+              </button>
+              
+              {showActionsDropdown && (
+                <div className="post-actions-dropdown-menu">
+                  {isOwner && (
+                    <button
+                      type="button"
+                      className="dropdown-item edit-item"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowEditModal(true);
+                        setShowActionsDropdown(false);
+                      }}
+                    >
+                      <FiEdit3 size={14} /> Edit Post
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      type="button"
+                      className="dropdown-item delete-item"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        setShowActionsDropdown(false);
+                        if (window.confirm("Are you sure you want to delete this post? This will also delete all comments on it.")) {
+                          try {
+                            await communityApi.deletePost(post._id);
+                            toast.success("Post deleted successfully");
+                            if (onPostDeleted) onPostDeleted(post._id);
+                          } catch (err) {
+                            toast.error("Failed to delete post");
+                          }
+                        }
+                      }}
+                    >
+                      <FiTrash2 size={14} /> Delete Post
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {post.title && post.title !== "Untitled" ? <h3 className="post-title">{post.title}</h3> : null}
+      {post.content && (
+        <p className="post-content">
+          {renderContentWithLinks(post.sharedPostId ? post.content : (post.content.length > 180 ? `${post.content.substring(0, 180)}...` : post.content))}
+        </p>
+      )}
+
+      {renderAttachments(post.attachments)}
+      {renderLectureAttachment(post.lecture)}
+
+      {post.sharedPostId && (
+        <div className="shared-post-nested-card">
+          <div className="shared-post-header">
+            <div className="shared-post-author">
+              <div className="shared-author-avatar" style={{ position: "relative" }}>
+                {post.sharedPostId.author?.profilePicture ? (
+                  <img 
+                    src={post.sharedPostId.author.profilePicture} 
+                    alt="Avatar" 
+                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
+                  />
+                ) : (
+                  post.sharedPostId.author?.name?.charAt(0).toUpperCase()
+                )}
+                {onlineUsers?.includes(post.sharedPostId.author?._id || post.sharedPostId.author?.id) && (
+                  <span 
+                    style={{
+                      position: "absolute",
+                      bottom: -1,
+                      right: -1,
+                      width: 9,
+                      height: 9,
+                      borderRadius: "50%",
+                      backgroundColor: "#10b981",
+                      border: "1.5px solid var(--border-light, #ffffff)",
+                      zIndex: 2
+                    }}
+                    title="Online"
+                  />
+                )}
+              </div>
+              <div className="shared-author-info">
+                <strong>{post.sharedPostId.author?.name}</strong>
+                <span className="shared-author-badge">{post.sharedPostId.author?.role}</span>
+              </div>
+            </div>
+            <span className="shared-post-date">
+              {new Date(post.sharedPostId.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+          {post.sharedPostId.title && post.sharedPostId.title !== "Untitled" ? <h4 className="shared-post-title">{post.sharedPostId.title}</h4> : null}
+          <p className="shared-post-content">
+            {renderContentWithLinks(post.sharedPostId.content)}
+          </p>
+          {renderAttachments(post.sharedPostId.attachments)}
+          {renderLectureAttachment(post.sharedPostId.lecture)}
+        </div>
+      )}
+
+      <div className="post-stats">
+        <div className="stat-item">
+          <FiThumbsUp size={14} />
+          <span>{likeCount} likes</span>
+        </div>
+        <div className="stat-item">
+          <FiThumbsDown size={14} />
+          <span>{dislikeCount} dislikes</span>
+        </div>
+        <div className="stat-item">
+          <FiMessageCircle size={14} />
+          <span>{localCommentCount} comments</span>
+        </div>
+        <div className="stat-item">
+          <FiClock size={14} />
+          <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+        </div>
+      </div>
+
+      <div className="post-actions">
+        <button
+          className={`action-btn like-btn ${isLiked ? "liked" : ""}`}
+          onClick={handleLike}
+        >
+          <FiThumbsUp size={16} />
+          <span>{isLiked ? "Liked" : "Like"}</span>
+        </button>
+        <button
+          className={`action-btn dislike-btn ${isDisliked ? "disliked" : ""}`}
+          onClick={handleDislike}
+        >
+          <FiThumbsDown size={16} />
+          <span>{isDisliked ? "Disliked" : "Dislike"}</span>
+        </button>
+        <button className="action-btn comment-btn" onClick={toggleComments}>
+          <FiMessageCircle size={16} />
+          <span>Comment</span>
+        </button>
+        <button
+          className="action-btn share-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowShareModal(true);
+          }}
+        >
+          <FiShare2 size={16} />
+          <span>Share</span>
+        </button>
+      </div>
+
+      {showComments && (
+        <div className="inline-comments-section">
+          <hr className="comments-divider" />
+          <form className="inline-comment-form" onSubmit={handleAddComment}>
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Write a comment..."
+              required
+              className="inline-comment-input"
+            />
+            <button type="submit" className="inline-comment-submit-btn">
+              <FiSend size={14} />
+            </button>
+          </form>
+
+          {loadingComments ? (
+            <div className="inline-comments-loading">
+              <div className="spinner-small"></div>
+            </div>
+          ) : comments.length === 0 ? (
+            <p className="no-comments-placeholder">No comments yet. Be the first to comment!</p>
+          ) : (
+            <div className="inline-comments-list">
+              {comments.map((comment) => (
+                <div key={comment._id} className="inline-comment-item">
+                  <div className="comment-avatar">
+                    {comment.author?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="comment-content-bubble">
+                    <div className="comment-author-name">
+                      {comment.author?.name}
+                      <span className="comment-author-role">{comment.author?.role}</span>
+                    </div>
+                    <p className="comment-text">{comment.content}</p>
+                    <span className="comment-time">
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {showEditModal && (
+        <EditPostModal
+          post={post}
+          onClose={() => setShowEditModal(false)}
+          onUpdatePost={handleUpdatePost}
+        />
+      )}
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        shareUrl={shareUrl}
+        postTitle={post.title}
+        postId={post._id}
+        courseId={courseId}
+        fileUrl={
+          post.lecture?.fileURL || 
+          post.attachments?.[0]?.fileUrl || 
+          post.sharedPostId?.lecture?.fileURL || 
+          post.sharedPostId?.attachments?.[0]?.fileUrl || 
+          null
+        }
+      />
+    </div>
+  );
+}
+
+function EditPostModal({ post, onClose, onUpdatePost }) {
+  const [content, setContent] = useState(post.content || "");
+  const [category, setCategory] = useState(post.category || "general");
+  const [existingAttachments, setExistingAttachments] = useState(post.attachments || []);
+  const [removedAttachments, setRemovedAttachments] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!content) {
+      toast.error("Please write something");
+      return;
+    }
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("content", content);
+      formData.append("category", category);
+      
+      removedAttachments.forEach((url) => {
+        formData.append("removedAttachments", url);
+      });
+
+      selectedFiles.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      await onUpdatePost(post._id, formData);
+      onClose();
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Edit Post</h2>
+          <button className="close-btn" onClick={onClose}>
+            <FiX size={20} />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Category</label>
+            <div className="category-select">
+              <button
+                type="button"
+                className={`category-option ${category === "general" ? "selected" : ""}`}
+                onClick={() => setCategory("general")}
+              >
+                <FiMessageSquare size={14} /> General
+              </button>
+              <button
+                type="button"
+                className={`category-option ${category === "question" ? "selected" : ""}`}
+                onClick={() => setCategory("question")}
+              >
+                <FiHelpCircle size={14} /> Question
+              </button>
+              <button
+                type="button"
+                className={`category-option ${category === "announcement" ? "selected" : ""}`}
+                onClick={() => setCategory("announcement")}
+              >
+                <FiBell size={14} /> Announcement
+              </button>
+              <button
+                type="button"
+                className={`category-option ${category === "resource" ? "selected" : ""}`}
+                onClick={() => setCategory("resource")}
+              >
+                <FiBookOpen size={14} /> Resource
+              </button>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Content</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={6}
+              required
+            />
+          </div>
+
+          {existingAttachments.length > 0 && (
+            <div className="form-group">
+              <label>Current Attachments</label>
+              <div className="existing-attachments-list">
+                {existingAttachments.map((file, idx) => {
+                  const isRemoved = removedAttachments.includes(file.fileUrl);
+                  return (
+                    <div key={idx} className={`existing-attachment-item ${isRemoved ? "removed" : ""}`}>
+                      <span className="file-name" style={{ textDecoration: isRemoved ? "line-through" : "none" }}>
+                        {file.fileName}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn-remove-existing"
+                        onClick={() => {
+                          if (isRemoved) {
+                            setRemovedAttachments(removedAttachments.filter((url) => url !== file.fileUrl));
+                          } else {
+                            setRemovedAttachments([...removedAttachments, file.fileUrl]);
+                          }
+                        }}
+                      >
+                        {isRemoved ? "Undo Delete" : "🗑️ Delete"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>Attach New Files</label>
+            <div className="file-upload-zone">
+              <label htmlFor="edit-modal-file-upload" className="file-upload-label">
+                <FiPlus size={20} />
+                <span>Choose Files</span>
+              </label>
+              <input
+                id="edit-modal-file-upload"
+                type="file"
+                multiple
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setSelectedFiles([...selectedFiles, ...Array.from(e.target.files)]);
+                  }
+                }}
+                style={{ display: "none" }}
+              />
+            </div>
+            
+            {selectedFiles.length > 0 && (
+              <div className="selected-files-list">
+                {selectedFiles.map((file, idx) => (
+                  <div key={idx} className="selected-file-item">
+                    <span className="file-name">{file.name}</span>
+                    <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <button
+                      type="button"
+                      className="remove-file-btn"
+                      onClick={() => {
+                        setSelectedFiles(selectedFiles.filter((_, i) => i !== idx));
+                      }}
+                    >
+                      <FiX size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="modal-actions">
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? "Saving..." : "💾 Save Changes"}
+            </button>
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

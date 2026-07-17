@@ -1,0 +1,973 @@
+:root {
+  /* Primary Colors - Pastel Blue Theme */
+  --pastel-blue-light: #e8f4fd;
+  --pastel-blue-soft: #d6eef8;
+  --pastel-blue-primary: #7ec8e3;
+  --pastel-blue-dark: #5baed4;
+  --pastel-blue-deep: #3b8db3;
+  --pastel-blue-night: #2a6f8f;
+
+  /* Text Colors */
+  --text-dark: #2c4b66;
+  --text-gray: #6b89a0;
+  --text-white: #ffffff;
+
+  /* Background Colors */
+  --bg-light: #e8f4fd;
+  --bg-soft: #d6eef8;
+  --bg-white: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.9);
+
+  /* Border Colors */
+  --border-light: #e2eef6;
+
+  /* Shadow Colors */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(59, 141, 179, 0.08);
+  --shadow-lg: 0 8px 24px rgba(59, 141, 179, 0.12);
+
+  /* Status Colors */
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #7ec8e3, #3b8db3);
+  --gradient-light: linear-gradient(135deg, #e8f4fd, #d6eef8);
+  --gradient-card: linear-gradient(135deg, #ffffff, #e8f4fd);
+
+  /* Custom box styling for Settings details cards */
+  --gradient-card-box: linear-gradient(135deg, #f0f7fa, #ffffff);
+  --border-card-box: var(--pastel-blue-soft);
+  --bg-info-card: var(--bg-white);
+  --border-info-card: var(--border-light);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ==================== DARK THEME OVERRIDES ==================== */
+body.dark-theme {
+  /* Primary Colors - Dark Theme Adjustments */
+  --pastel-blue-light: #090e1a; /* Slate-like space dark background */
+  --pastel-blue-soft: #111a2e;  /* Lighter space dark blue */
+  --pastel-blue-primary: #00d2ff; /* Neon bright cyan */
+  --pastel-blue-dark: #0072ff;   /* Neon space blue */
+  --pastel-blue-deep: #00d2ff;   /* Glow highlight */
+  --pastel-blue-night: #e2eef6;  /* High contrast light text blue */
+
+  /* Text Colors */
+  --text-dark: #f8fafc; /* Slate 50 */
+  --text-gray: #94a3b8; /* Slate 400 */
+  --text-white: #090e1a;
+
+  /* Background Colors */
+  --bg-light: #060913;  /* Ultimate deep space dark */
+  --bg-soft: #0a0f1d;
+  --bg-white: rgba(14, 22, 40, 0.7);  /* Glassmorphism card default */
+  --bg-card: rgba(14, 22, 40, 0.85);
+
+  /* Border Colors */
+  --border-light: rgba(56, 189, 248, 0.15); /* Sleek neon cyan border */
+
+  /* Shadow Colors */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 48px 0 rgba(0, 0, 0, 0.55);
+
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #0072ff, #00d2ff);
+  --gradient-light: linear-gradient(135deg, #0a0f1d, #12192c);
+  --gradient-card: linear-gradient(135deg, rgba(14, 22, 40, 0.85), rgba(6, 9, 19, 0.85));
+
+  /* Custom box styling for Settings details cards */
+  --gradient-card-box: linear-gradient(135deg, rgba(10, 15, 30, 0.8), rgba(20, 30, 55, 0.8));
+  --border-card-box: rgba(56, 189, 248, 0.15);
+  --bg-info-card: rgba(10, 15, 30, 0.85);
+  --border-info-card: rgba(56, 189, 248, 0.15);
+}
+
+body.dark-theme {
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(18, 42, 87, 0.8) 0%, transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(18, 42, 87, 0.8) 0%, transparent 45%),
+    radial-gradient(circle at 50% 100%, #122a57 0%, #060a15 60%, #020306 100%) !important;
+  background-attachment: fixed !important;
+}
+
+body.dark-theme .dashboard-container,
+body.dark-theme .auth-container,
+body.dark-theme .app-container {
+  background: transparent !important;
+}
+
+/* Dark Mode Overrides for Hardcoded Backgrounds */
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea {
+  background-color: rgba(8, 12, 24, 0.6) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 8px !important;
+}
+
+body.dark-theme select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme input:focus,
+body.dark-theme select:focus,
+body.dark-theme textarea:focus {
+  border-color: #00d2ff !important;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.45) !important;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: #5b708b !important;
+}
+
+body.dark-theme .post-card,
+body.dark-theme .comment-item,
+body.dark-theme .modal-container,
+body.dark-theme .create-post-container,
+body.dark-theme .dashboard-card,
+body.dark-theme .course-card,
+body.dark-theme .materials-list,
+body.dark-theme .material-card,
+body.dark-theme .assignment-card,
+body.dark-theme .exam-card,
+body.dark-theme .assessment-table,
+body.dark-theme .attendance-table,
+body.dark-theme .messages-wrapper,
+body.dark-theme .chat-area,
+body.dark-theme .user-item,
+body.dark-theme .new-message-form,
+body.dark-theme .card,
+body.dark-theme .stat-card {
+  background: rgba(12, 19, 36, 0.6) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+}
+
+body.dark-theme .user-item.active {
+  background: linear-gradient(135deg, rgba(0, 114, 255, 0.28), rgba(0, 210, 255, 0.28)) !important;
+  border-left: 3px solid #00d2ff !important;
+  box-shadow: inset 0 0 15px rgba(0, 210, 255, 0.2), 0 0 12px rgba(0, 210, 255, 0.15) !important;
+}
+
+body.dark-theme .user-item:hover:not(.active) {
+  background-color: rgba(56, 189, 248, 0.1) !important;
+}
+
+body.dark-theme .modal-header,
+body.dark-theme .modal-actions {
+  border-color: rgba(56, 189, 248, 0.2) !important;
+}
+
+@media (min-width: 769px) {
+  body.dark-theme .sidebar,
+  body.dark-theme .community-sidebar,
+  body.dark-theme .dashboard-sidebar {
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 24px !important;
+    margin: 16px 0 16px 16px !important;
+    height: calc(100vh - 32px) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35) !important;
+  }
+}
+
+body.dark-theme .sidebar,
+body.dark-theme .community-sidebar,
+body.dark-theme .dashboard-sidebar {
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-theme .nav-item {
+  color: #94a3b8 !important;
+  transition: all 0.3s ease !important;
+}
+
+body.dark-theme .nav-item:hover,
+body.dark-theme .nav-item.active {
+  background: linear-gradient(135deg, rgba(0, 114, 255, 0.18), rgba(0, 210, 255, 0.18)) !important;
+  color: #00d2ff !important;
+  text-shadow: 0 0 8px rgba(0, 210, 255, 0.5) !important;
+  box-shadow: inset 0 0 12px rgba(0, 210, 255, 0.15), 0 0 10px rgba(0, 210, 255, 0.1) !important;
+}
+
+body.dark-theme th {
+  background-color: rgba(18, 28, 50, 0.8) !important;
+  color: #f8fafc !important;
+  border-bottom: 2px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+body.dark-theme td {
+  border-bottom-color: rgba(56, 189, 248, 0.1) !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme tr:hover {
+  background-color: rgba(56, 189, 248, 0.04) !important;
+}
+
+/* ==================== Custom Dark Theme Styling Additions ==================== */
+
+/* Quoted/shared post styling inside Community Hub and Course Community */
+body.dark-theme .shared-post-nested-card {
+  background-color: rgba(6, 9, 19, 0.7) !important;
+  border: 1px solid rgba(56, 189, 248, 0.15) !important;
+  color: #f8fafc !important;
+}
+body.dark-theme .shared-post-title,
+body.dark-theme .shared-post-content,
+body.dark-theme .shared-author-info h5 {
+  color: #f8fafc !important;
+}
+
+/* Category Filter Chips */
+body.dark-theme .filter-chip {
+  background-color: rgba(16, 22, 37, 0.7) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.15) !important;
+}
+body.dark-theme .filter-chip:hover {
+  background-color: rgba(56, 189, 248, 0.1) !important;
+  color: #f8fafc !important;
+}
+body.dark-theme .filter-chip.active {
+  background: linear-gradient(135deg, #0072ff, #00d2ff) !important;
+  color: #ffffff !important;
+  border-color: #00d2ff !important;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.4) !important;
+}
+
+/* Messages sidebar white header background fix */
+body.dark-theme .users-sidebar {
+  background-color: rgba(14, 22, 40, 0.75) !important;
+  border-right: 1px solid rgba(56, 189, 248, 0.15) !important;
+}
+body.dark-theme .users-header {
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15) !important;
+  color: #f8fafc !important;
+}
+body.dark-theme .search-users {
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15) !important;
+  background-color: rgba(10, 15, 28, 0.6) !important;
+}
+body.dark-theme .search-users input {
+  background-color: transparent !important;
+  color: #f8fafc !important;
+}
+
+/* Global Notification Bell Drawer styling */
+body.dark-theme .notification-drawer {
+  background-color: #1e293b !important;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.45) !important;
+}
+body.dark-theme .notification-drawer-header {
+  border-bottom: 1px solid #334155 !important;
+}
+body.dark-theme .notification-drawer-header h3 {
+  color: #f8fafc !important;
+}
+body.dark-theme .mark-all-read-btn {
+  color: #38bdf8 !important;
+}
+body.dark-theme .mark-all-read-btn:hover {
+  background-color: #334155 !important;
+}
+body.dark-theme .close-drawer-btn {
+  color: #94a3b8 !important;
+}
+body.dark-theme .close-drawer-btn:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+body.dark-theme .global-notification-bell-btn {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+}
+body.dark-theme .global-notification-bell-btn:hover {
+  background-color: #334155 !important;
+  color: #38bdf8 !important;
+}
+body.dark-theme .notification-item {
+  border-bottom: 1px solid #334155 !important;
+}
+body.dark-theme .notification-item:hover {
+  background-color: #334155 !important;
+}
+body.dark-theme .notification-item.unread {
+  background-color: #0f172a !important;
+}
+body.dark-theme .notification-title {
+  color: #f8fafc !important;
+}
+body.dark-theme .notification-message {
+  color: #94a3b8 !important;
+}
+
+/* Secondary Button Dark Theme Styling */
+body.dark-theme .btn-secondary {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+body.dark-theme .btn-secondary:hover {
+  background-color: #475569 !important;
+}
+
+/* Table Footer (tfoot) Dark Theme styling */
+body.dark-theme tfoot tr {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+}
+body.dark-theme tfoot td {
+  color: #f8fafc !important;
+  border-top: 1px solid #334155 !important;
+}
+
+/* Theory status badge contrast fix in Attendance list view */
+body.dark-theme td span[style*="background: #F3F4F6"],
+body.dark-theme td span[style*="background:#F3F4F6"],
+body.dark-theme td span[style*="background: rgb(243, 244, 246)"],
+body.dark-theme span[style*="background: #F3F4F6"],
+body.dark-theme span[style*="background:#F3F4F6"] {
+  background-color: #334155 !important;
+  color: #38bdf8 !important;
+  border: 1px solid #475569 !important;
+}
+
+/* Grid Matrix cells styling in Attendance calendar view */
+body.dark-theme td[style*="background: #dcfce7"],
+body.dark-theme td[style*="background:#dcfce7"],
+body.dark-theme td[style*="background: rgb(220, 252, 231)"] {
+  background: #064e3b !important;
+  color: #10b981 !important;
+  border-color: #334155 !important;
+}
+body.dark-theme td[style*="background: #fee2e2"],
+body.dark-theme td[style*="background:#fee2e2"],
+body.dark-theme td[style*="background: rgb(254, 226, 226)"] {
+  background: #7f1d1d !important;
+  color: #f87171 !important;
+  border-color: #334155 !important;
+}
+body.dark-theme td[style*="background: #f9f9f9"],
+body.dark-theme td[style*="background:#f9f9f9"],
+body.dark-theme td[style*="background: rgb(249, 249, 249)"] {
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+/* Grid indicators row background in Attendance calendar view */
+body.dark-theme div[style*="background: #f8f9fa"],
+body.dark-theme div[style*="background:#f8f9fa"],
+body.dark-theme div[style*="background: rgb(248, 249, 250)"] {
+  background: #111827 !important;
+  border: 1px solid #334155 !important;
+}
+body.dark-theme div[style*="background: #f9f9f9"],
+body.dark-theme div[style*="background:#f9f9f9"] {
+  background: #1e293b !important;
+}
+
+/* Premium Course Material Category Cards styling */
+.lecture-card {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  z-index: 1;
+}
+.lecture-card:hover {
+  transform: translateY(-4px) !important;
+  background: var(--bg-white) !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.dark-theme .lecture-card:hover {
+  background: #1e293b !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Icon colors and scaling on hover */
+.lecture-card .lecture-card-icon svg {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+.lecture-card:hover .lecture-card-icon svg {
+  transform: scale(1.18);
+}
+
+/* Specific glows for categories */
+/* PDF */
+.lecture-card.card-pdf {
+  border-left: 3px solid #ef4444 !important;
+}
+.lecture-card.card-pdf .lecture-card-icon svg {
+  color: #ef4444 !important;
+}
+.lecture-card.card-pdf:hover {
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+}
+
+/* PPT / PPTX */
+.lecture-card.card-ppt,
+.lecture-card.card-pptx {
+  border-left: 3px solid #f59e0b !important;
+}
+.lecture-card.card-ppt .lecture-card-icon svg,
+.lecture-card.card-pptx .lecture-card-icon svg {
+  color: #f59e0b !important;
+}
+.lecture-card.card-ppt:hover,
+.lecture-card.card-pptx:hover {
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15) !important;
+  border-color: #f59e0b !important;
+}
+
+/* Videos */
+.lecture-card.card-video {
+  border-left: 3px solid #8b5cf6 !important;
+}
+.lecture-card.card-video .lecture-card-icon svg {
+  color: #8b5cf6 !important;
+}
+.lecture-card.card-video:hover {
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15) !important;
+  border-color: #8b5cf6 !important;
+}
+
+/* DOC / DOCX */
+.lecture-card.card-doc,
+.lecture-card.card-docx {
+  border-left: 3px solid #3b82f6 !important;
+}
+.lecture-card.card-doc .lecture-card-icon svg,
+.lecture-card.card-docx .lecture-card-icon svg {
+  color: #3b82f6 !important;
+}
+.lecture-card.card-doc:hover,
+.lecture-card.card-docx:hover {
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15) !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Other / Audio / Image */
+.lecture-card.card-audio {
+  border-left: 3px solid #06b6d4 !important;
+}
+.lecture-card.card-audio .lecture-card-icon svg {
+  color: #06b6d4 !important;
+}
+.lecture-card.card-audio:hover {
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.15) !important;
+  border-color: #06b6d4 !important;
+}
+
+.lecture-card.card-image {
+  border-left: 3px solid #10b981 !important;
+}
+.lecture-card.card-image .lecture-card-icon svg {
+  color: #10b981 !important;
+}
+.lecture-card.card-image:hover {
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15) !important;
+  border-color: #10b981 !important;
+}
+
+/* Empty State dark theme background fix */
+body.dark-theme .empty-state {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+body.dark-theme .empty-state h3 {
+  color: #f8fafc !important;
+}
+body.dark-theme .empty-state p {
+  color: #94a3b8 !important;
+}
+
+/* Messages sidebar active / hover name styles */
+.user-item strong {
+  font-weight: 700 !important;
+  font-size: 15px !important;
+}
+body.dark-theme .user-item strong {
+  color: #f8fafc !important;
+}
+body.dark-theme .user-item:hover strong {
+  color: #38bdf8 !important;
+}
+body.dark-theme .user-item.active strong {
+  color: #ffffff !important;
+}
+
+/* Exam Overall Feedback card and question breakdown text contrast overrides */
+body.dark-theme div[style*="background: #f0f9ff"],
+body.dark-theme div[style*="background:#f0f9ff"],
+body.dark-theme div[style*="background: rgb(240, 249, 255)"] {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-left-color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-left-width: 4px !important;
+}
+body.dark-theme div[style*="background: #f0f9ff"] strong,
+body.dark-theme div[style*="background:#f0f9ff"] strong,
+body.dark-theme div[style*="background: rgb(240, 249, 255)"] strong {
+  color: #38bdf8 !important;
+}
+body.dark-theme div[style*="background: #f0f9ff"] p,
+body.dark-theme div[style*="background:#f0f9ff"] p,
+body.dark-theme div[style*="background: rgb(240, 249, 255)"] p {
+  color: #f8fafc !important;
+}
+
+body.dark-theme [style*="color: #1e293b"],
+body.dark-theme [style*="color:#1e293b"],
+body.dark-theme [style*="color: #2C4B66"],
+body.dark-theme [style*="color:#2C4B66"],
+body.dark-theme [style*="color: #475569"],
+body.dark-theme [style*="color:#475569"],
+body.dark-theme [style*="color: #334155"],
+body.dark-theme [style*="color:#334155"],
+body.dark-theme [style*="color: #1a365d"],
+body.dark-theme [style*="color:#1a365d"] {
+  color: #f1f5f9 !important;
+}
+
+/* Cheating/Success status banner overrides in dark mode */
+body.dark-theme div[style*="background: rgb(220, 252, 231)"],
+body.dark-theme div[style*="background: #dcfce7"],
+body.dark-theme div[style*="background:#dcfce7"] {
+  background-color: #064e3b !important;
+  border: 1px solid #0f5132 !important;
+}
+body.dark-theme div[style*="background: rgb(220, 252, 231)"] p,
+body.dark-theme div[style*="background: #dcfce7"] p,
+body.dark-theme div[style*="background:#dcfce7"] p {
+  color: #10b981 !important;
+}
+
+body.dark-theme div[style*="background: rgb(254, 226, 226)"],
+body.dark-theme div[style*="background: #fee2e2"],
+body.dark-theme div[style*="background:#fee2e2"] {
+  background-color: #7f1d1d !important;
+  border: 1px solid #842029 !important;
+}
+body.dark-theme div[style*="background: rgb(254, 226, 226)"] p,
+body.dark-theme div[style*="background: #fee2e2"] p,
+body.dark-theme div[style*="background:#fee2e2"] p {
+  color: #f87171 !important;
+}
+
+/* Community Hub main background dark theme fix */
+body.dark-theme .community-container {
+  background: #0f172a !important;
+}
+
+/* Teacher Attendance Grid Table Dark Theme overrides */
+body.dark-theme .attendance-grid-table th,
+body.dark-theme .attendance-grid-table td {
+  border-color: #334155 !important;
+}
+body.dark-theme .attendance-grid-table th[style*="background: #f5f5f5"],
+body.dark-theme .attendance-grid-table th[style*="background:#f5f5f5"],
+body.dark-theme .attendance-grid-table th[style*="background: rgb(245, 245, 245)"],
+body.dark-theme .attendance-grid-table th[style*="background:rgb(245, 245, 245)"],
+body.dark-theme .attendance-grid-table td[style*="background: #fafafa"],
+body.dark-theme .attendance-grid-table td[style*="background:#fafafa"],
+body.dark-theme .attendance-grid-table td[style*="background: rgb(250, 250, 250)"],
+body.dark-theme .attendance-grid-table td[style*="background:rgb(250, 250, 250)"] {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+}
+body.dark-theme .attendance-grid-table td[style*="background: #f0fdf4"],
+body.dark-theme .attendance-grid-table td[style*="background:#f0fdf4"],
+body.dark-theme .attendance-grid-table td[style*="background: rgb(240, 253, 244)"],
+body.dark-theme .attendance-grid-table td[style*="background:rgb(240, 253, 244)"] {
+  background-color: #064e3b !important;
+  color: #10b981 !important;
+}
+body.dark-theme .attendance-grid-table td[style*="background: #E8F4FD"],
+body.dark-theme .attendance-grid-table td[style*="background:#E8F4FD"],
+body.dark-theme .attendance-grid-table th[style*="background: #E8F4FD"],
+body.dark-theme .attendance-grid-table th[style*="background:#E8F4FD"],
+body.dark-theme .attendance-grid-table td[style*="background: rgb(232, 244, 253)"],
+body.dark-theme .attendance-grid-table td[style*="background:rgb(232, 244, 253)"],
+body.dark-theme .attendance-grid-table th[style*="background: rgb(232, 244, 253)"],
+body.dark-theme .attendance-grid-table th[style*="background:rgb(232, 244, 253)"] {
+  background-color: #1e293b !important;
+  color: #38bdf8 !important;
+}
+body.dark-theme .attendance-grid-table td[style*="background: #dcfce7"],
+body.dark-theme .attendance-grid-table td[style*="background:#dcfce7"],
+body.dark-theme .attendance-grid-table th[style*="background: #dcfce7"],
+body.dark-theme .attendance-grid-table th[style*="background:#dcfce7"],
+body.dark-theme .attendance-grid-table td[style*="background: rgb(220, 252, 231)"],
+body.dark-theme .attendance-grid-table td[style*="background:rgb(220, 252, 231)"],
+body.dark-theme .attendance-grid-table th[style*="background: rgb(220, 252, 231)"],
+body.dark-theme .attendance-grid-table th[style*="background:rgb(220, 252, 231)"] {
+  background-color: #064e3b !important;
+  color: #10b981 !important;
+}
+body.dark-theme .attendance-grid-table td[style*="background: #fee2e2"],
+body.dark-theme .attendance-grid-table td[style*="background:#fee2e2"],
+body.dark-theme .attendance-grid-table td[style*="background: rgb(254, 226, 226)"],
+body.dark-theme .attendance-grid-table td[style*="background:rgb(254, 226, 226)"] {
+  background-color: #7f1d1d !important;
+  color: #f87171 !important;
+}
+body.dark-theme .attendance-grid-table td[style*="background: #f9f9f9"],
+body.dark-theme .attendance-grid-table td[style*="background:#f9f9f9"],
+body.dark-theme .attendance-grid-table td[style*="background: rgb(249, 249, 249)"],
+body.dark-theme .attendance-grid-table td[style*="background:rgb(249, 249, 249)"] {
+  background-color: #1e293b !important;
+}
+
+/* File Upload Zone hover states and dark theme overrides */
+.upload-dropzone:hover {
+  background: rgba(59, 141, 179, 0.12) !important;
+  border-color: var(--pastel-blue-primary) !important;
+  transform: translateY(-2px);
+}
+body.dark-theme .upload-dropzone {
+  background: rgba(56, 189, 248, 0.05) !important;
+  border-color: #334155 !important;
+}
+body.dark-theme .upload-dropzone:hover {
+  background: rgba(56, 189, 248, 0.1) !important;
+  border-color: var(--pastel-blue-primary) !important;
+}
+
+/* Base Dashboard Card (Light Theme) */
+.dashboard-card {
+  background: #ffffff;
+  border: 1px solid #e2eef6;
+  box-shadow: 0 4px 12px rgba(44, 75, 102, 0.03);
+}
+
+/* Marksheet course cards dark theme overrides */
+body.dark-theme .assessment-course-card {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+body.dark-theme .assessment-course-card:hover {
+  border-color: var(--pastel-blue-primary) !important;
+  box-shadow: 0 10px 25px rgba(56, 189, 248, 0.15) !important;
+}
+body.dark-theme span[style*="background: #E8F4FD"],
+body.dark-theme span[style*="background:#E8F4FD"],
+body.dark-theme span[style*="background: rgb(232, 244, 253)"] {
+  background-color: #1e293b !important;
+  color: #38bdf8 !important;
+}
+
+/* Restoring semantic green/red text colors for attendance stats in dark mode */
+body.dark-theme .attendance-grid-table td[style*="color: #10B981"],
+body.dark-theme .attendance-grid-table td[style*="color:#10B981"],
+body.dark-theme .attendance-grid-table td[style*="color: rgb(16, 185, 129)"] {
+  color: #10b981 !important;
+}
+body.dark-theme .attendance-grid-table td[style*="color: #EF4444"],
+body.dark-theme .attendance-grid-table td[style*="color:#EF4444"],
+body.dark-theme .attendance-grid-table td[style*="color: rgb(239, 68, 68)"] {
+  color: #f87171 !important;
+}
+
+/* Bold and Highlighted Post Contents (Light Theme) */
+.post-content {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+}
+.post-detail-content {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  font-size: 16.5px !important;
+}
+.shared-post-content {
+  color: #334155 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+/* Bold and Highlighted Post Contents (Dark Theme) */
+body.dark-theme .post-content {
+  color: #f8fafc !important;
+}
+body.dark-theme .post-detail-content {
+  color: #f8fafc !important;
+}
+body.dark-theme .shared-post-content {
+  color: #cbd5e1 !important;
+}
+
+/* Premium Grading Question Cards */
+.grading-question-card {
+  background: #ffffff;
+  border: 1px solid #e2eef6;
+  border-left: 4px solid var(--pastel-blue-deep);
+  border-radius: 8px 12px 12px 8px;
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(44, 75, 102, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.grading-question-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(44, 75, 102, 0.08);
+  border-left-color: var(--pastel-blue-dark);
+}
+.grading-question-header {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+}
+.grading-question-type {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 16px 0;
+}
+.grading-student-answer-box {
+  margin-top: 14px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.grading-student-answer-box strong {
+  font-size: 11px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  display: block;
+  margin-bottom: 8px;
+}
+.grading-student-answer-box p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #0f172a;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.grading-correct-answer-box {
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: rgba(16, 185, 129, 0.06);
+  border-left: 4px solid #10b981;
+  border-radius: 4px 8px 8px 4px;
+}
+.grading-correct-answer-box strong {
+  font-size: 12px;
+  color: #065f46;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  margin-right: 8px;
+}
+.grading-correct-answer-box span {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+/* Dark theme overrides for premium grading cards */
+body.dark-theme .grading-question-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  border-left-color: #38bdf8 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+body.dark-theme .grading-question-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
+  border-left-color: #7dd3fc !important;
+}
+body.dark-theme .grading-question-header {
+  color: #f1f5f9 !important;
+}
+body.dark-theme .grading-question-type {
+  color: #94a3b8 !important;
+}
+body.dark-theme .grading-student-answer-box {
+  background: #111827 !important;
+  border-color: #334155 !important;
+}
+body.dark-theme .grading-student-answer-box strong {
+  color: #94a3b8 !important;
+}
+body.dark-theme .grading-student-answer-box p {
+  color: #f1f5f9 !important;
+}
+body.dark-theme .grading-correct-answer-box {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-left-color: #10b981 !important;
+}
+body.dark-theme .grading-correct-answer-box strong,
+body.dark-theme .grading-correct-answer-box span {
+  color: #34d399 !important;
+}
+
+/* Responsive profile settings grids */
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .profile-info-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* Feedback input group on Teacher Exam page */
+.feedback-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+@media (max-width: 768px) {
+  .feedback-input-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  
+  .feedback-input-group textarea {
+    width: 100% !important;
+  }
+  
+  .feedback-input-group button {
+    width: 100% !important;
+  }
+}
+
+/* Ensure all main headings and titles are bright and readable in dark theme */
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme .top-bar h1 {
+  color: #f8fafc !important;
+}
+
+/* Custom scrollbar styling for sidebars (Light Theme) */
+.sidebar::-webkit-scrollbar,
+.community-sidebar::-webkit-scrollbar,
+.dashboard-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.community-sidebar::-webkit-scrollbar-track,
+.dashboard-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.community-sidebar::-webkit-scrollbar-thumb,
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(59, 141, 179, 0.25);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.community-sidebar::-webkit-scrollbar-thumb:hover,
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 141, 179, 0.45);
+}
+
+.sidebar,
+.community-sidebar,
+.dashboard-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 141, 179, 0.25) transparent;
+}
+
+/* Custom scrollbar styling for sidebars (Dark Theme Overrides) */
+body.dark-theme .sidebar::-webkit-scrollbar-track,
+body.dark-theme .community-sidebar::-webkit-scrollbar-track,
+body.dark-theme .dashboard-sidebar::-webkit-scrollbar-track {
+  background: rgba(14, 22, 40, 0.45) !important;
+}
+
+body.dark-theme .sidebar::-webkit-scrollbar-thumb,
+body.dark-theme .community-sidebar::-webkit-scrollbar-thumb,
+body.dark-theme .dashboard-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(59, 141, 179, 0.35) !important;
+}
+
+body.dark-theme .sidebar::-webkit-scrollbar-thumb:hover,
+body.dark-theme .community-sidebar::-webkit-scrollbar-thumb:hover,
+body.dark-theme .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 210, 255, 0.65) !important;
+}
+
+body.dark-theme .sidebar,
+body.dark-theme .community-sidebar,
+body.dark-theme .dashboard-sidebar {
+  scrollbar-color: rgba(59, 141, 179, 0.35) rgba(14, 22, 40, 0.45) !important;
+}
+
+/* Brighter Sidebar Texts in Dark Theme */
+body.dark-theme .sidebar .nav-item,
+body.dark-theme .community-sidebar .nav-item,
+body.dark-theme .dashboard-sidebar .nav-item {
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme .sidebar .user-info h3,
+body.dark-theme .community-sidebar .user-info h3,
+body.dark-theme .dashboard-sidebar .user-info h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .sidebar .user-info p,
+body.dark-theme .community-sidebar .user-info p,
+body.dark-theme .dashboard-sidebar .user-info p {
+  color: #93c5fd !important;
+}
+
+body.dark-theme .sidebar .user-info p.user-email,
+body.dark-theme .community-sidebar .user-info p.user-email,
+body.dark-theme .dashboard-sidebar .user-info p.user-email {
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme .sidebar-header h2 {
+  color: #00d2ff !important;
+}

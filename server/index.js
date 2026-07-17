@@ -65,6 +65,9 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // Static files - uploads folder (with inline Content-Disposition for browser preview)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
   setHeaders: (res, filePath) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     const ext = path.extname(filePath).toLowerCase();
     const inlineTypes = [".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4", ".webm", ".ogg", ".mp3", ".wav"];
     if (inlineTypes.includes(ext)) {

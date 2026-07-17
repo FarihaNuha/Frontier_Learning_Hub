@@ -245,8 +245,8 @@
     "semantic_hash": "59deec97eac88e636b0c958badab423c"
   },
   "server/index.js": {
-    "mtime": 1784310898.2869592,
-    "ast_hash": "9639afc4f81713e31c62b80adba2921a",
+    "mtime": 1784315985.8819668,
+    "ast_hash": "d813993cd499e39c4884911245e6a73d",
     "semantic_hash": ""
   },
   "server/middleware/authMiddleware.js": {

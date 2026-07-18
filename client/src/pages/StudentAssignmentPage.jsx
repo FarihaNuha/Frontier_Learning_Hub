@@ -181,11 +181,14 @@ export default function StudentAssignmentPage({
         (a) => a.courseId === finalCourseId || a.course === finalCourseCode,
       );
 
-      // Filter submissions for this course only
+      // Filter submissions for this course and current student only
+      const currentUserId = (user?.id || user?._id || "").toString();
       const courseAssignmentIds = courseAssignments.map(a => a._id.toString());
       const courseSubmissions = (subData.submissions || []).filter(s => {
         const aId = s.assignmentId?._id || s.assignmentId;
-        return aId && courseAssignmentIds.includes(aId.toString());
+        const subStudentId = (s.studentId?._id || s.studentId || "").toString();
+        const matchesStudent = !currentUserId || subStudentId === currentUserId;
+        return aId && courseAssignmentIds.includes(aId.toString()) && matchesStudent;
       });
 
       setAssignments(courseAssignments);

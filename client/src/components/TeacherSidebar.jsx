@@ -113,47 +113,41 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
               {communityOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
             </button>
             {communityOpen && (
-              <div style={{ paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3, margin: "2px 0 6px 0" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
                 <button
-                  className="nav-item"
-                  onClick={() => navigate("/community")}
+                  className={`nav-item ${window.location.pathname.includes("/community") ? "active" : ""}`}
+                  onClick={() => navigate(cid ? `/community/courses/${cid}` : "/community")}
                   style={{
-                    fontSize: 13,
-                    padding: "7px 12px",
-                    background: window.location.pathname.includes("/community") ? "rgba(59, 141, 179, 0.15)" : "transparent",
-                    color: window.location.pathname.includes("/community") ? "#3B8DB3" : "#475569",
-                    fontWeight: window.location.pathname.includes("/community") ? 600 : 500,
+                    paddingLeft: 32,
+                    fontSize: 14,
+                    fontWeight: 600,
                   }}
                 >
-                  <FiMessageCircle size={15} />
+                  <FiMessageCircle size={16} />
                   <span>Discussion Feed</span>
                 </button>
                 <button
-                  className="nav-item"
+                  className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
                   onClick={() => navigate("/messages")}
                   style={{
-                    fontSize: 13,
-                    padding: "7px 12px",
-                    background: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
-                    color: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
-                    fontWeight: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? 600 : 500,
+                    paddingLeft: 32,
+                    fontSize: 14,
+                    fontWeight: 600,
                   }}
                 >
-                  <FiMail size={15} />
+                  <FiMail size={16} />
                   <span>Messages</span>
                 </button>
                 <button
-                  className="nav-item"
+                  className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
                   onClick={() => navigate("/messages?tab=requests")}
                   style={{
-                    fontSize: 13,
-                    padding: "7px 12px",
-                    background: window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
-                    color: window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
-                    fontWeight: window.location.search.includes("tab=requests") ? 600 : 500,
+                    paddingLeft: 32,
+                    fontSize: 14,
+                    fontWeight: 600,
                   }}
                 >
-                  <FiClock size={15} />
+                  <FiClock size={16} />
                   <span>Contact Requests</span>
                 </button>
               </div>
@@ -261,47 +255,41 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             {communityOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
           </button>
           {communityOpen && (
-            <div style={{ paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3, margin: "2px 0 6px 0" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
               <button
-                className="nav-item"
+                className={`nav-item ${window.location.pathname.includes("/community") ? "active" : ""}`}
                 onClick={() => navigate(`/community/courses/${cid}`)}
                 style={{
-                  fontSize: 13,
-                  padding: "7px 12px",
-                  background: window.location.pathname.includes("/community") ? "rgba(59, 141, 179, 0.15)" : "transparent",
-                  color: window.location.pathname.includes("/community") ? "#3B8DB3" : "#475569",
-                  fontWeight: window.location.pathname.includes("/community") ? 600 : 500,
+                  paddingLeft: 32,
+                  fontSize: 14,
+                  fontWeight: 600,
                 }}
               >
-                <FiMessageCircle size={15} />
+                <FiMessageCircle size={16} />
                 <span>Discussion Feed</span>
               </button>
               <button
-                className="nav-item"
+                className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
                 onClick={() => navigate("/messages")}
                 style={{
-                  fontSize: 13,
-                  padding: "7px 12px",
-                  background: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
-                  color: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
-                  fontWeight: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? 600 : 500,
+                  paddingLeft: 32,
+                  fontSize: 14,
+                  fontWeight: 600,
                 }}
               >
-                <FiMail size={15} />
+                <FiMail size={16} />
                 <span>Messages</span>
               </button>
               <button
-                className="nav-item"
+                className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
                 onClick={() => navigate("/messages?tab=requests")}
                 style={{
-                  fontSize: 13,
-                  padding: "7px 12px",
-                  background: window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
-                  color: window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
-                  fontWeight: window.location.search.includes("tab=requests") ? 600 : 500,
+                  paddingLeft: 32,
+                  fontSize: 14,
+                  fontWeight: 600,
                 }}
               >
-                <FiClock size={15} />
+                <FiClock size={16} />
                 <span>Contact Requests</span>
               </button>
             </div>

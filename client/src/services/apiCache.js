@@ -7,10 +7,44 @@ const CACHE_PREFIX = "uftb_swr_cache_";
 const DEFAULT_TTL = 1000 * 60 * 15; // 15 minutes TTL by default
 
 /**
+ * Scope cache key by current user ID to avoid cross-user data leakage
+ */
+const getUserScopedKey = (key) => {
+  if (!key) return "";
+  try {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const u = JSON.parse(userStr);
+      const uid = u.id || u._id;
+      if (uid) return `usr_${uid}_${key}`;
+    }
+  } catch (e) {}
+  return key;
+};
+
+/**
+ * Clear all cache entries (used on login / logout)
+ */
+export const clearAllCache = () => {
+  memoryCache.clear();
+  try {
+    const keysToRemove = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const k = sessionStorage.key(i);
+      if (k && k.startsWith(CACHE_PREFIX)) {
+        keysToRemove.push(k);
+      }
+    }
+    keysToRemove.forEach((k) => sessionStorage.removeItem(k));
+  } catch (err) {}
+};
+
+/**
  * Read cached item from memory or sessionStorage
  */
-export const getCachedData = (key) => {
-  if (!key) return null;
+export const getCachedData = (rawKey) => {
+  if (!rawKey) return null;
+  const key = getUserScopedKey(rawKey);
   
   // 1. Check in-memory Map
   if (memoryCache.has(key)) {
@@ -45,8 +79,9 @@ export const getCachedData = (key) => {
 /**
  * Store item into memory and sessionStorage
  */
-export const setCachedData = (key, data) => {
-  if (!key || data === undefined) return;
+export const setCachedData = (rawKey, data) => {
+  if (!rawKey || data === undefined) return;
+  const key = getUserScopedKey(rawKey);
   const entry = { data, timestamp: Date.now() };
 
   // 1. Store in memory
@@ -95,7 +130,7 @@ export const invalidateCache = (keyOrPattern) => {
  * Helper for cached GET requests (Stale-While-Revalidate pattern)
  */
 export const fetchWithCache = async (url, options = {}) => {
-  const { ttl = DEFAULT_TTL, forceRefresh = false } = options;
+  const { forceRefresh = false } = options;
   
   if (!forceRefresh) {
     const cached = getCachedData(url);
@@ -130,7 +165,6 @@ export function useCachedFetch(url, config = {}) {
   const [loading, setLoading] = useState(() => {
     if (!enabled || !url) return false;
     const cached = getCachedData(cacheKey);
-    // If cached data exists, loading is false (0ms load experience!)
     return cached === null;
   });
 
@@ -169,7 +203,6 @@ export function useCachedFetch(url, config = {}) {
   useEffect(() => {
     isMounted.current = true;
 
-    // Check sync cache again when URL changes
     const cached = getCachedData(cacheKey);
     if (cached !== null) {
       setData(cached);

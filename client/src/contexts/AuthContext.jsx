@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api, { BACKEND_URL } from "../services/api";
+import { clearAllCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
@@ -91,6 +92,7 @@ export function AuthProvider({ children }) {
       const res = await api.post("/auth/login", { email, password });
       const { token, user } = res.data;
 
+      clearAllCache();
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -141,6 +143,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    clearAllCache();
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     delete api.defaults.headers.common["Authorization"];

@@ -29,6 +29,8 @@ import {
   FiSlash
 } from "react-icons/fi";
 import "../styles/community.css";
+import TeacherSidebar from "../components/TeacherSidebar";
+import StudentSidebar from "../components/StudentSidebar";
 
 const renderContentWithLinks = (text) => {
   if (!text) return "";
@@ -164,85 +166,11 @@ export default function CommunityHub() {
 
   return (
     <div className="community-container">
-      <div className="community-sidebar">
-        <div className="sidebar-header">
-          <h2>UFTB Moodle</h2>
-          <span className={`badge ${user?.role}`}>{user?.role?.toUpperCase()}</span>
-        </div>
-
-        <div className="sidebar-user" style={{ padding: "20px", textAlign: "center", borderBottom: "1px solid #e2eef6" }}>
-          <div className="avatar" style={{ width: "70px", height: "70px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-            {user?.profilePicture ? (
-              <img 
-                src={user.profilePicture} 
-                alt="Profile" 
-                style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", display: "block" }} 
-              />
-            ) : (
-              <FiUsers size={32} style={{ display: "block", margin: "0 auto" }} />
-            )}
-          </div>
-          <h3>{user?.name}</h3>
-          {user?.department && (
-            <p style={{ fontWeight: 600, color: "#3b8db3", fontSize: "13px", marginBottom: "2px" }}>
-              {user.department}
-            </p>
-          )}
-          {user?.email && (
-            <p style={{ fontSize: "11px", color: "#6b89a0", marginTop: "4px", wordBreak: "break-all" }}>
-              {user.email}
-            </p>
-          )}
-        </div>
-
-        <nav className="sidebar-nav">
-          <button
-            className={`nav-item ${activeTab === "feed" ? "active" : ""}`}
-            onClick={() => setActiveTab("feed")}
-          >
-            <FiTrendingUp size={18} />
-            <span>Community Feed</span>
-          </button>
-          <button
-            className="nav-item"
-            onClick={() => navigate("/community/messages")}
-            style={{ position: "relative", width: "100%", display: "flex", alignItems: "center" }}
-          >
-            <FiMail size={18} />
-            <span>Messages</span>
-            {unreadCount > 0 && (
-              <span 
-                style={{ 
-                  background: "#EF4444", 
-                  color: "#FFFFFF", 
-                  marginLeft: "auto", 
-                  borderRadius: "50%", 
-                  minWidth: "18px", 
-                  height: "18px", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center", 
-                  fontSize: "11px", 
-                  fontWeight: "700",
-                  padding: "0 4px"
-                }}
-              >
-                {unreadCount}
-              </span>
-            )}
-          </button>
-          <div className="nav-divider"></div>
-          <button className="nav-item" onClick={() => navigate("/courses")}>
-            <FiMessageSquare size={18} />
-            <span>Back to Courses</span>
-          </button>
-          <div className="nav-divider"></div>
-          <button className="nav-item logout-btn" onClick={logout}>
-            <FiLogOut size={18} />
-            <span>Logout</span>
-          </button>
-        </nav>
-      </div>
+      {user?.role === "teacher" ? (
+        <TeacherSidebar currentPage="community" />
+      ) : (
+        <StudentSidebar currentPage="community" />
+      )}
 
       <div className="community-main">
         {activeTab === "feed" && (

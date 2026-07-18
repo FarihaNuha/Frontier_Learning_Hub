@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/CourseListPage.jsx": {
-    "mtime": 1784312830.2066915,
-    "ast_hash": "578ff65ac24a8c26b5f1d0c8ee5ec98a",
+    "mtime": 1784357080.467591,
+    "ast_hash": "0f81b5cc396317c79006083d3d47189a",
     "semantic_hash": ""
   },
   "client/src/pages/MessagePage.jsx": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssignmentPage.jsx": {
-    "mtime": 1784318954.3443468,
-    "ast_hash": "e59c79c760810c5f6e211f239abd6e6c",
+    "mtime": 1784357126.7006135,
+    "ast_hash": "1ff7cc5726f8052771b6078e2edac6ff",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAttendancePage.jsx": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentDashboard.jsx": {
-    "mtime": 1784318931.9803028,
-    "ast_hash": "e33cc4445cf2f6e4272814e335f7b35a",
+    "mtime": 1784357063.414819,
+    "ast_hash": "1be8507e1afc89543977d85bcd930cb4",
     "semantic_hash": ""
   },
   "client/src/pages/StudentExamPage.jsx": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1784318945.2591221,
-    "ast_hash": "183879fedaabb5b26ea3bffae833b1e0",
+    "mtime": 1784357092.7743256,
+    "ast_hash": "65016a9acd080fdc656ac0947ef59a3b",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1784318924.2961316,
-    "ast_hash": "b2c86a6d874d0bb492e15e35c41010aa",
+    "mtime": 1784357053.929987,
+    "ast_hash": "58c7ccea2acf3e0613e2ec8d8a28e219",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -527,6 +527,11 @@
   "client/src/components/SkeletonLoader.jsx": {
     "mtime": 1784318965.8787007,
     "ast_hash": "66b9abdb74f270bb1ee04fabf5200725",
+    "semantic_hash": ""
+  },
+  "client/src/services/apiCache.js": {
+    "mtime": 1784357010.0556617,
+    "ast_hash": "5b8da747ffc54bce758f956f819dbb82",
     "semantic_hash": ""
   }
 }

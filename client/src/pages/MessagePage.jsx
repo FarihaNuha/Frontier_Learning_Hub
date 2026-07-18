@@ -5,6 +5,8 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { communityApi } from "../services/communityApi";
 import api from "../services/api";
+import TeacherSidebar from "../components/TeacherSidebar";
+import StudentSidebar from "../components/StudentSidebar";
 import toast from "react-hot-toast";
 import {
   FiArrowLeft,
@@ -700,7 +702,13 @@ export default function MessagePage() {
   // ==================================================================
 
   return (
-    <div className="messages-container">
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+      {user?.role === "teacher" ? (
+        <TeacherSidebar currentPage="community" />
+      ) : (
+        <StudentSidebar currentPage="community" />
+      )}
+      <div className="messages-container" style={{ flex: 1, padding: "24px 32px", overflowY: "auto" }}>
       {/* ===== Header ===== */}
       <div className="messages-header">
         <button className="back-btn" onClick={() => navigate("/community")}>
@@ -1546,6 +1554,7 @@ export default function MessagePage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

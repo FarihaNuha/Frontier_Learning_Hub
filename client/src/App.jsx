@@ -354,6 +354,22 @@ function AppContent() {
             }
           />
           <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <MessagePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages/:userId"
+            element={
+              <ProtectedRoute>
+                <MessagePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/community/courses/:courseId"
             element={
               <ProtectedRoute>

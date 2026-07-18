@@ -151,6 +151,25 @@ function calculateSimilarity(newSentences, refSentences) {
 
   if (newClean.length === 0 || refClean.length === 0) return 0;
 
+  // 0. Direct full-text & high-word overlap check (100% exact match)
+  const newFullText = newClean.join(" ");
+  const refFullText = refClean.join(" ");
+  if (newFullText && refFullText) {
+    if (newFullText === refFullText) return 100;
+
+    const newWordsAll = newFullText.split(" ").filter((w) => w.length > 1);
+    const refWordsAll = refFullText.split(" ").filter((w) => w.length > 1);
+    if (newWordsAll.length > 0 && refWordsAll.length > 0) {
+      const refSet = new Set(refWordsAll);
+      let wordMatches = 0;
+      for (const w of newWordsAll) {
+        if (refSet.has(w)) wordMatches++;
+      }
+      const wordSimilarity = Math.round((wordMatches / newWordsAll.length) * 100);
+      if (wordSimilarity >= 90) return wordSimilarity;
+    }
+  }
+
   // 1. Sentence-level similarity ratio
   const refCleanSet = new Set(refClean);
   let matchCount = 0;

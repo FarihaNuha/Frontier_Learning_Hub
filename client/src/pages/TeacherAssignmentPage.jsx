@@ -284,20 +284,20 @@ export default function TeacherAssignmentPage({
   };
 
   const handleGrade = async (submissionId) => {
-    if (!gradeForm.marks) {
-      toast.error("Enter marks");
+    if (gradeForm.marks === "" || gradeForm.marks === null || gradeForm.marks === undefined || isNaN(Number(gradeForm.marks))) {
+      toast.error("Please enter valid marks");
       return;
     }
     try {
       await api.put(`/assignments/grade/${submissionId}`, {
         marks: Number(gradeForm.marks),
-        feedback: gradeForm.feedback,
+        feedback: gradeForm.feedback || "",
       });
-      toast.success("Graded!");
+      toast.success("Graded successfully!");
       setGradeForm({ id: null, marks: "", feedback: "" });
       handleViewSubmissions(viewSubmissions, selectedTitle);
     } catch (error) {
-      toast.error("Grading failed");
+      toast.error(error.response?.data?.error || "Grading failed");
     }
   };
 
@@ -667,9 +667,10 @@ export default function TeacherAssignmentPage({
                                 type="number"
                                 value={gradeForm.marks}
                                 onChange={(e) => setGradeForm({ ...gradeForm, marks: e.target.value })}
-                                style={{ width: "60px", padding: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
+                                style={{ width: "80px", padding: "6px 8px", borderRadius: "6px", border: "1.5px solid #3b8db3", fontSize: "14px", fontWeight: "600", outline: "none" }}
                                 min="0"
                                 placeholder="Marks"
+                                autoFocus
                               />
                             ) : sub.marks !== null ? (
                               <span style={{ fontWeight: 600 }}>{sub.marks}</span>
@@ -683,8 +684,8 @@ export default function TeacherAssignmentPage({
                                 type="text"
                                 value={gradeForm.feedback}
                                 onChange={(e) => setGradeForm({ ...gradeForm, feedback: e.target.value })}
-                                style={{ width: "150px", padding: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
-                                placeholder="Feedback"
+                                style={{ width: "180px", padding: "6px 8px", borderRadius: "6px", border: "1.5px solid #3b8db3", fontSize: "14px", outline: "none" }}
+                                placeholder="Feedback (optional)"
                               />
                             ) : (
                               sub.feedback || <span style={{ color: "#9ca3af", fontStyle: "italic" }}>No feedback</span>

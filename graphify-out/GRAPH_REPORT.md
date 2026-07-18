@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-07-18)
 
 ## Corpus Check
-- 107 files · ~85,432 words
+- 107 files · ~86,880 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 703 nodes · 1146 edges · 40 communities (31 shown, 9 thin omitted)
+- 703 nodes · 1148 edges · 53 communities (33 shown, 20 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8778f419`
+- Built from commit: `aaae6329`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,10 +31,13 @@
 - assessmentController.js
 - previewService.js
 - deadlineReminder.js
+- package.json
 - development
 - emailService.js
 - package.json
 - manifest.json
+- scripts
+- axios
 - scripts
 - seedAdmin.js
 - previewService.js
@@ -46,11 +49,21 @@
 - inspect_db.js
 - test_query_requests.js
 - vercel.json
+- xlsx
 - react
+- jspdf
+- jspdf-autotable
+- react
+- react-hot-toast
+- react-icons
+- @testing-library/dom
+- @testing-library/jest-dom
 - deadlineReminder.js
 - emailService.js
 - Exam.js
 - Assessment.js
+- @testing-library/react
+- web-vitals
 
 ## God Nodes (most connected - your core abstractions)
 1. `useAuth()` - 54 edges
@@ -79,7 +92,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (40 total, 9 thin omitted)
+## Communities (53 total, 20 thin omitted)
 
 ### Community 0 - "App.jsx"
 Cohesion: 0.07
@@ -102,8 +115,8 @@ Cohesion: 0.07
 Nodes (31): mongoose, submissionSchema, fs, main(), mongoose, path, recalculateAssignmentSimilarity(), similarityService (+23 more)
 
 ### Community 5 - "assignmentController.js"
-Cohesion: 0.06
-Nodes (29): Assignment, Course, deleteSubmission(), fs, { getIO }, Notification, path, previewService (+21 more)
+Cohesion: 0.07
+Nodes (30): Assignment, Course, deleteSubmission(), fs, { getIO }, getSubmissions(), Notification, path (+22 more)
 
 ### Community 6 - "test_exam_controller.js"
 Cohesion: 0.10
@@ -130,8 +143,8 @@ Cohesion: 0.12
 Nodes (16): concurrently, author, dependencies, concurrently, description, keywords, license, main (+8 more)
 
 ### Community 12 - "dependencies"
-Cohesion: 0.05
-Nodes (37): axios, jszip, xlsx, docx-preview, dependencies, axios, docx-preview, jspdf (+29 more)
+Cohesion: 0.13
+Nodes (15): jszip, docx-preview, dependencies, docx-preview, jszip, react-dom, react-router-dom, react-scripts (+7 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.15
@@ -145,9 +158,13 @@ Nodes (27): App(), AppContent(), AuthPage, CommunityHub, CourseAnalyticsPage, Co
 Cohesion: 0.50
 Nodes (3): answerSchema, examSubmissionSchema, mongoose
 
+### Community 16 - "package.json"
+Cohesion: 0.25
+Nodes (7): eslintConfig, extends, name, private, version, react-app, react-app/jest
+
 ### Community 17 - "development"
-Cohesion: 0.09
-Nodes (21): browserslist, development, production, eslintConfig, extends, name, private, scripts (+13 more)
+Cohesion: 0.22
+Nodes (9): browserslist, development, production, >0.2%, last 1 chrome version, last 1 firefox version, last 1 safari version, not dead (+1 more)
 
 ### Community 18 - "emailService.js"
 Cohesion: 0.16
@@ -160,6 +177,10 @@ Nodes (3): @opencode-ai/plugin, dependencies, @opencode-ai/plugin
 ### Community 20 - "manifest.json"
 Cohesion: 0.50
 Nodes (3): plugin, $schema, .opencode/plugins/graphify.js
+
+### Community 21 - "scripts"
+Cohesion: 0.40
+Nodes (5): scripts, build, eject, start, test
 
 ### Community 23 - "scripts"
 Cohesion: 0.08
@@ -192,16 +213,16 @@ Nodes (4): assessmentSchema, mongoose, Assessment, mongoose
 ## Knowledge Gaps
 - **319 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+314 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useAuth()` connect `App.jsx` to `previewService.js`?**
   _High betweenness centrality (0.037) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `dependencies` to `development`?**
+- **Why does `dependencies` connect `dependencies` to `xlsx`, `jspdf`, `jspdf-autotable`, `react`, `react-hot-toast`, `react-icons`, `@testing-library/dom`, `@testing-library/jest-dom`, `package.json`, `@testing-library/react`, `web-vitals`, `axios`?**
   _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `TeacherAttendancePage()` connect `App.jsx` to `dependencies`?**
+- **Why does `TeacherAttendancePage()` connect `App.jsx` to `jspdf`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **What connects `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin` to the rest of the system?**
   _322 weakly-connected nodes found - possible documentation gaps or missing edges._

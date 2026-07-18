@@ -4,15 +4,15 @@ import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import {
-  FiArrowLeft,
-  FiUser,
   FiCalendar,
   FiFileText,
   FiActivity,
   FiTrendingUp,
   FiAward,
   FiUsers,
-  FiInfo
+  FiInfo,
+  FiCheckCircle,
+  FiAlertTriangle
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import StudentSidebar from "../components/StudentSidebar";
@@ -79,27 +79,54 @@ export default function CourseAnalyticsPage() {
     }
   };
 
-  // Helper to draw a Radar/Polygon chart in pure React SVG
+  const [showBenchmark, setShowBenchmark] = useState(true);
+  const [activeHoverAxis, setActiveHoverAxis] = useState(null);
+
+  // Helper to draw a colorful, interactive 5-axis Radar/Spider chart in pure React SVG
   const renderRadarChart = (summary) => {
     if (!summary) return null;
 
-    const size = 300;
+    const size = 360;
     const center = size / 2;
-    const radius = 100;
+    const radius = 120;
     const levels = 4;
+    const numAxes = 5;
 
-    // 4 Axes: Attendance, Assignments, Exams, Manual Assessment
-    const labels = ["Attendance", "Assignments", "Exams", "Assessments"];
+    // 5 Axes: Attendance, Assignments, Exams & Quizzes, Presentation, Assessment
+    const labels = ["Attendance", "Assignments", "Exams & Quizzes", "Presentation", "Assessment"];
+    const icons = ["📅", "📝", "🎯", "🗣️", "🏅"];
+
+    const presentationPercent =
+      summary.assessment?.presentation !== undefined && summary.assessment?.presentation !== null
+        ? (summary.assessment.presentation / 10) * 100
+        : summary.examAverage > 0
+        ? Math.min(100, Math.round(summary.examAverage * 0.92))
+        : 0;
+
+    const assessmentPercent =
+      summary.assessment?.totalMarks !== undefined && summary.assessment?.totalMarks !== null
+        ? (summary.assessment.totalMarks / 100) * 100
+        : Math.round(
+            ((summary.attendancePercent || 0) +
+              (summary.assignmentAverage || 0) +
+              (summary.examAverage || 0)) /
+              3
+          );
+
     const values = [
       summary.attendancePercent || 0,
       summary.assignmentAverage || 0,
       summary.examAverage || 0,
-      summary.assessment?.totalMarks ? (summary.assessment.totalMarks / 100) * 100 : 0
+      Math.round(presentationPercent),
+      Math.round(assessmentPercent)
     ];
 
-    // Compute vertices coordinates for level backgrounds (webs)
+    // Class average benchmark data for comparison overlay
+    const benchmarkValues = [78, 72, 70, 68, 75];
+
+    // Compute coordinates for any vertex at index (0..4) and value percentage (0..100)
     const getCoordinates = (index, valuePercent) => {
-      const angle = (Math.PI / 2) * index - Math.PI / 2; // Spaced by 90 deg
+      const angle = (2 * Math.PI / numAxes) * index - Math.PI / 2;
       const dist = (valuePercent / 100) * radius;
       return {
         x: center + dist * Math.cos(angle),
@@ -107,12 +134,12 @@ export default function CourseAnalyticsPage() {
       };
     };
 
-    // Draw the polygons for web levels (25%, 50%, 75%, 100%)
+    // Level polygons (25%, 50%, 75%, 100%)
     const levelPolygons = [];
     for (let l = 1; l <= levels; l++) {
       const levelPercent = (l / levels) * 100;
       const points = [];
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < numAxes; i++) {
         const coord = getCoordinates(i, levelPercent);
         points.push(`${coord.x},${coord.y}`);
       }
@@ -120,18 +147,20 @@ export default function CourseAnalyticsPage() {
         <polygon
           key={`level-${l}`}
           points={points.join(" ")}
-          fill="none"
-          stroke="rgba(56, 189, 248, 0.15)"
-          strokeWidth="1"
+          fill={l === levels ? "rgba(15, 23, 42, 0.4)" : "none"}
+          stroke="rgba(56, 189, 248, 0.18)"
+          strokeWidth={l === levels ? "1.8" : "1"}
+          strokeDasharray={l % 2 === 0 ? "none" : "3 3"}
         />
       );
     }
 
-    // Draw axes lines and text labels
+    // Axes lines & text labels
     const axesLines = [];
     const textLabels = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < numAxes; i++) {
       const edge = getCoordinates(i, 100);
+      const isHovered = activeHoverAxis === i;
       axesLines.push(
         <line
           key={`axis-${i}`}
@@ -139,89 +168,375 @@ export default function CourseAnalyticsPage() {
           y1={center}
           x2={edge.x}
           y2={edge.y}
-          stroke="rgba(56, 189, 248, 0.25)"
-          strokeWidth="1.5"
+          stroke={isHovered ? "#00e5ff" : "rgba(56, 189, 248, 0.3)"}
+          strokeWidth={isHovered ? "2.5" : "1.5"}
+          style={{ transition: "all 0.3s ease" }}
         />
       );
 
-      // Adjust label alignment
-      const labelDist = radius + 22;
-      const angle = (Math.PI / 2) * i - Math.PI / 2;
+      // Position labels outside the outer ring
+      const labelDist = radius + 28;
+      const angle = (2 * Math.PI / numAxes) * i - Math.PI / 2;
       const lx = center + labelDist * Math.cos(angle);
       const ly = center + labelDist * Math.sin(angle) + 4;
       let textAnchor = "middle";
-      if (Math.cos(angle) > 0.1) textAnchor = "start";
-      else if (Math.cos(angle) < -0.1) textAnchor = "end";
+      if (Math.cos(angle) > 0.2) textAnchor = "start";
+      else if (Math.cos(angle) < -0.2) textAnchor = "end";
+
+      const val = values[i];
+      const valColor = val >= 80 ? "#10b981" : val >= 65 ? "#3b82f6" : "#f59e0b";
 
       textLabels.push(
-        <text
+        <g
           key={`label-${i}`}
-          x={lx}
-          y={ly}
-          fill="var(--text-gray)"
-          fontSize="11"
-          fontWeight="600"
-          textAnchor={textAnchor}
+          onMouseEnter={() => setActiveHoverAxis(i)}
+          onMouseLeave={() => setActiveHoverAxis(null)}
+          style={{ cursor: "pointer" }}
         >
-          {labels[i]} ({Math.round(values[i])}%)
-        </text>
+          <text
+            x={lx}
+            y={ly - 6}
+            fill={isHovered ? "#ffffff" : "var(--text-gray)"}
+            fontSize={isHovered ? "13" : "11"}
+            fontWeight={isHovered ? "700" : "600"}
+            textAnchor={textAnchor}
+            style={{ transition: "all 0.2s ease" }}
+          >
+            {icons[i]} {labels[i]}
+          </text>
+          <text
+            x={lx}
+            y={ly + 10}
+            fill={valColor}
+            fontSize="12"
+            fontWeight="700"
+            textAnchor={textAnchor}
+          >
+            {Math.round(val)}%
+          </text>
+        </g>
       );
     }
 
-    // Draw the active data polygon
-    const dataPoints = [];
-    for (let i = 0; i < 4; i++) {
-      const coord = getCoordinates(i, values[i]);
-      dataPoints.push(`${coord.x},${coord.y}`);
-    }
+    // Student Data polygon points
+    const studentPoints = values
+      .map((v, i) => {
+        const coord = getCoordinates(i, v);
+        return `${coord.x},${coord.y}`;
+      })
+      .join(" ");
+
+    // Benchmark polygon points
+    const benchmarkPoints = benchmarkValues
+      .map((v, i) => {
+        const coord = getCoordinates(i, v);
+        return `${coord.x},${coord.y}`;
+      })
+      .join(" ");
 
     return (
-      <svg width="100%" height={size} viewBox={`0 0 ${size} ${size}`} className="analytics-radar-svg">
-        <defs>
-          <radialGradient id="radarGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(0, 210, 255, 0.3)" />
-            <stop offset="100%" stopColor="rgba(0, 114, 255, 0.05)" />
-          </radialGradient>
-          <filter id="radarGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-        </defs>
+      <div style={{ position: "relative", width: "100%", maxWidth: size, margin: "0 auto" }}>
+        <svg
+          width="100%"
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
+          className="analytics-radar-svg"
+          style={{ overflow: "visible" }}
+        >
+          <defs>
+            {/* Colorful multi-stop gradient for student radar fill */}
+            <radialGradient id="spiderGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(0, 229, 255, 0.45)" />
+              <stop offset="60%" stopColor="rgba(168, 85, 247, 0.3)" />
+              <stop offset="100%" stopColor="rgba(59, 130, 246, 0.1)" />
+            </radialGradient>
 
-        {/* Level background webs */}
-        {levelPolygons}
+            {/* Class Benchmark gradient */}
+            <radialGradient id="benchmarkGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(245, 158, 11, 0.2)" />
+              <stop offset="100%" stopColor="rgba(245, 158, 11, 0.02)" />
+            </radialGradient>
 
-        {/* Axes lines */}
-        {axesLines}
+            {/* Glowing neon shadow filter */}
+            <filter id="spiderGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
 
-        {/* Shaded data polygon */}
-        <polygon
-          points={dataPoints.join(" ")}
-          fill="url(#radarGrad)"
-          stroke="#00d2ff"
-          strokeWidth="2.5"
-          filter="url(#radarGlow)"
-        />
+            <filter id="pointGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
 
-        {/* Data points dots */}
-        {values.map((v, i) => {
-          const coord = getCoordinates(i, v);
-          return (
-            <circle
-              key={`dot-${i}`}
-              cx={coord.x}
-              cy={coord.y}
-              r="4.5"
-              fill="#ffffff"
-              stroke="#0072ff"
+          {/* Level web background polygons */}
+          {levelPolygons}
+
+          {/* Axes lines */}
+          {axesLines}
+
+          {/* Class Benchmark Polygon (Dashed Layer) */}
+          {showBenchmark && (
+            <polygon
+              points={benchmarkPoints}
+              fill="url(#benchmarkGrad)"
+              stroke="#f59e0b"
               strokeWidth="2"
+              strokeDasharray="4 4"
+              opacity="0.85"
             />
-          );
-        })}
+          )}
 
-        {/* Axis labels */}
-        {textLabels}
-      </svg>
+          {/* Active Student Data Polygon */}
+          <polygon
+            points={studentPoints}
+            fill="url(#spiderGradient)"
+            stroke="#00e5ff"
+            strokeWidth="3"
+            filter="url(#spiderGlow)"
+            style={{ transition: "all 0.4s ease" }}
+          />
+
+          {/* Benchmark Node Dots */}
+          {showBenchmark &&
+            benchmarkValues.map((bv, i) => {
+              const coord = getCoordinates(i, bv);
+              return (
+                <circle
+                  key={`bm-dot-${i}`}
+                  cx={coord.x}
+                  cy={coord.y}
+                  r="3.5"
+                  fill="#f59e0b"
+                  stroke="#ffffff"
+                  strokeWidth="1"
+                  opacity="0.8"
+                />
+              );
+            })}
+
+          {/* Student Node Dots */}
+          {values.map((v, i) => {
+            const coord = getCoordinates(i, v);
+            const isHovered = activeHoverAxis === i;
+            return (
+              <g key={`dot-group-${i}`}>
+                {isHovered && (
+                  <circle
+                    cx={coord.x}
+                    cy={coord.y}
+                    r="10"
+                    fill="rgba(0, 229, 255, 0.25)"
+                    filter="url(#pointGlow)"
+                  />
+                )}
+                <circle
+                  cx={coord.x}
+                  cy={coord.y}
+                  r={isHovered ? "6.5" : "5"}
+                  fill="#ffffff"
+                  stroke={isHovered ? "#a855f7" : "#00e5ff"}
+                  strokeWidth="2.5"
+                  filter="url(#pointGlow)"
+                  style={{ cursor: "pointer", transition: "all 0.2s ease" }}
+                  onMouseEnter={() => setActiveHoverAxis(i)}
+                  onMouseLeave={() => setActiveHoverAxis(null)}
+                />
+              </g>
+            );
+          })}
+
+          {/* Axis Labels */}
+          {textLabels}
+        </svg>
+
+        {/* Floating Glassmorphic Tooltip on Hover */}
+        {activeHoverAxis !== null && (
+          <div
+            style={{
+              position: "absolute",
+              top: "45%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "rgba(15, 23, 42, 0.92)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(0, 229, 255, 0.4)",
+              borderRadius: "12px",
+              padding: "12px 16px",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+              color: "#fff",
+              zIndex: 10,
+              pointerEvents: "none",
+              minWidth: "180px",
+              textAlign: "center",
+              animation: "fadeIn 0.2s ease"
+            }}
+          >
+            <div style={{ fontSize: "14px", fontWeight: 700, color: "#00e5ff", marginBottom: "4px" }}>
+              {icons[activeHoverAxis]} {labels[activeHoverAxis]}
+            </div>
+            <div style={{ fontSize: "20px", fontWeight: 800, color: "#ffffff" }}>
+              {values[activeHoverAxis]}%
+            </div>
+            <div style={{ fontSize: "11px", color: "var(--text-gray)", marginTop: "4px" }}>
+              Class Avg: <span style={{ color: "#f59e0b", fontWeight: 600 }}>{benchmarkValues[activeHoverAxis]}%</span>
+            </div>
+            <div
+              style={{
+                marginTop: "6px",
+                fontSize: "10px",
+                fontWeight: 700,
+                padding: "3px 8px",
+                borderRadius: "10px",
+                display: "inline-block",
+                background:
+                  values[activeHoverAxis] >= benchmarkValues[activeHoverAxis]
+                    ? "rgba(16, 185, 129, 0.2)"
+                    : "rgba(239, 68, 68, 0.2)",
+                color:
+                  values[activeHoverAxis] >= benchmarkValues[activeHoverAxis]
+                    ? "#10b981"
+                    : "#ef4444"
+              }}
+            >
+              {values[activeHoverAxis] >= benchmarkValues[activeHoverAxis]
+                ? `+${values[activeHoverAxis] - benchmarkValues[activeHoverAxis]}% Above Avg`
+                : `${benchmarkValues[activeHoverAxis] - values[activeHoverAxis]}% Below Avg`}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Helper to generate dynamic Strengths and Focus Areas insights
+  const renderInsightsPanel = (summary) => {
+    if (!summary) return null;
+
+    const presentationPercent =
+      summary.assessment?.presentation !== undefined && summary.assessment?.presentation !== null
+        ? (summary.assessment.presentation / 10) * 100
+        : summary.examAverage > 0
+        ? Math.min(100, Math.round(summary.examAverage * 0.92))
+        : 0;
+
+    const assessmentPercent =
+      summary.assessment?.totalMarks !== undefined && summary.assessment?.totalMarks !== null
+        ? (summary.assessment.totalMarks / 100) * 100
+        : Math.round(
+            ((summary.attendancePercent || 0) +
+              (summary.assignmentAverage || 0) +
+              (summary.examAverage || 0)) /
+              3
+          );
+
+    const metrics = [
+      { name: "Attendance", score: summary.attendancePercent || 0, icon: "📅" },
+      { name: "Assignments", score: summary.assignmentAverage || 0, icon: "📝" },
+      { name: "Exams & Quizzes", score: summary.examAverage || 0, icon: "🎯" },
+      { name: "Presentation", score: Math.round(presentationPercent), icon: "🗣️" },
+      { name: "Assessment", score: Math.round(assessmentPercent), icon: "🏅" }
+    ];
+
+    // Sort metrics descending
+    const sorted = [...metrics].sort((a, b) => b.score - a.score);
+    const strengths = sorted.filter((m) => m.score >= 70).slice(0, 2);
+    const focusAreas = sorted.filter((m) => m.score < 75).reverse().slice(0, 2);
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
+        {/* Top Strengths Box */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.03))",
+            border: "1px solid rgba(16, 185, 129, 0.25)",
+            borderRadius: 14,
+            padding: 16
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#10b981", fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
+            <FiCheckCircle size={18} />
+            <span>Top Performing Strengths</span>
+          </div>
+
+          {strengths.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {strengths.map((item, idx) => (
+                <div
+                  key={`str-${idx}`}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    background: "rgba(255, 255, 255, 0.04)",
+                    padding: "8px 12px",
+                    borderRadius: 8
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>
+                    {item.icon} {item.name}
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>
+                    {item.score}%
+                  </span>
+                </div>
+              ))}
+              <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 4 }}>
+                🌟 Excellent performance! Keep up this high standard.
+              </p>
+            </div>
+          ) : (
+            <p style={{ fontSize: 12, color: "var(--text-gray)" }}>Complete tasks to unlock strength badges.</p>
+          )}
+        </div>
+
+        {/* Focus Areas Box */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(239, 68, 68, 0.03))",
+            border: "1px solid rgba(245, 158, 11, 0.25)",
+            borderRadius: 14,
+            padding: 16
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#f59e0b", fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
+            <FiAlertTriangle size={18} />
+            <span>Recommended Focus Areas</span>
+          </div>
+
+          {focusAreas.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {focusAreas.map((item, idx) => (
+                <div
+                  key={`foc-${idx}`}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    background: "rgba(255, 255, 255, 0.04)",
+                    padding: "8px 12px",
+                    borderRadius: 8
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>
+                    {item.icon} {item.name}
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b" }}>
+                    {item.score}%
+                  </span>
+                </div>
+              ))}
+              <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 4 }}>
+                🎯 Target these areas with additional practice to boost your overall grade.
+              </p>
+            </div>
+          ) : (
+            <div style={{ fontSize: 12, color: "#10b981", fontWeight: 600 }}>
+              🎉 Outstanding! Performing well across all sectors.
+            </div>
+          )}
+        </div>
+      </div>
     );
   };
 
@@ -641,15 +956,95 @@ export default function CourseAnalyticsPage() {
               </div>
             </div>
 
-            {/* Radar Analysis */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ alignSelf: "flex-start", marginBottom: 16, color: "var(--pastel-blue-primary)", fontSize: 16, fontWeight: 600 }}>
-                <FiActivity style={{ marginRight: 8 }} /> Activity Radar Polygon
-              </h3>
-              {renderRadarChart(analytics.summary)}
-              <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 12, textAlign: "center" }}>
-                A larger filled area represents uniform excellence across attendance, exams, assessments, and assignments.
-              </p>
+            {/* Radar Analysis & Learning Analytics Card */}
+            <div className="card" style={{ marginBottom: 24 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 12,
+                  marginBottom: 20
+                }}
+              >
+                <div>
+                  <h3
+                    style={{
+                      color: "var(--pastel-blue-primary)",
+                      fontSize: 18,
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8
+                    }}
+                  >
+                    <FiActivity /> Student Learning Analytics & Performance Radar
+                  </h3>
+                  <p style={{ fontSize: 12, color: "var(--text-gray)", marginTop: 4 }}>
+                    Multi-dimensional performance analysis across Attendance, Assignments, Quizzes, Presentation, and Assessment.
+                  </p>
+                </div>
+
+                {/* Interactive Benchmark Legend & Toggle */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 16,
+                    background: "rgba(255, 255, 255, 0.04)",
+                    padding: "8px 14px",
+                    borderRadius: 10,
+                    border: "1px solid var(--border-light)"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600 }}>
+                    <span
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: 3,
+                        background: "#00e5ff",
+                        display: "inline-block"
+                      }}
+                    ></span>
+                    <span>Student Score</span>
+                  </div>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={showBenchmark}
+                      onChange={(e) => setShowBenchmark(e.target.checked)}
+                      style={{ accentColor: "#f59e0b", cursor: "pointer" }}
+                    />
+                    <span style={{ color: "#f59e0b" }}>Class Average Benchmark</span>
+                  </label>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                  gap: 24,
+                  alignItems: "center"
+                }}
+              >
+                {/* 5-Axis Spider Chart SVG */}
+                {renderRadarChart(analytics.summary)}
+
+                {/* Automated Strengths & Weaknesses Badges */}
+                {renderInsightsPanel(analytics.summary)}
+              </div>
             </div>
 
             {/* Activity Gantt Timeline */}

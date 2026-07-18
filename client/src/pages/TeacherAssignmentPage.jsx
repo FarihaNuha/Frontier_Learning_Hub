@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api, { BACKEND_URL } from "../services/api";
+import { fetchWithCache, invalidateCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import axios from "axios";
 import * as docx from "docx-preview";
@@ -158,18 +159,18 @@ export default function TeacherAssignmentPage({
 
   const fetchCourseInfo = async () => {
     try {
-      const res = await api.get(`/courses/${finalCourseId}`);
-      setCourseInfo(res.data.course);
+      const data = await fetchWithCache(`/courses/${finalCourseId}`);
+      setCourseInfo(data.course);
     } catch (error) {
       console.error("Fetch course info error:", error);
     }
   };
 
-  const fetchAssignments = async () => {
+  const fetchAssignments = async (forceRefresh = false) => {
     try {
-      console.log("Fetching assignments for course:", finalCourseId);
-      const res = await api.get(`/assignments?courseId=${finalCourseId}`);
-      setAssignments(res.data.assignments);
+      const url = `/assignments?courseId=${finalCourseId}`;
+      const data = await fetchWithCache(url, { forceRefresh });
+      setAssignments(data.assignments || []);
     } catch (error) {
       console.error("Fetch error:", error);
       toast.error("Failed to load");

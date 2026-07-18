@@ -15,8 +15,8 @@
     "semantic_hash": "d9d975cebe2ec20b6c652e1e4c12ccf0"
   },
   "client/src/App.jsx": {
-    "mtime": 1784188147.9955354,
-    "ast_hash": "4771d9c180d9fd4ca1d1e3cde1a91777",
+    "mtime": 1784318998.5963473,
+    "ast_hash": "57dd992df354c1ccd232536909fbe250",
     "semantic_hash": ""
   },
   "client/src/components/GlobalNotificationBell.jsx": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "client/src/components/StudentSidebar.jsx": {
-    "mtime": 1784310059.0735877,
-    "ast_hash": "224f4e1ea83dc133dc96edb88a48900b",
+    "mtime": 1784318915.58804,
+    "ast_hash": "596d0090c0724821f0b2ec3511ff2837",
     "semantic_hash": ""
   },
   "client/src/components/common/Navbar.jsx": {
@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/CourseListPage.jsx": {
-    "mtime": 1784188148.3107674,
-    "ast_hash": "9976a7cc0f9decc3c5c5bc9b61e8671b",
+    "mtime": 1784312830.2066915,
+    "ast_hash": "578ff65ac24a8c26b5f1d0c8ee5ec98a",
     "semantic_hash": ""
   },
   "client/src/pages/MessagePage.jsx": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssignmentPage.jsx": {
-    "mtime": 1784288138.8094397,
-    "ast_hash": "673b5c05716aa5d7218be9555e08e85e",
+    "mtime": 1784318954.3443468,
+    "ast_hash": "e59c79c760810c5f6e211f239abd6e6c",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAttendancePage.jsx": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentDashboard.jsx": {
-    "mtime": 1784288153.0020423,
-    "ast_hash": "2007c0670626a28db9135a6b0c67e66b",
+    "mtime": 1784318931.9803028,
+    "ast_hash": "e33cc4445cf2f6e4272814e335f7b35a",
     "semantic_hash": ""
   },
   "client/src/pages/StudentExamPage.jsx": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1784310094.2955437,
-    "ast_hash": "e7dda5cb8caafee833277850afc61e7f",
+    "mtime": 1784318945.2591221,
+    "ast_hash": "183879fedaabb5b26ea3bffae833b1e0",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1784288183.8163495,
-    "ast_hash": "e83db1a915705da3ae4af23f255f7448",
+    "mtime": 1784318924.2961316,
+    "ast_hash": "b2c86a6d874d0bb492e15e35c41010aa",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -215,8 +215,8 @@
     "semantic_hash": ""
   },
   "server/controllers/communityController.js": {
-    "mtime": 1784212958.0715313,
-    "ast_hash": "9f170c9ed27b5134ac4dd754c0f0e674",
+    "mtime": 1784318887.2865775,
+    "ast_hash": "6c4f725ba0c00d826e50774d0a9ed9c7",
     "semantic_hash": ""
   },
   "server/controllers/courseController.js": {
@@ -245,8 +245,8 @@
     "semantic_hash": "59deec97eac88e636b0c958badab423c"
   },
   "server/index.js": {
-    "mtime": 1784310898.2869592,
-    "ast_hash": "9639afc4f81713e31c62b80adba2921a",
+    "mtime": 1784315985.8819668,
+    "ast_hash": "d813993cd499e39c4884911245e6a73d",
     "semantic_hash": ""
   },
   "server/middleware/authMiddleware.js": {
@@ -465,8 +465,8 @@
     "semantic_hash": "691deee769f094db4848968582bbc7a4"
   },
   "server/services/emailService.js": {
-    "mtime": 1784310066.3510563,
-    "ast_hash": "80d8bddb84641ac21bedfaa5410a9481",
+    "mtime": 1784318875.264486,
+    "ast_hash": "57b8d84ddedb1bfcc811df4953186be6",
     "semantic_hash": ""
   },
   "server/services/previewService.js": {
@@ -505,8 +505,8 @@
     "semantic_hash": ""
   },
   "client/src/components/TeacherSidebar.jsx": {
-    "mtime": 1784310035.463366,
-    "ast_hash": "04117ba0458eaeed558f4f4c5259c184",
+    "mtime": 1784318908.5223513,
+    "ast_hash": "4c6fa55201ab4218a79d9cdeb49b21e1",
     "semantic_hash": ""
   },
   "client/src/pages/CourseAnalyticsPage.jsx": {
@@ -522,6 +522,11 @@
   "client/vercel.json": {
     "mtime": 1784288224.846355,
     "ast_hash": "6411d2fbb5f0e00aaff0ca0ded84e0b6",
+    "semantic_hash": ""
+  },
+  "client/src/components/SkeletonLoader.jsx": {
+    "mtime": 1784318965.8787007,
+    "ast_hash": "66b9abdb74f270bb1ee04fabf5200725",
     "semantic_hash": ""
   }
 }

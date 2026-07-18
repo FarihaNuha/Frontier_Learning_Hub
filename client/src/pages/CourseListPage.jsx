@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
+import { fetchWithCache, invalidateCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import {
   FiPlus,
@@ -123,10 +124,10 @@ export default function CourseListPage() {
     fetchCourses();
   }, []);
 
-  const fetchCourses = async () => {
+  const fetchCourses = async (forceRefresh = false) => {
     try {
-      const res = await api.get("/courses/my");
-      setCourses(res.data.courses);
+      const data = await fetchWithCache("/courses/my", { forceRefresh });
+      setCourses(data.courses || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -150,7 +151,8 @@ export default function CourseListPage() {
         displayCode: "",
         department: user?.department || "Software",
       });
-      fetchCourses();
+      invalidateCache("/courses");
+      fetchCourses(true);
       toast(`Join Code: ${res.data.course.joinCode}`, {
         icon: "🔑",
         duration: 6000,
@@ -171,7 +173,8 @@ export default function CourseListPage() {
       toast.success(res.data.message);
       setShowJoin(false);
       setJoinCode("");
-      fetchCourses();
+      invalidateCache("/courses");
+      fetchCourses(true);
     } catch (error) {
       toast.error(error.response?.data?.error || "Failed");
     }

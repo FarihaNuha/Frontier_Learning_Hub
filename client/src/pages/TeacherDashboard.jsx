@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as docx from "docx-preview";
 import { useAuth } from "../contexts/AuthContext";
 import api, { BACKEND_URL } from "../services/api";
+import { fetchWithCache, invalidateCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import ShareModal from "../components/ShareModal";
 import {
@@ -173,10 +174,11 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     fetchLectures();
   }, []);
 
-  const fetchLectures = async () => {
+  const fetchLectures = async (forceRefresh = false) => {
     try {
-      const res = await api.get(`/lectures?courseId=${courseId || ""}`);
-      setLectures(res.data.lectures);
+      const url = `/lectures?courseId=${courseId || ""}`;
+      const data = await fetchWithCache(url, { forceRefresh });
+      setLectures(data.lectures || []);
     } catch (error) {
       console.error(error);
     }
@@ -225,7 +227,8 @@ export default function TeacherDashboard({ courseId, courseCode }) {
         department: user?.department || "Software",
       });
       setFile(null);
-      fetchLectures();
+      invalidateCache("/lectures");
+      fetchLectures(true);
     } catch (error) {
       toast.error("Upload failed");
     } finally {
@@ -238,7 +241,8 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     try {
       await api.delete(`/lectures/${id}`);
       toast.success("Deleted");
-      fetchLectures();
+      invalidateCache("/lectures");
+      fetchLectures(true);
     } catch (error) {
       toast.error("Failed");
     }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api, { BACKEND_URL } from "../services/api";
+import { fetchWithCache, invalidateCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import axios from "axios";
 import * as docx from "docx-preview";
@@ -161,30 +162,28 @@ export default function StudentAssignmentPage({
 
   const fetchCourseInfo = async () => {
     try {
-      const res = await api.get(`/courses/${finalCourseId}`);
-      setCourseInfo(res.data.course);
+      const data = await fetchWithCache(`/courses/${finalCourseId}`);
+      setCourseInfo(data.course);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (forceRefresh = false) => {
     try {
-      setLoading(true);
-      // Get assignments for this specific course only
-      const [assignRes, subRes] = await Promise.all([
-        api.get(`/assignments?courseId=${finalCourseId}`),
-        api.get("/assignments/my-submissions"),
+      const [assignData, subData] = await Promise.all([
+        fetchWithCache(`/assignments?courseId=${finalCourseId}`, { forceRefresh }),
+        fetchWithCache("/assignments/my-submissions", { forceRefresh }),
       ]);
 
       // Filter assignments for this course only
-      const courseAssignments = (assignRes.data.assignments || []).filter(
+      const courseAssignments = (assignData.assignments || []).filter(
         (a) => a.courseId === finalCourseId || a.course === finalCourseCode,
       );
 
       // Filter submissions for this course only
       const courseAssignmentIds = courseAssignments.map(a => a._id.toString());
-      const courseSubmissions = (subRes.data.submissions || []).filter(s => {
+      const courseSubmissions = (subData.submissions || []).filter(s => {
         const aId = s.assignmentId?._id || s.assignmentId;
         return aId && courseAssignmentIds.includes(aId.toString());
       });
@@ -192,7 +191,8 @@ export default function StudentAssignmentPage({
       setAssignments(courseAssignments);
       setSubmissions(courseSubmissions);
     } catch (error) {
-      toast.error("Failed to load data");
+      console.error(error);
+      toast.error("Failed to load assignments");
     } finally {
       setLoading(false);
     }

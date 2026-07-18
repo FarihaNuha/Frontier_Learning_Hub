@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import * as docx from "docx-preview";
 import { useAuth } from "../contexts/AuthContext";
 import api, { BACKEND_URL } from "../services/api";
+import { fetchWithCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import ShareModal from "../components/ShareModal";
 import {
@@ -177,8 +178,8 @@ export default function StudentDashboard({
 
   const fetchCourseInfo = async () => {
     try {
-      const res = await api.get(`/courses/${finalCourseId}`);
-      setCourseInfo(res.data.course);
+      const data = await fetchWithCache(`/courses/${finalCourseId}`);
+      setCourseInfo(data.course);
     } catch (error) {
       console.error(error);
       toast.error("Course not found");
@@ -188,10 +189,9 @@ export default function StudentDashboard({
 
   const fetchLectures = async () => {
     try {
-      setLoading(true);
-      // Get lectures for THIS SPECIFIC COURSE only
-      const res = await api.get(`/lectures?courseId=${finalCourseId}`);
-      setLectures(res.data.lectures || []);
+      const url = `/lectures?courseId=${finalCourseId}`;
+      const data = await fetchWithCache(url);
+      setLectures(data.lectures || []);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load materials");

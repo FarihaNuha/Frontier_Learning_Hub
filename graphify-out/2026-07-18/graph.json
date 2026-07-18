@@ -1177,7 +1177,7 @@
       "label": "TeacherSidebar()",
       "file_type": "code",
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L24",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "client_src_components_teachersidebar_teachersidebar",
       "community": 0,
@@ -8908,7 +8908,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L24",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "client_src_components_teachersidebar",
       "target": "client_src_components_teachersidebar_teachersidebar",
@@ -9096,7 +9096,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L25",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "client_src_components_teachersidebar_teachersidebar",
       "target": "client_src_contexts_authcontext_useauth"
@@ -19288,5 +19288,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "33f199c9f25739ba170e507c2031e85d69fadf73"
+  "built_at_commit": "ffd15e0bb0cfe043da2955255af74d5bf47d72e8"
 }

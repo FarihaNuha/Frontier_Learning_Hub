@@ -164,15 +164,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           </button>
         </div>
         <div className="sidebar-footer-fixed">
-          <div id="sidebar-notification-portal" style={{ width: "100%" }}>
-            <button
-              className={`nav-item ${currentPage === "notifications" ? "active" : ""}`}
-              onClick={() => navigate("/notifications")}
-            >
-              <FiBell size={18} />
-              <span>Notifications</span>
-            </button>
-          </div>
+          <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
           <div className="nav-divider" style={{ margin: "2px 0" }}></div>
           <button
             className={`nav-item ${currentPage === "settings" ? "active" : ""}`}
@@ -351,13 +343,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
         )}
       </div>
       <div className="sidebar-footer-fixed">
-        <button
-          className={`nav-item ${currentPage === "notifications" ? "active" : ""}`}
-          onClick={() => navigate("/notifications")}
-        >
-          <FiBell size={18} />
-          <span>Notifications</span>
-        </button>
+        <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
         <button className="nav-item" onClick={() => navigate("/courses")}>
           <FiArrowLeft size={18} />

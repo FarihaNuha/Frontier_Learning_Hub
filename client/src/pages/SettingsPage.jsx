@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import TeacherSidebar from "../components/TeacherSidebar";
+import StudentSidebar from "../components/StudentSidebar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
@@ -180,23 +182,27 @@ export default function SettingsPage() {
     setIsDarkMode(savedDarkMode);
 
     const savedSettings = localStorage.getItem("user_settings");
+    let currentEmailNotif = user?.emailNotifications !== false;
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
+        if (typeof parsed.emailNotifications === "boolean") {
+          currentEmailNotif = parsed.emailNotifications;
+        }
         setSettings({
           ...parsed,
-          emailNotifications: user?.emailNotifications !== false
+          emailNotifications: currentEmailNotif
         });
+        return;
       } catch (e) {
         console.error("Failed to parse settings", e);
       }
-    } else {
-      setSettings((prev) => ({
-        ...prev,
-        emailNotifications: user?.emailNotifications !== false
-      }));
     }
-  }, [user?.emailNotifications]);
+    setSettings((prev) => ({
+      ...prev,
+      emailNotifications: currentEmailNotif
+    }));
+  }, [user]);
 
   // Toggle Theme
   const handleThemeChange = (dark) => {
@@ -212,18 +218,35 @@ export default function SettingsPage() {
   };
 
   // Toggle individual setting
-  const handleToggle = (key) => {
-    setSettings((prev) => {
-      const updated = {
-        ...prev,
-        [key]: !prev[key]
-      };
-      localStorage.setItem("user_settings", JSON.stringify(updated));
-      if (key === "activeStatus" && socket) {
-        socket.emit("update_active_status", { activeStatus: updated.activeStatus });
+  const handleToggle = async (key) => {
+    const newValue = !settings[key];
+    const updated = {
+      ...settings,
+      [key]: newValue
+    };
+    setSettings(updated);
+    localStorage.setItem("user_settings", JSON.stringify(updated));
+
+    if (key === "emailNotifications") {
+      try {
+        const res = await api.put("/auth/profile", {
+          emailNotifications: newValue
+        });
+        const updatedUser = {
+          ...user,
+          emailNotifications: res.data.user?.emailNotifications ?? newValue
+        };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        toast.success(`Email notifications turned ${newValue ? "ON" : "OFF"}`);
+      } catch (err) {
+        console.error("Failed to update email notifications preference", err);
       }
-      return updated;
-    });
+    }
+
+    if (key === "activeStatus" && socket) {
+      socket.emit("update_active_status", { activeStatus: newValue });
+    }
   };
 
   // Save settings
@@ -253,59 +276,11 @@ export default function SettingsPage() {
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar Layout matching portals */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h2>UFTB Moodle</h2>
-          <span className={`badge ${user?.role}`}>
-            {user?.role?.toUpperCase()}
-          </span>
-        </div>
-        <div className="user-info">
-          <div className="avatar">
-            {user?.profilePicture ? (
-              <img 
-                src={user.profilePicture} 
-                alt="Profile" 
-                style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--pastel-blue-deep)", display: "block", margin: "0 auto 12px auto" }} 
-              />
-            ) : (
-              <FiUser size={48} color="#2C4B66" />
-            )}
-          </div>
-          <h3>{user?.name}</h3>
-          <p>{user?.department}</p>
-          <p className="user-email">{user?.email}</p>
-        </div>
-        <nav className="sidebar-nav">
-          <button className="nav-item" onClick={() => navigate("/courses")}>
-            <FiBook size={18} />
-            <span>My Courses</span>
-          </button>
-          <button className="nav-item" onClick={() => navigate("/community")}>
-            <FiMessageSquare size={18} />
-            <span>Community Hub</span>
-          </button>
-          <button
-            className="nav-item"
-            onClick={() => {
-              if (user?.role === "teacher") {
-                navigate("/teacher/assessment");
-              } else {
-                navigate("/student/assessment");
-              }
-            }}
-          >
-            <FiBookOpen size={18} />
-            <span>Assessment Marksheet</span>
-          </button>
-          <div className="nav-divider"></div>
-          <button className="nav-item logout-btn" onClick={logout}>
-            <FiLogOut size={18} />
-            <span>Logout</span>
-          </button>
-        </nav>
-      </div>
+      {user?.role === "teacher" ? (
+        <TeacherSidebar currentPage="settings" />
+      ) : (
+        <StudentSidebar currentPage="settings" />
+      )}
 
       {/* Main settings area */}
       <div className="main-content" style={{ padding: "40px", overflowY: "auto" }}>

@@ -1157,7 +1157,7 @@
       "label": "StudentSidebar()",
       "file_type": "code",
       "source_file": "client/src/components/StudentSidebar.jsx",
-      "source_location": "L22",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "client_src_components_studentsidebar_studentsidebar",
       "community": 0,
@@ -1177,7 +1177,7 @@
       "label": "TeacherSidebar()",
       "file_type": "code",
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L24",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "client_src_components_teachersidebar_teachersidebar",
       "community": 0,
@@ -8579,7 +8579,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/components/StudentSidebar.jsx",
-      "source_location": "L22",
+      "source_location": "L24",
       "weight": 1.0,
       "source": "client_src_components_studentsidebar",
       "target": "client_src_components_studentsidebar_studentsidebar",
@@ -8756,7 +8756,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/components/StudentSidebar.jsx",
-      "source_location": "L23",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "client_src_components_studentsidebar_studentsidebar",
       "target": "client_src_contexts_authcontext_useauth"
@@ -8886,7 +8886,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L24",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "client_src_components_teachersidebar",
       "target": "client_src_components_teachersidebar_teachersidebar",
@@ -9063,7 +9063,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L25",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "client_src_components_teachersidebar_teachersidebar",
       "target": "client_src_contexts_authcontext_useauth"
@@ -19244,5 +19244,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7cfd5b216b55967c218a4aac4fad7bce28a1a136"
+  "built_at_commit": "0b8539ab80032341d9bc983381c9d26664b9c798"
 }

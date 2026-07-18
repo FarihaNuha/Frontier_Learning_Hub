@@ -1237,50 +1237,152 @@ export default function MessagePage() {
 
       {/* ===== CONTACT REQUESTS TAB ===== */}
       {activeTab === "requests" && (
-        <div style={{ padding: "24px", maxWidth: "900px", margin: "0 auto", width: "100%" }}>
+        <div style={{ padding: "28px", maxWidth: "920px", margin: "0 auto", width: "100%" }}>
           {/* STUDENT: Send request form */}
           {user?.role === "student" && (
-            <div style={{ background: "var(--bg-card)", borderRadius: "16px", padding: "24px", marginBottom: "24px", boxShadow: "0 4px 24px rgba(0,0,0,0.08)", border: "1px solid var(--border-color)" }}>
-              <h3 style={{ margin: "0 0 16px", display: "flex", alignItems: "center", gap: "8px", color: "var(--text-primary)" }}>
-                <FiRequestSend size={20} color="var(--pastel-blue-primary)" /> Request Teacher Contact
-              </h3>
-              <form onSubmit={handleSendContactRequest} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>Select Teacher *</label>
-                  <select
-                    value={crTeacherId}
-                    onChange={(e) => setCrTeacherId(e.target.value)}
-                    required
-                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "14px" }}
-                  >
-                    <option value="">— Choose a teacher —</option>
-                    {teachers.map((t) => <option key={t._id} value={t._id}>{t.name} ({t.department || t.email})</option>)}
-                  </select>
+            <div
+              style={{
+                background: "var(--bg-card)",
+                borderRadius: "20px",
+                padding: "28px",
+                marginBottom: "32px",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.05)",
+                border: "1px solid var(--border-color)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease"
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "14px",
+                    background: "linear-gradient(135deg, rgba(59,141,179,0.15), rgba(37,99,235,0.15))",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#3B8DB3",
+                    fontSize: "22px"
+                  }}
+                >
+                  <FiRequestSend />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>Subject / Course *</label>
-                  <input
-                    type="text"
-                    value={crSubject}
-                    onChange={(e) => setCrSubject(e.target.value)}
-                    placeholder="e.g. Mathematics, Data Structures"
-                    required
-                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "14px", boxSizing: "border-box" }}
-                  />
+                  <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "var(--text-primary)" }}>
+                    Request Teacher Contact
+                  </h3>
+                  <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--text-secondary)" }}>
+                    Submit a formal inquiry or schedule a 1-on-1 consultation window with your teacher.
+                  </p>
                 </div>
+              </div>
+
+              <form onSubmit={handleSendContactRequest} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>
+                      Select Instructor / Teacher <span style={{ color: "#ef4444" }}>*</span>
+                    </label>
+                    <select
+                      value={crTeacherId}
+                      onChange={(e) => setCrTeacherId(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        borderRadius: "12px",
+                        border: "1.5px solid var(--border-color)",
+                        background: "var(--bg-secondary)",
+                        color: "var(--text-primary)",
+                        fontSize: "14px",
+                        outline: "none",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      <option value="">— Choose a teacher —</option>
+                      {teachers.map((t) => (
+                        <option key={t._id} value={t._id}>
+                          {t.name} {t.department ? `(${t.department})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>
+                      Subject / Course Title <span style={{ color: "#ef4444" }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={crSubject}
+                      onChange={(e) => setCrSubject(e.target.value)}
+                      placeholder="e.g. Mathematics, Web Development"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        borderRadius: "12px",
+                        border: "1.5px solid var(--border-color)",
+                        background: "var(--bg-secondary)",
+                        color: "var(--text-primary)",
+                        fontSize: "14px",
+                        outline: "none",
+                        boxSizing: "border-box",
+                        transition: "all 0.2s"
+                      }}
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>Topic / Reason</label>
+                  <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>
+                    Topic / Discussion Reason
+                  </label>
                   <textarea
                     value={crTopic}
                     onChange={(e) => setCrTopic(e.target.value)}
-                    placeholder="Describe what you'd like to discuss with the teacher..."
+                    placeholder="Describe what topic, assignment, or query you would like to discuss..."
                     rows={3}
-                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "14px", resize: "vertical", boxSizing: "border-box" }}
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      borderRadius: "12px",
+                      border: "1.5px solid var(--border-color)",
+                      background: "var(--bg-secondary)",
+                      color: "var(--text-primary)",
+                      fontSize: "14px",
+                      resize: "vertical",
+                      outline: "none",
+                      boxSizing: "border-box",
+                      transition: "all 0.2s"
+                    }}
                   />
                 </div>
-                <button type="submit" disabled={crSending} style={{ alignSelf: "flex-start", padding: "10px 24px", background: "var(--pastel-blue-primary)", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", opacity: crSending ? 0.7 : 1 }}>
-                  <FiRequestSend size={16} /> {crSending ? "Sending..." : "Send Request"}
-                </button>
+
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <button
+                    type="submit"
+                    disabled={crSending}
+                    style={{
+                      padding: "12px 28px",
+                      background: "linear-gradient(135deg, #3B8DB3 0%, #2563eb 100%)",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontWeight: 700,
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      boxShadow: "0 4px 14px rgba(37,99,235,0.25)",
+                      opacity: crSending ? 0.7 : 1,
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    <FiRequestSend size={18} /> {crSending ? "Sending..." : "Send Contact Request"}
+                  </button>
+                </div>
               </form>
             </div>
           )}
@@ -1288,12 +1390,16 @@ export default function MessagePage() {
           {/* TEACHER: Pending requests */}
           {user?.role === "teacher" && (
             <>
-              <h3 style={{ margin: "0 0 16px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "8px" }}>
-                <FiInbox size={20} color="var(--pastel-blue-primary)" /> Incoming Requests
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                <h3 style={{ margin: 0, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "10px", fontSize: "18px" }}>
+                  <FiInbox size={22} color="#3B8DB3" /> Incoming Contact Requests
+                </h3>
                 {pendingRequests.length > 0 && (
-                  <span style={{ background: "#ef4444", color: "#fff", borderRadius: "20px", padding: "2px 10px", fontSize: "12px", fontWeight: 700 }}>{pendingRequests.length} pending</span>
+                  <span style={{ background: "rgba(239,68,68,0.12)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "20px", padding: "4px 14px", fontSize: "12px", fontWeight: 700 }}>
+                    {pendingRequests.length} pending
+                  </span>
                 )}
-              </h3>
+              </div>
               {crLoading ? (
                 <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)" }}>Loading requests...</div>
               ) : pendingRequests.length === 0 ? (
@@ -1301,128 +1407,195 @@ export default function MessagePage() {
                   <FiInbox size={40} style={{ marginBottom: 12, opacity: 0.4 }} />
                   <p style={{ margin: 0 }}>No pending contact requests</p>
                 </div>
-              ) : pendingRequests.map((req) => (
-                <div key={req._id} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "20px", marginBottom: "14px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
-                    <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                      {req.student?.profilePicture ? (
-                        <img 
-                          src={req.student.profilePicture} 
-                          alt="Profile" 
-                          style={{ width: "44px", height: "44px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} 
-                        />
-                      ) : (
-                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--pastel-blue-primary)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 18, fontWeight: 700, flexShrink: 0 }}>
-                          {req.student?.name?.charAt(0).toUpperCase()}
+              ) : (
+                pendingRequests.map((req) => (
+                  <div
+                    key={req._id}
+                    style={{
+                      background: "var(--bg-card)",
+                      border: "1px solid var(--border-color)",
+                      borderLeft: "5px solid #f59e0b",
+                      borderRadius: "16px",
+                      padding: "22px",
+                      marginBottom: "16px",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.04)"
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
+                      <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+                        {req.student?.profilePicture ? (
+                          <img 
+                            src={req.student.profilePicture} 
+                            alt="Profile" 
+                            style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "2px solid var(--border-color)" }} 
+                          />
+                        ) : (
+                          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #3B8DB3, #2563eb)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 700, flexShrink: 0 }}>
+                            {req.student?.name?.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <p style={{ margin: 0, fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>{req.student?.name}</p>
+                          <p style={{ margin: "2px 0 0", fontSize: "12px", color: "var(--text-secondary)" }}>{req.student?.email}</p>
                         </div>
-                      )}
-                      <div>
-                        <p style={{ margin: 0, fontWeight: 700, fontSize: "15px" }}>{req.student?.name}</p>
-                        <p style={{ margin: "2px 0 0", fontSize: "12px", color: "var(--text-secondary)" }}>{req.student?.email}</p>
                       </div>
+                      <span style={{ fontSize: "12px", background: "rgba(245,158,11,0.12)", color: "#d97706", border: "1px solid rgba(245,158,11,0.25)", padding: "4px 14px", borderRadius: "20px", fontWeight: 700 }}>
+                        🕐 Pending Approval
+                      </span>
                     </div>
-                    <span style={{ fontSize: "11px", color: "var(--text-secondary)", background: "rgba(251,191,36,0.15)", color: "#d97706", padding: "3px 10px", borderRadius: "20px", fontWeight: 600 }}>
-                      🕐 Pending
-                    </span>
-                  </div>
-                  <div style={{ padding: "12px 14px", background: "var(--bg-secondary)", borderRadius: "10px", marginBottom: "14px" }}>
-                    <p style={{ margin: "0 0 4px", fontWeight: 600, fontSize: "13px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                      <FiBookOpen size={14} style={{ color: "#3B8DB3" }} />
-                      {req.subject}
-                    </p>
-                    {req.topic && <p style={{ margin: 0, fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.5 }}>{req.topic}</p>}
-                  </div>
-                  <p style={{ margin: "0 0 12px", fontSize: "12px", color: "var(--text-muted)" }}>
-                    Received: {new Date(req.createdAt).toLocaleString()}
-                  </p>
 
-                  {respondingId === req._id ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "14px", background: "rgba(99,102,241,0.04)", borderRadius: "10px", border: "1px solid rgba(99,102,241,0.15)" }}>
-                      <p style={{ margin: "0 0 4px", fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>📅 Set Schedule Window</p>
-                      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                        <div style={{ flex: 1, minWidth: 200 }}>
-                          <label style={{ display: "block", fontSize: "12px", marginBottom: "4px", color: "var(--text-secondary)", fontWeight: 600 }}>From</label>
-                          <input
-                            type="datetime-local"
-                            value={scheduleStart}
-                            onChange={(e) => setScheduleStart(e.target.value)}
-                            style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box" }}
-                          />
+                    <div style={{ padding: "14px 16px", background: "var(--bg-secondary)", borderRadius: "12px", marginBottom: "16px" }}>
+                      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: "14px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <FiBookOpen size={16} color="#3B8DB3" />
+                        {req.subject}
+                      </p>
+                      {req.topic && <p style={{ margin: 0, fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.5 }}>{req.topic}</p>}
+                    </div>
+                    <p style={{ margin: "0 0 14px", fontSize: "12px", color: "var(--text-muted)" }}>
+                      Submitted on: {new Date(req.createdAt).toLocaleString()}
+                    </p>
+
+                    {respondingId === req._id ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "16px", background: "rgba(59,141,179,0.06)", borderRadius: "12px", border: "1px solid rgba(59,141,179,0.2)" }}>
+                        <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "14px", color: "var(--text-primary)" }}>📅 Set Schedule Window</p>
+                        <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
+                          <div style={{ flex: 1, minWidth: 200 }}>
+                            <label style={{ display: "block", fontSize: "12px", marginBottom: "4px", color: "var(--text-secondary)", fontWeight: 600 }}>Start Time</label>
+                            <input
+                              type="datetime-local"
+                              value={scheduleStart}
+                              onChange={(e) => setScheduleStart(e.target.value)}
+                              style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid var(--border-color)", background: "var(--bg-card)", color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box" }}
+                            />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 200 }}>
+                            <label style={{ display: "block", fontSize: "12px", marginBottom: "4px", color: "var(--text-secondary)", fontWeight: 600 }}>End Time</label>
+                            <input
+                              type="datetime-local"
+                              value={scheduleEnd}
+                              onChange={(e) => setScheduleEnd(e.target.value)}
+                              style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid var(--border-color)", background: "var(--bg-card)", color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box" }}
+                            />
+                          </div>
                         </div>
-                        <div style={{ flex: 1, minWidth: 200 }}>
-                          <label style={{ display: "block", fontSize: "12px", marginBottom: "4px", color: "var(--text-secondary)", fontWeight: 600 }}>To</label>
-                          <input
-                            type="datetime-local"
-                            value={scheduleEnd}
-                            onChange={(e) => setScheduleEnd(e.target.value)}
-                            style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box" }}
-                          />
+                        <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
+                          <button onClick={() => handleRespondToRequest(req._id, "accepted")} style={{ padding: "10px 20px", background: "#10b981", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <FiCheck size={16} /> Accept & Schedule
+                          </button>
+                          <button onClick={() => { setRespondingId(null); setScheduleStart(""); setScheduleEnd(""); }} style={{ padding: "10px 18px", background: "transparent", color: "var(--text-secondary)", border: "1px solid var(--border-color)", borderRadius: "10px", fontWeight: 600, fontSize: "13px", cursor: "pointer" }}>
+                            Cancel
+                          </button>
                         </div>
                       </div>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <button onClick={() => handleRespondToRequest(req._id, "accepted")} style={{ padding: "8px 18px", background: "#10b981", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
-                          <FiCheck size={14} /> Accept & Schedule
+                    ) : (
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <button onClick={() => setRespondingId(req._id)} style={{ padding: "10px 22px", background: "#10b981", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <FiCheck size={16} /> Accept
                         </button>
-                        <button onClick={() => { setRespondingId(null); setScheduleStart(""); setScheduleEnd(""); }} style={{ padding: "8px 16px", background: "transparent", color: "var(--text-secondary)", border: "1px solid var(--border-color)", borderRadius: "8px", fontWeight: 600, fontSize: "13px", cursor: "pointer" }}>
-                          Cancel
+                        <button onClick={() => handleRespondToRequest(req._id, "rejected")} style={{ padding: "10px 18px", background: "transparent", color: "#ef4444", border: "1.5px solid #ef4444", borderRadius: "10px", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <FiX size={16} /> Decline
                         </button>
                       </div>
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => setRespondingId(req._id)} style={{ padding: "8px 18px", background: "#10b981", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
-                        <FiCheck size={14} /> Accept
-                      </button>
-                      <button onClick={() => handleRespondToRequest(req._id, "rejected")} style={{ padding: "8px 16px", background: "transparent", color: "#ef4444", border: "1px solid #ef4444", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
-                        <FiX size={14} /> Decline
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                ))
+              )}
             </>
           )}
 
           {/* All requests (both roles) — history */}
-          <h3 style={{ margin: "24px 0 16px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "8px" }}>
-            <FiClock size={20} color="var(--pastel-blue-primary)" /> {user?.role === "student" ? "My Requests" : "Request History"}
-          </h3>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "32px", marginBottom: "16px" }}>
+            <FiClock size={22} color="#3B8DB3" />
+            <h3 style={{ margin: 0, color: "var(--text-primary)", fontSize: "18px", fontWeight: 700 }}>
+              {user?.role === "student" ? "My Contact Requests" : "Request History"}
+            </h3>
+          </div>
+
           {crLoading ? (
-            <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)" }}>Loading...</div>
+            <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)" }}>Loading requests...</div>
           ) : contactRequests.filter((r) => user?.role === "teacher" ? r.status !== "pending" : true).length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)", background: "var(--bg-card)", borderRadius: "16px", border: "1px solid var(--border-color)" }}>
-              <p style={{ margin: 0 }}>No requests yet.</p>
+              <p style={{ margin: 0, fontSize: "14px" }}>No contact requests found.</p>
             </div>
-          ) : contactRequests
+          ) : (
+            contactRequests
               .filter((r) => user?.role === "teacher" ? r.status !== "pending" : true)
               .map((req) => {
-                const statusColor = { pending: "#d97706", accepted: "#10b981", rejected: "#ef4444" };
+                const statusColor = { pending: "#f59e0b", accepted: "#10b981", rejected: "#ef4444" };
                 const statusLabel = { pending: "🕐 Pending", accepted: "✅ Accepted", rejected: "❌ Declined" };
+                const statusBg = { pending: "rgba(245,158,11,0.12)", accepted: "rgba(16,185,129,0.12)", rejected: "rgba(239,68,68,0.12)" };
                 const otherPerson = user?.role === "student" ? req.teacher : req.student;
                 return (
-                  <div key={req._id} style={{ background: "var(--bg-card)", border: `1px solid ${statusColor[req.status]}33`, borderLeft: `4px solid ${statusColor[req.status]}`, borderRadius: "12px", padding: "16px 20px", marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
-                    <div>
-                      <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "14px" }}>{otherPerson?.name}</p>
-                      <p style={{ margin: "0 0 4px", fontSize: "13px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                        <FiBookOpen size={14} style={{ color: "#3B8DB3" }} />
-                        {req.subject}
-                      </p>
-                      {req.topic && <p style={{ margin: "0 0 4px", fontSize: "12px", color: "var(--text-muted)" }}>{req.topic}</p>}
-                      {req.status === "accepted" && req.scheduleStart && (
-                        <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#10b981", fontWeight: 600 }}>
-                          🗓 {new Date(req.scheduleStart).toLocaleString()} – {new Date(req.scheduleEnd).toLocaleTimeString()}
+                  <div
+                    key={req._id}
+                    style={{
+                      background: "var(--bg-card)",
+                      border: `1px solid var(--border-color)`,
+                      borderLeft: `5px solid ${statusColor[req.status]}`,
+                      borderRadius: "16px",
+                      padding: "20px 24px",
+                      marginBottom: "14px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      flexWrap: "wrap",
+                      gap: "16px",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: "260px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #3B8DB3, #2563eb)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14 }}>
+                          {otherPerson?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: 700, fontSize: "15px", color: "var(--text-primary)" }}>{otherPerson?.name}</span>
+                          <span style={{ marginLeft: "8px", fontSize: "11px", background: "var(--bg-secondary)", padding: "2px 8px", borderRadius: "12px", color: "var(--text-secondary)", fontWeight: 600 }}>
+                            {user?.role === "student" ? "Teacher" : "Student"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div style={{ margin: "10px 0", padding: "10px 14px", background: "var(--bg-secondary)", borderRadius: "10px" }}>
+                        <p style={{ margin: "0 0 4px", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <FiBookOpen size={15} color="#3B8DB3" />
+                          {req.subject}
                         </p>
+                        {req.topic && <p style={{ margin: 0, fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.4 }}>{req.topic}</p>}
+                      </div>
+
+                      {req.status === "accepted" && req.scheduleStart && (
+                        <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(16,185,129,0.08)", borderRadius: "8px", border: "1px solid rgba(16,185,129,0.2)" }}>
+                          <p style={{ margin: 0, fontSize: "12px", color: "#10b981", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
+                            🗓️ Scheduled Window: {new Date(req.scheduleStart).toLocaleString()} – {new Date(req.scheduleEnd).toLocaleTimeString()}
+                          </p>
+                        </div>
                       )}
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px" }}>
-                      <span style={{ padding: "3px 12px", borderRadius: "20px", background: `${statusColor[req.status]}18`, color: statusColor[req.status], fontSize: "12px", fontWeight: 700 }}>
+
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px" }}>
+                      <span
+                        style={{
+                          padding: "6px 16px",
+                          borderRadius: "20px",
+                          background: statusBg[req.status],
+                          color: statusColor[req.status],
+                          border: `1px solid ${statusColor[req.status]}33`,
+                          fontSize: "12px",
+                          fontWeight: 700
+                        }}
+                      >
                         {statusLabel[req.status]}
                       </span>
-                      <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>{new Date(req.createdAt).toLocaleDateString()}</span>
+                      <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                        {new Date(req.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                 );
-              })}
+              })
+          )}
         </div>
       )}
 

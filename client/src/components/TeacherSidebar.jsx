@@ -18,22 +18,13 @@ import {
   FiMessageCircle,
   FiMail,
   FiClock,
-  FiBell,
-  FiSettings,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
 export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const activeCourseId = courseId || courseInfo?._id;
-  const cid = activeCourseId || sessionStorage.getItem("last_active_teacher_course_id");
-
-  useEffect(() => {
-    if (activeCourseId) {
-      sessionStorage.setItem("last_active_teacher_course_id", activeCourseId);
-    }
-  }, [activeCourseId]);
+  const cid = courseId || courseInfo?._id;
 
   const [course, setCourse] = useState(courseInfo || null);
   const [communityOpen, setCommunityOpen] = useState(
@@ -172,7 +163,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
         </div>
         <div className="sidebar-footer-fixed">
           <button
-            className={`nav-item ${currentPage === "notifications" || window.location.pathname.includes("/notifications") ? "active" : ""}`}
+            className={`nav-item ${currentPage === "notifications" ? "active" : ""}`}
             onClick={() => navigate("/notifications")}
           >
             <FiBell size={18} />
@@ -180,7 +171,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           </button>
           <div className="nav-divider" style={{ margin: "2px 0" }}></div>
           <button
-            className={`nav-item ${currentPage === "settings" || window.location.pathname.includes("/settings") ? "active" : ""}`}
+            className={`nav-item ${currentPage === "settings" ? "active" : ""}`}
             onClick={() => navigate("/settings")}
           >
             <FiSettings size={18} />
@@ -357,8 +348,8 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
       </div>
       <div className="sidebar-footer-fixed">
         <button
-          className={`nav-item ${currentPage === "notifications" || window.location.pathname.includes("/notifications") ? "active" : ""}`}
-          onClick={() => navigate(cid ? `/notifications?courseId=${cid}` : "/notifications")}
+          className={`nav-item ${currentPage === "notifications" ? "active" : ""}`}
+          onClick={() => navigate("/notifications")}
         >
           <FiBell size={18} />
           <span>Notifications</span>
@@ -370,8 +361,8 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
         </button>
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
         <button
-          className={`nav-item ${currentPage === "settings" || window.location.pathname.includes("/settings") ? "active" : ""}`}
-          onClick={() => navigate(cid ? `/settings?courseId=${cid}` : "/settings")}
+          className={`nav-item ${currentPage === "settings" ? "active" : ""}`}
+          onClick={() => navigate("/settings")}
         >
           <FiSettings size={18} />
           <span>Settings</span>

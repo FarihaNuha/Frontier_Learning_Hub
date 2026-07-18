@@ -33,9 +33,21 @@ async function extractTextFromFile(filePath) {
     const result = await mammoth.extractRawText({ path: filePath });
     text = result.value || "";
   } else if (ext === ".pdf") {
-    const dataBuffer = fs.readFileSync(filePath);
-    const data = await pdfParse(dataBuffer);
-    text = data.text || "";
+    try {
+      const dataBuffer = fs.readFileSync(filePath);
+      const data = await pdfParse(dataBuffer);
+      text = data.text || "";
+    } catch (pdfErr) {
+      console.error("pdfParse error:", pdfErr);
+    }
+    if (!text || text.trim().length === 0) {
+      // Fallback: raw buffer extraction of text streams
+      try {
+        const bufStr = fs.readFileSync(filePath, "latin1");
+        const matches = bufStr.match(/\(([^()]{3,})\)/g) || [];
+        text = matches.map(m => m.slice(1, -1)).join(" ");
+      } catch (e) {}
+    }
   } else {
     throw new Error("Unsupported file format. Only .docx, .pdf, and .txt are supported.");
   }
@@ -65,10 +77,15 @@ function preprocessText(text) {
 function splitIntoSentences(text) {
   if (!text) return [];
   const clean = cleanExtractedText(text);
-  return clean
-    .split(/[.!?]+\s*/)
+  const sentences = clean
+    .split(/[.!?\r\n]+\s*/)
     .map(s => s.trim())
-    .filter(s => s.length > 5); // Ignore empty or trivial 1-2 char noise
+    .filter(s => s.length > 5);
+  
+  if (sentences.length === 0 && clean.length > 5) {
+    return [clean];
+  }
+  return sentences;
 }
 
 /**
@@ -141,10 +158,40 @@ function getTrigrams(words) {
  * Combines sentence fuzzy matching with document Trigram Jaccard similarity.
  * @param {string[]} newSentences - Sentences from the new submission.
  * @param {string[]} refSentences - Sentences from the reference submission.
+ * @param {string} rawTextA - Full raw text of new submission.
+ * @param {string} rawTextB - Full raw text of reference submission.
  * @returns {number} - Percentage similarity (0 to 100).
  */
-function calculateSimilarity(newSentences, refSentences) {
-  if (!newSentences || !refSentences || newSentences.length === 0 || refSentences.length === 0) return 0;
+function calculateSimilarity(newSentences, refSentences, rawTextA = "", rawTextB = "") {
+  const normA = preprocessText(rawTextA || (newSentences ? newSentences.join(" ") : ""));
+  const normB = preprocessText(rawTextB || (refSentences ? refSentences.join(" ") : ""));
+
+  if (normA && normB) {
+    if (normA === normB) return 100;
+
+    const wordsA = normA.split(" ").filter((w) => w.length > 1);
+    const wordsB = normB.split(" ").filter((w) => w.length > 1);
+    if (wordsA.length > 0 && wordsB.length > 0) {
+      const setB = new Set(wordsB);
+      let matchCount = 0;
+      for (const w of wordsA) {
+        if (setB.has(w)) matchCount++;
+      }
+      const wordSim = Math.round((matchCount / wordsA.length) * 100);
+      if (wordSim >= 85) return wordSim;
+    }
+  }
+
+  if (!newSentences || !refSentences || newSentences.length === 0 || refSentences.length === 0) {
+    if (normA && normB && normA.length > 5 && normB.length > 5) {
+      const sampleA = normA.slice(0, 500);
+      const sampleB = normB.slice(0, 500);
+      const dist = computeLevenshtein(sampleA, sampleB);
+      const maxLen = Math.max(sampleA.length, sampleB.length);
+      return Math.round(((maxLen - dist) / maxLen) * 100);
+    }
+    return 0;
+  }
 
   const newClean = newSentences.map(s => preprocessText(s)).filter(s => s.length > 0);
   const refClean = refSentences.map(s => preprocessText(s)).filter(s => s.length > 0);

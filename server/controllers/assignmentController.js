@@ -426,6 +426,11 @@ exports.submitAssignment = async (req, res) => {
 // Get submissions (Teacher)
 exports.getSubmissions = async (req, res) => {
   try {
+    try {
+      await recalculateAssignmentSimilarity(req.params.id);
+    } catch (recalcErr) {
+      console.error("Auto recalculate similarity error:", recalcErr);
+    }
     const submissions = await Submission.find({ assignmentId: req.params.id })
       .populate("studentId", "name email studentId")
       .populate("similarityMatchedStudent", "name email studentId")

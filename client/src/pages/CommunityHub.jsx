@@ -26,6 +26,7 @@ import {
   FiMoreVertical,
   FiEdit3,
   FiTrash2,
+  FiEye,
   FiLogOut,
   FiSlash
 } from "react-icons/fi";
@@ -303,9 +304,9 @@ const renderAttachments = (attachments, onPreview) => {
                   <button
                     onClick={() => onPreview && onPreview(fileObj)}
                     className="btn-download-link"
-                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer" }}
+                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                   >
-                    👁️ View
+                    <FiEye size={14} /> View
                   </button>
                   <a href={absoluteUrl} download={file.fileName} className="btn-download-link" target="_blank" rel="noopener noreferrer">Download</a>
                 </div>
@@ -324,9 +325,9 @@ const renderAttachments = (attachments, onPreview) => {
                   <button
                     onClick={() => onPreview && onPreview(fileObj)}
                     className="btn-download-link"
-                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer" }}
+                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                   >
-                    👁️ View
+                    <FiEye size={14} /> View
                   </button>
                   <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
                 </div>
@@ -345,9 +346,9 @@ const renderAttachments = (attachments, onPreview) => {
                   <button
                     onClick={() => onPreview && onPreview(fileObj)}
                     className="btn-download-link"
-                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer" }}
+                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                   >
-                    👁️ View
+                    <FiEye size={14} /> View
                   </button>
                   <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
                 </div>
@@ -371,7 +372,7 @@ const renderAttachments = (attachments, onPreview) => {
                 className="btn-download-link"
                 style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
               >
-                👁️ View
+                <FiEye size={14} /> View
               </button>
               <a
                 href={absoluteUrl}

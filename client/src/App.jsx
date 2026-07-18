@@ -24,6 +24,7 @@ const TeacherAssessmentPage = lazy(() => import("./pages/TeacherAssessmentPage")
 const StudentAssessmentPage = lazy(() => import("./pages/StudentAssessmentPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const CourseAnalyticsPage = lazy(() => import("./pages/CourseAnalyticsPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
 // Fixed ProtectedRoute - checks token and user state
 function ProtectedRoute({ children }) {
@@ -316,6 +317,15 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <RoleRouter />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />

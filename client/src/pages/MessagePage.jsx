@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import * as docx from "docx-preview";
 import JSZip from "jszip";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { communityApi } from "../services/communityApi";
 import api from "../services/api";
@@ -62,8 +62,19 @@ export default function MessagePage() {
   const [showAttachmentPicker, setShowAttachmentPicker] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
 
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
   // ---- tab state ----
-  const [activeTab, setActiveTab] = useState("messages"); // "messages" | "requests"
+  const [activeTab, setActiveTab] = useState(tabParam === "requests" ? "requests" : "messages"); // "messages" | "requests"
+
+  useEffect(() => {
+    if (tabParam === "requests") {
+      setActiveTab("requests");
+    } else if (tabParam === "messages") {
+      setActiveTab("messages");
+    }
+  }, [tabParam]);
 
   // ---- contact request state ----
   const [contactRequests, setContactRequests] = useState([]);

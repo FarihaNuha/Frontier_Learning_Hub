@@ -130,7 +130,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_json",
-      "community": 15,
+      "community": 17,
       "norm_label": "package.json"
     },
     {
@@ -140,7 +140,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_name",
-      "community": 15,
+      "community": 17,
       "norm_label": "name"
     },
     {
@@ -150,7 +150,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_version",
-      "community": 15,
+      "community": 17,
       "norm_label": "version"
     },
     {
@@ -160,7 +160,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_private",
-      "community": 15,
+      "community": 17,
       "norm_label": "private"
     },
     {
@@ -180,7 +180,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_testing_library_dom",
-      "community": 52,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -190,7 +190,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "testing_library_dom",
-      "community": 52,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -200,7 +200,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_testing_library_jest_dom",
-      "community": 40,
+      "community": 12,
       "norm_label": "@testing-library/jest-dom"
     },
     {
@@ -210,7 +210,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "testing_library_jest_dom",
-      "community": 40,
+      "community": 12,
       "norm_label": "@testing-library/jest-dom"
     },
     {
@@ -220,7 +220,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_testing_library_react",
-      "community": 41,
+      "community": 12,
       "norm_label": "@testing-library/react"
     },
     {
@@ -230,7 +230,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "testing_library_react",
-      "community": 41,
+      "community": 12,
       "norm_label": "@testing-library/react"
     },
     {
@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_docx_preview",
-      "community": 22,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 22,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -300,7 +300,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_jspdf",
-      "community": 34,
+      "community": 12,
       "norm_label": "jspdf"
     },
     {
@@ -310,7 +310,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "jspdf",
-      "community": 34,
+      "community": 12,
       "norm_label": "jspdf"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_jspdf_autotable",
-      "community": 36,
+      "community": 12,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -330,7 +330,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "jspdf_autotable",
-      "community": 36,
+      "community": 12,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -360,7 +360,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_react",
-      "community": 37,
+      "community": 12,
       "norm_label": "react"
     },
     {
@@ -370,7 +370,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "react",
-      "community": 37,
+      "community": 12,
       "norm_label": "react"
     },
     {
@@ -400,7 +400,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_react_hot_toast",
-      "community": 38,
+      "community": 12,
       "norm_label": "react-hot-toast"
     },
     {
@@ -410,7 +410,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "react_hot_toast",
-      "community": 38,
+      "community": 12,
       "norm_label": "react-hot-toast"
     },
     {
@@ -420,7 +420,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_react_icons",
-      "community": 39,
+      "community": 12,
       "norm_label": "react-icons"
     },
     {
@@ -430,7 +430,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "react_icons",
-      "community": 39,
+      "community": 12,
       "norm_label": "react-icons"
     },
     {
@@ -500,7 +500,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_web_vitals",
-      "community": 42,
+      "community": 12,
       "norm_label": "web-vitals"
     },
     {
@@ -510,7 +510,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "web_vitals",
-      "community": 42,
+      "community": 12,
       "norm_label": "web-vitals"
     },
     {
@@ -520,7 +520,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_xlsx",
-      "community": 21,
+      "community": 12,
       "norm_label": "xlsx"
     },
     {
@@ -530,7 +530,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_package_json_xlsx",
-      "community": 21,
+      "community": 12,
       "norm_label": "xlsx"
     },
     {
@@ -540,7 +540,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_scripts",
-      "community": 16,
+      "community": 17,
       "norm_label": "scripts"
     },
     {
@@ -550,7 +550,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_scripts_start",
-      "community": 16,
+      "community": 17,
       "norm_label": "start"
     },
     {
@@ -560,7 +560,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_scripts_build",
-      "community": 16,
+      "community": 17,
       "norm_label": "build"
     },
     {
@@ -570,7 +570,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_scripts_test",
-      "community": 16,
+      "community": 17,
       "norm_label": "test"
     },
     {
@@ -580,7 +580,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_scripts_eject",
-      "community": 16,
+      "community": 17,
       "norm_label": "eject"
     },
     {
@@ -590,7 +590,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_eslintconfig",
-      "community": 15,
+      "community": 17,
       "norm_label": "eslintconfig"
     },
     {
@@ -600,7 +600,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_eslintconfig_extends",
-      "community": 15,
+      "community": 17,
       "norm_label": "extends"
     },
     {
@@ -610,7 +610,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "ref_react_app",
-      "community": 15,
+      "community": 17,
       "norm_label": "react-app"
     },
     {
@@ -620,7 +620,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "ref_react_app_jest",
-      "community": 15,
+      "community": 17,
       "norm_label": "react-app/jest"
     },
     {
@@ -1557,7 +1557,7 @@
       "label": "getCourseBanner()",
       "file_type": "code",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "client_src_pages_courselistpage_getcoursebanner",
       "community": 0,
@@ -1567,7 +1567,7 @@
       "label": "CourseListPage()",
       "file_type": "code",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L106",
+      "source_location": "L107",
       "_origin": "ast",
       "id": "client_src_pages_courselistpage_courselistpage",
       "community": 0,
@@ -1577,7 +1577,7 @@
       "label": "Sidebar()",
       "file_type": "code",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L586",
+      "source_location": "L589",
       "_origin": "ast",
       "id": "client_src_pages_courselistpage_sidebar",
       "community": 0,
@@ -1737,7 +1737,7 @@
       "label": "StudentAssignmentPage()",
       "file_type": "code",
       "source_file": "client/src/pages/StudentAssignmentPage.jsx",
-      "source_location": "L31",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "client_src_pages_studentassignmentpage_studentassignmentpage",
       "community": 0,
@@ -1777,7 +1777,7 @@
       "label": "StudentDashboard()",
       "file_type": "code",
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "client_src_pages_studentdashboard_studentdashboard",
       "community": 0,
@@ -1837,7 +1837,7 @@
       "label": "TeacherAssignmentPage()",
       "file_type": "code",
       "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "client_src_pages_teacherassignmentpage_teacherassignmentpage",
       "community": 0,
@@ -1877,7 +1877,7 @@
       "label": "TeacherDashboard()",
       "file_type": "code",
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "client_src_pages_teacherdashboard_teacherdashboard",
       "community": 0,
@@ -1972,6 +1972,76 @@
       "id": "client_src_services_api_api",
       "community": 0,
       "norm_label": "api"
+    },
+    {
+      "label": "apiCache.js",
+      "file_type": "code",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "client_src_services_apicache",
+      "community": 0,
+      "norm_label": "apicache.js"
+    },
+    {
+      "label": "memoryCache",
+      "file_type": "code",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "client_src_services_apicache_memorycache",
+      "community": 0,
+      "norm_label": "memorycache"
+    },
+    {
+      "label": "getCachedData()",
+      "file_type": "code",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "client_src_services_apicache_getcacheddata",
+      "community": 0,
+      "norm_label": "getcacheddata()"
+    },
+    {
+      "label": "setCachedData()",
+      "file_type": "code",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L48",
+      "_origin": "ast",
+      "id": "client_src_services_apicache_setcacheddata",
+      "community": 0,
+      "norm_label": "setcacheddata()"
+    },
+    {
+      "label": "invalidateCache()",
+      "file_type": "code",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "client_src_services_apicache_invalidatecache",
+      "community": 0,
+      "norm_label": "invalidatecache()"
+    },
+    {
+      "label": "fetchWithCache()",
+      "file_type": "code",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "client_src_services_apicache_fetchwithcache",
+      "community": 0,
+      "norm_label": "fetchwithcache()"
+    },
+    {
+      "label": "useCachedFetch()",
+      "file_type": "code",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L119",
+      "_origin": "ast",
+      "id": "client_src_services_apicache_usecachedfetch",
+      "community": 0,
+      "norm_label": "usecachedfetch()"
     },
     {
       "label": "communityApi.js",
@@ -2360,7 +2430,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_uploadmarksheet",
-      "community": 3,
+      "community": 15,
       "norm_label": "uploadmarksheet()"
     },
     {
@@ -2530,7 +2600,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_createassignment",
-      "community": 3,
+      "community": 15,
       "norm_label": "createassignment()"
     },
     {
@@ -2630,7 +2700,7 @@
       "source_location": "L491",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_gradesubmission",
-      "community": 3,
+      "community": 15,
       "norm_label": "gradesubmission()"
     },
     {
@@ -3270,7 +3340,7 @@
       "source_location": "L1007",
       "_origin": "ast",
       "id": "server_controllers_communitycontroller_createcontactrequest",
-      "community": 3,
+      "community": 15,
       "norm_label": "createcontactrequest()"
     },
     {
@@ -3290,7 +3360,7 @@
       "source_location": "L1109",
       "_origin": "ast",
       "id": "server_controllers_communitycontroller_respondtocontactrequest",
-      "community": 3,
+      "community": 15,
       "norm_label": "respondtocontactrequest()"
     },
     {
@@ -3510,7 +3580,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_createexam",
-      "community": 3,
+      "community": 15,
       "norm_label": "createexam()"
     },
     {
@@ -3550,7 +3620,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_submitexam",
-      "community": 3,
+      "community": 15,
       "norm_label": "submitexam()"
     },
     {
@@ -3620,7 +3690,7 @@
       "source_location": "L466",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_publishexamresults",
-      "community": 3,
+      "community": 15,
       "norm_label": "publishexamresults()"
     },
     {
@@ -3750,7 +3820,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_uploadlecture",
-      "community": 3,
+      "community": 8,
       "norm_label": "uploadlecture()"
     },
     {
@@ -4440,7 +4510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_examsubmission",
-      "community": 51,
+      "community": 47,
       "norm_label": "examsubmission.js"
     },
     {
@@ -4450,7 +4520,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_examsubmission_mongoose",
-      "community": 51,
+      "community": 47,
       "norm_label": "mongoose"
     },
     {
@@ -4460,7 +4530,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_examsubmission_answerschema",
-      "community": 51,
+      "community": 47,
       "norm_label": "answerschema"
     },
     {
@@ -4470,7 +4540,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_models_examsubmission_examsubmissionschema",
-      "community": 51,
+      "community": 47,
       "norm_label": "examsubmissionschema"
     },
     {
@@ -4540,7 +4610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification",
-      "community": 47,
+      "community": 13,
       "norm_label": "notification.js"
     },
     {
@@ -4550,7 +4620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification_mongoose",
-      "community": 47,
+      "community": 13,
       "norm_label": "mongoose"
     },
     {
@@ -4560,7 +4630,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notification_notificationschema",
-      "community": 47,
+      "community": 13,
       "norm_label": "notificationschema"
     },
     {
@@ -4600,7 +4670,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission",
-      "community": 4,
+      "community": 5,
       "norm_label": "submission.js"
     },
     {
@@ -4610,7 +4680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission_mongoose",
-      "community": 4,
+      "community": 5,
       "norm_label": "mongoose"
     },
     {
@@ -4620,7 +4690,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_submission_submissionschema",
-      "community": 4,
+      "community": 5,
       "norm_label": "submissionschema"
     },
     {
@@ -4630,7 +4700,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_user",
-      "community": 7,
+      "community": 10,
       "norm_label": "user.js"
     },
     {
@@ -4640,7 +4710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_user_mongoose",
-      "community": 7,
+      "community": 10,
       "norm_label": "mongoose"
     },
     {
@@ -4650,7 +4720,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_models_user_bcrypt",
-      "community": 7,
+      "community": 10,
       "norm_label": "bcrypt"
     },
     {
@@ -4660,7 +4730,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_models_user_userschema",
-      "community": 7,
+      "community": 10,
       "norm_label": "userschema"
     },
     {
@@ -5700,7 +5770,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_startscheduler",
-      "community": 3,
+      "community": 15,
       "norm_label": "startscheduler()"
     },
     {
@@ -5810,7 +5880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism",
-      "community": 4,
+      "community": 10,
       "norm_label": "recalculate_all_plagiarism.js"
     },
     {
@@ -5820,7 +5890,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_mongoose",
-      "community": 4,
+      "community": 10,
       "norm_label": "mongoose"
     },
     {
@@ -5830,7 +5900,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_path",
-      "community": 4,
+      "community": 10,
       "norm_label": "path"
     },
     {
@@ -5840,7 +5910,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_similarityservice",
-      "community": 4,
+      "community": 10,
       "norm_label": "similarityservice"
     },
     {
@@ -5850,7 +5920,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_submission",
-      "community": 4,
+      "community": 10,
       "norm_label": "submission"
     },
     {
@@ -5860,7 +5930,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_user",
-      "community": 4,
+      "community": 10,
       "norm_label": "user"
     },
     {
@@ -5870,7 +5940,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_fs",
-      "community": 4,
+      "community": 10,
       "norm_label": "fs"
     },
     {
@@ -5880,7 +5950,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_recalculateassignmentsimilarity",
-      "community": 4,
+      "community": 10,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -5890,7 +5960,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_main",
-      "community": 4,
+      "community": 10,
       "norm_label": "main()"
     },
     {
@@ -5900,7 +5970,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate",
-      "community": 4,
+      "community": 5,
       "norm_label": "run_recalculate.js"
     },
     {
@@ -5910,7 +5980,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_mongoose",
-      "community": 4,
+      "community": 5,
       "norm_label": "mongoose"
     },
     {
@@ -5920,7 +5990,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_path",
-      "community": 4,
+      "community": 5,
       "norm_label": "path"
     },
     {
@@ -5930,7 +6000,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_similarityservice",
-      "community": 4,
+      "community": 5,
       "norm_label": "similarityservice"
     },
     {
@@ -5940,7 +6010,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_submission",
-      "community": 4,
+      "community": 5,
       "norm_label": "submission"
     },
     {
@@ -5950,7 +6020,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_user",
-      "community": 4,
+      "community": 5,
       "norm_label": "user"
     },
     {
@@ -5960,7 +6030,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_fs",
-      "community": 4,
+      "community": 5,
       "norm_label": "fs"
     },
     {
@@ -5970,7 +6040,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_recalculateassignmentsimilarity",
-      "community": 4,
+      "community": 5,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -5980,7 +6050,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_main",
-      "community": 4,
+      "community": 5,
       "norm_label": "main()"
     },
     {
@@ -6570,7 +6640,7 @@
       "source_location": "L367",
       "_origin": "ast",
       "id": "server_services_emailservice_queueemail",
-      "community": 3,
+      "community": 15,
       "norm_label": "queueemail()"
     },
     {
@@ -6880,7 +6950,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "server_socket_getio",
-      "community": 3,
+      "community": 15,
       "norm_label": "getio()"
     },
     {
@@ -8267,7 +8337,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard",
       "target": "client_src_components_sharemodal",
@@ -8278,7 +8348,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard",
       "target": "client_src_components_sharemodal",
@@ -8344,7 +8414,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard",
       "target": "client_src_components_sharemodal_sharemodal",
@@ -8355,7 +8425,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard",
       "target": "client_src_components_sharemodal_sharemodal",
@@ -8452,7 +8522,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage",
       "target": "client_src_components_studentsidebar",
@@ -8474,7 +8544,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentAssignmentPage.jsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "client_src_pages_studentassignmentpage",
       "target": "client_src_components_studentsidebar",
@@ -8496,7 +8566,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard",
       "target": "client_src_components_studentsidebar",
@@ -8551,7 +8621,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage",
       "target": "client_src_components_studentsidebar_studentsidebar",
@@ -8573,7 +8643,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentAssignmentPage.jsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "client_src_pages_studentassignmentpage",
       "target": "client_src_components_studentsidebar_studentsidebar",
@@ -8595,7 +8665,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard",
       "target": "client_src_components_studentsidebar_studentsidebar",
@@ -8693,7 +8763,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage",
       "target": "client_src_components_teachersidebar",
@@ -8715,7 +8785,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "client_src_pages_teacherassignmentpage",
       "target": "client_src_components_teachersidebar",
@@ -8737,7 +8807,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard",
       "target": "client_src_components_teachersidebar",
@@ -8792,7 +8862,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage",
       "target": "client_src_components_teachersidebar_teachersidebar",
@@ -8814,7 +8884,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "client_src_pages_teacherassignmentpage",
       "target": "client_src_components_teachersidebar_teachersidebar",
@@ -8836,7 +8906,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard",
       "target": "client_src_components_teachersidebar_teachersidebar",
@@ -9349,7 +9419,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L107",
+      "source_location": "L108",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage_courselistpage",
       "target": "client_src_contexts_authcontext_useauth"
@@ -9481,7 +9551,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/StudentAssignmentPage.jsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "weight": 1.0,
       "source": "client_src_pages_studentassignmentpage_studentassignmentpage",
       "target": "client_src_contexts_authcontext_useauth"
@@ -9525,7 +9595,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L36",
+      "source_location": "L37",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard_studentdashboard",
       "target": "client_src_contexts_authcontext_useauth"
@@ -9591,7 +9661,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "weight": 1.0,
       "source": "client_src_pages_teacherassignmentpage_teacherassignmentpage",
       "target": "client_src_contexts_authcontext_useauth"
@@ -9635,7 +9705,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard_teacherdashboard",
       "target": "client_src_contexts_authcontext_useauth"
@@ -10359,7 +10429,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L106",
+      "source_location": "L107",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage",
       "target": "client_src_pages_courselistpage_courselistpage",
@@ -10369,7 +10439,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage",
       "target": "client_src_pages_courselistpage_getcoursebanner",
@@ -10379,7 +10449,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L586",
+      "source_location": "L589",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage",
       "target": "client_src_pages_courselistpage_sidebar",
@@ -10408,15 +10478,70 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/CourseListPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_courselistpage",
+      "target": "client_src_services_apicache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/CourseListPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_courselistpage",
+      "target": "client_src_services_apicache_fetchwithcache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/CourseListPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_courselistpage",
+      "target": "client_src_services_apicache_invalidatecache",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseListPage.jsx",
-      "source_location": "L399",
+      "source_location": "L402",
       "weight": 1.0,
       "source": "client_src_pages_courselistpage_courselistpage",
       "target": "client_src_pages_courselistpage_getcoursebanner",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/src/pages/CourseListPage.jsx",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "client_src_pages_courselistpage_courselistpage",
+      "target": "client_src_services_apicache_fetchwithcache"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/src/pages/CourseListPage.jsx",
+      "source_location": "L154",
+      "weight": 1.0,
+      "source": "client_src_pages_courselistpage_courselistpage",
+      "target": "client_src_services_apicache_invalidatecache"
     },
     {
       "relation": "contains",
@@ -10666,7 +10791,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentAssignmentPage.jsx",
-      "source_location": "L31",
+      "source_location": "L32",
       "weight": 1.0,
       "source": "client_src_pages_studentassignmentpage",
       "target": "client_src_pages_studentassignmentpage_studentassignmentpage",
@@ -10706,6 +10831,50 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentAssignmentPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_studentassignmentpage",
+      "target": "client_src_services_apicache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentAssignmentPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_studentassignmentpage",
+      "target": "client_src_services_apicache_fetchwithcache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentAssignmentPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_studentassignmentpage",
+      "target": "client_src_services_apicache_invalidatecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/src/pages/StudentAssignmentPage.jsx",
+      "source_location": "L165",
+      "weight": 1.0,
+      "source": "client_src_pages_studentassignmentpage_studentassignmentpage",
+      "target": "client_src_services_apicache_fetchwithcache"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentAttendancePage.jsx",
@@ -10741,7 +10910,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard",
       "target": "client_src_pages_studentdashboard_studentdashboard",
@@ -10779,6 +10948,39 @@
       "source": "client_src_pages_studentdashboard",
       "target": "client_src_services_api_backend_url",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentDashboard.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "client_src_pages_studentdashboard",
+      "target": "client_src_services_apicache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentDashboard.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "client_src_pages_studentdashboard",
+      "target": "client_src_services_apicache_fetchwithcache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/src/pages/StudentDashboard.jsx",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "client_src_pages_studentdashboard_studentdashboard",
+      "target": "client_src_services_apicache_fetchwithcache"
     },
     {
       "relation": "contains",
@@ -10881,7 +11083,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "client_src_pages_teacherassignmentpage",
       "target": "client_src_pages_teacherassignmentpage_teacherassignmentpage",
@@ -10921,6 +11123,50 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherassignmentpage",
+      "target": "client_src_services_apicache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherassignmentpage",
+      "target": "client_src_services_apicache_fetchwithcache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherassignmentpage",
+      "target": "client_src_services_apicache_invalidatecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
+      "source_location": "L162",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherassignmentpage_teacherassignmentpage",
+      "target": "client_src_services_apicache_fetchwithcache"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherAttendancePage.jsx",
@@ -10956,7 +11202,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard",
       "target": "client_src_pages_teacherdashboard_teacherdashboard",
@@ -10994,6 +11240,61 @@
       "source": "client_src_pages_teacherdashboard",
       "target": "client_src_services_api_backend_url",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherDashboard.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherdashboard",
+      "target": "client_src_services_apicache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherDashboard.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherdashboard",
+      "target": "client_src_services_apicache_fetchwithcache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherDashboard.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherdashboard",
+      "target": "client_src_services_apicache_invalidatecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/src/pages/TeacherDashboard.jsx",
+      "source_location": "L180",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherdashboard_teacherdashboard",
+      "target": "client_src_services_apicache_fetchwithcache"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/src/pages/TeacherDashboard.jsx",
+      "source_location": "L230",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherdashboard_teacherdashboard",
+      "target": "client_src_services_apicache_invalidatecache"
     },
     {
       "relation": "contains",
@@ -11103,6 +11404,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "client/src/services/communityApi.js",
       "source_location": "L1",
       "weight": 1.0,
@@ -11114,11 +11426,126 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_api_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "client/src/services/communityApi.js",
       "source_location": "L1",
       "weight": 1.0,
       "source": "client_src_services_communityapi",
       "target": "client_src_services_api_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_apicache_fetchwithcache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_apicache_getcacheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_apicache_invalidatecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_apicache_memorycache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_apicache_setcacheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L119",
+      "weight": 1.0,
+      "source": "client_src_services_apicache",
+      "target": "client_src_services_apicache_usecachedfetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "client_src_services_apicache_fetchwithcache",
+      "target": "client_src_services_apicache_getcacheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L126",
+      "weight": 1.0,
+      "source": "client_src_services_apicache_usecachedfetch",
+      "target": "client_src_services_apicache_getcacheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "client_src_services_apicache_fetchwithcache",
+      "target": "client_src_services_apicache_setcacheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/apiCache.js",
+      "source_location": "L157",
+      "weight": 1.0,
+      "source": "client_src_services_apicache_usecachedfetch",
+      "target": "client_src_services_apicache_setcacheddata",
       "confidence_score": 1.0
     },
     {
@@ -18326,5 +18753,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7a1cfcd8281e04adb9ba6911827a4b354781d9e7"
+  "built_at_commit": "eccf8dad3f262ad04bae3f837407b146887a4ee8"
 }

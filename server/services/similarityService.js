@@ -4,6 +4,18 @@ const mammoth = require("mammoth");
 const pdfParse = require("pdf-parse");
 
 /**
+ * Clean and normalize text extracted from files
+ */
+function cleanExtractedText(rawText) {
+  if (!rawText) return "";
+  return rawText
+    .replace(/([a-zA-Z0-9])-\s*[\r\n]+\s*([a-zA-Z0-9])/g, "$1$2") // Rejoin broken words at line breaks
+    .replace(/[\r\n]+/g, " ")                                      // Collapse linebreaks to spaces
+    .replace(/\s+/g, " ")                                          // Collapse multiple spaces
+    .trim();
+}
+
+/**
  * Extracts plain text from an uploaded file (.txt, .docx, or .pdf).
  * @param {string} filePath - Absolute path to the file on the server.
  * @returns {Promise<string>} - Extracted raw text.
@@ -13,17 +25,22 @@ async function extractTextFromFile(filePath) {
     throw new Error("File not found on server.");
   }
   const ext = path.extname(filePath).toLowerCase();
+  let text = "";
+
   if (ext === ".txt") {
-    return fs.readFileSync(filePath, "utf-8");
+    text = fs.readFileSync(filePath, "utf-8");
   } else if (ext === ".docx") {
     const result = await mammoth.extractRawText({ path: filePath });
-    return result.value;
+    text = result.value || "";
   } else if (ext === ".pdf") {
     const dataBuffer = fs.readFileSync(filePath);
     const data = await pdfParse(dataBuffer);
-    return data.text;
+    text = data.text || "";
+  } else {
+    throw new Error("Unsupported file format. Only .docx, .pdf, and .txt are supported.");
   }
-  throw new Error("Unsupported file format. Only .docx, .pdf, and .txt are supported.");
+
+  return cleanExtractedText(text);
 }
 
 /**
@@ -47,10 +64,11 @@ function preprocessText(text) {
  */
 function splitIntoSentences(text) {
   if (!text) return [];
-  return text
+  const clean = cleanExtractedText(text);
+  return clean
     .split(/[.!?]+\s*/)
     .map(s => s.trim())
-    .filter(s => s.length > 0);
+    .filter(s => s.length > 5); // Ignore empty or trivial 1-2 char noise
 }
 
 /**
@@ -59,6 +77,9 @@ function splitIntoSentences(text) {
 function computeLevenshtein(s1, s2) {
   const m = s1.length;
   const n = s2.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+
   const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
 
   for (let i = 0; i <= m; i++) dp[i][0] = i;
@@ -86,45 +107,68 @@ function computeLevenshtein(s1, s2) {
 function getSentenceSimilarity(s1, s2) {
   if (s1 === s2) return 1.0;
   if (!s1 || !s2) return 0.0;
+
+  // Word set Jaccard similarity for fast comparison
+  const w1 = new Set(s1.split(" "));
+  const w2 = new Set(s2.split(" "));
+  let intersection = 0;
+  for (const w of w1) {
+    if (w2.has(w)) intersection++;
+  }
+  const union = new Set([...w1, ...w2]).size;
+  const wordJaccard = union > 0 ? intersection / union : 0;
+
+  if (wordJaccard >= 0.6) return wordJaccard;
+
   const dist = computeLevenshtein(s1, s2);
   const maxLen = Math.max(s1.length, s2.length);
   return (maxLen - dist) / maxLen;
 }
 
 /**
+ * Generate word N-grams (trigrams) from text array
+ */
+function getTrigrams(words) {
+  const trigrams = new Set();
+  for (let i = 0; i < words.length - 2; i++) {
+    trigrams.add(`${words[i]} ${words[i + 1]} ${words[i + 2]}`);
+  }
+  return trigrams;
+}
+
+/**
  * Computes the similarity percentage of new sentences compared to reference sentences.
- * Checks close matches with Levenshtein and exact matches using a set.
+ * Combines sentence fuzzy matching with document Trigram Jaccard similarity.
  * @param {string[]} newSentences - Sentences from the new submission.
  * @param {string[]} refSentences - Sentences from the reference submission.
  * @returns {number} - Percentage similarity (0 to 100).
  */
 function calculateSimilarity(newSentences, refSentences) {
-  if (newSentences.length === 0 || refSentences.length === 0) return 0;
+  if (!newSentences || !refSentences || newSentences.length === 0 || refSentences.length === 0) return 0;
 
   const newClean = newSentences.map(s => preprocessText(s)).filter(s => s.length > 0);
   const refClean = refSentences.map(s => preprocessText(s)).filter(s => s.length > 0);
 
   if (newClean.length === 0 || refClean.length === 0) return 0;
 
+  // 1. Sentence-level similarity ratio
   const refCleanSet = new Set(refClean);
   let matchCount = 0;
 
   for (const ns of newClean) {
-    // 1. Exact match check
     if (refCleanSet.has(ns)) {
       matchCount++;
       continue;
     }
 
-    // 2. Similarity match check (Levenshtein)
     let foundMatch = false;
     for (const rs of refClean) {
       const lenDiff = Math.abs(ns.length - rs.length);
       const maxLen = Math.max(ns.length, rs.length);
-      if (lenDiff / maxLen > 0.05) continue; // Skip if lengths differ by more than 5%
+      if (lenDiff / maxLen > 0.4) continue; // Skip if lengths differ by more than 40%
 
       const similarity = getSentenceSimilarity(ns, rs);
-      if (similarity >= 0.95) {
+      if (similarity >= 0.70) { // 70%+ sentence match threshold
         foundMatch = true;
         break;
       }
@@ -135,7 +179,26 @@ function calculateSimilarity(newSentences, refSentences) {
     }
   }
 
-  return Math.round((matchCount / newClean.length) * 100);
+  const sentenceMatchPercent = Math.round((matchCount / newClean.length) * 100);
+
+  // 2. Document Trigram Jaccard Overlap
+  const newWords = newClean.join(" ").split(" ").filter(w => w.length > 2);
+  const refWords = refClean.join(" ").split(" ").filter(w => w.length > 2);
+
+  let ngramPercent = 0;
+  if (newWords.length >= 3 && refWords.length >= 3) {
+    const newTrigrams = getTrigrams(newWords);
+    const refTrigrams = getTrigrams(refWords);
+    
+    let commonTrigrams = 0;
+    for (const tri of newTrigrams) {
+      if (refTrigrams.has(tri)) commonTrigrams++;
+    }
+    ngramPercent = Math.round((commonTrigrams / Math.max(1, newTrigrams.size)) * 100);
+  }
+
+  // Final combined similarity score (highest of sentence match and trigram overlap)
+  return Math.min(100, Math.max(sentenceMatchPercent, ngramPercent));
 }
 
 module.exports = {

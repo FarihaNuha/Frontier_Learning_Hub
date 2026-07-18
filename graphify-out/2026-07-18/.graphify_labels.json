@@ -45,5 +45,11 @@
   "43": "useExamSecurity.js",
   "44": "Navbar.jsx",
   "45": "ExamInterface.jsx",
-  "46": "AttendanceSheet.jsx"
+  "46": "AttendanceSheet.jsx",
+  "47": "deadlineReminder.js",
+  "48": "emailService.js",
+  "49": "Exam.js",
+  "50": "Assessment.js",
+  "51": "ExamSubmission.js",
+  "52": "@testing-library/dom"
 }

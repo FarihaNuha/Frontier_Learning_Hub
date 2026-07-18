@@ -53,6 +53,7 @@ export default function TeacherAttendancePage({
   const [theoryFormula, setTheoryFormula] = useState("=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
   const [labFormula, setLabFormula] = useState("=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
   const [formulaInput, setFormulaInput] = useState("");
+  const [appliedClassType, setAppliedClassType] = useState(null);
 
   const [gridMonth, setGridMonth] = useState(new Date().getMonth());
   const [gridYear, setGridYear] = useState(new Date().getFullYear());
@@ -407,8 +408,9 @@ export default function TeacherAttendancePage({
       const res = await api.put(`/attendance/courses/${courseId}/formulas`, payload);
       const updatedCourse = res.data.course;
       
-      setTheoryFormula(updatedCourse.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
-      setLabFormula(updatedCourse.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
+      setTheoryFormula(updatedCourse.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
+      setLabFormula(updatedCourse.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+      setAppliedClassType(classType);
       
       toast.success("Excel Formula saved successfully!");
       
@@ -949,7 +951,7 @@ export default function TeacherAttendancePage({
                 {(() => {
                   const hasTheory = attendanceHistory.some(a => a.classType === "theory");
                   const hasLab = attendanceHistory.some(a => a.classType === "lab");
-                  const lockedType = hasTheory ? "theory" : hasLab ? "lab" : null;
+                  const lockedType = hasTheory ? "theory" : hasLab ? "lab" : appliedClassType;
                   return (
                     <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                       {["theory", "lab"].map((type) => {
@@ -961,7 +963,7 @@ export default function TeacherAttendancePage({
                             onClick={() => {
                               if (isDisabled) {
                                 toast.error(
-                                  `This course already has ${lockedType === "theory" ? "Theory" : "Lab"} records. Only one class type can be used per course.`
+                                  `This course has ${lockedType === "theory" ? "Theory" : "Lab"} active. Only one class type can be used per course.`
                                 );
                                 return;
                               }
@@ -979,7 +981,7 @@ export default function TeacherAttendancePage({
                               fontSize: 13,
                               transition: "all 0.2s",
                             }}
-                            title={isDisabled ? `Disabled: course already has ${lockedType} records` : ""}
+                            title={isDisabled ? `Disabled: ${lockedType} is active` : ""}
                           >
                             {type === "theory" ? "Theory" : "Lab"}
                             {lockedType === type && (
@@ -1100,7 +1102,13 @@ export default function TeacherAttendancePage({
                   {loading ? "Saving…" : "✔ Apply"}
                 </button>
                 <button
-                  onClick={() => setFormulaInput(classType === "lab" ? labFormula : theoryFormula)}
+                  onClick={() => {
+                    const defaultFormula = classType === "lab" 
+                      ? "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)" 
+                      : "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)";
+                    setFormulaInput(defaultFormula);
+                    toast.success("Reset to default system formula!");
+                  }}
                   style={{
                     padding: "6px 12px",
                     background: "transparent",
@@ -1110,7 +1118,7 @@ export default function TeacherAttendancePage({
                     cursor: "pointer",
                     fontSize: 13,
                   }}
-                  title="Reset to current saved formula"
+                  title="Reset to system default formula"
                 >
                   ↩ Reset
                 </button>

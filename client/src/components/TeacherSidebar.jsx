@@ -13,6 +13,11 @@ import {
   FiMessageSquare,
   FiActivity,
   FiCopy,
+  FiChevronDown,
+  FiChevronUp,
+  FiMessageCircle,
+  FiMail,
+  FiClock,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -22,6 +27,12 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
   const cid = courseId || courseInfo?._id;
 
   const [course, setCourse] = useState(courseInfo || null);
+  const [communityOpen, setCommunityOpen] = useState(
+    currentPage === "community-hub" ||
+      currentPage === "community" ||
+      window.location.pathname.includes("/community") ||
+      window.location.pathname.includes("/messages")
+  );
 
   useEffect(() => {
     if (courseInfo) {
@@ -89,13 +100,65 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             <FiBookOpen size={18} />
             <span>My Courses</span>
           </button>
-          <button
-            className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
-            onClick={() => navigate("/community")}
-          >
-            <FiMessageSquare size={18} />
-            <span>Community Hub</span>
-          </button>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <button
+              className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
+              onClick={() => setCommunityOpen(!communityOpen)}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <FiMessageSquare size={18} />
+                <span>Community Hub</span>
+              </div>
+              {communityOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+            </button>
+            {communityOpen && (
+              <div style={{ paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3, margin: "2px 0 6px 0" }}>
+                <button
+                  className="nav-item"
+                  onClick={() => navigate("/community")}
+                  style={{
+                    fontSize: 13,
+                    padding: "7px 12px",
+                    background: window.location.pathname.includes("/community") ? "rgba(59, 141, 179, 0.15)" : "transparent",
+                    color: window.location.pathname.includes("/community") ? "#3B8DB3" : "#475569",
+                    fontWeight: window.location.pathname.includes("/community") ? 600 : 500,
+                  }}
+                >
+                  <FiMessageCircle size={15} />
+                  <span>Discussion Feed</span>
+                </button>
+                <button
+                  className="nav-item"
+                  onClick={() => navigate("/messages")}
+                  style={{
+                    fontSize: 13,
+                    padding: "7px 12px",
+                    background: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
+                    color: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
+                    fontWeight: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? 600 : 500,
+                  }}
+                >
+                  <FiMail size={15} />
+                  <span>Messages</span>
+                </button>
+                <button
+                  className="nav-item"
+                  onClick={() => navigate("/messages?tab=requests")}
+                  style={{
+                    fontSize: 13,
+                    padding: "7px 12px",
+                    background: window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
+                    color: window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
+                    fontWeight: window.location.search.includes("tab=requests") ? 600 : 500,
+                  }}
+                >
+                  <FiClock size={15} />
+                  <span>Contact Requests</span>
+                </button>
+              </div>
+            )}
+          </div>
           <button
             className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
             onClick={() => navigate("/teacher/assessment")}
@@ -185,13 +248,65 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           <FiCalendar size={18} />
           <span>Attendance</span>
         </button>
-        <button
-          className={`nav-item ${currentPage === "community" ? "active" : ""}`}
-          onClick={() => navigate(`/community/courses/${cid}`)}
-        >
-          <FiMessageSquare size={18} />
-          <span>Community</span>
-        </button>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <button
+            className={`nav-item ${currentPage === "community" ? "active" : ""}`}
+            onClick={() => setCommunityOpen(!communityOpen)}
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <FiMessageSquare size={18} />
+              <span>Community</span>
+            </div>
+            {communityOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+          </button>
+          {communityOpen && (
+            <div style={{ paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3, margin: "2px 0 6px 0" }}>
+              <button
+                className="nav-item"
+                onClick={() => navigate(`/community/courses/${cid}`)}
+                style={{
+                  fontSize: 13,
+                  padding: "7px 12px",
+                  background: window.location.pathname.includes("/community") ? "rgba(59, 141, 179, 0.15)" : "transparent",
+                  color: window.location.pathname.includes("/community") ? "#3B8DB3" : "#475569",
+                  fontWeight: window.location.pathname.includes("/community") ? 600 : 500,
+                }}
+              >
+                <FiMessageCircle size={15} />
+                <span>Discussion Feed</span>
+              </button>
+              <button
+                className="nav-item"
+                onClick={() => navigate("/messages")}
+                style={{
+                  fontSize: 13,
+                  padding: "7px 12px",
+                  background: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
+                  color: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
+                  fontWeight: window.location.pathname === "/messages" && !window.location.search.includes("tab=requests") ? 600 : 500,
+                }}
+              >
+                <FiMail size={15} />
+                <span>Messages</span>
+              </button>
+              <button
+                className="nav-item"
+                onClick={() => navigate("/messages?tab=requests")}
+                style={{
+                  fontSize: 13,
+                  padding: "7px 12px",
+                  background: window.location.search.includes("tab=requests") ? "rgba(59, 141, 179, 0.15)" : "transparent",
+                  color: window.location.search.includes("tab=requests") ? "#3B8DB3" : "#475569",
+                  fontWeight: window.location.search.includes("tab=requests") ? 600 : 500,
+                }}
+              >
+                <FiClock size={15} />
+                <span>Contact Requests</span>
+              </button>
+            </div>
+          )}
+        </div>
         <button
           className={`nav-item ${currentPage === "analytics" ? "active" : ""}`}
           onClick={() => navigate(`/teacher/analytics/${cid}`)}

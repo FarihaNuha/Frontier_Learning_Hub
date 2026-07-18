@@ -180,7 +180,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_testing_library_dom",
-      "community": 12,
+      "community": 52,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -190,7 +190,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "testing_library_dom",
-      "community": 12,
+      "community": 52,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -260,7 +260,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_axios",
-      "community": 18,
+      "community": 12,
       "norm_label": "axios"
     },
     {
@@ -270,7 +270,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_json_axios",
-      "community": 18,
+      "community": 12,
       "norm_label": "axios"
     },
     {
@@ -1944,10 +1944,30 @@
       "norm_label": "api.js"
     },
     {
+      "label": "getBackendUrl()",
+      "file_type": "code",
+      "source_file": "client/src/services/api.js",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "client_src_services_api_getbackendurl",
+      "community": 0,
+      "norm_label": "getbackendurl()"
+    },
+    {
+      "label": "BACKEND_URL",
+      "file_type": "code",
+      "source_file": "client/src/services/api.js",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "client_src_services_api_backend_url",
+      "community": 0,
+      "norm_label": "backend_url"
+    },
+    {
       "label": "api",
       "file_type": "code",
       "source_file": "client/src/services/api.js",
-      "source_location": "L5",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "client_src_services_api_api",
       "community": 0,
@@ -2340,7 +2360,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_uploadmarksheet",
-      "community": 13,
+      "community": 3,
       "norm_label": "uploadmarksheet()"
     },
     {
@@ -3730,7 +3750,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_uploadlecture",
-      "community": 8,
+      "community": 3,
       "norm_label": "uploadlecture()"
     },
     {
@@ -4140,7 +4160,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assessment",
-      "community": 13,
+      "community": 50,
       "norm_label": "assessment.js"
     },
     {
@@ -4150,7 +4170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assessment_mongoose",
-      "community": 13,
+      "community": 50,
       "norm_label": "mongoose"
     },
     {
@@ -4160,7 +4180,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_assessment_assessmentschema",
-      "community": 13,
+      "community": 50,
       "norm_label": "assessmentschema"
     },
     {
@@ -4380,7 +4400,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_exam",
-      "community": 6,
+      "community": 49,
       "norm_label": "exam.js"
     },
     {
@@ -4390,7 +4410,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_exam_mongoose",
-      "community": 6,
+      "community": 49,
       "norm_label": "mongoose"
     },
     {
@@ -4400,7 +4420,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_exam_questionschema",
-      "community": 6,
+      "community": 49,
       "norm_label": "questionschema"
     },
     {
@@ -4410,7 +4430,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_models_exam_examschema",
-      "community": 6,
+      "community": 49,
       "norm_label": "examschema"
     },
     {
@@ -4420,7 +4440,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_examsubmission",
-      "community": 6,
+      "community": 51,
       "norm_label": "examsubmission.js"
     },
     {
@@ -4430,7 +4450,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_examsubmission_mongoose",
-      "community": 6,
+      "community": 51,
       "norm_label": "mongoose"
     },
     {
@@ -4440,7 +4460,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_examsubmission_answerschema",
-      "community": 6,
+      "community": 51,
       "norm_label": "answerschema"
     },
     {
@@ -4450,7 +4470,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_models_examsubmission_examsubmissionschema",
-      "community": 6,
+      "community": 51,
       "norm_label": "examsubmissionschema"
     },
     {
@@ -4520,7 +4540,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification",
-      "community": 13,
+      "community": 47,
       "norm_label": "notification.js"
     },
     {
@@ -4530,7 +4550,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification_mongoose",
-      "community": 13,
+      "community": 47,
       "norm_label": "mongoose"
     },
     {
@@ -4540,7 +4560,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notification_notificationschema",
-      "community": 13,
+      "community": 47,
       "norm_label": "notificationschema"
     },
     {
@@ -5590,7 +5610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder",
-      "community": 13,
+      "community": 47,
       "norm_label": "deadlinereminder.js"
     },
     {
@@ -5600,7 +5620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_cron",
-      "community": 13,
+      "community": 47,
       "norm_label": "cron"
     },
     {
@@ -5610,7 +5630,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_assignment",
-      "community": 13,
+      "community": 47,
       "norm_label": "assignment"
     },
     {
@@ -5620,7 +5640,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_exam",
-      "community": 13,
+      "community": 47,
       "norm_label": "exam"
     },
     {
@@ -5630,7 +5650,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_notification",
-      "community": 13,
+      "community": 47,
       "norm_label": "notification"
     },
     {
@@ -5640,7 +5660,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_user",
-      "community": 13,
+      "community": 47,
       "norm_label": "user"
     },
     {
@@ -5650,7 +5670,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_examsubmission",
-      "community": 13,
+      "community": 47,
       "norm_label": "examsubmission"
     },
     {
@@ -5660,7 +5680,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_sendemail_emailtemplates_queueemail",
-      "community": 13,
+      "community": 47,
       "norm_label": "{ sendemail, emailtemplates, queueemail }"
     },
     {
@@ -5670,7 +5690,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_getio",
-      "community": 13,
+      "community": 47,
       "norm_label": "{ getio }"
     },
     {
@@ -5680,7 +5700,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_startscheduler",
-      "community": 13,
+      "community": 3,
       "norm_label": "startscheduler()"
     },
     {
@@ -5970,7 +5990,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_assessment",
-      "community": 13,
+      "community": 50,
       "norm_label": "test_assessment.js"
     },
     {
@@ -5980,7 +6000,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_assessment_mongoose",
-      "community": 13,
+      "community": 50,
       "norm_label": "mongoose"
     },
     {
@@ -5990,7 +6010,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_assessment_assessment",
-      "community": 13,
+      "community": 50,
       "norm_label": "assessment"
     },
     {
@@ -6000,7 +6020,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_assessment_testassessmentmodel",
-      "community": 13,
+      "community": 50,
       "norm_label": "testassessmentmodel()"
     },
     {
@@ -6120,7 +6140,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_emails",
-      "community": 13,
+      "community": 48,
       "norm_label": "test_emails.js"
     },
     {
@@ -6130,7 +6150,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_emails_sendemail_emailtemplates",
-      "community": 13,
+      "community": 48,
       "norm_label": "{ sendemail, emailtemplates }"
     },
     {
@@ -6140,7 +6160,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_emails_test",
-      "community": 13,
+      "community": 48,
       "norm_label": "test()"
     },
     {
@@ -6150,7 +6170,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller",
-      "community": 6,
+      "community": 18,
       "norm_label": "test_exam_controller.js"
     },
     {
@@ -6160,7 +6180,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_assert",
-      "community": 6,
+      "community": 18,
       "norm_label": "assert"
     },
     {
@@ -6170,7 +6190,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_mongoose",
-      "community": 6,
+      "community": 18,
       "norm_label": "mongoose"
     },
     {
@@ -6180,7 +6200,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_exam",
-      "community": 6,
+      "community": 18,
       "norm_label": "exam"
     },
     {
@@ -6190,7 +6210,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_examsubmission",
-      "community": 6,
+      "community": 18,
       "norm_label": "examsubmission"
     },
     {
@@ -6200,7 +6220,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_course",
-      "community": 6,
+      "community": 18,
       "norm_label": "course"
     },
     {
@@ -6210,7 +6230,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_user",
-      "community": 6,
+      "community": 18,
       "norm_label": "user"
     },
     {
@@ -6220,7 +6240,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_notification",
-      "community": 6,
+      "community": 18,
       "norm_label": "notification"
     },
     {
@@ -6230,7 +6250,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_socketmodule",
-      "community": 6,
+      "community": 18,
       "norm_label": "socketmodule"
     },
     {
@@ -6240,7 +6260,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_emailservice",
-      "community": 6,
+      "community": 18,
       "norm_label": "emailservice"
     },
     {
@@ -6250,7 +6270,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_examcontroller",
-      "community": 6,
+      "community": 18,
       "norm_label": "examcontroller"
     },
     {
@@ -6260,7 +6280,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_testcreateexam",
-      "community": 6,
+      "community": 18,
       "norm_label": "testcreateexam()"
     },
     {
@@ -6270,7 +6290,7 @@
       "source_location": "L133",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_testgetmysubmissions",
-      "community": 6,
+      "community": 18,
       "norm_label": "testgetmysubmissions()"
     },
     {
@@ -6280,7 +6300,7 @@
       "source_location": "L296",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_testupdateoverallfeedback",
-      "community": 6,
+      "community": 18,
       "norm_label": "testupdateoverallfeedback()"
     },
     {
@@ -6290,7 +6310,7 @@
       "source_location": "L331",
       "_origin": "ast",
       "id": "server_scratch_test_exam_controller_runtests",
-      "community": 6,
+      "community": 18,
       "norm_label": "runtests()"
     },
     {
@@ -6300,7 +6320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model",
-      "community": 6,
+      "community": 49,
       "norm_label": "test_exam_model.js"
     },
     {
@@ -6310,7 +6330,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_mongoose",
-      "community": 6,
+      "community": 49,
       "norm_label": "mongoose"
     },
     {
@@ -6320,7 +6340,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_exam",
-      "community": 6,
+      "community": 49,
       "norm_label": "exam"
     },
     {
@@ -6330,7 +6350,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_testmodel",
-      "community": 6,
+      "community": 49,
       "norm_label": "testmodel()"
     },
     {
@@ -6460,7 +6480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_services_emailservice",
-      "community": 13,
+      "community": 48,
       "norm_label": "emailservice.js"
     },
     {
@@ -6470,7 +6490,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_services_emailservice_nodemailer",
-      "community": 13,
+      "community": 48,
       "norm_label": "nodemailer"
     },
     {
@@ -6480,7 +6500,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_services_emailservice_clienturl",
-      "community": 13,
+      "community": 48,
       "norm_label": "clienturl"
     },
     {
@@ -6490,7 +6510,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_services_emailservice_transporter",
-      "community": 13,
+      "community": 48,
       "norm_label": "transporter"
     },
     {
@@ -6500,7 +6520,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "server_services_emailservice_safeformatdate",
-      "community": 13,
+      "community": 48,
       "norm_label": "safeformatdate()"
     },
     {
@@ -6510,7 +6530,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "server_services_emailservice_sendemail",
-      "community": 13,
+      "community": 48,
       "norm_label": "sendemail()"
     },
     {
@@ -6520,7 +6540,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "server_services_emailservice_emailtemplates",
-      "community": 13,
+      "community": 48,
       "norm_label": "emailtemplates"
     },
     {
@@ -6530,7 +6550,7 @@
       "source_location": "L299",
       "_origin": "ast",
       "id": "server_services_emailservice_emailqueue",
-      "community": 13,
+      "community": 48,
       "norm_label": "emailqueue"
     },
     {
@@ -6540,7 +6560,7 @@
       "source_location": "L304",
       "_origin": "ast",
       "id": "server_services_emailservice_processqueue",
-      "community": 13,
+      "community": 48,
       "norm_label": "processqueue()"
     },
     {
@@ -8906,6 +8926,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/contexts/AuthContext.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "client_src_contexts_authcontext",
+      "target": "client_src_services_api_backend_url",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -10664,6 +10695,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentAssignmentPage.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "client_src_pages_studentassignmentpage",
+      "target": "client_src_services_api_backend_url",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentAttendancePage.jsx",
@@ -10725,6 +10767,17 @@
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard",
       "target": "client_src_services_api_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentDashboard.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_studentdashboard",
+      "target": "client_src_services_api_backend_url",
       "confidence_score": 1.0
     },
     {
@@ -10857,6 +10910,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherassignmentpage",
+      "target": "client_src_services_api_backend_url",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/TeacherAttendancePage.jsx",
@@ -10918,6 +10982,17 @@
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard",
       "target": "client_src_services_api_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/TeacherDashboard.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_pages_teacherdashboard",
+      "target": "client_src_services_api_backend_url",
       "confidence_score": 1.0
     },
     {
@@ -10998,10 +11073,30 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/services/api.js",
-      "source_location": "L5",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_services_api",
       "target": "client_src_services_api_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/api.js",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "client_src_services_api",
+      "target": "client_src_services_api_backend_url",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/services/api.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "client_src_services_api",
+      "target": "client_src_services_api_getbackendurl",
       "confidence_score": 1.0
     },
     {
@@ -18231,5 +18326,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f5f2bcfad87063c3a25afc953d3322a0ea8d08f3"
+  "built_at_commit": "7a1cfcd8281e04adb9ba6911827a4b354781d9e7"
 }

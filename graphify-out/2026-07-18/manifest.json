@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssignmentPage.jsx": {
-    "mtime": 1784362943.0999615,
-    "ast_hash": "384b5ea48864a48d005e199b89c780ab",
+    "mtime": 1784366562.3639183,
+    "ast_hash": "cca069bf93148d4298363f8da53a0ce5",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAttendancePage.jsx": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "server/controllers/assignmentController.js": {
-    "mtime": 1784363929.3528392,
-    "ast_hash": "343cf037cd592e9a4ea809ac611bdf1e",
+    "mtime": 1784366532.7136042,
+    "ast_hash": "3c927768e50783cf20ae1185bc955d10",
     "semantic_hash": ""
   },
   "server/controllers/attendanceController.js": {

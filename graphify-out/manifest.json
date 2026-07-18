@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "server/controllers/assignmentController.js": {
-    "mtime": 1784366532.7136042,
-    "ast_hash": "3c927768e50783cf20ae1185bc955d10",
+    "mtime": 1784367653.239688,
+    "ast_hash": "a855522d370b5350d0b53767ebfad00d",
     "semantic_hash": ""
   },
   "server/controllers/attendanceController.js": {

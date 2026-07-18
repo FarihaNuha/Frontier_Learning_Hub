@@ -84,30 +84,46 @@ export default function TeacherAssignmentPage({
       setPreviewLoading(true);
       setPreviewError(false);
       try {
-        const fileURLParam = previewFile.fileURL ? `?fileURL=${encodeURIComponent(previewFile.fileURL)}` : "";
-        const endpoint = previewFile.type === "submission"
-          ? `/assignments/submission/view-base64/${previewFile.id}${fileURLParam}`
-          : `/assignments/view-base64/${previewFile.id}`;
+        const fileURL = previewFile.fileURL;
+        const ext = (fileURL || "").split('.').pop().toLowerCase();
 
-        const response = await api.get(endpoint);
-        const { base64, fileType, previewType: type, previewHtml: html, previewText: txt, mimeType } = response.data;
-        
-        // Decode base64 to binary blob
-        const byteCharacters = atob(base64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const rawBlob = new Blob([byteArray], { type: mimeType || fileType || "application/pdf" });
-        
+        const serverBase = api.defaults?.baseURL
+          ? api.defaults.baseURL.replace(/\/api\/?$/, "")
+          : "http://localhost:5000";
+        const staticUrl = `${serverBase}${fileURL.startsWith("/") ? "" : "/"}${fileURL}`;
+
+        // Fast binary stream fetch directly from static endpoint
+        const response = await api.get(staticUrl, { responseType: "blob" });
+        const rawBlob = response.data;
+
         if (active) {
           url = URL.createObjectURL(rawBlob);
           setPreviewBlobUrl(url);
           setPreviewBlob(rawBlob);
-          setPreviewType(type || (previewFile.fileURL?.toLowerCase().endsWith(".pdf") ? "pdf" : "unsupported"));
-          setPreviewHtml(html);
-          setPreviewText(txt);
+
+          if (ext === "pdf") {
+            setPreviewType("pdf");
+          } else if (ext === "docx") {
+            setPreviewType("docx");
+          } else if (ext === "txt") {
+            const txt = await rawBlob.text();
+            setPreviewText(txt);
+            setPreviewType("txt");
+          } else if (["png", "jpg", "jpeg", "gif", "webp", "svg"].includes(ext)) {
+            setPreviewType("image");
+          } else {
+            try {
+              const fileURLParam = previewFile.fileURL ? `?fileURL=${encodeURIComponent(previewFile.fileURL)}` : "";
+              const endpoint = previewFile.type === "submission"
+                ? `/assignments/submission/view-base64/${previewFile.id}${fileURLParam}`
+                : `/assignments/view-base64/${previewFile.id}`;
+              const metaRes = await api.get(endpoint);
+              setPreviewType(metaRes.data.previewType || "unsupported");
+              setPreviewHtml(metaRes.data.previewHtml);
+            } catch (metaErr) {
+              setPreviewType("unsupported");
+            }
+          }
         }
       } catch (err) {
         console.error("Failed to load preview blob:", err);

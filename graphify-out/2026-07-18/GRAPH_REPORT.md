@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-07-18)
 
 ## Corpus Check
-- 107 files · ~85,373 words
+- 107 files · ~85,471 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 702 nodes · 1142 edges · 44 communities (32 shown, 12 thin omitted)
+- 703 nodes · 1146 edges · 40 communities (31 shown, 9 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4edbdc17`
+- Built from commit: `88802732`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,7 +31,6 @@
 - assessmentController.js
 - previewService.js
 - deadlineReminder.js
-- courseController.js
 - development
 - emailService.js
 - package.json
@@ -48,9 +47,6 @@
 - test_query_requests.js
 - vercel.json
 - react
-- User.js
-- Attendance.js
-- Course.js
 - deadlineReminder.js
 - emailService.js
 - Exam.js
@@ -83,7 +79,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (44 total, 12 thin omitted)
+## Communities (40 total, 9 thin omitted)
 
 ### Community 0 - "App.jsx"
 Cohesion: 0.07
@@ -98,8 +94,8 @@ Cohesion: 0.04
 Nodes (46): bcryptjs, cors, dotenv, express, jsonwebtoken, mammoth, mongoose, multer (+38 more)
 
 ### Community 3 - "communityController.js"
-Cohesion: 0.08
-Nodes (38): addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest, Course, createCoursePost(), createPublicPost() (+30 more)
+Cohesion: 0.07
+Nodes (50): uploadMarksheet(), createAssignment(), gradeSubmission(), addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest (+42 more)
 
 ### Community 4 - "User.js"
 Cohesion: 0.07
@@ -107,19 +103,19 @@ Nodes (31): mongoose, submissionSchema, fs, main(), mongoose, path, recalculateA
 
 ### Community 5 - "assignmentController.js"
 Cohesion: 0.06
-Nodes (26): Assignment, Course, deleteSubmission(), fs, { getIO }, Notification, path, previewService (+18 more)
+Nodes (29): Assignment, Course, deleteSubmission(), fs, { getIO }, Notification, path, previewService (+21 more)
 
 ### Community 6 - "test_exam_controller.js"
 Cohesion: 0.10
 Nodes (11): analyzeAI(), { analyzeAnswers }, Exam, ExamSubmission, { getIO }, Notification, { sendEmail, emailTemplates, queueEmail }, User (+3 more)
 
 ### Community 7 - "attendanceController.js"
-Cohesion: 0.17
-Nodes (11): Attendance, Course, evalArithmetic(), evaluateExcelFormula(), getAttendance(), getAttendanceStats(), markAttendance(), IMPORTANT: Filter only students, not teachers (+3 more)
+Cohesion: 0.07
+Nodes (20): Attendance, Course, evalArithmetic(), evaluateExcelFormula(), getAttendance(), getAttendanceStats(), markAttendance(), IMPORTANT: Filter only students, not teachers (+12 more)
 
 ### Community 8 - "lectureController.js"
 Cohesion: 0.09
-Nodes (25): axios, jwt, mongoose, test(), Course, deleteLecture(), downloadLecture(), fs (+17 more)
+Nodes (24): axios, jwt, mongoose, test(), Course, deleteLecture(), downloadLecture(), fs (+16 more)
 
 ### Community 9 - "examController.js"
 Cohesion: 0.25
@@ -138,16 +134,16 @@ Cohesion: 0.05
 Nodes (37): axios, jszip, xlsx, docx-preview, dependencies, axios, docx-preview, jspdf (+29 more)
 
 ### Community 13 - "assessmentController.js"
-Cohesion: 0.12
-Nodes (10): Assessment, Course, fs, { getIO }, Notification, { sendEmail, emailTemplates, queueEmail }, User, XLSX (+2 more)
+Cohesion: 0.15
+Nodes (8): Assessment, Course, fs, { getIO }, Notification, { sendEmail, emailTemplates, queueEmail }, User, XLSX
 
 ### Community 14 - "previewService.js"
 Cohesion: 0.07
 Nodes (27): App(), AppContent(), AuthPage, CommunityHub, CourseAnalyticsPage, CourseCommunity, CourseCommunityPostDetail, CourseDashboard (+19 more)
 
 ### Community 15 - "deadlineReminder.js"
-Cohesion: 0.33
-Nodes (11): uploadMarksheet(), createAssignment(), gradeSubmission(), createContactRequest(), respondToContactRequest(), createExam(), publishExamResults(), submitExam() (+3 more)
+Cohesion: 0.50
+Nodes (3): answerSchema, examSubmissionSchema, mongoose
 
 ### Community 17 - "development"
 Cohesion: 0.09
@@ -177,13 +173,9 @@ Nodes (3): adminData, bcrypt, mongoose
 Cohesion: 0.26
 Nodes (12): buildSlideBodyHtml(), extractPptxSlidesArray(), extractPptxSlidesHtml(), extractSlideElements(), formatTableHtml(), formatTextElementHtml(), fs, generatePreviewData() (+4 more)
 
-### Community 36 - "User.js"
-Cohesion: 0.50
-Nodes (3): bcrypt, mongoose, userSchema
-
 ### Community 47 - "deadlineReminder.js"
-Cohesion: 0.15
-Nodes (11): answerSchema, examSubmissionSchema, mongoose, Assignment, cron, Exam, ExamSubmission, { getIO } (+3 more)
+Cohesion: 0.17
+Nodes (10): mongoose, notificationSchema, Assignment, cron, Exam, ExamSubmission, { getIO }, Notification (+2 more)
 
 ### Community 48 - "emailService.js"
 Cohesion: 0.21
@@ -200,7 +192,7 @@ Nodes (4): assessmentSchema, mongoose, Assessment, mongoose
 ## Knowledge Gaps
 - **319 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+314 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

@@ -119,35 +119,35 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
                   onClick={() => navigate(cid ? `/community/courses/${cid}` : "/community")}
                   style={{
                     paddingLeft: 32,
-                    fontSize: 14,
-                    fontWeight: 600,
+                    fontSize: 13,
+                    fontWeight: 400,
                   }}
                 >
-                  <FiMessageCircle size={16} />
+                  <FiMessageCircle size={15} />
                   <span>Discussion Feed</span>
                 </button>
                 <button
                   className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate("/messages")}
+                  onClick={() => navigate(cid ? `/messages?courseId=${cid}` : "/messages")}
                   style={{
                     paddingLeft: 32,
-                    fontSize: 14,
-                    fontWeight: 600,
+                    fontSize: 13,
+                    fontWeight: 400,
                   }}
                 >
-                  <FiMail size={16} />
+                  <FiMail size={15} />
                   <span>Messages</span>
                 </button>
                 <button
                   className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate("/messages?tab=requests")}
+                  onClick={() => navigate(cid ? `/messages?tab=requests&courseId=${cid}` : "/messages?tab=requests")}
                   style={{
                     paddingLeft: 32,
-                    fontSize: 14,
-                    fontWeight: 600,
+                    fontSize: 13,
+                    fontWeight: 400,
                   }}
                 >
-                  <FiClock size={16} />
+                  <FiClock size={15} />
                   <span>Contact Requests</span>
                 </button>
               </div>
@@ -261,35 +261,35 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
                 onClick={() => navigate(`/community/courses/${cid}`)}
                 style={{
                   paddingLeft: 32,
-                  fontSize: 14,
-                  fontWeight: 600,
+                  fontSize: 13,
+                  fontWeight: 400,
                 }}
               >
-                <FiMessageCircle size={16} />
+                <FiMessageCircle size={15} />
                 <span>Discussion Feed</span>
               </button>
               <button
                 className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
-                onClick={() => navigate("/messages")}
+                onClick={() => navigate(`/messages?courseId=${cid}`)}
                 style={{
                   paddingLeft: 32,
-                  fontSize: 14,
-                  fontWeight: 600,
+                  fontSize: 13,
+                  fontWeight: 400,
                 }}
               >
-                <FiMail size={16} />
+                <FiMail size={15} />
                 <span>Messages</span>
               </button>
               <button
                 className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
-                onClick={() => navigate("/messages?tab=requests")}
+                onClick={() => navigate(`/messages?tab=requests&courseId=${cid}`)}
                 style={{
                   paddingLeft: 32,
-                  fontSize: 14,
-                  fontWeight: 600,
+                  fontSize: 13,
+                  fontWeight: 400,
                 }}
               >
-                <FiClock size={16} />
+                <FiClock size={15} />
                 <span>Contact Requests</span>
               </button>
             </div>

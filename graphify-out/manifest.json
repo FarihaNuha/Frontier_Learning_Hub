@@ -160,8 +160,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
-    "mtime": 1784231605.011554,
-    "ast_hash": "4d81f9312afcaf68e8ea93139611dec5",
+    "mtime": 1784363933.8479943,
+    "ast_hash": "2daaa0ef428cde8e7ecba115cdacdee5",
     "semantic_hash": ""
   },
   "client/src/services/aiDetector.js": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "server/controllers/assignmentController.js": {
-    "mtime": 1784233046.944469,
-    "ast_hash": "a0dcc5e7c2fa8792608aae353f2dd802",
+    "mtime": 1784363929.3528392,
+    "ast_hash": "343cf037cd592e9a4ea809ac611bdf1e",
     "semantic_hash": ""
   },
   "server/controllers/attendanceController.js": {

@@ -701,12 +701,14 @@ export default function MessagePage() {
   //  Render
   // ==================================================================
 
+  const courseIdParam = searchParams.get("courseId");
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
       {user?.role === "teacher" ? (
-        <TeacherSidebar currentPage="community" />
+        <TeacherSidebar currentPage="community" courseId={courseIdParam} />
       ) : (
-        <StudentSidebar currentPage="community" />
+        <StudentSidebar currentPage="community" courseId={courseIdParam} />
       )}
       <div className="messages-container" style={{ flex: 1, padding: "24px 32px", overflowY: "auto" }}>
       {/* ===== Header ===== */}

@@ -27,6 +27,8 @@ import {
   FiMail,
 } from "react-icons/fi";
 import "../styles/community.css";
+import TeacherSidebar from "../components/TeacherSidebar";
+import StudentSidebar from "../components/StudentSidebar";
 
 const renderContentWithLinks = (text) => {
   if (!text) return "";
@@ -199,88 +201,11 @@ export default function CourseCommunity() {
 
   return (
     <div className="community-container">
-      <div className="community-sidebar">
-        <div className="sidebar-header">
-          <h2>UFTB Moodle</h2>
-          <span className={`badge ${user?.role}`}>{user?.role?.toUpperCase()}</span>
-        </div>
-
-        <div className="sidebar-user">
-          <div className="avatar">
-            {user?.profilePicture ? (
-              <img 
-                src={user.profilePicture} 
-                alt="Profile" 
-                style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", display: "block" }} 
-              />
-            ) : (
-              <FiUser size={32} />
-            )}
-          </div>
-          <h3>{user?.name}</h3>
-          <p style={{ fontWeight: 600, color: "#3b8db3", fontSize: "13px", marginBottom: "2px" }}>
-            {course?.displayCode}
-          </p>
-          <p style={{ fontSize: "12px", color: "#6b89a0", marginBottom: "2px" }}>
-            {course?.name}
-          </p>
-          {user?.department && (
-            <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--pastel-blue-deep)", marginBottom: "4px" }}>
-              {user.department}
-            </p>
-          )}
-          <p style={{ fontSize: "11px", color: "#6b89a0", marginTop: "4px", wordBreak: "break-all" }}>
-            {user?.email}
-          </p>
-        </div>
-
-        <nav className="sidebar-nav">
-          <button className="nav-item active">
-            <FiMessageSquare size={18} />
-            <span>Discussions</span>
-          </button>
-          <button
-            className="nav-item"
-            onClick={() => navigate(`/community/messages?courseId=${courseId}`)}
-            style={{ position: "relative", width: "100%", display: "flex", alignItems: "center" }}
-          >
-            <FiMail size={18} />
-            <span>Messages</span>
-            {unreadCount > 0 && (
-              <span 
-                style={{ 
-                  background: "#EF4444", 
-                  color: "#FFFFFF", 
-                  marginLeft: "auto", 
-                  borderRadius: "50%", 
-                  minWidth: "18px", 
-                  height: "18px", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center", 
-                  fontSize: "11px", 
-                  fontWeight: "700",
-                  padding: "0 4px"
-                }}
-              >
-                {unreadCount}
-              </span>
-            )}
-          </button>
-          <button
-            className="nav-item"
-            onClick={() => navigate(`/course/${courseId}`)}
-          >
-            <FiArrowLeft size={18} />
-            <span>Back to Course</span>
-          </button>
-          <div className="nav-divider"></div>
-          <button className="nav-item logout-btn" onClick={logout}>
-            <FiLogOut size={18} />
-            <span>Logout</span>
-          </button>
-        </nav>
-      </div>
+      {user?.role === "teacher" ? (
+        <TeacherSidebar currentPage="community" courseId={courseId} courseInfo={course} />
+      ) : (
+        <StudentSidebar currentPage="community" courseId={courseId} courseInfo={course} />
+      )}
 
       <div className="community-main">
         <div className="feed-header">

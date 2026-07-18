@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-07-18)
 
 ## Corpus Check
-- 107 files · ~85,515 words
+- 107 files · ~85,373 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 702 nodes · 1138 edges · 58 communities (35 shown, 23 thin omitted)
+- 702 nodes · 1142 edges · 44 communities (32 shown, 12 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c0ca1af7`
+- Built from commit: `4edbdc17`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -36,8 +36,6 @@
 - emailService.js
 - package.json
 - manifest.json
-- CourseCommunity.jsx
-- package.json
 - scripts
 - seedAdmin.js
 - previewService.js
@@ -49,26 +47,14 @@
 - inspect_db.js
 - test_query_requests.js
 - vercel.json
-- scripts
 - react
 - User.js
 - Attendance.js
 - Course.js
-- xlsx
-- docx-preview
-- jspdf
-- jspdf-autotable
 - deadlineReminder.js
 - emailService.js
 - Exam.js
 - Assessment.js
-- react
-- react-hot-toast
-- react-icons
-- @testing-library/dom
-- @testing-library/jest-dom
-- @testing-library/react
-- web-vitals
 
 ## God Nodes (most connected - your core abstractions)
 1. `useAuth()` - 54 edges
@@ -76,9 +62,9 @@
 3. `getIO()` - 22 edges
 4. `queueEmail()` - 21 edges
 5. `CommunityPost` - 17 edges
-6. `fetchWithCache()` - 13 edges
-7. `StudentSidebar()` - 12 edges
-8. `TeacherSidebar()` - 12 edges
+6. `StudentSidebar()` - 13 edges
+7. `TeacherSidebar()` - 13 edges
+8. `fetchWithCache()` - 13 edges
 9. `verifyToken()` - 11 edges
 10. `Lecture` - 10 edges
 
@@ -91,17 +77,17 @@
   client/src/App.jsx → client/src/contexts/AuthContext.jsx
 - `AppContent()` --calls--> `useAuth()`  [EXTRACTED]
   client/src/App.jsx → client/src/contexts/AuthContext.jsx
-- `CourseCommunity()` --calls--> `useAuth()`  [EXTRACTED]
-  client/src/pages/CourseCommunity.jsx → client/src/contexts/AuthContext.jsx
+- `TeacherAttendancePage()` --references--> `jspdf`  [EXTRACTED]
+  client/src/pages/TeacherAttendancePage.jsx → client/package.json
 
 ## Import Cycles
 - None detected.
 
-## Communities (58 total, 23 thin omitted)
+## Communities (44 total, 12 thin omitted)
 
 ### Community 0 - "App.jsx"
-Cohesion: 0.08
-Nodes (52): GlobalNotificationBell(), ShareModal(), StudentSidebar(), TeacherSidebar(), AuthContext, AuthProvider(), getActiveStatusSetting(), getSocketUrl() (+44 more)
+Cohesion: 0.07
+Nodes (58): GlobalNotificationBell(), ShareModal(), StudentSidebar(), TeacherSidebar(), AuthContext, AuthProvider(), getActiveStatusSetting(), getSocketUrl() (+50 more)
 
 ### Community 1 - "authMiddleware.js"
 Cohesion: 0.05
@@ -148,8 +134,8 @@ Cohesion: 0.12
 Nodes (16): concurrently, author, dependencies, concurrently, description, keywords, license, main (+8 more)
 
 ### Community 12 - "dependencies"
-Cohesion: 0.13
-Nodes (15): axios, jszip, dependencies, axios, jszip, react-dom, react-router-dom, react-scripts (+7 more)
+Cohesion: 0.05
+Nodes (37): axios, jszip, xlsx, docx-preview, dependencies, axios, docx-preview, jspdf (+29 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.12
@@ -164,8 +150,8 @@ Cohesion: 0.33
 Nodes (11): uploadMarksheet(), createAssignment(), gradeSubmission(), createContactRequest(), respondToContactRequest(), createExam(), publishExamResults(), submitExam() (+3 more)
 
 ### Community 17 - "development"
-Cohesion: 0.22
-Nodes (9): browserslist, development, production, >0.2%, last 1 chrome version, last 1 firefox version, last 1 safari version, not dead (+1 more)
+Cohesion: 0.09
+Nodes (21): browserslist, development, production, eslintConfig, extends, name, private, scripts (+13 more)
 
 ### Community 18 - "emailService.js"
 Cohesion: 0.16
@@ -179,14 +165,6 @@ Nodes (3): @opencode-ai/plugin, dependencies, @opencode-ai/plugin
 Cohesion: 0.50
 Nodes (3): plugin, $schema, .opencode/plugins/graphify.js
 
-### Community 21 - "CourseCommunity.jsx"
-Cohesion: 0.43
-Nodes (6): CourseCommunity(), CoursePostCard(), getFileUrl(), renderAttachments(), renderContentWithLinks(), renderLectureAttachment()
-
-### Community 22 - "package.json"
-Cohesion: 0.25
-Nodes (7): eslintConfig, extends, name, private, version, react-app, react-app/jest
-
 ### Community 23 - "scripts"
 Cohesion: 0.08
 Nodes (21): mongoose, allowedOrigins, app, connectDB, cors, dns, express, fs (+13 more)
@@ -198,10 +176,6 @@ Nodes (3): adminData, bcrypt, mongoose
 ### Community 25 - "previewService.js"
 Cohesion: 0.26
 Nodes (12): buildSlideBodyHtml(), extractPptxSlidesArray(), extractPptxSlidesHtml(), extractSlideElements(), formatTableHtml(), formatTextElementHtml(), fs, generatePreviewData() (+4 more)
-
-### Community 34 - "scripts"
-Cohesion: 0.40
-Nodes (5): scripts, build, eject, start, test
 
 ### Community 36 - "User.js"
 Cohesion: 0.50
@@ -226,21 +200,21 @@ Nodes (4): assessmentSchema, mongoose, Assessment, mongoose
 ## Knowledge Gaps
 - **319 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+314 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useAuth()` connect `App.jsx` to `CourseCommunity.jsx`, `previewService.js`?**
+- **Why does `useAuth()` connect `App.jsx` to `previewService.js`?**
   _High betweenness centrality (0.037) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `dependencies` to `xlsx`, `docx-preview`, `jspdf`, `jspdf-autotable`, `react`, `react-hot-toast`, `react-icons`, `@testing-library/dom`, `@testing-library/jest-dom`, `@testing-library/react`, `web-vitals`, `package.json`?**
+- **Why does `dependencies` connect `dependencies` to `development`?**
   _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `TeacherAttendancePage()` connect `App.jsx` to `jspdf`?**
+- **Why does `TeacherAttendancePage()` connect `App.jsx` to `dependencies`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **What connects `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin` to the rest of the system?**
   _322 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `App.jsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.08206361935311414 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07435610302351624 - nodes in this community are weakly interconnected._
 - **Should `authMiddleware.js` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `dependencies` be split into smaller, more focused modules?**

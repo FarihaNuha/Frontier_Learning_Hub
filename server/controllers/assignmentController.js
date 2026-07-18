@@ -370,6 +370,7 @@ exports.submitAssignment = async (req, res) => {
 
     const now = new Date();
     const isLate = now > new Date(assignment.deadline);
+    const allCurrentFiles = [...finalFiles, ...newUploadedFiles];
 
     const submissionData = {
       assignmentId: req.params.id,

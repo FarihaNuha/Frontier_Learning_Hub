@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/MessagePage.jsx": {
-    "mtime": 1784385625.7560008,
-    "ast_hash": "7fc42c3a31555f91828c7087f6891546",
+    "mtime": 1784388734.7970185,
+    "ast_hash": "846d3c98ea458c79cc1238115447299f",
     "semantic_hash": ""
   },
   "client/src/pages/PostDetailPage.jsx": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/SettingsPage.jsx": {
-    "mtime": 1784385609.4914484,
-    "ast_hash": "af1a9973686cb0d3de3bf017461a4cbc",
+    "mtime": 1784388716.7130117,
+    "ast_hash": "a1b05f42fe54c88faf193eec944aa21d",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssessmentPage.jsx": {
@@ -210,13 +210,13 @@
     "semantic_hash": ""
   },
   "server/controllers/authController.js": {
-    "mtime": 1784202299.00081,
-    "ast_hash": "a49a3e29b7e9c76e475145780c87520e",
+    "mtime": 1784388667.7758694,
+    "ast_hash": "cf4bd1096561344d42aff57d250421a7",
     "semantic_hash": ""
   },
   "server/controllers/communityController.js": {
-    "mtime": 1784318887.2865775,
-    "ast_hash": "6c4f725ba0c00d826e50774d0a9ed9c7",
+    "mtime": 1784388696.407536,
+    "ast_hash": "bf5c359cdfd33e05130b86da2a9b6f77",
     "semantic_hash": ""
   },
   "server/controllers/courseController.js": {
@@ -330,8 +330,8 @@
     "semantic_hash": "da7303312f114d9534e9c4341339ecea"
   },
   "server/models/User.js": {
-    "mtime": 1784202294.2313008,
-    "ast_hash": "ec2495c2d140835892a9b0797e64f48c",
+    "mtime": 1784388654.6471376,
+    "ast_hash": "d7e4b9baa707a80ac0c6cb39547ce93e",
     "semantic_hash": ""
   },
   "server/package.json": {

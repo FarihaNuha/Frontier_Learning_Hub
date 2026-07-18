@@ -1,7 +1,7 @@
 # Graph Report - UFTB_Moodle  (2026-07-18)
 
 ## Corpus Check
-- 109 files · ~92,922 words
+- 109 files · ~93,172 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fec4a3ec`
+- Built from commit: `ef9ccdc4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -150,7 +150,7 @@ Nodes (16): concurrently, author, dependencies, concurrently, description, keywo
 
 ### Community 12 - "dependencies"
 Cohesion: 0.13
-Nodes (15): jszip, docx-preview, dependencies, docx-preview, jszip, react-dom, react-router-dom, react-scripts (+7 more)
+Nodes (15): axios, jszip, dependencies, axios, jszip, react-dom, react-router-dom, react-scripts (+7 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.15

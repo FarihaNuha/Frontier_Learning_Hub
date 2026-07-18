@@ -260,7 +260,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_axios",
-      "community": 40,
+      "community": 12,
       "norm_label": "axios"
     },
     {
@@ -270,7 +270,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_json_axios",
-      "community": 40,
+      "community": 12,
       "norm_label": "axios"
     },
     {
@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_docx_preview",
-      "community": 12,
+      "community": 40,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 12,
+      "community": 40,
       "norm_label": "docx-preview"
     },
     {
@@ -3037,7 +3037,7 @@
       "label": "forgotPassword()",
       "file_type": "code",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L165",
+      "source_location": "L169",
       "_origin": "ast",
       "id": "server_controllers_authcontroller_forgotpassword",
       "community": 10,
@@ -3047,7 +3047,7 @@
       "label": "resetPassword()",
       "file_type": "code",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L212",
+      "source_location": "L216",
       "_origin": "ast",
       "id": "server_controllers_authcontroller_resetpassword",
       "community": 10,
@@ -3057,7 +3057,7 @@
       "label": "blockUser()",
       "file_type": "code",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L247",
+      "source_location": "L251",
       "_origin": "ast",
       "id": "server_controllers_authcontroller_blockuser",
       "community": 10,
@@ -3067,7 +3067,7 @@
       "label": "unblockUser()",
       "file_type": "code",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L281",
+      "source_location": "L285",
       "_origin": "ast",
       "id": "server_controllers_authcontroller_unblockuser",
       "community": 10,
@@ -3077,7 +3077,7 @@
       "label": "getBlockedUsers()",
       "file_type": "code",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L300",
+      "source_location": "L304",
       "_origin": "ast",
       "id": "server_controllers_authcontroller_getblockedusers",
       "community": 10,
@@ -13408,7 +13408,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L247",
+      "source_location": "L251",
       "weight": 1.0,
       "source": "server_controllers_authcontroller",
       "target": "server_controllers_authcontroller_blockuser",
@@ -13418,7 +13418,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L165",
+      "source_location": "L169",
       "weight": 1.0,
       "source": "server_controllers_authcontroller",
       "target": "server_controllers_authcontroller_forgotpassword",
@@ -13438,7 +13438,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L300",
+      "source_location": "L304",
       "weight": 1.0,
       "source": "server_controllers_authcontroller",
       "target": "server_controllers_authcontroller_getblockedusers",
@@ -13488,7 +13488,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L212",
+      "source_location": "L216",
       "weight": 1.0,
       "source": "server_controllers_authcontroller",
       "target": "server_controllers_authcontroller_resetpassword",
@@ -13498,7 +13498,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/authController.js",
-      "source_location": "L281",
+      "source_location": "L285",
       "weight": 1.0,
       "source": "server_controllers_authcontroller",
       "target": "server_controllers_authcontroller_unblockuser",
@@ -19437,5 +19437,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "fec4a3eccd1407cdbdf850366fc302abd9f2ac1d"
+  "built_at_commit": "ef9ccdc49db80c50abddecc43808bceb41bea71a"
 }

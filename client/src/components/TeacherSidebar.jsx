@@ -18,6 +18,8 @@ import {
   FiMessageCircle,
   FiMail,
   FiClock,
+  FiBell,
+  FiSettings,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 

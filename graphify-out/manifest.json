@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "client/src/components/StudentSidebar.jsx": {
-    "mtime": 1784384735.9363306,
-    "ast_hash": "ea938e3b675e82ded5922749b1f1af00",
+    "mtime": 1784385589.9786012,
+    "ast_hash": "a15096657df6209427e4f520ace8ece1",
     "semantic_hash": ""
   },
   "client/src/components/common/Navbar.jsx": {
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/MessagePage.jsx": {
-    "mtime": 1784365755.6277294,
-    "ast_hash": "7e9eee99a39580f68ac91f74a50c4ee5",
+    "mtime": 1784385625.7560008,
+    "ast_hash": "7fc42c3a31555f91828c7087f6891546",
     "semantic_hash": ""
   },
   "client/src/pages/PostDetailPage.jsx": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/SettingsPage.jsx": {
-    "mtime": 1784202529.5758348,
-    "ast_hash": "ab038c29b7ec38b4360dfc69eba9b142",
+    "mtime": 1784385609.4914484,
+    "ast_hash": "af1a9973686cb0d3de3bf017461a4cbc",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssessmentPage.jsx": {
@@ -505,8 +505,8 @@
     "semantic_hash": ""
   },
   "client/src/components/TeacherSidebar.jsx": {
-    "mtime": 1784384648.1591234,
-    "ast_hash": "8a06a3d5da59a9ee436561053fb34b20",
+    "mtime": 1784385559.1487343,
+    "ast_hash": "455b891633c05c56ae80cba6004c1239",
     "semantic_hash": ""
   },
   "client/src/pages/CourseAnalyticsPage.jsx": {
@@ -535,8 +535,8 @@
     "semantic_hash": ""
   },
   "client/src/components/FilePreviewModal.jsx": {
-    "mtime": 1784384599.4012797,
-    "ast_hash": "501c1fe1b853fc75b1b093a70979af45",
+    "mtime": 1784385529.2094574,
+    "ast_hash": "edf85282f14193011a371e3b610418da",
     "semantic_hash": ""
   }
 }

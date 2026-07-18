@@ -780,26 +780,30 @@ export default function StudentAssignmentPage({
                       )}
                     </p>
                   )}
-                  {isEditMode && remainingFiles.length > 0 && (
+                  {isEditMode && (
                     <div style={{ marginBottom: "16px", background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: "#2c4b66", marginBottom: "8px" }}>Currently submitted files:</p>
-                      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                        {remainingFiles.map((f, idx) => (
-                          <li key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px", background: "#ecfdf5", borderRadius: 6, border: "1px solid #d1fae5", marginBottom: 4, fontSize: 13 }}>
-                            <span style={{ display: "flex", alignItems: "center", gap: 6, color: "#065f46" }}>
-                              <FiFile size={14} color="#059669" /> {f.originalName}
-                            </span>
-                            <div style={{ display: "flex", gap: 10 }}>
-                              <button type="button" onClick={(e) => handleViewFile(e, f.fileURL, f.originalName, existingSubmission._id, "submission")} style={{ background: "none", border: "none", color: "#3b8db3", cursor: "pointer", fontSize: 12 }}>
-                                View
-                              </button>
-                              <button type="button" onClick={() => setRemainingFiles(remainingFiles.filter((_, i) => i !== idx))} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 12 }}>
-                                Delete
-                              </button>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
+                      {remainingFiles.length > 0 ? (
+                        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                          {remainingFiles.map((f, idx) => (
+                            <li key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px", background: "#ecfdf5", borderRadius: 6, border: "1px solid #d1fae5", marginBottom: 4, fontSize: 13 }}>
+                              <span style={{ display: "flex", alignItems: "center", gap: 6, color: "#065f46" }}>
+                                <FiFile size={14} color="#059669" /> {f.originalName}
+                              </span>
+                              <div style={{ display: "flex", gap: 10 }}>
+                                <button type="button" onClick={(e) => handleViewFile(e, f.fileURL, f.originalName, existingSubmission._id, "submission")} style={{ background: "none", border: "none", color: "#3b8db3", cursor: "pointer", fontSize: 12 }}>
+                                  View
+                                </button>
+                                <button type="button" onClick={() => setRemainingFiles(remainingFiles.filter((_, i) => i !== idx))} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 12 }}>
+                                  Delete
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p style={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic", margin: 0 }}>No files remaining (All documents removed)</p>
+                      )}
                     </div>
                   )}
                   {existingSubmission.comment && (

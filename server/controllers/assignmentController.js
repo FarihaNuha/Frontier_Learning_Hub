@@ -192,17 +192,29 @@ exports.deleteAssignment = async (req, res) => {
   }
 };
 
-// Recalculate similarity score for all submissions of an assignment in chronological order
+const resolveServerFilePath = (fileURL) => {
+  if (!fileURL) return null;
+  const rel = fileURL.replace(/^\/?uploads\//, "");
+  const p1 = path.join(__dirname, "../../uploads", rel);
+  if (fs.existsSync(p1)) return p1;
+  const p2 = path.join(process.cwd(), "uploads", rel);
+  if (fs.existsSync(p2)) return p2;
+  const p3 = path.join(__dirname, "../uploads", rel);
+  if (fs.existsSync(p3)) return p3;
+  return p1;
+};
+
+// Internal helper to recalculate and update similarity scores for all submissions of an assignment chronologically
 const recalculateAssignmentSimilarity = async (assignmentId) => {
   try {
-    const fs = require("fs");
-    const path = require("path");
+    const Assignment = require("../models/Assignment");
     const Submission = require("../models/Submission");
 
     const submissions = await Submission.find({ assignmentId }).sort({ submittedAt: 1 });
     const submissionSentencesCache = {};
+    const submissionRawTextCache = {};
 
-    // First pass: extract and cache sentences for all submissions (supporting PDF, DOCX, TXT)
+    // First pass: extract and cache sentences & raw text for all submissions (supporting PDF, DOCX, TXT)
     for (let i = 0; i < submissions.length; i++) {
       const currentSub = submissions[i];
       let currentFiles = currentSub.files || [];
@@ -211,15 +223,17 @@ const recalculateAssignmentSimilarity = async (assignmentId) => {
       }
 
       let allCurrentSentences = [];
+      let allRawTexts = [];
       for (const f of currentFiles) {
         const ext = path.extname(f.originalName || f.fileURL).toLowerCase();
         if (ext === ".txt" || ext === ".docx" || ext === ".pdf") {
-          const filePath = path.join(__dirname, "../../", f.fileURL);
-          if (fs.existsSync(filePath)) {
+          const filePath = resolveServerFilePath(f.fileURL);
+          if (filePath && fs.existsSync(filePath)) {
             try {
               const text = await similarityService.extractTextFromFile(filePath);
               const sentences = similarityService.splitIntoSentences(text);
               allCurrentSentences.push(...sentences);
+              allRawTexts.push(text);
             } catch (err) {
               console.error(`Recalculate: Text extraction failed for student ${currentSub.studentId}:`, err);
             }
@@ -227,26 +241,35 @@ const recalculateAssignmentSimilarity = async (assignmentId) => {
         }
       }
       submissionSentencesCache[currentSub._id.toString()] = allCurrentSentences;
+      submissionRawTextCache[currentSub._id.toString()] = allRawTexts.join(" ");
     }
 
     // Second pass: compute similarity by comparing each submission only with earlier submissions (j < i)
     for (let i = 0; i < submissions.length; i++) {
       const currentSub = submissions[i];
       const allCurrentSentences = submissionSentencesCache[currentSub._id.toString()] || [];
+      const currentRawText = submissionRawTextCache[currentSub._id.toString()] || "";
 
       let highestSimilarityPercent = 0;
       let highestMatchedStudent = null;
       let highestMatchedSubmission = null;
       let similarityMatches = [];
 
-      if (allCurrentSentences.length > 0) {
+      if (allCurrentSentences.length > 0 || currentRawText.length > 0) {
         for (let j = 0; j < i; j++) {
           const otherSub = submissions[j];
           if (otherSub.studentId.toString() === currentSub.studentId.toString()) continue;
 
           const otherSentences = submissionSentencesCache[otherSub._id.toString()] || [];
-          if (otherSentences.length > 0) {
-            const similarity = similarityService.calculateSimilarity(allCurrentSentences, otherSentences);
+          const otherRawText = submissionRawTextCache[otherSub._id.toString()] || "";
+
+          if (otherSentences.length > 0 || otherRawText.length > 0) {
+            const similarity = similarityService.calculateSimilarity(
+              allCurrentSentences, 
+              otherSentences, 
+              currentRawText, 
+              otherRawText
+            );
             
             if (similarity > 0) {
               similarityMatches.push({
@@ -530,12 +553,8 @@ exports.viewAssignmentBase64 = async (req, res) => {
     if (!assignment) return res.status(404).json({ error: "Assignment not found" });
     if (!assignment.fileURL) return res.status(404).json({ error: "No file attached to this assignment" });
 
-    const filePath = path.join(
-      __dirname,
-      "../../uploads",
-      assignment.fileURL.replace("/uploads/", "")
-    );
-    if (!fs.existsSync(filePath))
+    const filePath = resolveServerFilePath(assignment.fileURL);
+    if (!filePath || !fs.existsSync(filePath))
       return res.status(404).json({ error: "File not found on server" });
 
     const fileBuffer = fs.readFileSync(filePath);
@@ -581,12 +600,8 @@ exports.viewSubmissionBase64 = async (req, res) => {
 
     if (!fileURL) return res.status(404).json({ error: "No file attached to this submission" });
 
-    const filePath = path.join(
-      __dirname,
-      "../../uploads",
-      fileURL.replace("/uploads/", "")
-    );
-    if (!fs.existsSync(filePath))
+    const filePath = resolveServerFilePath(fileURL);
+    if (!filePath || !fs.existsSync(filePath))
       return res.status(404).json({ error: "File not found on server" });
 
     const fileBuffer = fs.readFileSync(filePath);

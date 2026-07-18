@@ -70,13 +70,13 @@
     "semantic_hash": ""
   },
   "client/src/pages/CommunityHub.jsx": {
-    "mtime": 1784363011.339879,
-    "ast_hash": "3979b7b46aea20cacb6c1dddb588ec47",
+    "mtime": 1784384226.6452112,
+    "ast_hash": "da46595af009b93e3beb628858039438",
     "semantic_hash": ""
   },
   "client/src/pages/CourseCommunity.jsx": {
-    "mtime": 1784365389.1529543,
-    "ast_hash": "a012b2a00802a3a849b0cfe60af61292",
+    "mtime": 1784384235.0750682,
+    "ast_hash": "75c7117c267385286f286a8e1bdf90ec",
     "semantic_hash": ""
   },
   "client/src/pages/CourseCommunityPostDetail.jsx": {
@@ -532,6 +532,11 @@
   "client/src/services/apiCache.js": {
     "mtime": 1784362889.949043,
     "ast_hash": "c75d8380a26692b523885e1b54f1f355",
+    "semantic_hash": ""
+  },
+  "client/src/components/FilePreviewModal.jsx": {
+    "mtime": 1784384045.8323052,
+    "ast_hash": "e92bf1df0db7928e2bacfec1ab468079",
     "semantic_hash": ""
   }
 }

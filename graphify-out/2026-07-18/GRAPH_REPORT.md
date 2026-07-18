@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-07-18)
 
 ## Corpus Check
-- 107 files · ~90,424 words
+- 107 files · ~90,361 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 706 nodes · 1156 edges · 53 communities (33 shown, 20 thin omitted)
+- 704 nodes · 1151 edges · 53 communities (33 shown, 20 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ba72045b`
+- Built from commit: `ccbc21a6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -111,8 +111,8 @@ Cohesion: 0.07
 Nodes (50): uploadMarksheet(), createAssignment(), gradeSubmission(), addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest (+42 more)
 
 ### Community 4 - "User.js"
-Cohesion: 0.07
-Nodes (31): mongoose, submissionSchema, fs, main(), mongoose, path, recalculateAssignmentSimilarity(), similarityService (+23 more)
+Cohesion: 0.06
+Nodes (34): mongoose, submissionSchema, bcrypt, mongoose, userSchema, fs, main(), mongoose (+26 more)
 
 ### Community 5 - "assignmentController.js"
 Cohesion: 0.07
@@ -124,7 +124,7 @@ Nodes (11): analyzeAI(), { analyzeAnswers }, Exam, ExamSubmission, { getIO }, No
 
 ### Community 7 - "attendanceController.js"
 Cohesion: 0.07
-Nodes (21): Attendance, Course, evalArithmetic(), evaluateExcelFormula(), getAttendance(), getAttendanceStats(), markAttendance(), IMPORTANT: Filter only students, not teachers (+13 more)
+Nodes (18): Attendance, Course, evalArithmetic(), evaluateExcelFormula(), getAttendance(), getAttendanceStats(), markAttendance(), IMPORTANT: Filter only students, not teachers (+10 more)
 
 ### Community 8 - "lectureController.js"
 Cohesion: 0.09
@@ -144,7 +144,7 @@ Nodes (16): concurrently, author, dependencies, concurrently, description, keywo
 
 ### Community 12 - "dependencies"
 Cohesion: 0.13
-Nodes (15): axios, jszip, dependencies, axios, jszip, react-dom, react-router-dom, react-scripts (+7 more)
+Nodes (15): jszip, docx-preview, dependencies, docx-preview, jszip, react-dom, react-router-dom, react-scripts (+7 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.15
@@ -191,8 +191,8 @@ Cohesion: 0.40
 Nodes (3): adminData, bcrypt, mongoose
 
 ### Community 25 - "previewService.js"
-Cohesion: 0.24
-Nodes (14): buildSlideBodyHtml(), extractPptxSlidesArray(), extractPptxSlidesHtml(), extractSlideBgColor(), extractSlideElements(), formatTableHtml(), formatTextElementHtml(), fs (+6 more)
+Cohesion: 0.26
+Nodes (12): buildSlideBodyHtml(), extractPptxSlidesArray(), extractPptxSlidesHtml(), extractSlideElements(), formatTableHtml(), formatTextElementHtml(), fs, generatePreviewData() (+4 more)
 
 ### Community 47 - "deadlineReminder.js"
 Cohesion: 0.17

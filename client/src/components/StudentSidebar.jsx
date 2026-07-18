@@ -17,12 +17,21 @@ import {
   FiMessageCircle,
   FiMail,
   FiClock,
+  FiBell,
+  FiSettings,
 } from "react-icons/fi";
 
 export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const cid = courseId || courseInfo?._id;
+  const activeCourseId = courseId || courseInfo?._id;
+  const cid = activeCourseId || sessionStorage.getItem("last_active_student_course_id");
+
+  useEffect(() => {
+    if (activeCourseId) {
+      sessionStorage.setItem("last_active_student_course_id", activeCourseId);
+    }
+  }, [activeCourseId]);
 
   const [course, setCourse] = useState(courseInfo || null);
   const [communityOpen, setCommunityOpen] = useState(
@@ -160,11 +169,21 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           </button>
         </div>
         <div className="sidebar-footer-fixed">
-          {/* Static Notification Portal Container */}
-          <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
+          <button
+            className={`nav-item ${currentPage === "notifications" || window.location.pathname.includes("/notifications") ? "active" : ""}`}
+            onClick={() => navigate("/notifications")}
+          >
+            <FiBell size={18} />
+            <span>Notifications</span>
+          </button>
           <div className="nav-divider" style={{ margin: "2px 0" }}></div>
-          {/* Static Settings Portal Container */}
-          <div id="sidebar-settings-portal" style={{ width: "100%" }}></div>
+          <button
+            className={`nav-item ${currentPage === "settings" || window.location.pathname.includes("/settings") ? "active" : ""}`}
+            onClick={() => navigate("/settings")}
+          >
+            <FiSettings size={18} />
+            <span>Settings</span>
+          </button>
           <button className="nav-item logout-btn" onClick={logout}>
             <FiLogOut size={18} />
             <span>Logout</span>
@@ -303,16 +322,26 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
         </button>
       </div>
       <div className="sidebar-footer-fixed">
-        {/* Static Notification Portal Container */}
-        <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
+        <button
+          className={`nav-item ${currentPage === "notifications" || window.location.pathname.includes("/notifications") ? "active" : ""}`}
+          onClick={() => navigate(cid ? `/notifications?courseId=${cid}` : "/notifications")}
+        >
+          <FiBell size={18} />
+          <span>Notifications</span>
+        </button>
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
         <button className="nav-item" onClick={() => navigate("/courses")}>
           <FiArrowLeft size={18} />
           <span>Back to Courses</span>
         </button>
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
-        {/* Static Settings Portal Container */}
-        <div id="sidebar-settings-portal" style={{ width: "100%" }}></div>
+        <button
+          className={`nav-item ${currentPage === "settings" || window.location.pathname.includes("/settings") ? "active" : ""}`}
+          onClick={() => navigate(cid ? `/settings?courseId=${cid}` : "/settings")}
+        >
+          <FiSettings size={18} />
+          <span>Settings</span>
+        </button>
         <button className="nav-item logout-btn" onClick={logout}>
           <FiLogOut size={18} />
           <span>Logout</span>

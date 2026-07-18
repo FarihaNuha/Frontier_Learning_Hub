@@ -6,6 +6,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
   const [loading, setLoading] = useState(false);
   const [blobUrl, setBlobUrl] = useState("");
   const [textContent, setTextContent] = useState("");
+  const [docxBuffer, setDocxBuffer] = useState(null);
   const [fileCategory, setFileCategory] = useState("other");
   const docxRef = useRef(null);
 
@@ -13,6 +14,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
     if (!file || !isOpen) {
       setBlobUrl("");
       setTextContent("");
+      setDocxBuffer(null);
       return;
     }
 
@@ -47,15 +49,9 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
         const createdUrl = URL.createObjectURL(blob);
         setBlobUrl(createdUrl);
 
-        if (category === "docx" && docxRef.current) {
+        if (category === "docx") {
           const arrayBuffer = await blob.arrayBuffer();
-          docxRef.current.innerHTML = "";
-          await docx.renderAsync(arrayBuffer, docxRef.current, null, {
-            className: "docx-preview",
-            inWrapper: true,
-            ignoreWidth: false,
-            ignoreHeight: false,
-          });
+          setDocxBuffer(arrayBuffer);
         } else if (category === "txt") {
           const text = await blob.text();
           setTextContent(text);
@@ -75,6 +71,18 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
       }
     };
   }, [file, isOpen]);
+
+  useEffect(() => {
+    if (fileCategory === "docx" && docxBuffer && docxRef.current) {
+      docxRef.current.innerHTML = "";
+      docx.renderAsync(docxBuffer, docxRef.current, null, {
+        className: "docx-preview",
+        inWrapper: true,
+        ignoreWidth: false,
+        ignoreHeight: false,
+      }).catch(err => console.error("docx render error:", err));
+    }
+  }, [docxBuffer, fileCategory, loading]);
 
   if (!isOpen || !file) return null;
 
@@ -167,7 +175,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
             background: "#fafafa"
           }}
         >
-          {loading ? (
+          {loading && fileCategory !== "docx" ? (
             <div style={{ textAlign: "center", color: "#64748b" }}>
               <div className="spinner" style={{ margin: "0 auto 12px" }}></div>
               <p style={{ fontWeight: 600 }}>Loading preview...</p>
@@ -181,7 +189,10 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
           ) : fileCategory === "audio" ? (
             <audio src={blobUrl || downloadUrl} controls style={{ width: "100%" }} />
           ) : fileCategory === "docx" ? (
-            <div ref={docxRef} style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", background: "#ffffff", padding: "20px", borderRadius: "10px" }} />
+            <div style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", background: "#ffffff", padding: "20px", borderRadius: "10px" }}>
+              {loading && <p style={{ color: "#64748b", textAlign: "center", fontWeight: "600" }}>Rendering document...</p>}
+              <div ref={docxRef} className="docx-preview-container" style={{ width: "100%", minHeight: "300px" }} />
+            </div>
           ) : fileCategory === "txt" ? (
             <pre style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", background: "#ffffff", padding: "16px", borderRadius: "10px", whiteSpace: "pre-wrap", fontFamily: "monospace" }}>
               {textContent}

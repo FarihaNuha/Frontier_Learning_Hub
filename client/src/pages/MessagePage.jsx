@@ -1242,45 +1242,46 @@ export default function MessagePage() {
           {user?.role === "student" && (
             <div
               style={{
-                background: "var(--bg-card)",
+                background: "linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%)",
                 borderRadius: "20px",
-                padding: "28px",
+                padding: "32px",
                 marginBottom: "32px",
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.05)",
-                border: "1px solid var(--border-color)",
+                boxShadow: "0 10px 30px rgba(59, 141, 179, 0.08)",
+                border: "1.5px solid #b1d4e5",
                 transition: "transform 0.2s ease, box-shadow 0.2s ease"
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px", borderBottom: "1px dashed rgba(59,141,179,0.2)", paddingBottom: "18px" }}>
                 <div
                   style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "14px",
-                    background: "linear-gradient(135deg, rgba(59,141,179,0.15), rgba(37,99,235,0.15))",
+                    width: "52px",
+                    height: "52px",
+                    borderRadius: "16px",
+                    background: "linear-gradient(135deg, #3B8DB3 0%, #2563eb 100%)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#3B8DB3",
-                    fontSize: "22px"
+                    color: "#ffffff",
+                    fontSize: "24px",
+                    boxShadow: "0 6px 16px rgba(37,99,235,0.25)"
                   }}
                 >
                   <FiRequestSend />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "var(--text-primary)" }}>
+                  <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 800, color: "#1e3a5f", letterSpacing: "-0.3px" }}>
                     Request Teacher Contact
                   </h3>
-                  <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--text-secondary)" }}>
+                  <p style={{ margin: "4px 0 0", fontSize: "13.5px", color: "var(--text-secondary)" }}>
                     Submit a formal inquiry or schedule a 1-on-1 consultation window with your teacher.
                   </p>
                 </div>
               </div>
 
-              <form onSubmit={handleSendContactRequest} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+              <form onSubmit={handleSendContactRequest} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
                   <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>
+                    <label style={{ display: "block", marginBottom: "8px", fontSize: "13.5px", fontWeight: 700, color: "#1e3a5f" }}>
                       Select Instructor / Teacher <span style={{ color: "#ef4444" }}>*</span>
                     </label>
                     <select
@@ -1289,13 +1290,15 @@ export default function MessagePage() {
                       required
                       style={{
                         width: "100%",
-                        padding: "12px 16px",
+                        padding: "13px 18px",
                         borderRadius: "12px",
-                        border: "1.5px solid var(--border-color)",
-                        background: "var(--bg-secondary)",
+                        border: "1.5px solid #b1d4e5",
+                        background: "#ffffff",
                         color: "var(--text-primary)",
                         fontSize: "14px",
+                        fontWeight: 500,
                         outline: "none",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
                         transition: "all 0.2s"
                       }}
                     >
@@ -1309,7 +1312,7 @@ export default function MessagePage() {
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>
+                    <label style={{ display: "block", marginBottom: "8px", fontSize: "13.5px", fontWeight: 700, color: "#1e3a5f" }}>
                       Subject / Course Title <span style={{ color: "#ef4444" }}>*</span>
                     </label>
                     <input
@@ -1320,14 +1323,16 @@ export default function MessagePage() {
                       required
                       style={{
                         width: "100%",
-                        padding: "12px 16px",
+                        padding: "13px 18px",
                         borderRadius: "12px",
-                        border: "1.5px solid var(--border-color)",
-                        background: "var(--bg-secondary)",
+                        border: "1.5px solid #b1d4e5",
+                        background: "#ffffff",
                         color: "var(--text-primary)",
                         fontSize: "14px",
+                        fontWeight: 500,
                         outline: "none",
                         boxSizing: "border-box",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
                         transition: "all 0.2s"
                       }}
                     />
@@ -1335,52 +1340,54 @@ export default function MessagePage() {
                 </div>
 
                 <div>
-                  <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>
+                  <label style={{ display: "block", marginBottom: "8px", fontSize: "13.5px", fontWeight: 700, color: "#1e3a5f" }}>
                     Topic / Discussion Reason
                   </label>
                   <textarea
                     value={crTopic}
                     onChange={(e) => setCrTopic(e.target.value)}
-                    placeholder="Describe what topic, assignment, or query you would like to discuss..."
-                    rows={3}
+                    placeholder="Describe what topic, assignment, or query you would like to discuss with your teacher..."
+                    rows={4}
                     style={{
                       width: "100%",
-                      padding: "12px 16px",
+                      padding: "13px 18px",
                       borderRadius: "12px",
-                      border: "1.5px solid var(--border-color)",
-                      background: "var(--bg-secondary)",
+                      border: "1.5px solid #b1d4e5",
+                      background: "#ffffff",
                       color: "var(--text-primary)",
                       fontSize: "14px",
+                      fontWeight: 500,
                       resize: "vertical",
                       outline: "none",
                       boxSizing: "border-box",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
                       transition: "all 0.2s"
                     }}
                   />
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "4px" }}>
                   <button
                     type="submit"
                     disabled={crSending}
                     style={{
-                      padding: "12px 28px",
+                      padding: "13px 32px",
                       background: "linear-gradient(135deg, #3B8DB3 0%, #2563eb 100%)",
                       color: "#ffffff",
                       border: "none",
                       borderRadius: "12px",
                       fontWeight: 700,
-                      fontSize: "14px",
+                      fontSize: "14.5px",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       gap: "10px",
-                      boxShadow: "0 4px 14px rgba(37,99,235,0.25)",
+                      boxShadow: "0 6px 18px rgba(37,99,235,0.3)",
                       opacity: crSending ? 0.7 : 1,
                       transition: "all 0.2s ease"
                     }}
                   >
-                    <FiRequestSend size={18} /> {crSending ? "Sending..." : "Send Contact Request"}
+                    <FiRequestSend size={18} /> {crSending ? "Sending Request..." : "Send Contact Request"}
                   </button>
                 </div>
               </form>

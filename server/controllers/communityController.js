@@ -68,7 +68,7 @@ exports.createPublicPost = async (req, res) => {
     // Send emails via queue (rate-limited, non-blocking)
     if (otherUsers.length > 0) {
       for (const recipient of otherUsers) {
-        if (recipient.email) {
+        if (recipient.email && recipient.emailNotifications !== false) {
           const { subject, html } = emailTemplates.newCommunityPost(
             recipient.name,
             post.author.name,
@@ -356,7 +356,7 @@ exports.createCoursePost = async (req, res) => {
     // Send emails via queue (rate-limited, non-blocking)
     if (recipients.length > 0) {
       for (const recipient of recipients) {
-        if (recipient.email) {
+        if (recipient.email && recipient.emailNotifications !== false) {
           const { subject, html } = emailTemplates.newCommunityPost(
             recipient.name,
             post.author.name,
@@ -675,8 +675,8 @@ exports.sendMessage = async (req, res) => {
       console.error("Failed to create message notification:", err);
     }
 
-    // Send email to receiver via queue (rate-limited, non-blocking)
-    if (receiver.email) {
+    // Send email to receiver via queue if emailNotifications is enabled
+    if (receiver.email && receiver.emailNotifications !== false) {
       const emailData = emailTemplates.newPrivateMessage(
         receiver.name,
         senderName,
@@ -1061,8 +1061,8 @@ exports.createContactRequest = async (req, res) => {
         io.to(`user_${teacherId}`).emit("newContactRequest", request);
       }
 
-      // Send email notification to teacher
-      if (teacherUser && teacherUser.email) {
+      // Send email notification to teacher if preference is enabled
+      if (teacherUser && teacherUser.email && teacherUser.contactRequestEmailNotifications !== false) {
         const emailData = emailTemplates.contactRequestNotification(
           teacherName,
           studentName,

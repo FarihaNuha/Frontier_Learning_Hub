@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  contactRequestEmailNotifications: {
+    type: Boolean,
+    default: true,
+  },
   resetOtp: String,
   resetOtpExpires: Date,
   createdAt: {

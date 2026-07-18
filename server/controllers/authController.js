@@ -113,7 +113,7 @@ exports.getMe = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, studentId, department, profilePicture, emailNotifications } = req.body;
+    const { name, studentId, department, profilePicture, emailNotifications, contactRequestEmailNotifications } = req.body;
     const userId = req.user.uid;
 
     const user = await User.findById(userId);
@@ -139,6 +139,9 @@ exports.updateProfile = async (req, res) => {
     if (emailNotifications !== undefined) {
       user.emailNotifications = emailNotifications;
     }
+    if (contactRequestEmailNotifications !== undefined) {
+      user.contactRequestEmailNotifications = contactRequestEmailNotifications;
+    }
 
     await user.save();
 
@@ -152,7 +155,8 @@ exports.updateProfile = async (req, res) => {
         department: user.department,
         studentId: user.studentId,
         profilePicture: user.profilePicture,
-        emailNotifications: user.emailNotifications
+        emailNotifications: user.emailNotifications,
+        contactRequestEmailNotifications: user.contactRequestEmailNotifications
       }
     });
   } catch (error) {

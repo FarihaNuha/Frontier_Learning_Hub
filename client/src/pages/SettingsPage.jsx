@@ -164,6 +164,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState({
     // General
     emailNotifications: user?.emailNotifications !== false,
+    contactRequestEmailNotifications: user?.contactRequestEmailNotifications !== false,
     activeStatus: true,
     
     // Teacher specific
@@ -183,15 +184,20 @@ export default function SettingsPage() {
 
     const savedSettings = localStorage.getItem("user_settings");
     let currentEmailNotif = user?.emailNotifications !== false;
+    let currentContactNotif = user?.contactRequestEmailNotifications !== false;
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
         if (typeof parsed.emailNotifications === "boolean") {
           currentEmailNotif = parsed.emailNotifications;
         }
+        if (typeof parsed.contactRequestEmailNotifications === "boolean") {
+          currentContactNotif = parsed.contactRequestEmailNotifications;
+        }
         setSettings({
           ...parsed,
-          emailNotifications: currentEmailNotif
+          emailNotifications: currentEmailNotif,
+          contactRequestEmailNotifications: currentContactNotif
         });
         return;
       } catch (e) {
@@ -200,7 +206,8 @@ export default function SettingsPage() {
     }
     setSettings((prev) => ({
       ...prev,
-      emailNotifications: currentEmailNotif
+      emailNotifications: currentEmailNotif,
+      contactRequestEmailNotifications: currentContactNotif
     }));
   }, [user]);
 
@@ -227,20 +234,22 @@ export default function SettingsPage() {
     setSettings(updated);
     localStorage.setItem("user_settings", JSON.stringify(updated));
 
-    if (key === "emailNotifications") {
+    if (key === "emailNotifications" || key === "contactRequestEmailNotifications") {
       try {
-        const res = await api.put("/auth/profile", {
-          emailNotifications: newValue
-        });
+        const payload = {
+          [key]: newValue
+        };
+        const res = await api.put("/auth/profile", payload);
         const updatedUser = {
           ...user,
-          emailNotifications: res.data.user?.emailNotifications ?? newValue
+          ...res.data.user
         };
         setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        toast.success(`Email notifications turned ${newValue ? "ON" : "OFF"}`);
+        const label = key === "contactRequestEmailNotifications" ? "Contact request email alerts" : "Community & message email notifications";
+        toast.success(`${label} turned ${newValue ? "ON" : "OFF"}`);
       } catch (err) {
-        console.error("Failed to update email notifications preference", err);
+        console.error("Failed to update notification preference", err);
       }
     }
 
@@ -351,13 +360,20 @@ export default function SettingsPage() {
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {/* Common settings */}
+              {/* Notification Toggles */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--border-light)" }}>
                 <div>
-                  <strong style={{ color: "var(--text-dark)", display: "block" }}>Email Notifications</strong>
-                  <span style={{ fontSize: "12px", color: "var(--text-gray)" }}>Receive email updates for new community posts and comments</span>
+                  <strong style={{ color: "var(--text-dark)", display: "block" }}>Community & Direct Message Emails</strong>
+                  <span style={{ fontSize: "12px", color: "var(--text-gray)" }}>
+                    Receive email notifications for community posts, announcements, and direct messages
+                  </span>
+                  {user?.role === "student" && (
+                    <span style={{ fontSize: "11px", color: "#3B8DB3", display: "block", marginTop: "4px", fontWeight: 500 }}>
+                      ℹ️ Note: Teacher contact request responses (Approvals / Declines) will always be sent to your email.
+                    </span>
+                  )}
                 </div>
-                <label className="toggle-switch-wrapper" style={{ position: "relative", display: "inline-block", width: "50px", height: "26px" }}>
+                <label className="toggle-switch-wrapper" style={{ position: "relative", display: "inline-block", width: "50px", height: "26px", flexShrink: 0 }}>
                   <input
                     type="checkbox"
                     checked={settings.emailNotifications}
@@ -385,6 +401,44 @@ export default function SettingsPage() {
                   </span>
                 </label>
               </div>
+
+              {user?.role === "teacher" && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--border-light)" }}>
+                  <div>
+                    <strong style={{ color: "var(--text-dark)", display: "block" }}>Student Contact Request Emails</strong>
+                    <span style={{ fontSize: "12px", color: "var(--text-gray)" }}>
+                      Receive email alerts when students submit a 1-on-1 contact consultation request
+                    </span>
+                  </div>
+                  <label className="toggle-switch-wrapper" style={{ position: "relative", display: "inline-block", width: "50px", height: "26px", flexShrink: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={settings.contactRequestEmailNotifications}
+                      onChange={() => handleToggle("contactRequestEmailNotifications")}
+                      style={{ opacity: 0, width: 0, height: 0 }}
+                    />
+                    <span className="toggle-switch-slider" style={{
+                      position: "absolute",
+                      cursor: "pointer",
+                      top: 0, left: 0, right: 0, bottom: 0,
+                      backgroundColor: settings.contactRequestEmailNotifications ? "var(--success)" : "#cbd5e1",
+                      transition: "0.4s",
+                      borderRadius: "34px"
+                    }}>
+                      <span style={{
+                        position: "absolute",
+                        content: "",
+                        height: "18px", width: "18px",
+                        left: settings.contactRequestEmailNotifications ? "28px" : "4px",
+                        bottom: "4px",
+                        backgroundColor: "white",
+                        transition: "0.4s",
+                        borderRadius: "50%"
+                      }} />
+                    </span>
+                  </label>
+                </div>
+              )}
 
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--border-light)" }}>
                 <div>

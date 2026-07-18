@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssignmentPage.jsx": {
-    "mtime": 1784366562.3639183,
-    "ast_hash": "cca069bf93148d4298363f8da53a0ce5",
+    "mtime": 1784368091.2934153,
+    "ast_hash": "2fc972962fdfe33821bad987b5c0a525",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAttendancePage.jsx": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1784357092.7743256,
-    "ast_hash": "65016a9acd080fdc656ac0947ef59a3b",
+    "mtime": 1784368083.3518124,
+    "ast_hash": "4c4c616849223144e0097c8eeeeb88d2",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {

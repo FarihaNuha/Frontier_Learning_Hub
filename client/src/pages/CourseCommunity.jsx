@@ -5,6 +5,7 @@ import api from "../services/api";
 import { communityApi } from "../services/communityApi";
 import toast from "react-hot-toast";
 import ShareModal from "../components/ShareModal";
+import FilePreviewModal from "../components/FilePreviewModal";
 import {
   FiMessageSquare,
   FiPlus,
@@ -441,7 +442,7 @@ const getFileUrl = (url) => {
   return `${window.location.origin}${url}`;
 };
 
-const renderAttachments = (attachments) => {
+const renderAttachments = (attachments, onPreview) => {
   if (!attachments || attachments.length === 0) return null;
 
   return (
@@ -451,14 +452,24 @@ const renderAttachments = (attachments) => {
         const isVideo = file.fileType?.startsWith("video/") || /\.(mp4|webm|ogg)$/i.test(file.fileName);
         const isAudio = file.fileType?.startsWith("audio/") || /\.(mp3|wav|ogg)$/i.test(file.fileName);
         const absoluteUrl = getFileUrl(file.fileUrl);
+        const fileObj = { name: file.fileName, url: absoluteUrl, fileType: file.fileType };
 
         if (isImage) {
           return (
-            <div key={idx} className="attachment-preview-wrapper image-preview">
+            <div key={idx} className="attachment-preview-wrapper image-preview" style={{ cursor: "pointer" }} onClick={() => onPreview && onPreview(fileObj)}>
               <img src={absoluteUrl} alt={file.fileName} className="attachment-image" />
-              <div className="attachment-file-info">
+              <div className="attachment-file-info" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>🖼️ {file.fileName}</span>
-                <a href={absoluteUrl} download={file.fileName} className="btn-download-link" target="_blank" rel="noopener noreferrer">Download</a>
+                <div style={{ display: "flex", gap: "6px" }} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={() => onPreview && onPreview(fileObj)}
+                    className="btn-download-link"
+                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer" }}
+                  >
+                    👁️ View
+                  </button>
+                  <a href={absoluteUrl} download={file.fileName} className="btn-download-link" target="_blank" rel="noopener noreferrer">Download</a>
+                </div>
               </div>
             </div>
           );
@@ -468,9 +479,18 @@ const renderAttachments = (attachments) => {
           return (
             <div key={idx} className="attachment-preview-wrapper video-preview">
               <video src={absoluteUrl} controls className="attachment-video" />
-              <div className="attachment-file-info">
+              <div className="attachment-file-info" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>🎥 {file.fileName}</span>
-                <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <button
+                    onClick={() => onPreview && onPreview(fileObj)}
+                    className="btn-download-link"
+                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer" }}
+                  >
+                    👁️ View
+                  </button>
+                  <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
+                </div>
               </div>
             </div>
           );
@@ -480,30 +500,50 @@ const renderAttachments = (attachments) => {
           return (
             <div key={idx} className="attachment-preview-wrapper audio-preview">
               <audio src={absoluteUrl} controls className="attachment-audio" />
-              <div className="attachment-file-info">
+              <div className="attachment-file-info" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>🎵 {file.fileName}</span>
-                <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <button
+                    onClick={() => onPreview && onPreview(fileObj)}
+                    className="btn-download-link"
+                    style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer" }}
+                  >
+                    👁️ View
+                  </button>
+                  <a href={absoluteUrl} download={file.fileName} className="btn-download-link">Download</a>
+                </div>
               </div>
             </div>
           );
         }
 
         return (
-          <div key={idx} className="attachment-file-card">
-            <div className="file-icon">📁</div>
-            <div className="file-details">
-              <span className="file-name">{file.fileName}</span>
-              <span className="file-type">{file.fileType || "Document"}</span>
+          <div key={idx} className="attachment-file-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }} onClick={() => onPreview && onPreview(fileObj)}>
+              <div className="file-icon">📁</div>
+              <div className="file-details">
+                <span className="file-name" style={{ fontWeight: "600" }}>{file.fileName}</span>
+                <span className="file-type" style={{ display: "block", fontSize: "11px", color: "#64748b" }}>{file.fileType || "Document"}</span>
+              </div>
             </div>
-            <a
-              href={absoluteUrl}
-              download={file.fileName}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-download-link"
-            >
-              ⬇️ Download
-            </a>
+            <div style={{ display: "flex", gap: "6px" }}>
+              <button
+                onClick={() => onPreview && onPreview(fileObj)}
+                className="btn-download-link"
+                style={{ background: "#e2eef6", color: "#1e3a5f", border: "1px solid #b1d4e5", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+              >
+                👁️ View
+              </button>
+              <a
+                href={absoluteUrl}
+                download={file.fileName}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-download-link"
+              >
+                ⬇️ Download
+              </a>
+            </div>
           </div>
         );
       })}
@@ -511,14 +551,14 @@ const renderAttachments = (attachments) => {
   );
 };
 
-const renderLectureAttachment = (lecture) => {
+const renderLectureAttachment = (lecture, onPreview) => {
   if (!lecture) return null;
   const file = {
     fileName: lecture.originalName || lecture.title,
     fileUrl: lecture.fileURL,
     fileType: lecture.fileType
   };
-  return renderAttachments([file]);
+  return renderAttachments([file], onPreview);
 };
 
 function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPostUpdated }) {
@@ -539,6 +579,7 @@ function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPo
   const [showShareModal, setShowShareModal] = useState(false);
   const [showActionsDropdown, setShowActionsDropdown] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [previewModalFile, setPreviewModalFile] = useState(null);
 
   useEffect(() => {
     if (!showActionsDropdown) return;
@@ -767,8 +808,8 @@ function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPo
         </p>
       )}
 
-      {renderAttachments(post.attachments)}
-      {renderLectureAttachment(post.lecture)}
+      {renderAttachments(post.attachments, setPreviewModalFile)}
+      {renderLectureAttachment(post.lecture, setPreviewModalFile)}
 
       {post.sharedPostId && (
         <div className="shared-post-nested-card">
@@ -814,8 +855,8 @@ function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPo
           <p className="shared-post-content">
             {renderContentWithLinks(post.sharedPostId.content)}
           </p>
-          {renderAttachments(post.sharedPostId.attachments)}
-          {renderLectureAttachment(post.sharedPostId.lecture)}
+          {renderAttachments(post.sharedPostId.attachments, setPreviewModalFile)}
+          {renderLectureAttachment(post.sharedPostId.lecture, setPreviewModalFile)}
         </div>
       )}
 
@@ -938,6 +979,11 @@ function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPo
           post.sharedPostId?.attachments?.[0]?.fileUrl || 
           null
         }
+      />
+      <FilePreviewModal
+        isOpen={!!previewModalFile}
+        onClose={() => setPreviewModalFile(null)}
+        file={previewModalFile}
       />
     </div>
   );

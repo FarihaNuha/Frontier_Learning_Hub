@@ -7469,7 +7469,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherAttendancePage.jsx",
-      "source_location": "L511",
+      "source_location": "L515",
       "weight": 1.0,
       "source": "client_src_pages_teacherattendancepage_teacherattendancepage",
       "target": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_jspdf"
@@ -11114,7 +11114,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/StudentAssignmentPage.jsx",
-      "source_location": "L161",
+      "source_location": "L162",
       "weight": 1.0,
       "source": "client_src_pages_studentassignmentpage_studentassignmentpage",
       "target": "client_src_services_apicache_fetchwithcache"
@@ -11222,7 +11222,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L181",
+      "source_location": "L182",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard_studentdashboard",
       "target": "client_src_services_apicache_fetchwithcache"

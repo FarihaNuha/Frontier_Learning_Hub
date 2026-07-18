@@ -28,6 +28,7 @@ import {
   FiMail,
   FiEye,
 } from "react-icons/fi";
+import "../styles/dashboard.css";
 import "../styles/community.css";
 import TeacherSidebar from "../components/TeacherSidebar";
 import StudentSidebar from "../components/StudentSidebar";

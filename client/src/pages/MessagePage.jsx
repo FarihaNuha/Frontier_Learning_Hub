@@ -73,7 +73,7 @@ export default function MessagePage() {
   useEffect(() => {
     if (tabParam === "requests") {
       setActiveTab("requests");
-    } else if (tabParam === "messages") {
+    } else {
       setActiveTab("messages");
     }
   }, [tabParam]);

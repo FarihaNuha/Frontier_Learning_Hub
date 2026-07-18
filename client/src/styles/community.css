@@ -651,9 +651,10 @@
 
 /* Messages Page */
 .messages-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px 32px;
 }
 
 .messages-header {

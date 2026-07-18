@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentDashboard.jsx": {
-    "mtime": 1784357063.414819,
-    "ast_hash": "1be8507e1afc89543977d85bcd930cb4",
+    "mtime": 1784381355.8571076,
+    "ast_hash": "d6ef65bc833d4f0e9a1e38d67abbd40c",
     "semantic_hash": ""
   },
   "client/src/pages/StudentExamPage.jsx": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1784368305.9134784,
-    "ast_hash": "0c27557eeaa500b24a6bcafb6f2d03bc",
+    "mtime": 1784370350.1054442,
+    "ast_hash": "b172cb5df154894323766756fea83c53",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1784357053.929987,
-    "ast_hash": "58c7ccea2acf3e0613e2ec8d8a28e219",
+    "mtime": 1784381370.1471527,
+    "ast_hash": "ec7d408e2b2da5544848f000da2dd1e1",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "server/controllers/courseController.js": {
-    "mtime": 1784310075.8548856,
-    "ast_hash": "4fa4b91699b5fa3ced9f9034ec12439b",
+    "mtime": 1784377929.5040655,
+    "ast_hash": "ef5f2ebc296594b23da7aeeadcbef62d",
     "semantic_hash": ""
   },
   "server/controllers/examController.js": {
@@ -470,9 +470,9 @@
     "semantic_hash": ""
   },
   "server/services/previewService.js": {
-    "mtime": 1784188241.831,
-    "ast_hash": "d3bb536c4425ce34bf624218d33ae87e",
-    "semantic_hash": "d3bb536c4425ce34bf624218d33ae87e"
+    "mtime": 1784382552.03967,
+    "ast_hash": "16b70edec08c8fbbfa15f175abb7a85e",
+    "semantic_hash": ""
   },
   "server/services/similarityService.js": {
     "mtime": 1784368678.4742494,
@@ -510,8 +510,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/CourseAnalyticsPage.jsx": {
-    "mtime": 1784369665.099756,
-    "ast_hash": "64a9730a3b35992e7d58620601fbc38f",
+    "mtime": 1784379816.5203724,
+    "ast_hash": "808426bd20551a8991941b3d0a81c8fd",
     "semantic_hash": ""
   },
   "server/models/ContactRequest.js": {

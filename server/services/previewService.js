@@ -63,21 +63,43 @@ function extractSlideElements(slideXmlText) {
       }
       const spXml = slideXmlText.substring(ev.index, endSpIndex + 7);
       
-      const pMatches = spXml.match(/<a:p>([\s\S]*?)<\/a:p>/g) || [];
+      const pMatches = spXml.match(/<a:p[\s>][\s\S]*?<\/a:p>/g) || [];
       const paragraphs = [];
       let maxSz = 0;
+      
+      // Extract shape fill color if any
+      const srgbMatch = spXml.match(/<a:srgbClr\s+val="([A-Fa-f0-9]{6})"/);
+      const shapeColor = srgbMatch ? `#${srgbMatch[1]}` : null;
       
       for (const pXml of pMatches) {
         const tMatches = pXml.match(/<a:t>([^<]*)<\/a:t>/g) || [];
         const text = tMatches.map(m => m.replace(/<\/?a:t>/g, "")).join("");
         if (text.trim().length > 0) {
-          paragraphs.push(text.trim());
+          // Paragraph or run specific color
+          const pColorMatch = pXml.match(/<a:srgbClr\s+val="([A-Fa-f0-9]{6})"/);
+          const pColor = pColorMatch ? `#${pColorMatch[1]}` : shapeColor;
           
           const szMatches = pXml.match(/sz="(\d+)"/g) || [];
           const sizes = szMatches.map(m => parseInt(m.match(/\d+/)[0], 10));
-          if (sizes.length > 0) {
-            maxSz = Math.max(maxSz, ...sizes);
-          }
+          const pSz = sizes.length > 0 ? Math.max(...sizes) : 0;
+          if (pSz > maxSz) maxSz = pSz;
+          
+          const isBold = pXml.includes('b="1"') || pXml.includes('b="true"');
+          const isItalic = pXml.includes('i="1"') || pXml.includes('i="true"');
+          
+          const hasBuNone = pXml.includes('<a:buNone/>') || pXml.includes('<a:buNone');
+          const hasBuChar = pXml.includes('<a:buChar') || pXml.includes('<a:buFont') || pXml.includes('<a:buAutoNum');
+          const startsWithBullet = /^[•\-\*]/.test(text.trim());
+          const isBullet = !hasBuNone && (hasBuChar || startsWithBullet);
+          
+          paragraphs.push({
+            text: text.trim(),
+            color: pColor,
+            fontSize: pSz > 0 ? Math.round(pSz / 100) : 0,
+            isBold,
+            isItalic,
+            isBullet
+          });
         }
       }
       
@@ -92,11 +114,13 @@ function extractSlideElements(slideXmlText) {
           y = grp.offY + (y - grp.chOffY) * (grp.extCx / grp.chExtCx);
         }
         
+        const isTitle = spXml.includes('type="title"') || spXml.includes('type="ctrTitle"');
         elements.push({
           type: "text",
           x: Math.round(x),
           y: Math.round(y),
           sz: maxSz,
+          isTitle: isTitle,
           content: paragraphs
         });
       }
@@ -186,40 +210,61 @@ function formatTableHtml(rows) {
 }
 
 function formatTextElementHtml(paragraphs, isSlideshow) {
-  // Strips any leading bullets/dashes/asterisks from text
-  const clean = (t) => t.trim().replace(/^[•\-\*\s]+/, "").trim();
-  const spacing = isSlideshow ? "16px" : "12px";
-  const liSpacing = isSlideshow ? "8px" : "6px";
+  const spacing = isSlideshow ? "14px" : "10px";
+  const liSpacing = isSlideshow ? "8px" : "5px";
+  const defaultFontSize = isSlideshow ? "16px" : "14px";
 
-  if (paragraphs.length === 1) {
-    const trimmed = clean(paragraphs[0]);
-    if (trimmed.length === 0) return "";
-    const colonIndex = trimmed.indexOf(":");
-    if (colonIndex > 0 && colonIndex <= 40) {
-      const keyword = trimmed.substring(0, colonIndex).trim();
-      const desc = trimmed.substring(colonIndex + 1).trim();
-      return `<p style="margin: 0 0 ${spacing} 0; font-family: inherit;"><strong style="color: #1e293b;">${keyword}</strong>: ${desc}</p>`;
+  let html = "";
+  let inBulletList = false;
+
+  const closeListIfOpen = () => {
+    if (inBulletList) {
+      html += `</ul>`;
+      inBulletList = false;
     }
-    return `<p style="margin: 0 0 ${spacing} 0; font-family: inherit;">${trimmed}</p>`;
-  }
+  };
 
-  let html = `<ul style="margin: 0 0 ${spacing} 0; padding-left: 20px; text-align: left; font-family: inherit;">`;
-  let hasLines = false;
-  for (const p of paragraphs) {
-    const trimmed = clean(p);
-    if (trimmed.length === 0) continue;
-    hasLines = true;
-    const colonIndex = trimmed.indexOf(":");
-    if (colonIndex > 0 && colonIndex <= 40) {
-      const keyword = trimmed.substring(0, colonIndex).trim();
-      const desc = trimmed.substring(colonIndex + 1).trim();
-      html += `<li style="margin-bottom: ${liSpacing}; font-family: inherit;"><strong style="color: #1e293b;">${keyword}</strong>: ${desc}</li>`;
+  for (const pObj of paragraphs) {
+    const rawText = typeof pObj === "string" ? pObj : pObj.text;
+    if (!rawText || rawText.trim().length === 0) continue;
+
+    const text = rawText.trim().replace(/^[•\-\*\s]+/, "").trim();
+    const color = (typeof pObj === "object" && pObj.color) ? pObj.color : "#1e293b";
+    const isBold = typeof pObj === "object" ? pObj.isBold : false;
+    const isItalic = typeof pObj === "object" ? pObj.isItalic : false;
+    const isBullet = typeof pObj === "object" ? pObj.isBullet : false;
+    const customSize = (typeof pObj === "object" && pObj.fontSize && pObj.fontSize > 0) ? `${pObj.fontSize}px` : defaultFontSize;
+
+    let fontStyleCss = "";
+    if (isItalic || text.startsWith('"') || text.startsWith('“') || text.startsWith("'")) {
+      fontStyleCss += "font-style: italic; ";
+    }
+    if (isBold) {
+      fontStyleCss += "font-weight: 700; ";
+    }
+
+    let contentHtml = text;
+    const colonIndex = text.indexOf(":");
+    if (colonIndex > 0 && colonIndex <= 45 && !text.startsWith('"') && !text.startsWith('“')) {
+      const keyword = text.substring(0, colonIndex).trim();
+      const desc = text.substring(colonIndex + 1).trim();
+      contentHtml = `<strong style="color: #0f172a; font-weight: 700;">${keyword}</strong>: ${desc}`;
+    }
+
+    if (isBullet) {
+      if (!inBulletList) {
+        html += `<ul style="margin: 0 0 ${spacing} 0; padding-left: 24px; text-align: left; font-family: system-ui, -apple-system, sans-serif; color: ${color}; font-size: ${customSize}; line-height: 1.6;">`;
+        inBulletList = true;
+      }
+      html += `<li style="margin-bottom: ${liSpacing}; font-family: inherit; color: ${color}; ${fontStyleCss}">${contentHtml}</li>`;
     } else {
-      html += `<li style="margin-bottom: ${liSpacing}; font-family: inherit;">${trimmed}</li>`;
+      closeListIfOpen();
+      html += `<p style="margin: 0 0 ${spacing} 0; font-family: system-ui, -apple-system, sans-serif; font-size: ${customSize}; color: ${color}; line-height: 1.6; ${fontStyleCss}">${contentHtml}</p>`;
     }
   }
-  html += `</ul>`;
-  return hasLines ? html : "";
+
+  closeListIfOpen();
+  return html;
 }
 
 /**
@@ -229,43 +274,35 @@ function formatTextElementHtml(paragraphs, isSlideshow) {
 function buildSlideBodyHtml(elements, isSlideshow = true) {
   if (elements.length === 0) return { title: "", bodyHtml: "", hasBodyContent: false };
   
-  // 1. Identify title element (shape with max sz, or topmost if none have sz)
-  let titleIdx = -1;
-  let maxSz = 0;
-  for (let i = 0; i < elements.length; i++) {
-    if (elements[i].type === "text" && elements[i].sz > maxSz) {
-      maxSz = elements[i].sz;
-      titleIdx = i;
-    }
-  }
-  
-  // Fallback: topmost element
+  // 1. Identify title element:
+  // First check if any text element has isTitle = true
+  let titleIdx = elements.findIndex(e => e.type === "text" && e.isTitle);
   if (titleIdx === -1) {
-    let minY = Infinity;
-    for (let i = 0; i < elements.length; i++) {
-      if (elements[i].y < minY) {
-        minY = elements[i].y;
-        titleIdx = i;
-      }
-    }
+    titleIdx = elements.findIndex(e => e.type === "text" && e.sz >= 2400);
   }
   
-  const titleElement = elements[titleIdx];
-  const title = titleElement ? titleElement.content[0] : "Slide";
-  
-  // Extract remaining elements
-  let remaining = elements.filter((_, i) => i !== titleIdx);
-  
-  // If the title element had more than 1 paragraph, the remaining paragraphs
-  // should be added back into the body elements list so they aren't lost!
-  if (titleElement && titleElement.content.length > 1) {
-    remaining.push({
-      type: "text",
-      x: titleElement.x,
-      y: titleElement.y + 1, // Sort right after title
-      sz: titleElement.sz,
-      content: titleElement.content.slice(1)
-    });
+  let title = "";
+  let titleColor = null;
+  let remaining = elements;
+
+  if (titleIdx !== -1) {
+    const titleElement = elements[titleIdx];
+    if (titleElement && titleElement.content.length > 0) {
+      const firstP = titleElement.content[0];
+      title = typeof firstP === "string" ? firstP : firstP.text;
+      titleColor = (typeof firstP === "object" && firstP.color) ? firstP.color : null;
+    }
+    remaining = elements.filter((_, i) => i !== titleIdx);
+    if (titleElement && titleElement.content.length > 1) {
+      remaining.push({
+        type: "text",
+        x: titleElement.x,
+        y: titleElement.y + 1,
+        sz: titleElement.sz,
+        isTitle: false,
+        content: titleElement.content.slice(1)
+      });
+    }
   }
   
   // Sort remaining elements: row grouping with 500000 units tolerance, then x
@@ -296,11 +333,14 @@ function buildSlideBodyHtml(elements, isSlideshow = true) {
     row.sort((a, b) => a.x - b.x);
   }
   
-  const titleFontSize = isSlideshow ? "24px" : "20px";
-  const titlePadding = isSlideshow ? "8px" : "6px";
-  const titleMargin = isSlideshow ? "18px" : "14px";
+  const titleFontSize = isSlideshow ? "28px" : "22px";
+  const titleMargin = isSlideshow ? "20px" : "14px";
   
-  let textHtml = `<h2 style="color: #d92121; font-size: ${titleFontSize}; font-weight: 700; margin-top: 0; margin-bottom: ${titleMargin}; font-family: inherit; border-bottom: 2px solid #3b8db3; padding-bottom: ${titlePadding}; word-break: normal; overflow-wrap: break-word; word-wrap: break-word;">${title}</h2>`;
+  let textHtml = "";
+  if (title && title.trim().length > 0) {
+    const titleStyleColor = titleColor || "#0066cc";
+    textHtml += `<h2 style="color: ${titleStyleColor}; font-size: ${titleFontSize}; font-weight: 700; margin-top: 0; margin-bottom: ${titleMargin}; font-family: system-ui, -apple-system, sans-serif; word-break: normal; overflow-wrap: break-word; line-height: 1.3;">${title}</h2>`;
+  }
   
   let hasBodyContent = false;
   if (rows.length > 0) {

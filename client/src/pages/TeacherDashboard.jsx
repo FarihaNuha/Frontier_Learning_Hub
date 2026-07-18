@@ -139,7 +139,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     if (isPlaying && previewSlides && previewSlides.length > 0) {
       interval = setInterval(() => {
         setCurrentSlideIndex((prev) => (prev + 1) % previewSlides.length);
-      }, 3500);
+      }, 2000);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -253,7 +253,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     setShareModalOpen(true);
   };
 
-  const getViewUrl = (id) => `${BACKEND_URL}/api/lectures/view/${id}?token=${localStorage.getItem("token")}`;
+  const getViewUrl = (id) => `${window.location.origin}/course/${courseId || ""}?lectureId=${id}`;
 
   // Group lectures by week
   const weeks = Array.from({ length: 14 }, (_, i) => i + 1);
@@ -676,31 +676,70 @@ export default function TeacherDashboard({ courseId, courseCode }) {
       {previewFile && (
         <div className="preview-modal-overlay" onClick={() => setPreviewFile(null)}>
           <div className="preview-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="preview-modal-header">
-              <h3>{previewFile.title}</h3>
+            <div className="preview-modal-header" style={{ padding: "10px 20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                <h3 style={{ margin: 0, fontSize: "16px" }}>{previewFile.title}</h3>
+                {previewType === "pptx" && previewSlides && (
+                  <div style={{ display: "flex", gap: "4px", background: "#e2e8f0", padding: "3px", borderRadius: "6px" }}>
+                    <button 
+                      onClick={() => setViewStyle("slideshow")}
+                      style={{
+                        padding: "4px 10px",
+                        fontSize: "12px",
+                        borderRadius: "4px",
+                        border: "none",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        background: viewStyle === "slideshow" ? "#3b8db3" : "transparent",
+                        color: viewStyle === "slideshow" ? "#ffffff" : "#475569",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      Slideshow Mode
+                    </button>
+                    <button 
+                      onClick={() => setViewStyle("list")}
+                      style={{
+                        padding: "4px 10px",
+                        fontSize: "12px",
+                        borderRadius: "4px",
+                        border: "none",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        background: viewStyle === "list" ? "#3b8db3" : "transparent",
+                        color: viewStyle === "list" ? "#ffffff" : "#475569",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      Scroll List Mode
+                    </button>
+                  </div>
+                )}
+              </div>
               <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                 <a
                   href={previewFile.downloadUrl}
                   className="btn-primary"
                   style={{
-                    padding: "6px 12px",
-                    fontSize: "13px",
+                    padding: "5px 12px",
+                    fontSize: "12px",
                     display: "flex",
                     alignItems: "center",
                     gap: "6px",
                     textDecoration: "none",
                     background: "#10b981",
+                    borderRadius: "6px"
                   }}
                   download
                 >
-                  <FiDownload size={14} /> Download
+                  <FiDownload size={13} /> Download
                 </a>
                 <button className="preview-close-btn" onClick={() => setPreviewFile(null)}>
-                  <FiX size={20} />
+                  <FiX size={18} />
                 </button>
               </div>
             </div>
-            <div className="preview-modal-body" style={{ position: "relative", minHeight: "300px" }}>
+            <div className="preview-modal-body" style={{ position: "relative", minHeight: "300px", padding: "8px" }}>
               {previewLoading ? (
                 <div style={{ textAlign: "center", padding: "40px" }}>
                   <div className="spinner" style={{ margin: "0 auto 16px auto" }}></div>
@@ -761,74 +800,36 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                   }}
                 />
               ) : previewType === "pptx" && previewSlides ? (
-                <div style={{ display: "flex", flexDirection: "column", height: "70vh", width: "100%" }}>
-                  {/* Mode Toolbar */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", background: "#f1f5f9", padding: "8px 16px", borderRadius: "8px" }}>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <button 
-                        onClick={() => setViewStyle("slideshow")}
-                        style={{
-                          padding: "6px 12px",
-                          fontSize: "13px",
-                          borderRadius: "6px",
-                          border: "none",
-                          cursor: "pointer",
-                          fontWeight: "600",
-                          background: viewStyle === "slideshow" ? "#3b8db3" : "transparent",
-                          color: viewStyle === "slideshow" ? "#ffffff" : "#475569",
-                          transition: "all 0.2s"
-                        }}
-                      >
-                        Slideshow Mode
-                      </button>
-                      <button 
-                        onClick={() => setViewStyle("list")}
-                        style={{
-                          padding: "6px 12px",
-                          fontSize: "13px",
-                          borderRadius: "6px",
-                          border: "none",
-                          cursor: "pointer",
-                          fontWeight: "600",
-                          background: viewStyle === "list" ? "#3b8db3" : "transparent",
-                          color: viewStyle === "list" ? "#ffffff" : "#475569",
-                          transition: "all 0.2s"
-                        }}
-                      >
-                        Scroll List Mode
-                      </button>
-                    </div>
-                  </div>
-
+                <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", flex: 1, minHeight: 0 }}>
                   {viewStyle === "slideshow" ? (
                     <div style={{ 
                       flex: 1, 
                       display: "flex", 
                       flexDirection: "column", 
-                      background: "#334155", 
-                      borderRadius: "12px", 
+                      background: "#1e293b", 
+                      borderRadius: "10px", 
                       overflow: "hidden", 
-                      border: "1px solid #1e293b",
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)" 
+                      border: "1px solid #334155",
+                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)",
+                      minHeight: 0
                     }}>
-                      {/* Floating Slide Canvas */}
+                      {/* Floating Slide Canvas — Full Proportional Slide Container */}
                       <div style={{ 
                         flex: 1, 
                         display: "flex", 
                         flexDirection: "column", 
-                        justifyContent: "center", 
-                        padding: "30px 40px", 
+                        justifyContent: "flex-start", 
+                        padding: "28px 40px", 
                         color: "#2C4B66", 
-                        overflow: "hidden", 
+                        overflowY: "auto", 
                         background: "#ffffff",
-                        height: "420px",
                         boxSizing: "border-box",
-                        border: "10px solid #0056b3", 
-                        margin: "24px",
-                        borderRadius: "4px",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.25)"
+                        margin: "8px",
+                        borderRadius: "6px",
+                        boxShadow: "0 6px 24px rgba(0,0,0,0.25)",
+                        minHeight: 0
                       }}>
-                        <div style={{ height: "100%", width: "100%", overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: previewSlides[currentSlideIndex] }} />
+                        <div style={{ width: "100%", minHeight: "100%", overflowY: "auto" }} dangerouslySetInnerHTML={{ __html: previewSlides[currentSlideIndex] }} />
                       </div>
 
                       {/* Control Panel */}
@@ -836,8 +837,8 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                         display: "flex", 
                         justifyContent: "space-between", 
                         alignItems: "center", 
-                        padding: "16px 24px", 
-                        background: "#1e293b", 
+                        padding: "12px 24px", 
+                        background: "#0f172a", 
                         borderTop: "1px solid #334155", 
                         color: "#94a3b8" 
                       }}>
@@ -847,19 +848,19 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                             background: "#334155",
                             color: "#f8fafc",
                             border: "none",
-                            padding: "8px 16px",
+                            padding: "8px 18px",
                             borderRadius: "6px",
                             cursor: "pointer",
-                            fontWeight: "500",
+                            fontWeight: "600",
                             fontSize: "13px",
                             transition: "background 0.2s"
                           }}
                         >
-                          Previous
+                          ← Previous Slide
                         </button>
                         
                         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-                          <span style={{ fontSize: "14px", fontWeight: "600", color: "#cbd5e1" }}>
+                          <span style={{ fontSize: "14px", fontWeight: "700", color: "#f8fafc" }}>
                             Slide {currentSlideIndex + 1} of {previewSlides.length}
                           </span>
                           <button 
@@ -868,7 +869,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                               background: isPlaying ? "#ef4444" : "#10b981",
                               color: "#f8fafc",
                               border: "none",
-                              padding: "6px 12px",
+                              padding: "6px 14px",
                               borderRadius: "6px",
                               cursor: "pointer",
                               fontSize: "13px",
@@ -886,15 +887,15 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                             background: "#334155",
                             color: "#f8fafc",
                             border: "none",
-                            padding: "8px 16px",
+                            padding: "8px 18px",
                             borderRadius: "6px",
                             cursor: "pointer",
-                            fontWeight: "500",
+                            fontWeight: "600",
                             fontSize: "13px",
                             transition: "background 0.2s"
                           }}
                         >
-                          Next
+                          Next Slide →
                         </button>
                       </div>
                     </div>
@@ -902,13 +903,14 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                     <div 
                       dangerouslySetInnerHTML={{ __html: previewHtml }} 
                       style={{ 
+                        flex: 1,
                         width: "100%", 
-                        maxHeight: "60vh", 
                         overflowY: "auto", 
                         background: "#ffffff", 
-                        padding: "20px",
+                        padding: "24px 32px",
                         borderRadius: "8px",
-                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)"
+                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)",
+                        minHeight: 0
                       }} 
                     />
                   )}

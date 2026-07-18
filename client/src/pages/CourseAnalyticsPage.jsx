@@ -81,48 +81,116 @@ export default function CourseAnalyticsPage() {
 
   const [showBenchmark, setShowBenchmark] = useState(true);
   const [activeHoverAxis, setActiveHoverAxis] = useState(null);
+  const [activeTab, setActiveTab] = useState("continuous"); // "continuous" | "final"
 
-  // Helper to draw a colorful, interactive 5-axis Radar/Spider chart in pure React SVG
-  const renderRadarChart = (summary) => {
+  // Helper to convert raw assessment marks into 0-100% effort percentage
+  const toPercentage = (val) => {
+    if (val === undefined || val === null || isNaN(val)) return 0;
+    const num = Number(val);
+    if (num <= 0) return 0;
+
+    // Out of 10
+    if (num <= 10) return Math.min(100, Math.round((num / 10) * 100));
+    // Out of 15
+    if (num <= 15) return Math.min(100, Math.round((num / 15) * 100));
+    // Out of 30 (e.g. 26 out of 30 => 86.67% => 87%)
+    if (num <= 30) return Math.min(100, Math.round((num / 30) * 100));
+    // Out of 40 (e.g. 34 out of 40 => 85%)
+    if (num <= 40) return Math.min(100, Math.round((num / 40) * 100));
+    // Out of 100 or already percentage
+    return Math.min(100, Math.round(num));
+  };
+
+  // Continuous Performance: ONLY live data (attendance, assignments, exams) — 3 axes
+  const computeContinuousValues = (summary) => {
+    if (!summary) return [0, 0, 0];
+    const att = Math.min(100, Math.round(summary.attendancePercent || 0));
+    const asgn = Math.min(100, Math.round(summary.assignmentAverage || 0));
+    const exam = Math.min(100, Math.round(summary.examAverage || 0));
+    return [att, asgn, exam];
+  };
+
+  // Final Evaluation: uses assessment marksheet data (prioritized), falls back to live
+  const computeSpiderValues = (summary) => {
+    if (!summary) return [0, 0, 0, 0, 0];
+
+    const hasAssessment = summary.assessment !== null && summary.assessment !== undefined;
+
+    // 1. Attendance (Use assessment.attendance if uploaded, else live attendancePercent)
+    const attVal = hasAssessment && summary.assessment.attendance !== undefined && summary.assessment.attendance !== null
+      ? toPercentage(summary.assessment.attendance)
+      : (summary.attendancePercent || 0);
+
+    // 2. Assignments (Use assessment.assignment if uploaded, else live assignmentAverage)
+    const assignVal = hasAssessment && summary.assessment.assignment !== undefined && summary.assessment.assignment !== null
+      ? toPercentage(summary.assessment.assignment)
+      : (summary.assignmentAverage || 0);
+
+    // 3. Exams & Quizzes (Use assessment.quiz if uploaded, else live examAverage)
+    const quizVal = hasAssessment && summary.assessment.quiz !== undefined && summary.assessment.quiz !== null
+      ? toPercentage(summary.assessment.quiz)
+      : (summary.examAverage || 0);
+
+    // 4. Presentation (Use assessment.presentation if uploaded, else estimate)
+    const presVal = hasAssessment && summary.assessment.presentation !== undefined && summary.assessment.presentation !== null
+      ? toPercentage(summary.assessment.presentation)
+      : (summary.examAverage > 0 ? Math.min(100, Math.round(summary.examAverage * 0.92)) : Math.round((attVal + assignVal + quizVal) / 3));
+
+    // 5. Total Assessment Marks (Use assessment.totalMarks if uploaded, else average of continuous activities)
+    const totalAssVal = hasAssessment && summary.assessment.totalMarks !== undefined && summary.assessment.totalMarks !== null
+      ? toPercentage(summary.assessment.totalMarks)
+      : Math.round((attVal + assignVal + quizVal) / 3);
+
+    return [
+      Math.round(attVal),
+      Math.round(assignVal),
+      Math.round(quizVal),
+      Math.round(presVal),
+      Math.round(totalAssVal)
+    ];
+  };
+
+  // Helper to draw a colorful, interactive Radar/Spider chart in pure React SVG (3-axis or 5-axis)
+  // Pass overrideValues to use pre-computed values instead of computeSpiderValues
+  const renderRadarChart = (summary, overrideValues) => {
     if (!summary) return null;
 
-    const size = 360;
+    const size = 420;
     const center = size / 2;
-    const radius = 120;
+    const radius = 115;
     const levels = 4;
-    const numAxes = 5;
 
-    // 5 Axes: Attendance, Assignments, Exams & Quizzes, Presentation, Assessment
-    const labels = ["Attendance", "Assignments", "Exams & Quizzes", "Presentation", "Assessment"];
-    const icons = ["📅", "📝", "🎯", "🗣️", "🏅"];
+    const values = overrideValues || computeSpiderValues(summary);
+    const numAxes = values.length;
+    const is3Axis = numAxes === 3;
 
-    const presentationPercent =
-      summary.assessment?.presentation !== undefined && summary.assessment?.presentation !== null
-        ? (summary.assessment.presentation / 10) * 100
-        : summary.examAverage > 0
-        ? Math.min(100, Math.round(summary.examAverage * 0.92))
-        : 0;
-
-    const assessmentPercent =
-      summary.assessment?.totalMarks !== undefined && summary.assessment?.totalMarks !== null
-        ? (summary.assessment.totalMarks / 100) * 100
-        : Math.round(
-            ((summary.attendancePercent || 0) +
-              (summary.assignmentAverage || 0) +
-              (summary.examAverage || 0)) /
-              3
-          );
-
-    const values = [
-      summary.attendancePercent || 0,
-      summary.assignmentAverage || 0,
-      summary.examAverage || 0,
-      Math.round(presentationPercent),
-      Math.round(assessmentPercent)
-    ];
+    // Dynamic Axes definitions
+    const labels = is3Axis
+      ? ["Attendance", "Assignments", "Exams & Quizzes"]
+      : ["Attendance", "Assignments", "Exams & Quizzes", "Presentation", "Assessment"];
+    const labelShort = is3Axis
+      ? ["Attendance", "Assignments", "Exams & Quizzes"]
+      : ["Attendance", "Assignments", "Exams", "Presentation", "Assessment"];
+    const colors = is3Axis
+      ? ["#00e5ff", "#3b82f6", "#a855f7"]
+      : ["#00e5ff", "#3b82f6", "#a855f7", "#f59e0b", "#10b981"];
 
     // Class average benchmark data for comparison overlay
-    const benchmarkValues = [78, 72, 70, 68, 75];
+    const benchmarkValues = summary.classAverage
+      ? (is3Axis
+          ? [
+              summary.classAverage.attendance || 78,
+              summary.classAverage.assignment || 72,
+              summary.classAverage.quiz || 70
+            ]
+          : [
+              summary.classAverage.attendance || 78,
+              summary.classAverage.assignment || 72,
+              summary.classAverage.quiz || 70,
+              summary.classAverage.presentation || 68,
+              summary.classAverage.assessment || 75
+            ])
+      : (is3Axis ? [78, 72, 70] : [78, 72, 70, 68, 75]);
 
     // Compute coordinates for any vertex at index (0..4) and value percentage (0..100)
     const getCoordinates = (index, valuePercent) => {
@@ -174,17 +242,18 @@ export default function CourseAnalyticsPage() {
         />
       );
 
-      // Position labels outside the outer ring
-      const labelDist = radius + 28;
+      // Position labels outside the outer ring with enough padding to stay inside card
+      const labelDist = radius + 32;
       const angle = (2 * Math.PI / numAxes) * i - Math.PI / 2;
       const lx = center + labelDist * Math.cos(angle);
       const ly = center + labelDist * Math.sin(angle) + 4;
       let textAnchor = "middle";
-      if (Math.cos(angle) > 0.2) textAnchor = "start";
-      else if (Math.cos(angle) < -0.2) textAnchor = "end";
+      if (Math.cos(angle) > 0.25) textAnchor = "start";
+      else if (Math.cos(angle) < -0.25) textAnchor = "end";
 
       const val = values[i];
       const valColor = val >= 80 ? "#10b981" : val >= 65 ? "#3b82f6" : "#f59e0b";
+      const axisColor = colors[i];
 
       textLabels.push(
         <g
@@ -196,20 +265,20 @@ export default function CourseAnalyticsPage() {
           <text
             x={lx}
             y={ly - 6}
-            fill={isHovered ? "#ffffff" : "var(--text-gray)"}
-            fontSize={isHovered ? "13" : "11"}
+            fill={isHovered ? axisColor : "rgba(255,255,255,0.7)"}
+            fontSize={isHovered ? "12" : "11"}
             fontWeight={isHovered ? "700" : "600"}
             textAnchor={textAnchor}
             style={{ transition: "all 0.2s ease" }}
           >
-            {icons[i]} {labels[i]}
+            {labelShort[i]}
           </text>
           <text
             x={lx}
             y={ly + 10}
             fill={valColor}
-            fontSize="12"
-            fontWeight="700"
+            fontSize="13"
+            fontWeight="800"
             textAnchor={textAnchor}
           >
             {Math.round(val)}%
@@ -235,13 +304,13 @@ export default function CourseAnalyticsPage() {
       .join(" ");
 
     return (
-      <div style={{ position: "relative", width: "100%", maxWidth: size, margin: "0 auto" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: size, margin: "0 auto", overflow: "hidden" }}>
         <svg
           width="100%"
           height={size}
           viewBox={`0 0 ${size} ${size}`}
           className="analytics-radar-svg"
-          style={{ overflow: "visible" }}
+          style={{ overflow: "visible", display: "block" }}
         >
           <defs>
             {/* Colorful multi-stop gradient for student radar fill */}
@@ -372,8 +441,8 @@ export default function CourseAnalyticsPage() {
               animation: "fadeIn 0.2s ease"
             }}
           >
-            <div style={{ fontSize: "14px", fontWeight: 700, color: "#00e5ff", marginBottom: "4px" }}>
-              {icons[activeHoverAxis]} {labels[activeHoverAxis]}
+            <div style={{ fontSize: "14px", fontWeight: 700, color: colors[activeHoverAxis] || "#00e5ff", marginBottom: "4px" }}>
+              {labels[activeHoverAxis]}
             </div>
             <div style={{ fontSize: "20px", fontWeight: 800, color: "#ffffff" }}>
               {values[activeHoverAxis]}%
@@ -410,33 +479,36 @@ export default function CourseAnalyticsPage() {
   };
 
   // Helper to generate dynamic Strengths and Focus Areas insights
-  const renderInsightsPanel = (summary) => {
+  const renderInsightsPanel = (summary, overrideValues) => {
     if (!summary) return null;
 
-    const presentationPercent =
-      summary.assessment?.presentation !== undefined && summary.assessment?.presentation !== null
-        ? (summary.assessment.presentation / 10) * 100
-        : summary.examAverage > 0
-        ? Math.min(100, Math.round(summary.examAverage * 0.92))
-        : 0;
+    const values = overrideValues || computeSpiderValues(summary);
+    const is3Axis = values.length === 3;
 
-    const assessmentPercent =
-      summary.assessment?.totalMarks !== undefined && summary.assessment?.totalMarks !== null
-        ? (summary.assessment.totalMarks / 100) * 100
-        : Math.round(
-            ((summary.attendancePercent || 0) +
-              (summary.assignmentAverage || 0) +
-              (summary.examAverage || 0)) /
-              3
-          );
+    const getMetricIcon = (name, size = 16) => {
+      switch (name) {
+        case "Attendance": return <FiCalendar size={size} style={{ marginRight: 8, verticalAlign: "middle", color: "#00e5ff" }} />;
+        case "Assignments": return <FiFileText size={size} style={{ marginRight: 8, verticalAlign: "middle", color: "#3b82f6" }} />;
+        case "Exams & Quizzes": return <FiActivity size={size} style={{ marginRight: 8, verticalAlign: "middle", color: "#a855f7" }} />;
+        case "Presentation": return <FiUsers size={size} style={{ marginRight: 8, verticalAlign: "middle", color: "#f59e0b" }} />;
+        case "Assessment": return <FiAward size={size} style={{ marginRight: 8, verticalAlign: "middle", color: "#10b981" }} />;
+        default: return null;
+      }
+    };
 
-    const metrics = [
-      { name: "Attendance", score: summary.attendancePercent || 0, icon: "📅" },
-      { name: "Assignments", score: summary.assignmentAverage || 0, icon: "📝" },
-      { name: "Exams & Quizzes", score: summary.examAverage || 0, icon: "🎯" },
-      { name: "Presentation", score: Math.round(presentationPercent), icon: "🗣️" },
-      { name: "Assessment", score: Math.round(assessmentPercent), icon: "🏅" }
-    ];
+    const metrics = is3Axis
+      ? [
+          { name: "Attendance", score: values[0] },
+          { name: "Assignments", score: values[1] },
+          { name: "Exams & Quizzes", score: values[2] }
+        ]
+      : [
+          { name: "Attendance", score: values[0] },
+          { name: "Assignments", score: values[1] },
+          { name: "Exams & Quizzes", score: values[2] },
+          { name: "Presentation", score: values[3] },
+          { name: "Assessment", score: values[4] }
+        ];
 
     // Sort metrics descending
     const sorted = [...metrics].sort((a, b) => b.score - a.score);
@@ -473,8 +545,8 @@ export default function CourseAnalyticsPage() {
                     borderRadius: 8
                   }}
                 >
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>
-                    {item.icon} {item.name}
+                  <span style={{ fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center" }}>
+                    {getMetricIcon(item.name)} {item.name}
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>
                     {item.score}%
@@ -482,7 +554,7 @@ export default function CourseAnalyticsPage() {
                 </div>
               ))}
               <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 4 }}>
-                🌟 Excellent performance! Keep up this high standard.
+                Excellent performance! Keep up this high standard.
               </p>
             </div>
           ) : (
@@ -518,8 +590,8 @@ export default function CourseAnalyticsPage() {
                     borderRadius: 8
                   }}
                 >
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>
-                    {item.icon} {item.name}
+                  <span style={{ fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center" }}>
+                    {getMetricIcon(item.name)} {item.name}
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b" }}>
                     {item.score}%
@@ -527,12 +599,12 @@ export default function CourseAnalyticsPage() {
                 </div>
               ))}
               <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 4 }}>
-                🎯 Target these areas with additional practice to boost your overall grade.
+                Target these areas with additional practice to boost your overall grade.
               </p>
             </div>
           ) : (
             <div style={{ fontSize: 12, color: "#10b981", fontWeight: 600 }}>
-              🎉 Outstanding! Performing well across all sectors.
+              Outstanding! Performing well across all sectors.
             </div>
           )}
         </div>
@@ -950,207 +1022,493 @@ export default function CourseAnalyticsPage() {
                     Selected Profile: {selectedStudent.name}
                   </h3>
                   <p style={{ fontSize: 12, color: "var(--text-gray)", marginTop: 2 }}>
-                    ID: {selectedStudent.studentIdNumber} | Dept: {selectedStudent.department} | Email: {selectedStudent.email}
+                    ID: {selectedStudent.studentIdNumber || selectedStudent.studentId || selectedStudent.id || "N/A"} | Dept: {selectedStudent.department} | Email: {selectedStudent.email}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Radar Analysis & Learning Analytics Card */}
-            <div className="card" style={{ marginBottom: 24 }}>
-              <div
+            {/* ═══ TAB NAVIGATION ═══ */}
+            <div
+              style={{
+                display: "flex",
+                gap: 6,
+                background: "rgba(248,250,252,0.06)",
+                border: "1px solid rgba(148,163,184,0.15)",
+                borderRadius: 16,
+                padding: 5,
+                marginBottom: 22,
+                width: "fit-content",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 2px 16px rgba(0,0,0,0.15)"
+              }}
+            >
+              <button
+                onClick={() => setActiveTab("continuous")}
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: 12,
-                  marginBottom: 20
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "10px 22px", borderRadius: 12,
+                  border: activeTab === "continuous"
+                    ? "1px solid rgba(56,189,248,0.5)"
+                    : "1px solid transparent",
+                  cursor: "pointer", fontSize: 13, fontWeight: 700,
+                  letterSpacing: "0.02em",
+                  transition: "all 0.25s ease",
+                  background: activeTab === "continuous"
+                    ? "linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(125,211,252,0.12) 100%)"
+                    : "transparent",
+                  color: activeTab === "continuous" ? "#38bdf8" : "rgba(148,163,184,0.7)",
+                  boxShadow: activeTab === "continuous"
+                    ? "0 0 16px rgba(56,189,248,0.18)"
+                    : "none"
                 }}
               >
-                <div>
-                  <h3
-                    style={{
-                      color: "var(--pastel-blue-primary)",
-                      fontSize: 18,
-                      fontWeight: 700,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8
-                    }}
-                  >
-                    <FiActivity /> Student Learning Analytics & Performance Radar
-                  </h3>
-                  <p style={{ fontSize: 12, color: "var(--text-gray)", marginTop: 4 }}>
-                    Multi-dimensional performance analysis across Attendance, Assignments, Quizzes, Presentation, and Assessment.
-                  </p>
-                </div>
+                <FiActivity size={15} />
+                Continuous Performance
+              </button>
+              <button
+                onClick={() => setActiveTab("final")}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "10px 22px", borderRadius: 12,
+                  border: activeTab === "final"
+                    ? "1px solid rgba(52,211,153,0.5)"
+                    : "1px solid transparent",
+                  cursor: "pointer", fontSize: 13, fontWeight: 700,
+                  letterSpacing: "0.02em",
+                  transition: "all 0.25s ease",
+                  background: activeTab === "final"
+                    ? "linear-gradient(135deg, rgba(52,211,153,0.2) 0%, rgba(16,185,129,0.12) 100%)"
+                    : "transparent",
+                  color: activeTab === "final" ? "#34d399" : "rgba(148,163,184,0.7)",
+                  boxShadow: activeTab === "final"
+                    ? "0 0 16px rgba(52,211,153,0.18)"
+                    : "none"
+                }}
+              >
+                <FiAward size={15} />
+                Final Evaluation
+              </button>
+            </div>
 
-                {/* Interactive Benchmark Legend & Toggle */}
+            {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                SECTION 1 : CONTINUOUS PERFORMANCE
+                (Live data: Quizzes, Assignments, Attendance)
+            â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* TAB 1 CONTENT: Continuous Performance */}
+            {activeTab === "continuous" && (
+            <div className="card" style={{ marginBottom: 24 }}>
+
+              {/* Section Header */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid rgba(56,189,248,0.15)" }}>
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 16,
-                    background: "rgba(255, 255, 255, 0.04)",
-                    padding: "8px 14px",
-                    borderRadius: 10,
-                    border: "1px solid var(--border-light)"
+                    width: 40, height: 40, borderRadius: 12,
+                    background: "linear-gradient(135deg, rgba(0,229,255,0.25), rgba(59,130,246,0.15))",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    border: "1px solid rgba(0,229,255,0.3)"
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600 }}>
-                    <span
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: 3,
-                        background: "#00e5ff",
-                        display: "inline-block"
-                      }}
-                    ></span>
-                    <span>Student Score</span>
-                  </div>
-                  <label
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      cursor: "pointer"
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={showBenchmark}
-                      onChange={(e) => setShowBenchmark(e.target.checked)}
-                      style={{ accentColor: "#f59e0b", cursor: "pointer" }}
-                    />
-                    <span style={{ color: "#f59e0b" }}>Class Average Benchmark</span>
-                  </label>
+                  <FiActivity size={20} color="#00e5ff" />
+                </div>
+                <div>
+                  <h3 style={{ color: "#00e5ff", fontSize: 17, fontWeight: 700, margin: 0 }}>
+                    Continuous Performance
+                  </h3>
+                  <p style={{ fontSize: 11, color: "var(--text-gray)", margin: 0, marginTop: 2 }}>
+                    Live data from quizzes, assignments &amp; attendance â€” updates dynamically
+                  </p>
+                </div>
+                <div style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-gray)", background: "rgba(0,229,255,0.08)", padding: "4px 10px", borderRadius: 8, border: "1px solid rgba(0,229,255,0.15)" }}>
+                  Live Tracking
                 </div>
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                  gap: 24,
-                  alignItems: "center"
-                }}
-              >
-                {/* 5-Axis Spider Chart SVG */}
-                {renderRadarChart(analytics.summary)}
-
-                {/* Automated Strengths & Weaknesses Badges */}
-                {renderInsightsPanel(analytics.summary)}
+              {/* Live Performance Radar — Continuous Data Only */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <div style={{ width: 3, height: 16, borderRadius: 4, background: "linear-gradient(#38bdf8, #818cf8)" }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#38bdf8" }}>Live Performance Radar</span>
+                  <span style={{ fontSize: 11, color: "var(--text-gray)" }}>— Based on live website activity</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 24, alignItems: "start" }}>
+                  <div style={{ overflow: "hidden", padding: "6px 0" }}>
+                    {renderRadarChart(analytics.summary, computeContinuousValues(analytics.summary))}
+                  </div>
+                  {renderInsightsPanel(analytics.summary, computeContinuousValues(analytics.summary))}
+                </div>
               </div>
-            </div>
 
-            {/* Activity Gantt Timeline */}
-            <div className="card" style={{ overflowX: "auto", marginBottom: 20 }}>
-              <h3 style={{ marginBottom: 16, color: "var(--pastel-blue-primary)", fontSize: 16, fontWeight: 600 }}>
-                <FiTrendingUp style={{ marginRight: 8 }} /> Activity Gantt Timeline
-              </h3>
-              {renderGanttChart(analytics.history)}
-              <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 12, textAlign: "center" }}>
-                Gantt chart representing assignment & exam intervals, submission times, and overdue tasks.
-              </p>
-            </div>
+              {/* Continuous Metrics Summary Cards */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 24 }}>
+                {[
+                  { label: "Attendance", value: `${analytics.summary.attendancePercent || 0}%`, sub: `${analytics.summary.presentCount || 0}/${analytics.summary.totalAttendanceCount || 0} classes`, color: "#00e5ff", icon: <FiCalendar size={16} /> },
+                  { label: "Assignments", value: `${analytics.summary.assignmentAverage || 0}%`, sub: `${analytics.summary.completedAssignments || 0}/${analytics.summary.totalAssignments || 0} submitted`, color: "#3b82f6", icon: <FiFileText size={16} /> },
+                  { label: "Exams & Quizzes", value: `${analytics.summary.examAverage || 0}%`, sub: `${analytics.summary.completedExams || 0}/${analytics.summary.totalExams || 0} attempted`, color: "#a855f7", icon: <FiActivity size={16} /> }
+                ].map((m, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: `linear-gradient(135deg, rgba(${i===0?"0,229,255":i===1?"59,130,246":"168,85,247"},0.1), rgba(${i===0?"0,229,255":i===1?"59,130,246":"168,85,247"},0.03))`,
+                      border: `1px solid rgba(${i===0?"0,229,255":i===1?"59,130,246":"168,85,247"},0.25)`,
+                      borderRadius: 12, padding: 14
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, color: m.color }}>
+                      {m.icon}
+                      <span style={{ fontSize: 11, fontWeight: 600 }}>{m.label}</span>
+                    </div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: m.color }}>{m.value}</div>
+                    <div style={{ fontSize: 10, color: "var(--text-gray)", marginTop: 4 }}>{m.sub}</div>
+                  </div>
+                ))}
+              </div>
 
-            {/* Detailed records breakdown */}
+              {/* Activities & Feedback History */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 3, height: 16, borderRadius: 4, background: "linear-gradient(#00e5ff, #3b82f6)" }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>Activity &amp; Feedback History</span>
+              </div>
+
+              {/* Assignments Section */}
+              {analytics.history.assignments.length > 0 && (
+                <div style={{ marginBottom: 22 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 4, height: 16, borderRadius: 4, background: "linear-gradient(#3b82f6, #00e5ff)" }} />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#3b82f6", textTransform: "uppercase", letterSpacing: "0.05em" }}>Assignments</span>
+                    <span style={{ fontSize: 10, background: "rgba(59,130,246,0.15)", color: "#3b82f6", borderRadius: 6, padding: "2px 7px", fontWeight: 600 }}>
+                      {analytics.history.assignments.length} tasks
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {analytics.history.assignments.map((item, idx) => {
+                      const pct = item.marksObtained !== null ? Math.round(item.percentage) : null;
+                      const pctColor = pct >= 80 ? "#10b981" : pct >= 60 ? "#3b82f6" : pct >= 40 ? "#f59e0b" : "#ef4444";
+                      return (
+                        <div
+                          key={`assign-${idx}`}
+                          style={{
+                            background: "rgba(59,130,246,0.05)",
+                            border: "1px solid rgba(59,130,246,0.18)",
+                            borderLeft: `4px solid ${item.submitted ? "#3b82f6" : "#64748b"}`,
+                            borderRadius: "0 12px 12px 0",
+                            padding: 14
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                <FiFileText size={13} color="#3b82f6" />
+                                <h4 style={{ fontSize: 13, fontWeight: 700, margin: 0 }}>{item.title}</h4>
+                                <span style={{
+                                  fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5,
+                                  background: item.submitted ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
+                                  color: item.submitted ? "#10b981" : "#ef4444"
+                                }}>
+                                  {item.submitted ? "Submitted" : "Not Submitted"}
+                                </span>
+                              </div>
+                              <div style={{ display: "flex", gap: 14, marginTop: 5, flexWrap: "wrap" }}>
+                                {item.deadline && (
+                                  <span style={{ fontSize: 10, color: "var(--text-gray)", display: "flex", alignItems: "center", gap: 3 }}>
+                                    <FiCalendar size={10} /> Due: {new Date(item.deadline).toLocaleDateString()}
+                                  </span>
+                                )}
+                                {item.submitted && item.submittedAt && (
+                                  <span style={{ fontSize: 10, color: "#10b981", display: "flex", alignItems: "center", gap: 3 }}>
+                                    <FiCheckCircle size={10} /> Submitted: {new Date(item.submittedAt).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </div>
+                              {item.feedback && String(item.feedback).trim() !== "" && (
+                                <div
+                                  style={{
+                                    marginTop: 10,
+                                    background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(37, 99, 235, 0.05))",
+                                    border: "1px solid rgba(59, 130, 246, 0.3)",
+                                    borderLeft: "3px solid #3b82f6",
+                                    borderRadius: "0 8px 8px 0",
+                                    padding: "8px 12px"
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      color: "#2563eb",
+                                      textTransform: "uppercase",
+                                      letterSpacing: "0.05em",
+                                      marginBottom: 4,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 5
+                                    }}
+                                  >
+                                    <FiUsers size={11} /> Teacher Feedback
+                                  </div>
+                                  <p
+                                    style={{
+                                      fontSize: 13,
+                                      fontWeight: 600,
+                                      color: "#1e293b",
+                                      margin: 0,
+                                      lineHeight: 1.5
+                                    }}
+                                  >
+                                    &ldquo;{item.feedback}&rdquo;
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            <div style={{
+                              textAlign: "center", minWidth: 62,
+                              background: pct !== null ? `rgba(${pct>=80?"16,185,129":pct>=60?"59,130,246":pct>=40?"245,158,11":"239,68,68"},0.12)` : "rgba(100,116,139,0.1)",
+                              border: `1px solid ${pct !== null ? pctColor : "rgba(100,116,139,0.3)"}`,
+                              borderRadius: 10, padding: "7px 9px"
+                            }}>
+                              {pct !== null ? (
+                                <>
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: pctColor }}>{pct}%</div>
+                                  <div style={{ fontSize: 9, color: "var(--text-gray)", marginTop: 2 }}>{item.marksObtained}/{item.totalMarks}</div>
+                                </>
+                              ) : (
+                                <div style={{ fontSize: 10, color: "var(--text-gray)" }}>Ungraded</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Exams Section */}
+              {analytics.history.exams.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 4, height: 16, borderRadius: 4, background: "linear-gradient(#a855f7, #7c3aed)" }} />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: "0.05em" }}>Exams &amp; Quizzes</span>
+                    <span style={{ fontSize: 10, background: "rgba(168,85,247,0.15)", color: "#a855f7", borderRadius: 6, padding: "2px 7px", fontWeight: 600 }}>
+                      {analytics.history.exams.length} exams
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {analytics.history.exams.map((item, idx) => {
+                      const pct = item.marksObtained !== null ? Math.round(item.percentage) : null;
+                      const pctColor = pct >= 80 ? "#10b981" : pct >= 60 ? "#3b82f6" : pct >= 40 ? "#f59e0b" : "#ef4444";
+                      const resultsVisible = item.marksObtained !== null;
+                      return (
+                        <div
+                          key={`exam-${idx}`}
+                          style={{
+                            background: "rgba(168,85,247,0.05)",
+                            border: "1px solid rgba(168,85,247,0.18)",
+                            borderLeft: `4px solid ${item.submitted ? "#a855f7" : "#64748b"}`,
+                            borderRadius: "0 12px 12px 0",
+                            padding: 14
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                <FiActivity size={13} color="#a855f7" />
+                                <h4 style={{ fontSize: 13, fontWeight: 700, margin: 0 }}>{item.title}</h4>
+                                <span style={{
+                                  fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5,
+                                  background: item.submitted ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
+                                  color: item.submitted ? "#10b981" : "#ef4444"
+                                }}>
+                                  {item.submitted ? "Attempted" : "Missed"}
+                                </span>
+                                {item.graded && !resultsVisible && (
+                                  <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontWeight: 600 }}>
+                                    Results Pending
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ marginTop: 5 }}>
+                                <span style={{ fontSize: 10, color: "var(--text-gray)", display: "flex", alignItems: "center", gap: 3 }}>
+                                  <FiCalendar size={10} /> {new Date(item.scheduledAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                              {item.feedback && String(item.feedback).trim() !== "" && (
+                                <div
+                                  style={{
+                                    marginTop: 10,
+                                    background: "linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(124, 58, 237, 0.05))",
+                                    border: "1px solid rgba(168, 85, 247, 0.3)",
+                                    borderLeft: "3px solid #a855f7",
+                                    borderRadius: "0 8px 8px 0",
+                                    padding: "8px 12px"
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      color: "#7c3aed",
+                                      textTransform: "uppercase",
+                                      letterSpacing: "0.05em",
+                                      marginBottom: 4,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 5
+                                    }}
+                                  >
+                                    <FiUsers size={11} /> Teacher Feedback
+                                  </div>
+                                  <p
+                                    style={{
+                                      fontSize: 13,
+                                      fontWeight: 600,
+                                      color: "#1e293b",
+                                      margin: 0,
+                                      lineHeight: 1.5
+                                    }}
+                                  >
+                                    &ldquo;{item.feedback}&rdquo;
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            <div style={{
+                              textAlign: "center", minWidth: 62,
+                              background: pct !== null ? `rgba(${pct>=80?"16,185,129":pct>=60?"59,130,246":pct>=40?"245,158,11":"239,68,68"},0.12)` : "rgba(100,116,139,0.1)",
+                              border: `1px solid ${pct !== null ? pctColor : "rgba(100,116,139,0.3)"}`,
+                              borderRadius: 10, padding: "7px 9px"
+                            }}>
+                              {pct !== null ? (
+                                <>
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: pctColor }}>{pct}%</div>
+                                  <div style={{ fontSize: 9, color: "var(--text-gray)", marginTop: 2 }}>{item.marksObtained}/{item.totalMarks}</div>
+                                </>
+                              ) : (
+                                <div style={{ fontSize: 10, color: "var(--text-gray)" }}>{item.submitted ? "Pending" : "N/A"}</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {analytics.history.assignments.length === 0 && analytics.history.exams.length === 0 && (
+                <div style={{ textAlign: "center", padding: "30px 0", color: "var(--text-gray)" }}>
+                  <FiFileText size={28} style={{ marginBottom: 10 }} />
+                  <p>No activities recorded yet for this course.</p>
+                </div>
+              )}
+            </div>
+            )} {/* end continuous tab */}
+
+
+            {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                SECTION 2 : FINAL EVALUATION
+                (Based on uploaded assessment marksheet)
+            â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* TAB 2: Final Evaluation */}
+            {activeTab === "final" && (
             <div className="card">
-              <h3 style={{ marginBottom: 16, color: "var(--pastel-blue-primary)", fontSize: 16, fontWeight: 600 }}>
-                <FiAward style={{ marginRight: 8 }} /> Activities & Feedback History
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {analytics.history.assignments.map((item, idx) => (
-                  <div
-                    key={`assign-item-${idx}`}
-                    style={{
-                      background: "rgba(255, 255, 255, 0.03)",
-                      border: "1px solid var(--border-light)",
-                      borderRadius: 12,
-                      padding: 16,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center"
-                    }}
-                  >
-                    <div>
-                      <h4 style={{ fontSize: 14, fontWeight: 600 }}>[Assignment] {item.title}</h4>
-                      <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 4 }}>
-                        Submitted: {item.submitted ? new Date(item.submittedAt).toLocaleDateString() : "No submission"}
-                      </p>
-                      {item.feedback && (
-                        <p style={{ fontSize: 12, color: "var(--pastel-blue-deep)", marginTop: 6, fontStyle: "italic" }}>
-                          Feedback: "{item.feedback}"
-                        </p>
-                      )}
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <span
-                        style={{
-                          fontSize: 16,
-                          fontWeight: 700,
-                          color: item.marksObtained !== null ? "var(--pastel-blue-primary)" : "var(--text-gray)"
-                        }}
-                      >
-                        {item.marksObtained !== null ? `${item.marksObtained}/${item.totalMarks}` : "Ungraded"}
-                      </span>
-                      {item.marksObtained !== null && (
-                        <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 2 }}>
-                          ({Math.round(item.percentage)}%)
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {analytics.history.exams.map((item, idx) => (
-                  <div
-                    key={`exam-item-${idx}`}
-                    style={{
-                      background: "rgba(255, 255, 255, 0.03)",
-                      border: "1px solid var(--border-light)",
-                      borderRadius: 12,
-                      padding: 16,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center"
-                    }}
-                  >
-                    <div>
-                      <h4 style={{ fontSize: 14, fontWeight: 600 }}>[Exam] {item.title}</h4>
-                      <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 4 }}>
-                        Date: {new Date(item.scheduledAt).toLocaleDateString()}
-                      </p>
-                      {item.feedback && (
-                        <p style={{ fontSize: 12, color: "var(--pastel-blue-deep)", marginTop: 6, fontStyle: "italic" }}>
-                          Feedback: "{item.feedback}"
-                        </p>
-                      )}
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <span
-                        style={{
-                          fontSize: 16,
-                          fontWeight: 700,
-                          color: item.marksObtained !== null ? "var(--pastel-blue-primary)" : "var(--text-gray)"
-                        }}
-                      >
-                        {item.marksObtained !== null ? `${item.marksObtained}/${item.totalMarks}` : "N/A"}
-                      </span>
-                      {item.marksObtained !== null && (
-                        <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 2 }}>
-                          ({Math.round(item.percentage)}%)
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid rgba(16,185,129,0.15)" }}>
+                <div
+                  style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    border: "1px solid rgba(16,185,129,0.3)"
+                  }}
+                >
+                  <FiAward size={20} color="#10b981" />
+                </div>
+                <div>
+                  <h3 style={{ color: "#10b981", fontSize: 17, fontWeight: 700, margin: 0 }}>
+                    Final Evaluation
+                  </h3>
+                  <p style={{ fontSize: 11, color: "var(--text-gray)", margin: 0, marginTop: 2 }}>
+                    Based on uploaded assessment marksheet â€” official course evaluation
+                  </p>
+                </div>
+                <div style={{ marginLeft: "auto" }}>
+                  {analytics.summary.assessment ? (
+                    <span style={{ fontSize: 11, color: "#10b981", background: "rgba(16,185,129,0.1)", padding: "4px 10px", borderRadius: 8, border: "1px solid rgba(16,185,129,0.25)", fontWeight: 600 }}>
+                      Marksheet Uploaded
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 11, color: "#f59e0b", background: "rgba(245,158,11,0.1)", padding: "4px 10px", borderRadius: 8, border: "1px solid rgba(245,158,11,0.25)", fontWeight: 600 }}>
+                      Awaiting Marksheet
+                    </span>
+                  )}
+                </div>
               </div>
+
+              {analytics.summary.assessment ? (
+                <>
+                  {/* Final marks breakdown grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 24 }}>
+                    {[
+                      { label: "Attendance", raw: analytics.summary.assessment.attendance, color: "#00e5ff", max: 30 },
+                      { label: "Assignment", raw: analytics.summary.assessment.assignment, color: "#3b82f6", max: 30 },
+                      { label: "Quiz", raw: analytics.summary.assessment.quiz, color: "#a855f7", max: 30 },
+                      { label: "Presentation", raw: analytics.summary.assessment.presentation, color: "#f59e0b", max: 30 },
+                      { label: "Total CA", raw: analytics.summary.assessment.totalMarks, color: "#10b981", max: 100 }
+                    ].map((m, i) => {
+                      const pct = m.raw !== null && m.raw !== undefined ? Math.min(100, Math.round((m.raw / m.max) * 100)) : null;
+                      const pctColor = pct >= 80 ? "#10b981" : pct >= 60 ? "#3b82f6" : pct >= 40 ? "#f59e0b" : "#ef4444";
+                      return (
+                        <div
+                          key={i}
+                          style={{
+                            background: `linear-gradient(135deg, rgba(${i===0?"0,229,255":i===1?"59,130,246":i===2?"168,85,247":i===3?"245,158,11":"16,185,129"},0.1), transparent)`,
+                            border: `1px solid rgba(${i===0?"0,229,255":i===1?"59,130,246":i===2?"168,85,247":i===3?"245,158,11":"16,185,129"},0.25)`,
+                            borderRadius: 12, padding: 14, textAlign: "center"
+                          }}
+                        >
+                          <div style={{ fontSize: 10, fontWeight: 700, color: m.color, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>{m.label}</div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: pct !== null ? pctColor : "var(--text-gray)" }}>
+                            {pct !== null ? `${pct}%` : "N/A"}
+                          </div>
+                          <div style={{ fontSize: 10, color: "var(--text-gray)", marginTop: 3 }}>
+                            {m.raw !== null && m.raw !== undefined ? `${m.raw} / ${m.max}` : "Not set"}
+                          </div>
+                          {/* Progress bar */}
+                          {pct !== null && (
+                            <div style={{ marginTop: 8, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                              <div style={{ height: "100%", borderRadius: 4, width: `${pct}%`, background: `linear-gradient(90deg, ${m.color}, ${pctColor})`, transition: "width 0.6s ease" }} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Final Radar Chart overlay */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                    <div style={{ width: 3, height: 16, borderRadius: 4, background: "linear-gradient(#10b981, #3b82f6)" }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>Final Performance Radar</span>
+                    <span style={{ fontSize: 10, color: "var(--text-gray)" }}>— Official Marksheet Based</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 24, alignItems: "start" }}>
+                    <div style={{ overflow: "hidden", padding: "10px 0" }}>
+                      {renderRadarChart(analytics.summary)}
+                    </div>
+                    {renderInsightsPanel(analytics.summary)}
+                  </div>
+                </>
+              ) : (
+                <div style={{ textAlign: "center", padding: "40px 0" }}>
+                  <FiAward size={40} style={{ color: "rgba(16,185,129,0.3)", marginBottom: 12 }} />
+                  <h4 style={{ color: "var(--text-gray)", fontWeight: 600, marginBottom: 8 }}>No Assessment Marksheet Yet</h4>
+                  <p style={{ fontSize: 12, color: "var(--text-gray)", maxWidth: 320, margin: "0 auto" }}>
+                    Once the teacher uploads the final assessment marksheet for this course,
+                    the official evaluation results will appear here.
+                  </p>
+                </div>
+              )}
             </div>
+            )} {/* end final tab */}
           </div>
         ) : (
           <div className="card" style={{ textAlign: "center", padding: "40px 0", color: "var(--text-gray)" }}>

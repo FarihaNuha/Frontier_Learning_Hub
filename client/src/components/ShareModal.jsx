@@ -4,6 +4,7 @@ import { FaWhatsapp, FaFacebook, FaTwitter, FaFacebookMessenger, FaTelegram, FaI
 import { communityApi } from "../services/communityApi";
 import api from "../services/api";
 import toast from "react-hot-toast";
+import "../styles/community.css";
 
 export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postId, courseId, lectureId, type = "post", fileUrl }) {
   const [showCaptionInput, setShowCaptionInput] = useState(false);
@@ -13,6 +14,11 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
   if (!isOpen) return null;
 
   const isLecture = type === "lecture";
+
+  // Ensure shareUrl is a clean, public-facing frontend URL
+  const cleanShareUrl = (shareUrl && !shareUrl.includes("/api/lectures/"))
+    ? shareUrl
+    : (courseId ? `${window.location.origin}/course/${courseId}` : window.location.href);
 
   const getAbsoluteFileUrl = (url) => {
     if (!url) return "";
@@ -32,8 +38,8 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
     : `Check out this post on UFTB Moodle: "${postTitle}"`;
 
   const fullShareText = fileDownloadUrl 
-    ? `${defaultText}\n\n📄 Document Link: ${fileDownloadUrl}\nPage Link: ${shareUrl}`
-    : `${defaultText}\n\nPage Link: ${shareUrl}`;
+    ? `${defaultText}\n\n📄 Document Link: ${fileDownloadUrl}\nPage Link: ${cleanShareUrl}`
+    : `${defaultText}\n\nPage Link: ${cleanShareUrl}`;
 
   const encodedText = encodeURIComponent(fullShareText);
 
@@ -47,25 +53,25 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
     {
       name: "Messenger",
       icon: <FaFacebookMessenger size={24} style={{ color: "#00B2FF" }} />,
-      url: `https://www.facebook.com/dialog/send?link=${encodeURIComponent(shareUrl)}&app_id=291494419107518&redirect_uri=${encodeURIComponent(shareUrl)}`,
-      bgColor: "#E6F7FF",
+      url: `https://www.facebook.com/dialog/send?link=${encodeURIComponent(cleanShareUrl)}&app_id=291494419107518&redirect_uri=${encodeURIComponent(cleanShareUrl)}`,
+      bgColor: "#E6F6FF",
     },
     {
       name: "Facebook",
       icon: <FaFacebook size={24} style={{ color: "#1877F2" }} />,
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(cleanShareUrl)}`,
       bgColor: "#E8F2FF",
     },
     {
       name: "Twitter / X",
       icon: <FaTwitter size={24} style={{ color: "#1DA1F2" }} />,
-      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(defaultText + (fileDownloadUrl ? `\n\n📄 Document: ${fileDownloadUrl}` : ""))}`,
+      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(cleanShareUrl)}&text=${encodeURIComponent(defaultText + (fileDownloadUrl ? `\n\n📄 Document: ${fileDownloadUrl}` : ""))}`,
       bgColor: "#E8F6FF",
     },
     {
       name: "Telegram",
       icon: <FaTelegram size={24} style={{ color: "#0088cc" }} />,
-      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(defaultText + (fileDownloadUrl ? `\n\n📄 Document: ${fileDownloadUrl}` : ""))}`,
+      url: `https://t.me/share/url?url=${encodeURIComponent(cleanShareUrl)}&text=${encodeURIComponent(defaultText + (fileDownloadUrl ? `\n\n📄 Document: ${fileDownloadUrl}` : ""))}`,
       bgColor: "#E8F4FD",
     },
     {
@@ -84,12 +90,12 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
 
   const handleCopyLink = (message) => {
     const textToCopy = fileDownloadUrl 
-      ? `📄 Document: ${fileDownloadUrl}\nPage Link: ${shareUrl}`
-      : shareUrl;
+      ? `📄 Document: ${fileDownloadUrl}\nPage Link: ${cleanShareUrl}`
+      : cleanShareUrl;
     navigator.clipboard
       .writeText(textToCopy)
       .then(() => {
-        toast.success(message || "📋 Link copied to clipboard!");
+        toast.success(typeof message === "string" ? message : "📋 Link copied to clipboard!");
       })
       .catch(() => {
         toast.error("Failed to copy link");
@@ -171,12 +177,48 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
   };
 
   return (
-    <div className="share-modal-overlay" onClick={onClose}>
-      <div className="share-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="share-modal-header">
-          <h3>{showCaptionInput ? "Write Caption" : isLecture ? "Share Lecture" : "Share Post"}</h3>
-          <button className="share-modal-close" onClick={onClose}>
-            <FiX size={18} />
+    <div 
+      className="share-modal-overlay" 
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        background: "rgba(15, 23, 42, 0.5)",
+        backdropFilter: "blur(6px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 999999,
+        padding: "16px",
+        boxSizing: "border-box"
+      }}
+    >
+      <div 
+        className="share-modal-content" 
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#ffffff",
+          borderRadius: "20px",
+          width: "100%",
+          maxWidth: "480px",
+          padding: "24px",
+          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+          border: "1px solid #e2e8f0",
+          boxSizing: "border-box",
+          margin: "auto"
+        }}
+      >
+        <div className="share-modal-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+          <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700", color: "#1e293b" }}>
+            {showCaptionInput ? "Write Caption" : isLecture ? "Share Lecture" : "Share Post"}
+          </h3>
+          <button className="share-modal-close" onClick={onClose} style={{ background: "#f1f5f9", border: "none", borderRadius: "50%", width: "32px", height: "32px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FiX size={18} color="#64748b" />
           </button>
         </div>
 
@@ -189,42 +231,90 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
                 placeholder="Write something about this post..."
                 className="share-caption-textarea"
                 rows={4}
+                style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #cbd5e1", outline: "none", fontSize: "14px", boxSizing: "border-box", marginBottom: "16px" }}
               />
-              <div className="share-caption-actions">
+              <div className="share-caption-actions" style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
                 <button
                   className="btn-primary"
                   onClick={handleShareToFeed}
                   disabled={sharing}
+                  style={{ padding: "10px 20px", background: "#3b8db3", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
                 >
                   {sharing ? "Sharing..." : "📢 Share Now"}
                 </button>
-                <button className="btn-secondary" onClick={() => setShowCaptionInput(false)}>
+                <button 
+                  className="btn-secondary" 
+                  onClick={() => setShowCaptionInput(false)}
+                  style={{ padding: "10px 16px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
+                >
                   Back
                 </button>
               </div>
             </div>
           ) : (
             <>
-              <button className="share-to-feed-btn" onClick={() => setShowCaptionInput(true)}>
+              <button 
+                className="share-to-feed-btn" 
+                onClick={() => setShowCaptionInput(true)}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  background: "#3b8db3",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "12px",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  marginBottom: "16px"
+                }}
+              >
                 <FiShare2 size={18} />
                 <span>Share to Community Feed</span>
               </button>
 
-              <div className="share-divider">
+              <div className="share-divider" style={{ textAlign: "center", margin: "16px 0", color: "#94a3b8", fontSize: "12px", fontWeight: "700" }}>
                 <span>OR</span>
               </div>
 
-              <p className="share-modal-subtitle">Share this {isLecture ? "lecture" : "post"} directly to other platforms:</p>
-              <div className="share-options-grid">
+              <p className="share-modal-subtitle" style={{ fontSize: "13px", color: "#64748b", margin: "0 0 12px 0" }}>
+                Share this {isLecture ? "lecture" : "post"} directly to other platforms:
+              </p>
+              <div 
+                className="share-options-grid"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gap: "12px",
+                  marginBottom: "20px"
+                }}
+              >
                 {shareOptions.map((option) =>
                   option.name === "Instagram" ? (
                     <button
                       key={option.name}
                       className="share-option-item"
-                      style={{ "--item-bg": option.bgColor, border: "none", cursor: "pointer", background: "transparent" }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "10px 4px",
+                        borderRadius: "12px",
+                        background: option.bgColor,
+                        border: "none",
+                        cursor: "pointer",
+                        textDecoration: "none",
+                        color: "#1e293b",
+                        fontSize: "12px"
+                      }}
                       onClick={() => { handleInstagramShare(); onClose(); }}
                     >
-                      <div className="share-icon-wrapper">{option.icon}</div>
+                      <div className="share-icon-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "40px", height: "40px" }}>{option.icon}</div>
                       <span>{option.name}</span>
                     </button>
                   ) : (
@@ -234,10 +324,21 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
                       target="_blank"
                       rel="noopener noreferrer"
                       className="share-option-item"
-                      style={{ "--item-bg": option.bgColor }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "10px 4px",
+                        borderRadius: "12px",
+                        background: option.bgColor,
+                        textDecoration: "none",
+                        color: "#1e293b",
+                        fontSize: "12px"
+                      }}
                       onClick={onClose}
                     >
-                      <div className="share-icon-wrapper">{option.icon}</div>
+                      <div className="share-icon-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "40px", height: "40px" }}>{option.icon}</div>
                       <span>{option.name}</span>
                     </a>
                   )
@@ -245,15 +346,77 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
               </div>
 
               {navigator.share && (
-                <button className="system-share-btn" onClick={handleSystemShare}>
+                <button 
+                  className="system-share-btn" 
+                  onClick={handleSystemShare}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    background: "#f1f5f9",
+                    color: "#334155",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "10px",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                    cursor: "pointer",
+                    marginBottom: "16px"
+                  }}
+                >
                   <FiShare2 size={16} />
                   <span>Share via Device Options...</span>
                 </button>
               )}
 
-              <div className="share-link-copy-section">
-                <input type="text" readOnly value={shareUrl} className="share-link-input" />
-                <button className="share-copy-button" onClick={handleCopyLink} title="Copy Link">
+              <div 
+                className="share-link-copy-section"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: "#f8fafc",
+                  padding: "6px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid #e2e8f0"
+                }}
+              >
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={cleanShareUrl} 
+                  className="share-link-input"
+                  style={{
+                    flex: 1,
+                    background: "transparent",
+                    border: "none",
+                    padding: "6px 8px",
+                    fontSize: "13px",
+                    color: "#334155",
+                    outline: "none",
+                    textOverflow: "ellipsis"
+                  }} 
+                />
+                <button 
+                  className="share-copy-button" 
+                  onClick={handleCopyLink} 
+                  title="Copy Link"
+                  style={{
+                    background: "#3b8db3",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "8px 16px",
+                    fontWeight: "600",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
                   <FiCopy size={16} />
                   <span>Copy</span>
                 </button>

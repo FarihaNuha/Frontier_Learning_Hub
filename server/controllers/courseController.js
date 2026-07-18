@@ -363,7 +363,48 @@ exports.handleJoinRequest = async (req, res) => {
   }
 };
 
-// Get Course Roster Analytics (Teacher only)
+// Helper to find Assessment document for a student in a course flexibly
+const findAssessmentRecord = async (studentDoc, courseDoc) => {
+  if (!studentDoc || !courseDoc) return null;
+
+  try {
+    const Assessment = require("../models/Assessment");
+    const idVal = studentDoc.studentIdNumber || studentDoc.studentId || "";
+    const studentIdStr = idVal ? String(idVal).trim() : "";
+    const displayCode = (courseDoc.displayCode || courseDoc.code || "").trim();
+    const rawCode = displayCode.replace(/[-\s]/g, "");
+
+    // Build course code variants for matching e.g. "CSE 201", "CSE201", "CSE-201"
+    const codeVariants = [
+      displayCode,
+      courseDoc.code,
+      rawCode
+    ].filter(Boolean);
+
+    const codeRegexList = codeVariants.map(c => new RegExp("^" + c.replace(/[-\s]/g, "[-_\\s]?") + "$", "i"));
+
+    const idConditions = [];
+    if (studentDoc._id) {
+      idConditions.push({ studentId: studentDoc._id });
+    }
+    if (studentIdStr) {
+      idConditions.push({ studentIdNumber: studentIdStr });
+      idConditions.push({ studentIdNumber: new RegExp("^" + studentIdStr.replace(/[-\s]/g, "") + "$", "i") });
+    }
+
+    if (idConditions.length === 0) return null;
+
+    return await Assessment.findOne({
+      $or: idConditions,
+      courseCode: { $in: codeRegexList }
+    });
+  } catch (err) {
+    console.error("findAssessmentRecord error:", err);
+    return null;
+  }
+};
+
+// Get All Students Analytics Roster for a Course (Teacher view)
 exports.getCourseStudentsAnalytics = async (req, res) => {
   try {
     const courseId = req.params.id;
@@ -377,7 +418,7 @@ exports.getCourseStudentsAnalytics = async (req, res) => {
     const Assessment = require("../models/Assessment");
 
     // Fetch Course with students populated
-    const course = await Course.findById(courseId).populate("students", "name email studentIdNumber department profilePicture");
+    const course = await Course.findById(courseId).populate("students", "name email studentId studentIdNumber department profilePicture");
     if (!course) {
       return res.status(404).json({ error: "Course not found" });
     }
@@ -439,11 +480,8 @@ exports.getCourseStudentsAnalytics = async (req, res) => {
       });
       const examPercent = totalExamPossible > 0 ? (examScoreSum / totalExamPossible) * 100 : 0;
 
-      // 4. Assessment
-      const assessment = await Assessment.findOne({
-        studentIdNumber: student.studentIdNumber || "",
-        courseCode: course.displayCode
-      });
+      // 4. Assessment (Search flexibly by student ID & course code)
+      const assessment = await findAssessmentRecord(student, course);
       
       // Calculate overall activity score
       let scoreSum = 0;
@@ -462,8 +500,8 @@ exports.getCourseStudentsAnalytics = async (req, res) => {
         weightSum += 0.3;
       }
       if (assessment) {
-        const quizPercentage = assessment.quiz ? (assessment.quiz / 10) * 100 : 0;
-        const presentationPercentage = assessment.presentation ? (assessment.presentation / 10) * 100 : 0;
+        const quizPercentage = assessment.quiz ? (assessment.quiz <= 10 ? (assessment.quiz / 10) * 100 : assessment.quiz) : 0;
+        const presentationPercentage = assessment.presentation ? (assessment.presentation <= 10 ? (assessment.presentation / 10) * 100 : assessment.presentation) : 0;
         const assessmentAvg = (quizPercentage + presentationPercentage) / 2;
         scoreSum += assessmentAvg * 0.2;
         weightSum += 0.2;
@@ -475,7 +513,7 @@ exports.getCourseStudentsAnalytics = async (req, res) => {
         id: student._id,
         name: student.name,
         email: student.email,
-        studentIdNumber: student.studentIdNumber || "N/A",
+        studentIdNumber: student.studentIdNumber || student.studentId || "N/A",
         department: student.department || "N/A",
         profilePicture: student.profilePicture || null,
         stats: {
@@ -524,10 +562,13 @@ exports.getStudentAnalytics = async (req, res) => {
     }
 
     // Fetch Student Details
-    const student = await User.findById(studentId, "name email studentIdNumber department profilePicture");
+    const student = await User.findById(studentId, "name email studentId studentIdNumber department profilePicture");
     if (!student) {
       return res.status(404).json({ error: "Student not found" });
     }
+
+    // Use MongoDB _id for all sub-collection queries (not Firebase UID)
+    const studentMongoId = student._id;
 
     // 1. Fetch Attendance Records
     const attendanceRecords = await Attendance.find({ courseId }).sort({ date: 1 });
@@ -536,7 +577,7 @@ exports.getStudentAnalytics = async (req, res) => {
     const attendanceHistory = [];
 
     attendanceRecords.forEach((att) => {
-      const record = att.records.find((r) => r.studentId.toString() === studentId);
+      const record = att.records.find((r) => r.studentId.toString() === studentMongoId.toString());
       if (record) {
         if (record.status === "present") {
           presentCount++;
@@ -554,17 +595,21 @@ exports.getStudentAnalytics = async (req, res) => {
     const totalAttendanceCount = presentCount + absentCount;
     const attendancePercentage = totalAttendanceCount > 0 ? (presentCount / totalAttendanceCount) * 100 : 0;
 
-    // 2. Fetch Assignment Submissions
+    // 2. Fetch Assignment Submissions - use student._id (ObjectId)
     const assignments = await Assignment.find({ courseId }).sort({ createdAt: 1 });
+    // Do NOT populate assignmentId - compare raw ObjectIds directly
     const assignmentSubmissions = await Submission.find({
-      studentId,
+      studentId: studentMongoId,
       assignmentId: { $in: assignments.map((a) => a._id) }
-    }).populate("assignmentId", "title totalMarks");
+    });
 
     const assignmentData = assignments.map((assign) => {
-      const sub = assignmentSubmissions.find((s) => s.assignmentId.toString() === assign._id.toString());
+      // Compare ObjectIds as strings directly (no populate, so assignmentId is still ObjectId)
+      const sub = assignmentSubmissions.find(
+        (s) => s.assignmentId.toString() === assign._id.toString()
+      );
       const maxMarks = assign.totalMarks || 100;
-      const marksObtained = sub ? sub.marks : null;
+      const marksObtained = sub ? (sub.marks !== undefined ? sub.marks : null) : null;
       return {
         id: assign._id,
         title: assign.title,
@@ -575,7 +620,7 @@ exports.getStudentAnalytics = async (req, res) => {
         submitted: !!sub,
         submittedAt: sub ? sub.submittedAt : null,
         percentage: marksObtained !== null ? (marksObtained / maxMarks) * 100 : null,
-        feedback: sub ? sub.feedback : ""
+        feedback: sub ? (sub.feedback || "") : ""
       };
     });
 
@@ -589,17 +634,21 @@ exports.getStudentAnalytics = async (req, res) => {
     });
     const assignmentAverage = totalAssignPossible > 0 ? (totalAssignEarned / totalAssignPossible) * 100 : 0;
 
-    // 3. Fetch Exam Submissions
+    // 3. Fetch Exam Submissions - use student._id (ObjectId)
     const exams = await Exam.find({ courseId }).sort({ scheduledAt: 1 });
+    // Do NOT populate examId - compare raw ObjectIds directly
     const examSubmissions = await ExamSubmission.find({
-      studentId,
+      studentId: studentMongoId,
       examId: { $in: exams.map((e) => e._id) }
-    }).populate("examId", "title totalMarks scheduledAt publishMode resultsPublished");
+    });
 
     const examData = exams.map((ex) => {
-      const sub = examSubmissions.find((s) => s.examId.toString() === ex._id.toString());
+      // Compare ObjectIds as strings directly (no populate, so examId is still ObjectId)
+      const sub = examSubmissions.find(
+        (s) => s.examId.toString() === ex._id.toString()
+      );
       const maxMarks = ex.totalMarks || 100;
-      
+
       const canSeeResults = ex.resultsPublished || ex.publishMode === "auto";
       const marksObtained = sub && sub.graded && canSeeResults ? sub.totalMarksObtained : null;
       const percentage = sub && sub.graded && canSeeResults ? sub.percentage : null;
@@ -613,7 +662,7 @@ exports.getStudentAnalytics = async (req, res) => {
         graded: sub ? sub.graded : false,
         submittedAt: sub ? sub.submittedAt : null,
         percentage,
-        feedback: sub && canSeeResults ? sub.feedback : "",
+        feedback: sub && canSeeResults ? (sub.feedback || "") : "",
         resultsPublished: ex.resultsPublished
       };
     });
@@ -628,11 +677,8 @@ exports.getStudentAnalytics = async (req, res) => {
     });
     const examAverage = totalExamPossible > 0 ? (totalExamEarned / totalExamPossible) * 100 : 0;
 
-    // 4. Fetch Manual Assessments
-    const assessment = await Assessment.findOne({
-      studentIdNumber: student.studentIdNumber || "",
-      courseCode: course.displayCode
-    });
+    // 4. Fetch Manual Assessments (Robust search by student ID & course code)
+    const assessment = await findAssessmentRecord(student, course);
 
     // 5. Calculate Overall Performance / Activity Score
     let scoreSum = 0;
@@ -684,12 +730,111 @@ exports.getStudentAnalytics = async (req, res) => {
       gradeColor = "#ef4444";
     }
 
+    // Dynamically calculate Class Average for the course across 5 parameters
+    let classAttAvg = 78;
+    let classAssignAvg = 72;
+    let classExamAvg = 70;
+    let classPresAvg = 68;
+    let classAssAvg = 75;
+
+    try {
+      // 1. Attendance Class Average
+      const allAttendance = await Attendance.find({ courseId });
+      let totalPresent = 0;
+      let totalRecords = 0;
+      allAttendance.forEach((att) => {
+        (att.records || []).forEach((rec) => {
+          totalRecords++;
+          if (rec.status === "present") totalPresent++;
+        });
+      });
+      if (totalRecords > 0) {
+        classAttAvg = Math.round((totalPresent / totalRecords) * 100);
+      }
+
+      // 2. Assignment Class Average
+      const allAssignments = await Assignment.find({ courseId });
+      const assignIds = allAssignments.map((a) => a._id);
+      const allSubmissions = await Submission.find({ assignmentId: { $in: assignIds } });
+      let assignSum = 0;
+      let assignCount = 0;
+      allSubmissions.forEach((sub) => {
+        const assign = allAssignments.find((a) => a._id.toString() === sub.assignmentId.toString());
+        if (assign && sub.marks !== null) {
+          assignSum += (sub.marks / (assign.totalMarks || 100)) * 100;
+          assignCount++;
+        }
+      });
+      if (assignCount > 0) {
+        classAssignAvg = Math.round(assignSum / assignCount);
+      }
+
+      // 3. Exams Class Average
+      const allExams = await Exam.find({ courseId });
+      const examIds = allExams.map((e) => e._id);
+      const allExamSubs = await ExamSubmission.find({ examId: { $in: examIds }, graded: true });
+      let examSum = 0;
+      let examCount = 0;
+      allExamSubs.forEach((sub) => {
+        const exam = allExams.find((e) => e._id.toString() === sub.examId.toString());
+        if (exam && sub.totalMarksObtained !== null) {
+          examSum += (sub.totalMarksObtained / (exam.totalMarks || 100)) * 100;
+          examCount++;
+        }
+      });
+      if (examCount > 0) {
+        classExamAvg = Math.round(examSum / examCount);
+      }
+
+      // 4 & 5. Assessments Class Average (All 5 parameters derived from assessment if available)
+      const toPercentage = (val) => {
+        if (val === undefined || val === null || isNaN(val)) return 0;
+        const num = Number(val);
+        if (num <= 0) return 0;
+        if (num <= 10) return Math.min(100, Math.round((num / 10) * 100));
+        if (num <= 15) return Math.min(100, Math.round((num / 15) * 100));
+        if (num <= 30) return Math.min(100, Math.round((num / 30) * 100));
+        if (num <= 40) return Math.min(100, Math.round((num / 40) * 100));
+        return Math.min(100, Math.round(num));
+      };
+
+      const displayCode = (course.displayCode || course.code || "").trim();
+      const rawCode = displayCode.replace(/[-\s]/g, "");
+      const allAssessments = await Assessment.find({
+        courseCode: { $regex: new RegExp("^" + rawCode.replace(/([a-zA-Z]+)(\d+)/, "$1[-_\\s]?$2") + "$", "i") }
+      });
+      if (allAssessments.length > 0) {
+        let attSum = 0;
+        let quizSum = 0;
+        let assignSum = 0;
+        let presSum = 0;
+        let totalSum = 0;
+
+        allAssessments.forEach((ass) => {
+          attSum += ass.attendance || 0;
+          quizSum += ass.quiz || 0;
+          assignSum += ass.assignment || 0;
+          presSum += ass.presentation || 0;
+          totalSum += ass.totalMarks || 0;
+        });
+
+        const count = allAssessments.length;
+        classAttAvg = toPercentage(attSum / count);
+        classAssignAvg = toPercentage(assignSum / count);
+        classExamAvg = toPercentage(quizSum / count);
+        classPresAvg = toPercentage(presSum / count);
+        classAssAvg = toPercentage(totalSum / count);
+      }
+    } catch (e) {
+      console.error("Error calculating dynamic class average:", e);
+    }
+
     res.json({
       student: {
         id: student._id,
         name: student.name,
         email: student.email,
-        studentIdNumber: student.studentIdNumber || "N/A",
+        studentIdNumber: student.studentIdNumber || student.studentId || "N/A",
         department: student.department || "N/A",
         profilePicture: student.profilePicture || null
       },
@@ -707,6 +852,13 @@ exports.getStudentAnalytics = async (req, res) => {
         activityScore,
         gradeLabel,
         gradeColor,
+        classAverage: {
+          attendance: classAttAvg,
+          assignment: classAssignAvg,
+          quiz: classExamAvg,
+          presentation: classPresAvg,
+          assessment: classAssAvg
+        },
         assessment: assessment ? {
           attendance: assessment.attendance,
           quiz: assessment.quiz,

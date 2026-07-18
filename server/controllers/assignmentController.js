@@ -345,15 +345,6 @@ exports.submitAssignment = async (req, res) => {
       }
     }
 
-    const allCurrentFiles = [...finalFiles, ...newUploadedFiles];
-
-    if (allCurrentFiles.length === 0) {
-      for (const file of newUploadedFiles) {
-        try { fs.unlinkSync(file.path); } catch (e) {}
-      }
-      return res.status(400).json({ error: "Please upload at least one assignment file (.docx or .txt)." });
-    }
-
     const now = new Date();
     const isLate = now > new Date(assignment.deadline);
 
@@ -363,8 +354,8 @@ exports.submitAssignment = async (req, res) => {
       isLate,
       submittedAt: now,
       updatedAt: now,
-      fileURL: allCurrentFiles[0].fileURL,
-      originalName: allCurrentFiles[0].originalName,
+      fileURL: allCurrentFiles.length > 0 ? allCurrentFiles[0].fileURL : "",
+      originalName: allCurrentFiles.length > 0 ? allCurrentFiles[0].originalName : "",
       files: allCurrentFiles.map(f => ({ fileURL: f.fileURL, originalName: f.originalName })),
       similarityPercent: 0,
       similarityMatchedStudent: null,

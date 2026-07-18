@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-07-18)
 
 ## Corpus Check
-- 107 files · ~84,518 words
+- 107 files · ~85,662 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 698 nodes · 1118 edges · 40 communities (31 shown, 9 thin omitted)
+- 700 nodes · 1123 edges · 40 communities (31 shown, 9 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `eccf8dad`
+- Built from commit: `8f629fa6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -94,16 +94,16 @@ Cohesion: 0.04
 Nodes (46): bcryptjs, cors, dotenv, express, jsonwebtoken, mammoth, mongoose, multer (+38 more)
 
 ### Community 3 - "communityController.js"
-Cohesion: 0.08
-Nodes (38): addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest, Course, createCoursePost(), createPublicPost() (+30 more)
+Cohesion: 0.07
+Nodes (49): uploadMarksheet(), createAssignment(), gradeSubmission(), addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest (+41 more)
 
 ### Community 4 - "User.js"
-Cohesion: 0.19
-Nodes (10): similarityService, calculateSimilarity(), computeLevenshtein(), extractTextFromFile(), fs, getSentenceSimilarity(), mammoth, path (+2 more)
+Cohesion: 0.07
+Nodes (31): mongoose, submissionSchema, fs, main(), mongoose, path, recalculateAssignmentSimilarity(), similarityService (+23 more)
 
 ### Community 5 - "assignmentController.js"
-Cohesion: 0.05
-Nodes (36): Assignment, Course, deleteSubmission(), fs, { getIO }, Notification, path, previewService (+28 more)
+Cohesion: 0.06
+Nodes (26): Assignment, Course, deleteSubmission(), fs, { getIO }, Notification, path, previewService (+18 more)
 
 ### Community 6 - "test_exam_controller.js"
 Cohesion: 0.10
@@ -111,7 +111,7 @@ Nodes (11): analyzeAI(), { analyzeAnswers }, Exam, ExamSubmission, { getIO }, No
 
 ### Community 7 - "attendanceController.js"
 Cohesion: 0.07
-Nodes (17): Attendance, Course, evalArithmetic(), evaluateExcelFormula(), getAttendance(), getAttendanceStats(), markAttendance(), IMPORTANT: Filter only students, not teachers (+9 more)
+Nodes (20): Attendance, Course, evalArithmetic(), evaluateExcelFormula(), getAttendance(), getAttendanceStats(), markAttendance(), IMPORTANT: Filter only students, not teachers (+12 more)
 
 ### Community 8 - "lectureController.js"
 Cohesion: 0.09
@@ -122,8 +122,8 @@ Cohesion: 0.25
 Nodes (7): background_color, display, icons, name, short_name, start_url, theme_color
 
 ### Community 10 - "authRoutes.js"
-Cohesion: 0.09
-Nodes (27): bcrypt, blockUser(), forgotPassword(), generateToken(), getBlockedUsers(), getMe(), jwt, login() (+19 more)
+Cohesion: 0.18
+Nodes (16): bcrypt, blockUser(), forgotPassword(), generateToken(), getBlockedUsers(), getMe(), jwt, login() (+8 more)
 
 ### Community 11 - "package.json"
 Cohesion: 0.12
@@ -134,16 +134,16 @@ Cohesion: 0.05
 Nodes (37): axios, jszip, xlsx, docx-preview, dependencies, axios, docx-preview, jspdf (+29 more)
 
 ### Community 13 - "assessmentController.js"
-Cohesion: 0.12
-Nodes (10): Assessment, Course, fs, { getIO }, Notification, { sendEmail, emailTemplates, queueEmail }, User, XLSX (+2 more)
+Cohesion: 0.15
+Nodes (8): Assessment, Course, fs, { getIO }, Notification, { sendEmail, emailTemplates, queueEmail }, User, XLSX
 
 ### Community 14 - "previewService.js"
 Cohesion: 0.07
 Nodes (27): App(), AppContent(), AuthPage, CommunityHub, CourseAnalyticsPage, CourseCommunity, CourseCommunityPostDetail, CourseDashboard (+19 more)
 
 ### Community 15 - "deadlineReminder.js"
-Cohesion: 0.33
-Nodes (11): uploadMarksheet(), createAssignment(), gradeSubmission(), createContactRequest(), respondToContactRequest(), createExam(), publishExamResults(), submitExam() (+3 more)
+Cohesion: 0.50
+Nodes (3): answerSchema, examSubmissionSchema, mongoose
 
 ### Community 17 - "development"
 Cohesion: 0.09
@@ -174,8 +174,8 @@ Cohesion: 0.26
 Nodes (12): buildSlideBodyHtml(), extractPptxSlidesArray(), extractPptxSlidesHtml(), extractSlideElements(), formatTableHtml(), formatTextElementHtml(), fs, generatePreviewData() (+4 more)
 
 ### Community 47 - "deadlineReminder.js"
-Cohesion: 0.15
-Nodes (11): answerSchema, examSubmissionSchema, mongoose, Assignment, cron, Exam, ExamSubmission, { getIO } (+3 more)
+Cohesion: 0.17
+Nodes (10): mongoose, notificationSchema, Assignment, cron, Exam, ExamSubmission, { getIO }, Notification (+2 more)
 
 ### Community 48 - "emailService.js"
 Cohesion: 0.21

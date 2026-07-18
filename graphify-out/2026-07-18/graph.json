@@ -1137,7 +1137,7 @@
       "label": "StudentSidebar()",
       "file_type": "code",
       "source_file": "client/src/components/StudentSidebar.jsx",
-      "source_location": "L17",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "client_src_components_studentsidebar_studentsidebar",
       "community": 0,
@@ -1157,7 +1157,7 @@
       "label": "TeacherSidebar()",
       "file_type": "code",
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L19",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "client_src_components_teachersidebar_teachersidebar",
       "community": 0,
@@ -2430,7 +2430,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_uploadmarksheet",
-      "community": 15,
+      "community": 3,
       "norm_label": "uploadmarksheet()"
     },
     {
@@ -2600,7 +2600,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_createassignment",
-      "community": 15,
+      "community": 3,
       "norm_label": "createassignment()"
     },
     {
@@ -2700,7 +2700,7 @@
       "source_location": "L491",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_gradesubmission",
-      "community": 15,
+      "community": 3,
       "norm_label": "gradesubmission()"
     },
     {
@@ -3340,7 +3340,7 @@
       "source_location": "L1007",
       "_origin": "ast",
       "id": "server_controllers_communitycontroller_createcontactrequest",
-      "community": 15,
+      "community": 3,
       "norm_label": "createcontactrequest()"
     },
     {
@@ -3360,7 +3360,7 @@
       "source_location": "L1109",
       "_origin": "ast",
       "id": "server_controllers_communitycontroller_respondtocontactrequest",
-      "community": 15,
+      "community": 3,
       "norm_label": "respondtocontactrequest()"
     },
     {
@@ -3580,7 +3580,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_createexam",
-      "community": 15,
+      "community": 3,
       "norm_label": "createexam()"
     },
     {
@@ -3620,7 +3620,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_submitexam",
-      "community": 15,
+      "community": 3,
       "norm_label": "submitexam()"
     },
     {
@@ -3690,7 +3690,7 @@
       "source_location": "L466",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_publishexamresults",
-      "community": 15,
+      "community": 3,
       "norm_label": "publishexamresults()"
     },
     {
@@ -4510,7 +4510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_examsubmission",
-      "community": 47,
+      "community": 15,
       "norm_label": "examsubmission.js"
     },
     {
@@ -4520,7 +4520,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_examsubmission_mongoose",
-      "community": 47,
+      "community": 15,
       "norm_label": "mongoose"
     },
     {
@@ -4530,7 +4530,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_examsubmission_answerschema",
-      "community": 47,
+      "community": 15,
       "norm_label": "answerschema"
     },
     {
@@ -4540,7 +4540,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_models_examsubmission_examsubmissionschema",
-      "community": 47,
+      "community": 15,
       "norm_label": "examsubmissionschema"
     },
     {
@@ -4610,7 +4610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification",
-      "community": 13,
+      "community": 47,
       "norm_label": "notification.js"
     },
     {
@@ -4620,7 +4620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification_mongoose",
-      "community": 13,
+      "community": 47,
       "norm_label": "mongoose"
     },
     {
@@ -4630,7 +4630,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notification_notificationschema",
-      "community": 13,
+      "community": 47,
       "norm_label": "notificationschema"
     },
     {
@@ -4670,7 +4670,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission",
-      "community": 5,
+      "community": 4,
       "norm_label": "submission.js"
     },
     {
@@ -4680,7 +4680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission_mongoose",
-      "community": 5,
+      "community": 4,
       "norm_label": "mongoose"
     },
     {
@@ -4690,7 +4690,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_submission_submissionschema",
-      "community": 5,
+      "community": 4,
       "norm_label": "submissionschema"
     },
     {
@@ -4700,7 +4700,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_user",
-      "community": 10,
+      "community": 7,
       "norm_label": "user.js"
     },
     {
@@ -4710,7 +4710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_user_mongoose",
-      "community": 10,
+      "community": 7,
       "norm_label": "mongoose"
     },
     {
@@ -4720,7 +4720,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_models_user_bcrypt",
-      "community": 10,
+      "community": 7,
       "norm_label": "bcrypt"
     },
     {
@@ -4730,7 +4730,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_models_user_userschema",
-      "community": 10,
+      "community": 7,
       "norm_label": "userschema"
     },
     {
@@ -5770,7 +5770,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_startscheduler",
-      "community": 15,
+      "community": 3,
       "norm_label": "startscheduler()"
     },
     {
@@ -5880,7 +5880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism",
-      "community": 10,
+      "community": 4,
       "norm_label": "recalculate_all_plagiarism.js"
     },
     {
@@ -5890,7 +5890,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_mongoose",
-      "community": 10,
+      "community": 4,
       "norm_label": "mongoose"
     },
     {
@@ -5900,7 +5900,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_path",
-      "community": 10,
+      "community": 4,
       "norm_label": "path"
     },
     {
@@ -5910,7 +5910,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_similarityservice",
-      "community": 10,
+      "community": 4,
       "norm_label": "similarityservice"
     },
     {
@@ -5920,7 +5920,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_submission",
-      "community": 10,
+      "community": 4,
       "norm_label": "submission"
     },
     {
@@ -5930,7 +5930,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_user",
-      "community": 10,
+      "community": 4,
       "norm_label": "user"
     },
     {
@@ -5940,7 +5940,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_fs",
-      "community": 10,
+      "community": 4,
       "norm_label": "fs"
     },
     {
@@ -5950,7 +5950,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_recalculateassignmentsimilarity",
-      "community": 10,
+      "community": 4,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -5960,7 +5960,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_main",
-      "community": 10,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -5970,7 +5970,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate",
-      "community": 5,
+      "community": 4,
       "norm_label": "run_recalculate.js"
     },
     {
@@ -5980,7 +5980,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_mongoose",
-      "community": 5,
+      "community": 4,
       "norm_label": "mongoose"
     },
     {
@@ -5990,7 +5990,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_path",
-      "community": 5,
+      "community": 4,
       "norm_label": "path"
     },
     {
@@ -6000,7 +6000,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_similarityservice",
-      "community": 5,
+      "community": 4,
       "norm_label": "similarityservice"
     },
     {
@@ -6010,7 +6010,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_submission",
-      "community": 5,
+      "community": 4,
       "norm_label": "submission"
     },
     {
@@ -6020,7 +6020,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_user",
-      "community": 5,
+      "community": 4,
       "norm_label": "user"
     },
     {
@@ -6030,7 +6030,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_fs",
-      "community": 5,
+      "community": 4,
       "norm_label": "fs"
     },
     {
@@ -6040,7 +6040,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_recalculateassignmentsimilarity",
-      "community": 5,
+      "community": 4,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -6050,7 +6050,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_main",
-      "community": 5,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -6640,7 +6640,7 @@
       "source_location": "L367",
       "_origin": "ast",
       "id": "server_services_emailservice_queueemail",
-      "community": 15,
+      "community": 3,
       "norm_label": "queueemail()"
     },
     {
@@ -6824,10 +6824,20 @@
       "norm_label": "pdfparse"
     },
     {
+      "label": "cleanExtractedText()",
+      "file_type": "code",
+      "source_file": "server/services/similarityService.js",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "server_services_similarityservice_cleanextractedtext",
+      "community": 4,
+      "norm_label": "cleanextractedtext()"
+    },
+    {
       "label": "extractTextFromFile()",
       "file_type": "code",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L11",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "server_services_similarityservice_extracttextfromfile",
       "community": 4,
@@ -6837,7 +6847,7 @@
       "label": "preprocessText()",
       "file_type": "code",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L34",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "server_services_similarityservice_preprocesstext",
       "community": 4,
@@ -6847,7 +6857,7 @@
       "label": "splitIntoSentences()",
       "file_type": "code",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L48",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "server_services_similarityservice_splitintosentences",
       "community": 4,
@@ -6857,7 +6867,7 @@
       "label": "computeLevenshtein()",
       "file_type": "code",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L59",
+      "source_location": "L77",
       "_origin": "ast",
       "id": "server_services_similarityservice_computelevenshtein",
       "community": 4,
@@ -6867,17 +6877,27 @@
       "label": "getSentenceSimilarity()",
       "file_type": "code",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L86",
+      "source_location": "L107",
       "_origin": "ast",
       "id": "server_services_similarityservice_getsentencesimilarity",
       "community": 4,
       "norm_label": "getsentencesimilarity()"
     },
     {
+      "label": "getTrigrams()",
+      "file_type": "code",
+      "source_file": "server/services/similarityService.js",
+      "source_location": "L131",
+      "_origin": "ast",
+      "id": "server_services_similarityservice_gettrigrams",
+      "community": 4,
+      "norm_label": "gettrigrams()"
+    },
+    {
       "label": "calculateSimilarity()",
       "file_type": "code",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L101",
+      "source_location": "L146",
       "_origin": "ast",
       "id": "server_services_similarityservice_calculatesimilarity",
       "community": 4,
@@ -6950,7 +6970,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "server_socket_getio",
-      "community": 15,
+      "community": 3,
       "norm_label": "getio()"
     },
     {
@@ -7389,7 +7409,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherAttendancePage.jsx",
-      "source_location": "L509",
+      "source_location": "L511",
       "weight": 1.0,
       "source": "client_src_pages_teacherattendancepage_teacherattendancepage",
       "target": "e_capstone_uftb_moodle_3_uftb_moodle_client_package_dependencies_jspdf"
@@ -8445,7 +8465,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/components/StudentSidebar.jsx",
-      "source_location": "L17",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_components_studentsidebar",
       "target": "client_src_components_studentsidebar_studentsidebar",
@@ -8589,7 +8609,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/components/StudentSidebar.jsx",
-      "source_location": "L18",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "client_src_components_studentsidebar_studentsidebar",
       "target": "client_src_contexts_authcontext_useauth"
@@ -8686,7 +8706,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L19",
+      "source_location": "L24",
       "weight": 1.0,
       "source": "client_src_components_teachersidebar",
       "target": "client_src_components_teachersidebar_teachersidebar",
@@ -8830,7 +8850,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/components/TeacherSidebar.jsx",
-      "source_location": "L20",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "client_src_components_teachersidebar_teachersidebar",
       "target": "client_src_contexts_authcontext_useauth"
@@ -18525,7 +18545,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L145",
+      "source_location": "L208",
       "weight": 1.0,
       "context": "collection",
       "source": "server_services_similarityservice",
@@ -18536,7 +18556,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L59",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "server_services_similarityservice",
+      "target": "server_services_similarityservice_cleanextractedtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/services/similarityService.js",
+      "source_location": "L77",
       "weight": 1.0,
       "source": "server_services_similarityservice",
       "target": "server_services_similarityservice_computelevenshtein",
@@ -18546,7 +18576,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L142",
+      "source_location": "L205",
       "weight": 1.0,
       "context": "collection",
       "source": "server_services_similarityservice",
@@ -18567,10 +18597,20 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L86",
+      "source_location": "L107",
       "weight": 1.0,
       "source": "server_services_similarityservice",
       "target": "server_services_similarityservice_getsentencesimilarity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/services/similarityService.js",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "server_services_similarityservice",
+      "target": "server_services_similarityservice_gettrigrams",
       "confidence_score": 1.0
     },
     {
@@ -18607,7 +18647,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L143",
+      "source_location": "L206",
       "weight": 1.0,
       "context": "collection",
       "source": "server_services_similarityservice",
@@ -18618,7 +18658,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L144",
+      "source_location": "L207",
       "weight": 1.0,
       "context": "collection",
       "source": "server_services_similarityservice",
@@ -18630,7 +18670,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L23",
+      "source_location": "L37",
       "weight": 1.0,
       "source": "server_services_similarityservice_extracttextfromfile",
       "target": "server_services_similarityservice_pdfparse",
@@ -18641,7 +18681,29 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L104",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "server_services_similarityservice_extracttextfromfile",
+      "target": "server_services_similarityservice_cleanextractedtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/services/similarityService.js",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "server_services_similarityservice_splitintosentences",
+      "target": "server_services_similarityservice_cleanextractedtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/services/similarityService.js",
+      "source_location": "L149",
       "weight": 1.0,
       "source": "server_services_similarityservice_calculatesimilarity",
       "target": "server_services_similarityservice_preprocesstext",
@@ -18652,7 +18714,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L89",
+      "source_location": "L123",
       "weight": 1.0,
       "source": "server_services_similarityservice_getsentencesimilarity",
       "target": "server_services_similarityservice_computelevenshtein",
@@ -18663,10 +18725,21 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/services/similarityService.js",
-      "source_location": "L126",
+      "source_location": "L170",
       "weight": 1.0,
       "source": "server_services_similarityservice_calculatesimilarity",
       "target": "server_services_similarityservice_getsentencesimilarity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/services/similarityService.js",
+      "source_location": "L190",
+      "weight": 1.0,
+      "source": "server_services_similarityservice_calculatesimilarity",
+      "target": "server_services_similarityservice_gettrigrams",
       "confidence_score": 1.0
     },
     {
@@ -18753,5 +18826,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "eccf8dad3f262ad04bae3f837407b146887a4ee8"
+  "built_at_commit": "8f629fa6669f9a664eb75c1ff6d511f0ed44759f"
 }

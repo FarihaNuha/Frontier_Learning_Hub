@@ -588,6 +588,7 @@ export default function TeacherExamPage({
                   type="button"
                   className="btn-primary"
                   onClick={addQuestion}
+                  style={{ marginTop: 22, marginBottom: 16 }}
                 >
                   <FiPlus size={16} /> Add Question
                 </button>

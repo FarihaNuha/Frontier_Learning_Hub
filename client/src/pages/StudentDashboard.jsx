@@ -35,7 +35,6 @@ export default function StudentDashboard({
   courseCode: propCourseCode,
 }) {
   const { user, logout } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
   const { id: urlCourseId } = useParams();
 
@@ -168,13 +167,16 @@ export default function StudentDashboard({
   }, [previewSlides]);
 
   useEffect(() => {
+    if (!user) return;
     if (finalCourseId) {
       fetchCourseInfo();
       fetchLectures();
     } else {
       navigate("/courses");
     }
-  }, [finalCourseId]);
+  }, [finalCourseId, user]);
+
+  if (!user) return null;
 
   const fetchCourseInfo = async () => {
     try {

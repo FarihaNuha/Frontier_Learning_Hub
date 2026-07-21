@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import SkeletonLoader from "./components/SkeletonLoader";
+import GlobalNotificationBell from "./components/GlobalNotificationBell";
+import GlobalSettingsPortal from "./components/GlobalSettingsPortal";
 
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
@@ -87,10 +89,6 @@ function RoleRouter() {
 
   return <Navigate to="/auth" replace />;
 }
-
-import GlobalNotificationBell from "./components/GlobalNotificationBell";
-import GlobalSettingsPortal from "./components/GlobalSettingsPortal";
-
 function AppContent() {
   const { user } = useAuth();
   const location = useLocation();

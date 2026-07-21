@@ -21,7 +21,6 @@ import TeacherSidebar from "../components/TeacherSidebar";
 export default function CourseAnalyticsPage() {
   const { id } = useParams();
   const { user } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
 
   const [course, setCourse] = useState(null);
@@ -30,12 +29,12 @@ export default function CourseAnalyticsPage() {
   const [selectedStudent, setSelectedStudent] = useState(null); // Active student details (id, name, etc.)
   const [analytics, setAnalytics] = useState(null); // Loaded analytics details (summary, history)
   const [loadingDetails, setLoadingDetails] = useState(false);
-
-  useEffect(() => {
-    fetchCourse();
-  }, [id]);
+  const [showBenchmark, setShowBenchmark] = useState(true);
+  const [activeHoverAxis, setActiveHoverAxis] = useState(null);
+  const [activeTab, setActiveTab] = useState("continuous"); // "continuous" | "final"
 
   const fetchCourse = async () => {
+    if (!user) return;
     try {
       const res = await api.get(`/courses/${id}`);
       setCourse(res.data.course);
@@ -79,9 +78,13 @@ export default function CourseAnalyticsPage() {
     }
   };
 
-  const [showBenchmark, setShowBenchmark] = useState(true);
-  const [activeHoverAxis, setActiveHoverAxis] = useState(null);
-  const [activeTab, setActiveTab] = useState("continuous"); // "continuous" | "final"
+  useEffect(() => {
+    if (user) {
+      fetchCourse();
+    }
+  }, [id, user]);
+
+  if (!user) return null;
 
   // Helper to convert raw assessment marks into 0-100% effort percentage
   const toPercentage = (val) => {

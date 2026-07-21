@@ -34,7 +34,6 @@ import TeacherSidebar from "../components/TeacherSidebar";
 
 export default function TeacherDashboard({ courseId, courseCode }) {
   const { user, logout } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
   const [lectures, setLectures] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -171,8 +170,12 @@ export default function TeacherDashboard({ courseId, courseCode }) {
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    fetchLectures();
-  }, []);
+    if (user) {
+      fetchLectures();
+    }
+  }, [user]);
+
+  if (!user) return null;
 
   const fetchLectures = async (forceRefresh = false) => {
     try {

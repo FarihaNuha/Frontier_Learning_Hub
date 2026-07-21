@@ -60,7 +60,6 @@ const renderContentWithLinks = (text) => {
 
 export default function CommunityHub() {
   const { user, socket, logout } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("feed");
   const [posts, setPosts] = useState([]);
@@ -80,28 +79,31 @@ export default function CommunityHub() {
   };
 
   useEffect(() => {
+    if (!user) return;
     if (activeTab === "feed") {
       fetchPosts();
     } else if (activeTab === "inbox") {
       fetchInbox();
     }
-  }, [activeTab, selectedCategory]);
+  }, [activeTab, selectedCategory, user]);
 
   useEffect(() => {
+    if (!user) return;
     fetchUnreadMessageCount();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (socket) {
-      const handleNewMessage = () => {
-        fetchUnreadMessageCount();
-      };
-      socket.on("newPrivateMessage", handleNewMessage);
-      return () => {
-        socket.off("newPrivateMessage", handleNewMessage);
-      };
-    }
-  }, [socket]);
+    if (!user || !socket) return;
+    const handleNewMessage = () => {
+      fetchUnreadMessageCount();
+    };
+    socket.on("newPrivateMessage", handleNewMessage);
+    return () => {
+      socket.off("newPrivateMessage", handleNewMessage);
+    };
+  }, [socket, user]);
+
+  if (!user) return null;
 
   const fetchPosts = async () => {
     try {

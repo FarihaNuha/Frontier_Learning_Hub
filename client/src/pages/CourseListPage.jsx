@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
@@ -7,16 +7,14 @@ import toast from "react-hot-toast";
 import {
   FiPlus,
   FiLogIn,
-  FiUser,
-  FiLogOut,
   FiBook,
-  FiBookOpen,
   FiCopy,
   FiTrash2,
   FiUsers,
   FiKey,
   FiCalendar,
-  FiMessageSquare,
+  FiSearch,
+  FiX,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -106,7 +104,6 @@ const getCourseBanner = (course) => {
 
 export default function CourseListPage() {
   const { user, logout } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,10 +116,67 @@ export default function CourseListPage() {
     department: user?.department || "Software",
   });
   const [joinCode, setJoinCode] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
 
   useEffect(() => {
-    fetchCourses();
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchCourses();
+    }
+  }, [user]);
+
+  if (!user) return null;
+
+  const filterCourse = (course, q) => {
+    if (!q.trim()) return true;
+    const query = q.trim().toLowerCase();
+    const queryNoSpace = query.replace(/\s+/g, "");
+
+    const name = (course.name || "").toLowerCase();
+    const nameNoSpace = name.replace(/\s+/g, "");
+
+    const code = (course.displayCode || "").toLowerCase();
+    const codeNoSpace = code.replace(/\s+/g, "");
+
+    const session = (course.session || "").toLowerCase();
+
+    return (
+      name.includes(query) ||
+      nameNoSpace.includes(queryNoSpace) ||
+      code.includes(query) ||
+      codeNoSpace.includes(queryNoSpace) ||
+      session.includes(query)
+    );
+  };
+
+  const filteredCourses = courses.filter((c) => filterCourse(c, searchQuery));
+
+  const matchingSuggestions = searchQuery.trim()
+    ? courses
+        .filter((c) => filterCourse(c, searchQuery))
+        .sort((a, b) => {
+          const q = searchQuery.trim().toLowerCase();
+          const aNameStart = (a.name || "").toLowerCase().startsWith(q);
+          const bNameStart = (b.name || "").toLowerCase().startsWith(q);
+          const aCodeStart = (a.displayCode || "").toLowerCase().startsWith(q);
+          const bCodeStart = (b.displayCode || "").toLowerCase().startsWith(q);
+
+          if ((aNameStart || aCodeStart) && !(bNameStart || bCodeStart)) return -1;
+          if (!(aNameStart || aCodeStart) && (bNameStart || bCodeStart)) return 1;
+          return 0;
+        })
+    : [];
 
   const fetchCourses = async (forceRefresh = false) => {
     try {
@@ -231,7 +285,186 @@ export default function CourseListPage() {
             <h1>My Courses</h1>
             <p className="subtitle">{user?.department} Department</p>
           </div>
-          <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            {/* Exact Shape Search Bar - SVG socket notch pill */}
+            <div ref={searchRef} style={{ position: "relative", width: "300px" }}>
+              <div style={{ position: "relative", width: "300px", height: "50px" }}>
+                {(() => {
+                  const isDark = document.body.classList.contains("dark-theme");
+                  return (
+                    <>
+                      {/* SVG pill with built-in socket notch on top-left */}
+                      <svg
+                        width="300" height="50"
+                        viewBox="0 0 300 50"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        style={{
+                          position: "absolute", top: 0, left: 0,
+                          width: "100%", height: "100%",
+                          pointerEvents: "none",
+                          filter: "drop-shadow(0 3px 10px rgba(59,141,179,0.2))",
+                        }}
+                      >
+                        {/* Pill body with socket scoop cut at top-left */}
+                        <path
+                          d="M 8 8
+                             C 8 20, 16 32, 30 36
+                             C 44 40, 54 30, 56 16
+                             C 57 9, 64 6, 72 6
+                             L 278 6
+                             C 290 6, 297 14, 297 25
+                             C 297 36, 290 44, 278 44
+                             L 22 44
+                             C 10 44, 3 36, 3 25
+                             C 3 16, 5 10, 8 8 Z"
+                          fill="#F3F4F6"
+                          stroke="#3B8DB3"
+                          strokeWidth="2"
+                        />
+                      </svg>
+
+                      {/* Badge sitting in the socket notch */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "6px",
+                          left: "8px",
+                          width: "48px",
+                          height: "36px",
+                          borderRadius: "0 0 24px 24px",
+                          background: "linear-gradient(160deg, #7EC8E3 0%, #3B8DB3 100%)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#ffffff",
+                          zIndex: 2,
+                          boxShadow: "0 3px 8px rgba(59,141,179,0.3)",
+                        }}
+                      >
+                        <FiSearch size={17} />
+                      </div>
+
+                      {/* Input field */}
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          setShowSuggestions(true);
+                        }}
+                        onFocus={() => setShowSuggestions(true)}
+                        placeholder="Search course or code..."
+                        className="search-pill-input"
+                        style={{
+                          position: "absolute",
+                          top: 0, left: 0, right: 0, bottom: 0,
+                          zIndex: 2,
+                          border: "none", outline: "none",
+                          background: "transparent",
+                          paddingLeft: "68px",
+                          paddingRight: searchQuery ? "36px" : "16px",
+                          fontSize: "13.5px",
+                          color: "#1A4F6E",
+                          fontWeight: 500,
+                          borderRadius: "24px",
+                        }}
+                      />
+
+                      {searchQuery && (
+                        <button
+                          onClick={() => { setSearchQuery(""); setShowSuggestions(false); }}
+                          style={{
+                            position: "absolute", right: "12px",
+                            top: "50%", transform: "translateY(-50%)",
+                            zIndex: 3, border: "none", background: "none",
+                            cursor: "pointer", 
+                            color: "#3B8DB3",
+                            display: "flex", alignItems: "center", padding: "4px",
+                          }}
+                          title="Clear search"
+                        >
+                          <FiX size={15} />
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* Suggestions Dropdown */}
+              {showSuggestions && searchQuery.trim().length > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 8px)",
+                    right: 0,
+                    width: "300px",
+                    background: "#ffffff",
+                    borderRadius: "16px",
+                    boxShadow: "0 10px 28px rgba(44, 75, 102, 0.16)",
+                    border: "1.5px solid #E8F4FD",
+                    zIndex: 1000,
+                    maxHeight: "280px",
+                    overflowY: "auto",
+                    padding: "6px",
+                  }}
+                >
+                  {matchingSuggestions.length === 0 ? (
+                    <div style={{ padding: "12px 14px", fontSize: "13px", color: "#6B89A0", textAlign: "center" }}>
+                      No matching courses found
+                    </div>
+                  ) : (
+                    matchingSuggestions.map((course) => (
+                      <div
+                        key={course._id}
+                        onClick={() => {
+                          setSearchQuery(course.name);
+                          setShowSuggestions(false);
+                          navigate(`/course/${course._id}`);
+                        }}
+                        style={{
+                          padding: "10px 12px",
+                          borderRadius: "10px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "8px",
+                          transition: "all 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "#E8F4FD")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <div style={{ overflow: "hidden" }}>
+                          <div style={{ fontSize: "13px", fontWeight: 600, color: "#2C4B66", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {course.name}
+                          </div>
+                          <div style={{ fontSize: "11px", color: "#6B89A0", marginTop: "2px" }}>
+                            {course.displayCode} {course.session ? `• ${course.session}` : ""}
+                          </div>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            color: "#3B8DB3",
+                            background: "rgba(59, 141, 179, 0.1)",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            whiteSpace: "nowrap",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {course.displayCode}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
             {user?.role === "teacher" && (
               <button
                 className="btn-primary"
@@ -385,7 +618,12 @@ export default function CourseListPage() {
         )}
 
         {/* Course List */}
-        <h2 style={{ marginBottom: 20 }}>All Courses ({courses.length})</h2>
+        <h2 style={{ marginBottom: 20 }}>
+          {searchQuery.trim()
+            ? `Search Results (${filteredCourses.length})`
+            : `All Courses (${courses.length})`}
+        </h2>
+
         {courses.length === 0 ? (
           <div className="empty-state">
             <FiBook size={48} color="#6B89A0" />
@@ -396,9 +634,22 @@ export default function CourseListPage() {
                 : "Join a course with join code from your teacher"}
             </p>
           </div>
+        ) : filteredCourses.length === 0 ? (
+          <div className="empty-state" style={{ padding: "40px 20px" }}>
+            <FiSearch size={40} color="#6B89A0" />
+            <h3 style={{ marginTop: 12 }}>No matching courses found</h3>
+            <p>No course matches "{searchQuery}"</p>
+            <button
+              className="btn-primary"
+              style={{ marginTop: 12 }}
+              onClick={() => setSearchQuery("")}
+            >
+              Clear Search
+            </button>
+          </div>
         ) : (
           <div className="lectures-grid">
-            {courses.map((course) => {
+            {filteredCourses.map((course) => {
               const banner = getCourseBanner(course);
 
               return (

@@ -32,15 +32,10 @@ import TeacherAttendancePage from "./TeacherAttendancePage";
 export default function CourseDashboard() {
   const { id } = useParams();
   const { user, logout } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("lectures");
-
-  useEffect(() => {
-    fetchCourse();
-  }, [id]);
 
   const fetchCourse = async () => {
     try {
@@ -54,6 +49,14 @@ export default function CourseDashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchCourse();
+    }
+  }, [id, user]);
+
+  if (!user) return null;
 
   const handleLecturesClick = () => {
     setActiveTab("lectures");

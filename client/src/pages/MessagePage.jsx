@@ -46,7 +46,6 @@ const RTC_CONFIG = {
 export default function MessagePage() {
   const { userId } = useParams();
   const { user, socket, onlineUsers } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
 
   // ---- messaging state ----
@@ -119,14 +118,19 @@ export default function MessagePage() {
   //  Lifecycle
   // ==================================================================
 
-  useEffect(() => { fetchUsers(); fetchContactRequests(); }, []);
+  useEffect(() => {
+    if (user) {
+      fetchUsers();
+      fetchContactRequests();
+    }
+  }, [user]);
 
   useEffect(() => {
-    if (userId) {
+    if (user && userId) {
       fetchConversation(userId);
       setShowNewMessage(false);
     }
-  }, [userId]);
+  }, [userId, user]);
 
   useEffect(() => { scrollToBottom(); }, [messages]);
 
@@ -292,11 +296,12 @@ export default function MessagePage() {
       toast.error("Please set a schedule window first."); return;
     }
     try {
-      await communityApi.respondToContactRequest(requestId, { 
-        status, 
-        scheduleStart: new Date(scheduleStart).toISOString(), 
-        scheduleEnd: new Date(scheduleEnd).toISOString() 
-      });
+      const payload = { status };
+      if (status === "accepted") {
+        payload.scheduleStart = new Date(scheduleStart).toISOString();
+        payload.scheduleEnd = new Date(scheduleEnd).toISOString();
+      }
+      await communityApi.respondToContactRequest(requestId, payload);
       toast.success(status === "accepted" ? "Request accepted & schedule set!" : "Request declined.");
       setRespondingId(null); setScheduleStart(""); setScheduleEnd("");
       fetchContactRequests();
@@ -471,6 +476,8 @@ export default function MessagePage() {
     peerConnectionRef.current = pc;
     return pc;
   }, [socket]);
+
+  if (!user) return null;
 
   const startCall = async (type) => {
     if (!selectedUser || !socket) return;
@@ -863,139 +870,7 @@ export default function MessagePage() {
 
           {/* Chat area */}
           <div className="chat-area">
-            {showNewMessage ? (
-              <div style={{
-                background: "var(--bg-card)",
-                borderRadius: "16px",
-                padding: "32px",
-                border: "1px solid var(--border-color)",
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.04)",
-                maxWidth: "600px",
-                margin: "40px auto",
-                width: "100%",
-                boxSizing: "border-box"
-              }}>
-                <h2 style={{ 
-                  margin: "0 0 24px", 
-                  fontSize: "20px", 
-                  fontWeight: 700, 
-                  color: "var(--text-primary)",
-                  borderBottom: "1px solid var(--border-color)",
-                  paddingBottom: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px"
-                }}>
-                  <FiMessageSquare size={20} color="var(--pastel-blue-primary)" /> New Message
-                </h2>
-                <form onSubmit={handleSendMessage} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-                  <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>To:</label>
-                    <select 
-                      value={selectedUser?._id || ""} 
-                      onChange={(e) => setSelectedUser(users.find((u) => u._id === e.target.value))} 
-                      required
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "10px",
-                        border: "1px solid var(--border-color)",
-                        background: "var(--bg-secondary)",
-                        color: "var(--text-primary)",
-                        fontSize: "14px",
-                        outline: "none"
-                      }}
-                    >
-                      <option value="">Select a user</option>
-                      {users.map((u) => <option key={u._id} value={u._id}>{u.name} ({u.role})</option>)}
-                    </select>
-                  </div>
-                  <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>Subject:</label>
-                    <input 
-                      type="text" 
-                      value={subject} 
-                      onChange={(e) => setSubject(e.target.value)} 
-                      placeholder="Message subject" 
-                      required 
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "10px",
-                        border: "1px solid var(--border-color)",
-                        background: "var(--bg-secondary)",
-                        color: "var(--text-primary)",
-                        fontSize: "14px",
-                        outline: "none",
-                        boxSizing: "border-box"
-                      }}
-                    />
-                  </div>
-                  <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>Message:</label>
-                    <textarea 
-                      value={newMessage} 
-                      onChange={(e) => setNewMessage(e.target.value)} 
-                      rows={6} 
-                      placeholder="Type your message here..." 
-                      required 
-                      style={{
-                        width: "100%",
-                        padding: "12px 14px",
-                        borderRadius: "10px",
-                        border: "1px solid var(--border-color)",
-                        background: "var(--bg-secondary)",
-                        color: "var(--text-primary)",
-                        fontSize: "14px",
-                        outline: "none",
-                        resize: "vertical",
-                        boxSizing: "border-box"
-                      }}
-                    />
-                  </div>
-                  <div className="form-actions" style={{ display: "flex", gap: "12px", marginTop: "8px", justifyContent: "flex-end" }}>
-                    <button 
-                      type="submit" 
-                      className="btn-primary" 
-                      disabled={sending}
-                      style={{
-                        padding: "10px 24px",
-                        background: "var(--pastel-blue-primary)",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "10px",
-                        fontWeight: 700,
-                        fontSize: "14px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        opacity: sending ? 0.7 : 1
-                      }}
-                    >
-                      <FiSend size={16} /> {sending ? "Sending..." : "Send Message"}
-                    </button>
-                    <button 
-                      type="button" 
-                      className="btn-secondary" 
-                      onClick={() => setShowNewMessage(false)}
-                      style={{
-                        padding: "10px 24px",
-                        background: "transparent",
-                        color: "#64748b",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: "10px",
-                        fontWeight: 700,
-                        fontSize: "14px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            ) : userId || selectedUser ? (
+            {userId || selectedUser ? (
               <>
                 {/* Chat Header */}
                 <div className="chat-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
@@ -1225,10 +1100,14 @@ export default function MessagePage() {
                 )}
               </>
             ) : (
-              <div className="empty-chat">
-                <FiMessageSquare size={64} />
-                <h3>Select a conversation</h3>
-                <button className="btn-primary" onClick={() => setShowNewMessage(true)}>+ New Message</button>
+              <div className="empty-chat" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "16px", padding: "40px 24px", textAlign: "center" }}>
+                <div style={{ width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg, #7EC8E3 0%, #3B8DB3 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 24px rgba(59,141,179,0.25)" }}>
+                  <FiMessageSquare size={32} color="#fff" />
+                </div>
+                <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "var(--text-primary)" }}>Community Hub</h3>
+                <p style={{ margin: 0, fontSize: "14px", color: "var(--text-secondary)", maxWidth: 280, lineHeight: 1.6 }}>
+                  Connect, collaborate, and communicate with everyone in your academic community. Select a conversation from the left to get started.
+                </p>
               </div>
             )}
           </div>

@@ -136,6 +136,19 @@ body.dark-theme textarea:focus {
   box-shadow: 0 0 12px rgba(0, 210, 255, 0.45) !important;
 }
 
+/* Search bar input - override dark theme overrides */
+body.dark-theme .search-pill-input {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 24px !important;
+  box-shadow: none !important;
+  color: #1A4F6E !important;
+}
+body.dark-theme .search-pill-input:focus {
+  border: none !important;
+  box-shadow: none !important;
+}
+
 body.dark-theme input::placeholder,
 body.dark-theme textarea::placeholder {
   color: #5b708b !important;

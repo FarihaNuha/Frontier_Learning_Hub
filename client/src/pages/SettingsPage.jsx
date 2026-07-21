@@ -30,7 +30,6 @@ import "../styles/dashboard.css";
 
 export default function SettingsPage() {
   const { user, setUser, logout, socket } = useAuth();
-  if (!user) return null;
   const navigate = useNavigate();
 
   // Profile Edit states
@@ -210,6 +209,8 @@ export default function SettingsPage() {
       contactRequestEmailNotifications: currentContactNotif
     }));
   }, [user]);
+
+  if (!user) return null;
 
   // Toggle Theme
   const handleThemeChange = (dark) => {

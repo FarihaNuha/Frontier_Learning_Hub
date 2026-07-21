@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "client/src/components/StudentSidebar.jsx": {
-    "mtime": 1784671105.2186873,
-    "ast_hash": "473e53bf2e5cdd43e4107d765815f440",
+    "mtime": 1784671407.6313226,
+    "ast_hash": "34cadd7fa48e13d4b19fc6632e97ef49",
     "semantic_hash": ""
   },
   "client/src/components/common/Navbar.jsx": {
@@ -505,8 +505,8 @@
     "semantic_hash": ""
   },
   "client/src/components/TeacherSidebar.jsx": {
-    "mtime": 1784671108.6073363,
-    "ast_hash": "8b5c16c4ebed097d17e682ea3a00d32c",
+    "mtime": 1784671411.543989,
+    "ast_hash": "957c2b327e36f3fca7d9e7f9f5e1784b",
     "semantic_hash": ""
   },
   "client/src/pages/CourseAnalyticsPage.jsx": {

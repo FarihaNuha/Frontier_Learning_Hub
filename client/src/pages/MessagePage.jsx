@@ -750,7 +750,7 @@ export default function MessagePage() {
   const courseIdParam = searchParams.get("courseId");
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div className="dashboard-container" style={{ minHeight: "100vh", background: "#f8fafc" }}>
       {user?.role === "teacher" ? (
         <TeacherSidebar currentPage="community" courseId={courseIdParam} />
       ) : (

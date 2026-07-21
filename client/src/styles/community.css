@@ -2844,6 +2844,11 @@ body.dark-theme .inline-comments-list::-webkit-scrollbar-thumb {
    COMMUNITY HUB & MESSAGES MOBILE RESPONSIVE STYLES
    ================================================================== */
 @media (max-width: 1024px) {
+  .community-container {
+    flex-direction: column !important;
+    min-height: 100vh !important;
+  }
+
   .community-sidebar {
     position: fixed !important;
     top: 56px !important;
@@ -2862,15 +2867,36 @@ body.dark-theme .inline-comments-list::-webkit-scrollbar-thumb {
   .community-main {
     margin-left: 0 !important;
     width: 100% !important;
-    padding: 16px !important;
+    padding: 16px 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .messages-container {
+    width: 100% !important;
+    padding: 16px 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .messages-wrapper {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  .users-sidebar {
+    width: 100% !important;
+    max-height: 220px !important;
+    border-right: none !important;
+    border-bottom: 1px solid #e2eef6 !important;
+  }
+
+  .chat-area {
+    width: 100% !important;
+    height: 520px !important;
   }
 }
 
 @media (max-width: 768px) {
-  .community-container {
-    flex-direction: column !important;
-  }
-
   .messages-layout {
     flex-direction: column !important;
     height: auto !important;
@@ -2878,7 +2904,7 @@ body.dark-theme .inline-comments-list::-webkit-scrollbar-thumb {
 
   .users-list-sidebar {
     width: 100% !important;
-    max-height: 250px !important;
+    max-height: 220px !important;
     overflow-y: auto !important;
     border-right: none !important;
     border-bottom: 1px solid #e2eef6 !important;
@@ -2886,7 +2912,8 @@ body.dark-theme .inline-comments-list::-webkit-scrollbar-thumb {
 
   .chat-area {
     width: 100% !important;
-    height: calc(100vh - 200px) !important;
+    height: calc(100vh - 220px) !important;
+    min-height: 400px !important;
   }
 
   .call-overlay-content {

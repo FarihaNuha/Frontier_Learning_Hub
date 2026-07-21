@@ -38,7 +38,13 @@ import "../styles/community.css";
 
 // ========================= WebRTC helpers =========================
 const RTC_CONFIG = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    { urls: "stun:stun4.l.google.com:19302" },
+  ],
 };
 
 // ==================================================================
@@ -112,6 +118,7 @@ export default function MessagePage() {
   const isCallerRef = useRef(false);
   const isCallAnsweredRef = useRef(false);
   const callStartTimeRef = useRef(null);
+  const pendingIceCandidatesRef = useRef([]);
   const quickEmojis = ["❤️", "👍", "😂", "😮", "😢", "😡"];
 
   // ==================================================================
@@ -191,16 +198,29 @@ export default function MessagePage() {
 
     const handleCallAnswered = async ({ answer }) => {
       try {
-        await peerConnectionRef.current?.setRemoteDescription(new RTCSessionDescription(answer));
-        isCallAnsweredRef.current = true;
-        callStartTimeRef.current = Date.now();
-        setCallState("active");
+        if (peerConnectionRef.current) {
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+          isCallAnsweredRef.current = true;
+          callStartTimeRef.current = Date.now();
+          setCallState("active");
+          // Process queued ICE candidates
+          while (pendingIceCandidatesRef.current.length > 0) {
+            const cand = pendingIceCandidatesRef.current.shift();
+            await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(cand)).catch(console.error);
+          }
+        }
       } catch (err) { console.error("setRemoteDescription error:", err); }
     };
 
     const handleIceCandidate = async ({ candidate }) => {
       try {
-        if (candidate) await peerConnectionRef.current?.addIceCandidate(new RTCIceCandidate(candidate));
+        if (candidate && peerConnectionRef.current) {
+          if (peerConnectionRef.current.remoteDescription && peerConnectionRef.current.remoteDescription.type) {
+            await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+          } else {
+            pendingIceCandidatesRef.current.push(candidate);
+          }
+        }
       } catch (err) { console.error("ICE candidate error:", err); }
     };
 
@@ -463,7 +483,16 @@ export default function MessagePage() {
 
     pc.ontrack = (event) => {
       if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = event.streams[0];
+        if (event.streams && event.streams[0]) {
+          remoteVideoRef.current.srcObject = event.streams[0];
+        } else {
+          let currentStream = remoteVideoRef.current.srcObject;
+          if (!currentStream || !(currentStream instanceof MediaStream)) {
+            currentStream = new MediaStream();
+            remoteVideoRef.current.srcObject = currentStream;
+          }
+          currentStream.addTrack(event.track);
+        }
       }
     };
 
@@ -536,6 +565,12 @@ export default function MessagePage() {
       await pc.setRemoteDescription(new RTCSessionDescription(incomingCall.offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
+
+      // Flush queued candidates
+      while (pendingIceCandidatesRef.current.length > 0) {
+        const cand = pendingIceCandidatesRef.current.shift();
+        await pc.addIceCandidate(new RTCIceCandidate(cand)).catch(console.error);
+      }
 
       socket.emit("answer-call", { to: incomingCall.from, answer });
 
@@ -642,9 +677,12 @@ export default function MessagePage() {
         screenStreamRef.current = stream;
 
         const videoTrack = stream.getVideoTracks()[0];
-        const sender = peerConnectionRef.current.getSenders().find((s) => s.track?.kind === "video");
-        if (sender) {
-          sender.replaceTrack(videoTrack);
+        const senders = peerConnectionRef.current.getSenders();
+        const videoSender = senders.find((s) => s.track && s.track.kind === "video");
+        if (videoSender) {
+          await videoSender.replaceTrack(videoTrack);
+        } else {
+          peerConnectionRef.current.addTrack(videoTrack, stream);
         }
 
         if (localVideoRef.current) {
@@ -671,15 +709,16 @@ export default function MessagePage() {
       screenStreamRef.current = null;
     }
 
-    if (localStream) {
-      const webcamTrack = localStream.getVideoTracks()[0];
-      const sender = peerConnectionRef.current?.getSenders().find((s) => s.track?.kind === "video");
-      if (sender && webcamTrack) {
-        sender.replaceTrack(webcamTrack);
-      }
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = localStream;
-      }
+    const webcamTrack = localStream ? localStream.getVideoTracks()[0] : null;
+    const senders = peerConnectionRef.current ? peerConnectionRef.current.getSenders() : [];
+    const videoSender = senders.find((s) => s.track && s.track.kind === "video");
+
+    if (videoSender) {
+      videoSender.replaceTrack(webcamTrack || null);
+    }
+
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = localStream;
     }
     setIsScreenSharing(false);
   };

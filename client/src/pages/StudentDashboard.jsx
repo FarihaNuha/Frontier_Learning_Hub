@@ -733,7 +733,7 @@ export default function StudentDashboard({
                     background: "#ffffff",
                   }}
                 />
-              ) : previewType === "pptx" && previewSlides ? (
+              ) : previewType === "pptx" && previewSlides && previewSlides.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", flex: 1, minHeight: 0 }}>
                   {viewStyle === "slideshow" ? (
                     <div style={{ 

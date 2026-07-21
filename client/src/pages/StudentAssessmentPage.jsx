@@ -21,16 +21,24 @@ export default function StudentAssessmentPage() {
 
   const [assessments, setAssessments] = useState([]);
   const [courseInfo, setCourseInfo] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [courseLoading, setCourseLoading] = useState(Boolean(courseId));
 
   useEffect(() => {
     fetchAssessments();
     if (courseId) {
+      setCourseLoading(true);
       api.get(`/courses/${courseId}`)
-        .then((res) => setCourseInfo(res.data.course))
-        .catch(() => {});
+        .then((res) => {
+          setCourseInfo(res.data.course);
+        })
+        .catch(() => {})
+        .finally(() => {
+          setCourseLoading(false);
+        });
     } else {
       setCourseInfo(null);
+      setCourseLoading(false);
     }
   }, [courseId]);
 
@@ -46,10 +54,14 @@ export default function StudentAssessmentPage() {
     }
   };
 
-  const displayedAssessments = courseInfo
-    ? assessments.filter(
-        (a) => (a.courseCode || "").trim().toLowerCase() === (courseInfo.displayCode || "").trim().toLowerCase()
-      )
+  const isDataLoading = loading || (Boolean(courseId) && courseLoading);
+
+  const displayedAssessments = courseId
+    ? (courseInfo
+        ? assessments.filter(
+            (a) => (a.courseCode || "").trim().toLowerCase() === (courseInfo.displayCode || "").trim().toLowerCase()
+          )
+        : [])
     : assessments;
 
   return (
@@ -87,7 +99,7 @@ export default function StudentAssessmentPage() {
             </h2>
           </div>
 
-          {loading ? (
+          {isDataLoading ? (
             <div className="loading-state" style={{ padding: "40px 0" }}>
               <div className="spinner" style={{ margin: "0 auto" }}></div>
             </div>

@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "client/src/components/StudentSidebar.jsx": {
-    "mtime": 1784389182.2775483,
-    "ast_hash": "b8038d3bbfd1d9c03c62aac68ace3722",
+    "mtime": 1784667959.0470767,
+    "ast_hash": "4e6353cc7599b11fc7e9e6f424494083",
     "semantic_hash": ""
   },
   "client/src/components/common/Navbar.jsx": {
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssessmentPage.jsx": {
-    "mtime": 1784209822.9969327,
-    "ast_hash": "53ecf0efd8578e9d43e6c4e71b40a717",
+    "mtime": 1784667974.325468,
+    "ast_hash": "5372e893415341f572111486a2869e79",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssignmentPage.jsx": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentDashboard.jsx": {
-    "mtime": 1784659047.7119985,
-    "ast_hash": "95d264c40f0b2e9210e76f75742ea53b",
+    "mtime": 1784667945.7061093,
+    "ast_hash": "6361d298be65576658a1a981a9cf6bf5",
     "semantic_hash": ""
   },
   "client/src/pages/StudentExamPage.jsx": {
@@ -140,8 +140,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssessmentPage.jsx": {
-    "mtime": 1784209846.0066211,
-    "ast_hash": "440a7845c1b278497a86bb4407f3dfde",
+    "mtime": 1784667968.5925696,
+    "ast_hash": "a4455d5c67a6017f2e52021898dfb5ba",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1784659047.7129989,
-    "ast_hash": "fd81747786b60761f0cb887c249646eb",
+    "mtime": 1784667949.7572255,
+    "ast_hash": "7de493b96d65d5f1ab525e2d88d401f6",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -505,8 +505,8 @@
     "semantic_hash": ""
   },
   "client/src/components/TeacherSidebar.jsx": {
-    "mtime": 1784389170.9737637,
-    "ast_hash": "7857d3b6ee9e86604467db42cc403fff",
+    "mtime": 1784667954.497125,
+    "ast_hash": "833f166d1f8fb0be724c05c1a67a793e",
     "semantic_hash": ""
   },
   "client/src/pages/CourseAnalyticsPage.jsx": {

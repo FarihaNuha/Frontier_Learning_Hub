@@ -175,6 +175,36 @@ function extractSlideElements(slideXmlText) {
     }
   }
   
+  if (elements.length === 0) {
+    const pMatches = slideXmlText.match(/<a:p[\s>][\s\S]*?<\/a:p>/g) || [];
+    const fallbackParagraphs = [];
+    for (const pXml of pMatches) {
+      const tMatches = pXml.match(/<a:t>([^<]*)<\/a:t>/g) || [];
+      const text = tMatches.map((m) => m.replace(/<\/?a:t>/g, "")).join("").trim();
+      if (text) {
+        const isBold = pXml.includes('b="1"') || pXml.includes('b="true"');
+        fallbackParagraphs.push({
+          text,
+          color: "#1e293b",
+          fontSize: 14,
+          isBold,
+          isItalic: false,
+          isBullet: false,
+        });
+      }
+    }
+    if (fallbackParagraphs.length > 0) {
+      elements.push({
+        type: "text",
+        x: 0,
+        y: 0,
+        sz: 14,
+        isTitle: false,
+        content: fallbackParagraphs,
+      });
+    }
+  }
+
   return elements;
 }
 
@@ -417,14 +447,24 @@ async function extractPptxSlidesHtml(filePath) {
     const data = fs.readFileSync(filePath);
     const zip = await JSZip.loadAsync(data);
     
-    const slideFiles = Object.keys(zip.files).filter(name => name.startsWith("ppt/slides/slide") && name.endsWith(".xml"));
+    const slideFiles = Object.keys(zip.files).filter((name) => {
+      const n = name.toLowerCase();
+      return (
+        (n.startsWith("ppt/slides/slide") || n.includes("/slides/slide") || n.includes("slides/slide")) &&
+        n.endsWith(".xml") &&
+        !n.includes("_rels") &&
+        !n.includes("slidelayout") &&
+        !n.includes("slidemaster")
+      );
+    });
+
     if (slideFiles.length === 0) {
       return "<p style='color: #6b89a0; text-align: center;'>No slides found in this presentation.</p>";
     }
 
     slideFiles.sort((a, b) => {
-      const numA = parseInt(a.replace("ppt/slides/slide", "").replace(".xml", ""), 10);
-      const numB = parseInt(b.replace("ppt/slides/slide", "").replace(".xml", ""), 10);
+      const numA = parseInt((a.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
+      const numB = parseInt((b.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
       return numA - numB;
     });
 
@@ -501,14 +541,24 @@ async function extractPptxSlidesArray(filePath) {
     const data = fs.readFileSync(filePath);
     const zip = await JSZip.loadAsync(data);
     
-    const slideFiles = Object.keys(zip.files).filter(name => name.startsWith("ppt/slides/slide") && name.endsWith(".xml"));
+    const slideFiles = Object.keys(zip.files).filter((name) => {
+      const n = name.toLowerCase();
+      return (
+        (n.startsWith("ppt/slides/slide") || n.includes("/slides/slide") || n.includes("slides/slide")) &&
+        n.endsWith(".xml") &&
+        !n.includes("_rels") &&
+        !n.includes("slidelayout") &&
+        !n.includes("slidemaster")
+      );
+    });
+
     if (slideFiles.length === 0) {
       return [];
     }
 
     slideFiles.sort((a, b) => {
-      const numA = parseInt(a.replace("ppt/slides/slide", "").replace(".xml", ""), 10);
-      const numB = parseInt(b.replace("ppt/slides/slide", "").replace(".xml", ""), 10);
+      const numA = parseInt((a.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
+      const numB = parseInt((b.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
       return numA - numB;
     });
 

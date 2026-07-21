@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
-    "mtime": 1784662624.6899202,
-    "ast_hash": "fdf8611b6a754d26223448ca9141e05b",
+    "mtime": 1784663570.289932,
+    "ast_hash": "cc032d9939fff10a0d0a945c93d9b24f",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "server/controllers/attendanceController.js": {
-    "mtime": 1784662613.5324042,
-    "ast_hash": "5f717f477bfb330260308690ed843ffc",
+    "mtime": 1784663558.3189151,
+    "ast_hash": "e96f0b8fa631d209d09f1d13e21656e2",
     "semantic_hash": ""
   },
   "server/controllers/authController.js": {
@@ -285,8 +285,8 @@
     "semantic_hash": ""
   },
   "server/models/Course.js": {
-    "mtime": 1784662604.529456,
-    "ast_hash": "84983bb2c93c43b755e9ad827e0d6c9d",
+    "mtime": 1784663545.9049706,
+    "ast_hash": "d7f4622e546aa9423854645c7c5b25c1",
     "semantic_hash": ""
   },
   "server/models/Department.js": {

@@ -195,6 +195,19 @@ exports.getCourse = async (req, res) => {
       return res.status(404).json({ error: "Course not found" });
     }
 
+    let modified = false;
+    if (course.labFormula && course.labFormula.startsWith("=ROUND(")) {
+      course.labFormula = course.labFormula.replace("=ROUND(", "=ROUNDUP(");
+      modified = true;
+    }
+    if (course.theoryFormula && course.theoryFormula.startsWith("=ROUND(")) {
+      course.theoryFormula = course.theoryFormula.replace("=ROUND(", "=ROUNDUP(");
+      modified = true;
+    }
+    if (modified) {
+      await course.save().catch(() => {});
+    }
+
     res.json({ course });
   } catch (error) {
     res.status(500).json({ error: error.message });

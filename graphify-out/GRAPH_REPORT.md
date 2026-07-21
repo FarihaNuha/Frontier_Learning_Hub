@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-07-22)
 
 ## Corpus Check
-- 110 files · ~94,061 words
+- 110 files · ~94,253 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 711 nodes · 1173 edges · 41 communities (31 shown, 10 thin omitted)
+- 711 nodes · 1173 edges · 41 communities (32 shown, 9 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8a5dcae5`
+- Built from commit: `b84e6cb0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -80,7 +80,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (41 total, 10 thin omitted)
+## Communities (41 total, 9 thin omitted)
 
 ### Community 0 - "App.jsx"
 Cohesion: 0.07
@@ -115,8 +115,8 @@ Cohesion: 0.07
 Nodes (18): Attendance, Course, evalArithmetic(), evaluateExcelFormula(), getAttendance(), getAttendanceStats(), markAttendance(), IMPORTANT: Filter only students, not teachers (+10 more)
 
 ### Community 8 - "lectureController.js"
-Cohesion: 0.10
-Nodes (22): axios, jwt, mongoose, test(), Course, deleteLecture(), downloadLecture(), fs (+14 more)
+Cohesion: 0.11
+Nodes (20): Course, deleteLecture(), downloadLecture(), fs, { getIO }, getLectures(), jwt, Lecture (+12 more)
 
 ### Community 9 - "examController.js"
 Cohesion: 0.25
@@ -166,6 +166,10 @@ Nodes (3): @opencode-ai/plugin, dependencies, @opencode-ai/plugin
 Cohesion: 0.50
 Nodes (3): plugin, $schema, .opencode/plugins/graphify.js
 
+### Community 21 - "upload.js"
+Cohesion: 0.40
+Nodes (4): axios, jwt, mongoose, test()
+
 ### Community 23 - "scripts"
 Cohesion: 0.11
 Nodes (14): mongoose, allowedOrigins, app, connectDB, cors, dns, express, fs (+6 more)
@@ -193,7 +197,7 @@ Nodes (4): assessmentSchema, mongoose, Assessment, mongoose
 ## Knowledge Gaps
 - **321 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+316 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

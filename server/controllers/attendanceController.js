@@ -12,8 +12,20 @@ exports.getTeacherCourses = async (req, res) => {
       isActive: true,
     }).select("name displayCode _id department theoryFormula labFormula theoryTotalClasses labTotalClasses");
 
-    console.log("Teacher ID:", req.user.uid);
-    console.log("Courses found:", courses.length);
+    for (const c of courses) {
+      let mod = false;
+      if (c.labFormula && c.labFormula.startsWith("=ROUND(")) {
+        c.labFormula = c.labFormula.replace("=ROUND(", "=ROUNDUP(");
+        mod = true;
+      }
+      if (c.theoryFormula && c.theoryFormula.startsWith("=ROUND(")) {
+        c.theoryFormula = c.theoryFormula.replace("=ROUND(", "=ROUNDUP(");
+        mod = true;
+      }
+      if (mod) {
+        await c.save().catch(() => {});
+      }
+    }
 
     res.json({ courses });
   } catch (error) {
@@ -251,6 +263,19 @@ exports.getAttendanceStats = async (req, res) => {
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ error: "Course not found" });
+    }
+
+    let mod = false;
+    if (course.labFormula && course.labFormula.startsWith("=ROUND(")) {
+      course.labFormula = course.labFormula.replace("=ROUND(", "=ROUNDUP(");
+      mod = true;
+    }
+    if (course.theoryFormula && course.theoryFormula.startsWith("=ROUND(")) {
+      course.theoryFormula = course.theoryFormula.replace("=ROUND(", "=ROUNDUP(");
+      mod = true;
+    }
+    if (mod) {
+      await course.save().catch(() => {});
     }
 
     const isLab = (detectedClassType || "theory") === "lab";

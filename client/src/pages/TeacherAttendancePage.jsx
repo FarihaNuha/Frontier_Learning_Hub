@@ -113,8 +113,14 @@ export default function TeacherAttendancePage({
       setCourseId(course._id);
       setCourseName(course.name);
       setCourseCode(course.displayCode);
-      setTheoryFormula(course.theoryFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
-      setLabFormula(course.labFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+      const fixLegacyFormula = (f, def) => {
+        if (!f) return def;
+        if (f.startsWith("=ROUND(")) return f.replace("=ROUND(", "=ROUNDUP(");
+        return f;
+      };
+
+      setTheoryFormula(fixLegacyFormula(course.theoryFormula, "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)"));
+      setLabFormula(fixLegacyFormula(course.labFormula, "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)"));
       setTheoryTotalClasses(course.theoryTotalClasses !== undefined ? course.theoryTotalClasses : 28);
       setLabTotalClasses(course.labTotalClasses !== undefined ? course.labTotalClasses : 14);
 
@@ -139,8 +145,14 @@ export default function TeacherAttendancePage({
         setCourseId(firstCourse._id);
         setCourseName(firstCourse.name);
         setCourseCode(firstCourse.displayCode);
-        setTheoryFormula(firstCourse.theoryFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
-        setLabFormula(firstCourse.labFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+        const fixLegacyFormula = (f, def) => {
+          if (!f) return def;
+          if (f.startsWith("=ROUND(")) return f.replace("=ROUND(", "=ROUNDUP(");
+          return f;
+        };
+
+        setTheoryFormula(fixLegacyFormula(firstCourse.theoryFormula, "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)"));
+        setLabFormula(fixLegacyFormula(firstCourse.labFormula, "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)"));
         setTheoryTotalClasses(firstCourse.theoryTotalClasses !== undefined ? firstCourse.theoryTotalClasses : 28);
         setLabTotalClasses(firstCourse.labTotalClasses !== undefined ? firstCourse.labTotalClasses : 14);
       } else {

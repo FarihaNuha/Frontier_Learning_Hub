@@ -52,7 +52,10 @@ export default function TeacherAttendancePage({
   const [studentStats, setStudentStats] = useState({});
   const [theoryFormula, setTheoryFormula] = useState("=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
   const [labFormula, setLabFormula] = useState("=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+  const [theoryTotalClasses, setTheoryTotalClasses] = useState(28);
+  const [labTotalClasses, setLabTotalClasses] = useState(14);
   const [formulaInput, setFormulaInput] = useState("");
+  const [totalClassesInput, setTotalClassesInput] = useState(28);
   const [appliedClassType, setAppliedClassType] = useState(null);
 
   const [gridMonth, setGridMonth] = useState(new Date().getMonth());
@@ -112,6 +115,8 @@ export default function TeacherAttendancePage({
       setCourseCode(course.displayCode);
       setTheoryFormula(course.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
       setLabFormula(course.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+      setTheoryTotalClasses(course.theoryTotalClasses !== undefined ? course.theoryTotalClasses : 28);
+      setLabTotalClasses(course.labTotalClasses !== undefined ? course.labTotalClasses : 14);
 
       toast.success(`Managing: ${course.displayCode} - ${course.name}`);
     } catch (error) {
@@ -136,6 +141,8 @@ export default function TeacherAttendancePage({
         setCourseCode(firstCourse.displayCode);
         setTheoryFormula(firstCourse.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
         setLabFormula(firstCourse.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+        setTheoryTotalClasses(firstCourse.theoryTotalClasses !== undefined ? firstCourse.theoryTotalClasses : 28);
+        setLabTotalClasses(firstCourse.labTotalClasses !== undefined ? firstCourse.labTotalClasses : 14);
       } else {
         toast.error("No course assigned to you");
       }
@@ -381,7 +388,8 @@ export default function TeacherAttendancePage({
 
   useEffect(() => {
     setFormulaInput(classType === "lab" ? labFormula : theoryFormula);
-  }, [classType, theoryFormula, labFormula]);
+    setTotalClassesInput(classType === "lab" ? labTotalClasses : theoryTotalClasses);
+  }, [classType, theoryFormula, labFormula, theoryTotalClasses, labTotalClasses]);
 
   useEffect(() => {
     const hasTheoryRecords = attendanceHistory.some(a => a.classType === "theory");
@@ -399,10 +407,13 @@ export default function TeacherAttendancePage({
     try {
       setLoading(true);
       const payload = {};
+      const numTotalClasses = Math.max(1, parseInt(totalClassesInput, 10) || (classType === "lab" ? 14 : 28));
       if (classType === "lab") {
         payload.labFormula = formulaInput;
+        payload.labTotalClasses = numTotalClasses;
       } else {
         payload.theoryFormula = formulaInput;
+        payload.theoryTotalClasses = numTotalClasses;
       }
       
       const res = await api.put(`/attendance/courses/${courseId}/formulas`, payload);
@@ -410,9 +421,11 @@ export default function TeacherAttendancePage({
       
       setTheoryFormula(updatedCourse.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
       setLabFormula(updatedCourse.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+      setTheoryTotalClasses(updatedCourse.theoryTotalClasses !== undefined ? updatedCourse.theoryTotalClasses : 28);
+      setLabTotalClasses(updatedCourse.labTotalClasses !== undefined ? updatedCourse.labTotalClasses : 14);
       setAppliedClassType(classType);
       
-      toast.success("Excel Formula saved successfully!");
+      toast.success("Settings & Total Classes saved successfully!");
       
       // Force reload statistics
       const studentsRes = await api.get(`/attendance/students/${courseId}`);
@@ -425,14 +438,15 @@ export default function TeacherAttendancePage({
     }
   };
 
-  const evaluateExcelFormula = (formula, present, credit) => {
+  const evaluateExcelFormula = (formula, present, credit, customTotalClasses) => {
     try {
       let expr = (formula || "").trim();
       if (!expr) return 0;
       if (expr.startsWith("=")) {
         expr = expr.substring(1);
       }
-      const percentage = (present / 28) * 100;
+      const activeTotalClasses = customTotalClasses || (classType === "lab" ? labTotalClasses : theoryTotalClasses) || (classType === "lab" ? 14 : 28);
+      const percentage = (present / activeTotalClasses) * 100;
       expr = expr.replace(/E5|Percentage/gi, percentage);
       expr = expr.replace(/D5|Present/gi, present);
       expr = expr.replace(/Credit/gi, credit);
@@ -1064,81 +1078,108 @@ export default function TeacherAttendancePage({
                   (Variables: <code>Percentage</code> = (Present/TotalClasses)*100, <code>Credit</code> = {classType === "lab" ? "1 (Lab)" : "3 (Theory)"}, Max Marks: {classType === "lab" ? 10 : 30})
                 </span>
               </div>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <span style={{ fontWeight: 700, color: "#0369a1", fontSize: 15, whiteSpace: "nowrap" }}>fx =</span>
-                <input
-                  type="text"
-                  value={formulaInput}
-                  onChange={(e) => setFormulaInput(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: "6px 10px",
-                    border: "1.5px solid #bae6fd",
-                    borderRadius: 6,
-                    fontFamily: "monospace",
-                    fontSize: 13,
-                    background: "white",
-                    color: "#0f172a",
-                    outline: "none",
-                  }}
-                  placeholder="e.g. =ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)"
-                  onKeyDown={(e) => { if (e.key === "Enter") handleSaveFormula(); }}
-                />
-                <button
-                  onClick={handleSaveFormula}
-                  disabled={loading}
-                  style={{
-                    padding: "6px 16px",
-                    background: "#0369a1",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 6,
-                    fontWeight: 600,
-                    cursor: loading ? "not-allowed" : "pointer",
-                    fontSize: 13,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {loading ? "Saving…" : "✔ Apply"}
-                </button>
-                <button
-                  onClick={() => {
-                    const defaultFormula = classType === "lab" 
-                      ? "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)" 
-                      : "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)";
-                    setFormulaInput(defaultFormula);
-                    toast.success("Reset to default system formula!");
-                  }}
-                  style={{
-                    padding: "6px 12px",
-                    background: "transparent",
-                    color: "#64748b",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: 6,
-                    cursor: "pointer",
-                    fontSize: 13,
-                  }}
-                  title="Reset to system default formula"
-                >
-                  ↩ Reset
-                </button>
+              <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <strong style={{ color: "#0369a1", fontSize: 13, whiteSpace: "nowrap" }}>Total Classes Count:</strong>
+                  <input
+                    type="number"
+                    min="1"
+                    value={totalClassesInput}
+                    onChange={(e) => setTotalClassesInput(e.target.value)}
+                    style={{
+                      width: 70,
+                      padding: "6px 8px",
+                      border: "1.5px solid #bae6fd",
+                      borderRadius: 6,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      textAlign: "center",
+                      background: "white",
+                      color: "#0369a1",
+                      outline: "none",
+                    }}
+                    title={`Default: ${classType === "lab" ? 14 : 28}`}
+                  />
+                </div>
+                <div style={{ display: "flex", flex: 1, gap: 8, alignItems: "center", minWidth: 280 }}>
+                  <span style={{ fontWeight: 700, color: "#0369a1", fontSize: 15, whiteSpace: "nowrap" }}>fx =</span>
+                  <input
+                    type="text"
+                    value={formulaInput}
+                    onChange={(e) => setFormulaInput(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: "6px 10px",
+                      border: "1.5px solid #bae6fd",
+                      borderRadius: 6,
+                      fontFamily: "monospace",
+                      fontSize: 13,
+                      background: "white",
+                      color: "#0f172a",
+                      outline: "none",
+                    }}
+                    placeholder="e.g. =ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)"
+                    onKeyDown={(e) => { if (e.key === "Enter") handleSaveFormula(); }}
+                  />
+                  <button
+                    onClick={handleSaveFormula}
+                    disabled={loading}
+                    style={{
+                      padding: "6px 16px",
+                      background: "#0369a1",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 6,
+                      fontWeight: 600,
+                      cursor: loading ? "not-allowed" : "pointer",
+                      fontSize: 13,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {loading ? "Saving…" : "✔ Save Settings"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const defaultFormula = classType === "lab" 
+                        ? "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)" 
+                        : "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)";
+                      const defaultTotal = classType === "lab" ? 14 : 28;
+                      setFormulaInput(defaultFormula);
+                      setTotalClassesInput(defaultTotal);
+                      toast.success("Reset to default system formula and total classes!");
+                    }}
+                    style={{
+                      padding: "6px 12px",
+                      background: "transparent",
+                      color: "#64748b",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      fontSize: 13,
+                    }}
+                    title="Reset to system default formula & total classes"
+                  >
+                    ↩ Reset
+                  </button>
+                </div>
               </div>
               {(() => {
-                const totalCls = attendanceHistory.filter(a => a.classType === classType).length || 28;
-                const halfCls = Math.round(totalCls / 2);
+                const activeTotal = parseInt(totalClassesInput, 10) || (classType === "lab" ? 14 : 28);
+                const halfCls = Math.round(activeTotal / 2);
                 return (
                   <div style={{ marginTop: 6, fontSize: 12, color: "#64748b" }}>
-                    Preview for 1 present:{" "}
+                    Formula: <code style={{ color: "#0369a1", fontWeight: 600 }}>Percentage = (Present / {activeTotal}) * 100</code>
+                    {" "}| Preview for 1 present:{" "}
                     <strong style={{ color: "#0369a1" }}>
-                      {evaluateExcelFormula(formulaInput, 1, classType === "lab" ? 1 : 3)} marks
+                      {evaluateExcelFormula(formulaInput, 1, classType === "lab" ? 1 : 3, activeTotal)} marks
                     </strong>
                     {" "} | For {halfCls} present:{" "}
                     <strong style={{ color: "#10B981" }}>
-                      {evaluateExcelFormula(formulaInput, halfCls, classType === "lab" ? 1 : 3)} marks
+                      {evaluateExcelFormula(formulaInput, halfCls, classType === "lab" ? 1 : 3, activeTotal)} marks
                     </strong>
-                    {" "} | For {totalCls} present:{" "}
+                    {" "} | For {activeTotal} present:{" "}
                     <strong style={{ color: "#10B981" }}>
-                      {evaluateExcelFormula(formulaInput, totalCls, classType === "lab" ? 1 : 3)} marks
+                      {evaluateExcelFormula(formulaInput, activeTotal, classType === "lab" ? 1 : 3, activeTotal)} marks
                     </strong>
                   </div>
                 );
@@ -1175,7 +1216,8 @@ export default function TeacherAttendancePage({
                         present: 0,
                         attendanceMarks: 0,
                       };
-                      const percentageVal = ((stats.present / 28) * 100).toFixed(1);
+                      const activeTotal = classType === "lab" ? labTotalClasses : theoryTotalClasses;
+                      const percentageVal = activeTotal > 0 ? ((stats.present / activeTotal) * 100).toFixed(1) : "0.0";
                       return (
                         <tr key={r.studentId}>
                           <td>{i + 1}</td>

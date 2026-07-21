@@ -10,7 +10,7 @@ exports.getTeacherCourses = async (req, res) => {
     const courses = await Course.find({
       teacher: req.user.uid,
       isActive: true,
-    }).select("name displayCode _id department theoryFormula labFormula");
+    }).select("name displayCode _id department theoryFormula labFormula theoryTotalClasses labTotalClasses");
 
     console.log("Teacher ID:", req.user.uid);
     console.log("Courses found:", courses.length);
@@ -253,29 +253,38 @@ exports.getAttendanceStats = async (req, res) => {
       return res.status(404).json({ error: "Course not found" });
     }
 
-    const credit = (detectedClassType || "theory") === "lab" ? 1 : 3;
-    const formulaString = (detectedClassType || "theory") === "lab"
+    const isLab = (detectedClassType || "theory") === "lab";
+    const credit = isLab ? 1 : 3;
+    const formulaString = isLab
       ? (course.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)")
       : (course.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
 
-    // Calculate percentage based on 28 classes as in the Excel sheet
-    const percentage = parseFloat(((present / 28) * 100).toFixed(8));
+    const totalClassesForType = isLab
+      ? (course.labTotalClasses !== undefined && course.labTotalClasses !== null ? course.labTotalClasses : 14)
+      : (course.theoryTotalClasses !== undefined && course.theoryTotalClasses !== null ? course.theoryTotalClasses : 28);
+
+    // Calculate percentage based on totalClassesForType (Present / Total Class Count) * 100
+    const percentage = totalClassesForType > 0
+      ? parseFloat(((present / totalClassesForType) * 100).toFixed(8))
+      : 0;
     
-    // Evaluate marks dynamically using the formulaString and 28 classes as the denominator
-    const attendanceMarks = evaluateExcelFormula(formulaString, present, credit, 28);
+    // Evaluate marks dynamically using the formulaString and totalClassesForType as the denominator
+    const attendanceMarks = evaluateExcelFormula(formulaString, present, credit, totalClassesForType);
     const maxAttendanceMarks = 10 * credit;
 
     res.json({
-      totalClasses: totalClasses,
+      totalClasses: totalClassesForType,
       actualTotalClasses: totalClasses,
       present,
-      absent: Math.max(0, totalClasses - present),
+      absent: Math.max(0, totalClassesForType - present),
       percentage: parseFloat(percentage.toFixed(1)),
       maxAttendanceMarks,
       attendanceMarks,
       classType: detectedClassType || "theory",
       theoryFormula: course.theoryFormula,
       labFormula: course.labFormula,
+      theoryTotalClasses: course.theoryTotalClasses || 28,
+      labTotalClasses: course.labTotalClasses || 14,
     });
   } catch (error) {
     console.error("Stats error:", error);
@@ -291,7 +300,7 @@ exports.getStudentCourses = async (req, res) => {
     const courses = await Course.find({
       students: req.user.uid,
       isActive: true,
-    }).select("name displayCode _id department theoryFormula labFormula");
+    }).select("name displayCode _id department theoryFormula labFormula theoryTotalClasses labTotalClasses");
 
     res.json({ courses });
   } catch (error) {
@@ -304,11 +313,13 @@ exports.getStudentCourses = async (req, res) => {
 exports.updateCourseFormulas = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { theoryFormula, labFormula } = req.body;
+    const { theoryFormula, labFormula, theoryTotalClasses, labTotalClasses } = req.body;
 
     const updatePayload = {};
     if (theoryFormula !== undefined) updatePayload.theoryFormula = theoryFormula;
     if (labFormula !== undefined) updatePayload.labFormula = labFormula;
+    if (theoryTotalClasses !== undefined) updatePayload.theoryTotalClasses = Number(theoryTotalClasses);
+    if (labTotalClasses !== undefined) updatePayload.labTotalClasses = Number(labTotalClasses);
 
     const course = await Course.findOneAndUpdate(
       { _id: courseId, teacher: req.user.uid },
@@ -338,7 +349,8 @@ function evaluateExcelFormula(formula, present, credit, totalClasses) {
       expr = expr.substring(1);
     }
     
-    const percentage = (present / 28) * 100;
+    const totalCls = (totalClasses && totalClasses > 0) ? totalClasses : (credit === 1 ? 14 : 28);
+    const percentage = (present / totalCls) * 100;
     
     // Replace variables (case-insensitive)
     expr = expr.replace(/E5|Percentage/gi, percentage);

@@ -47,6 +47,14 @@ const courseSchema = new mongoose.Schema({
     type: String,
     default: "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)",
   },
+  theoryTotalClasses: {
+    type: Number,
+    default: 28,
+  },
+  labTotalClasses: {
+    type: Number,
+    default: 14,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

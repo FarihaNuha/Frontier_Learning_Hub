@@ -41,11 +41,11 @@ const courseSchema = new mongoose.Schema({
   },
   theoryFormula: {
     type: String,
-    default: "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)",
+    default: "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)",
   },
   labFormula: {
     type: String,
-    default: "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)",
+    default: "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)",
   },
   theoryTotalClasses: {
     type: Number,

@@ -256,8 +256,8 @@ exports.getAttendanceStats = async (req, res) => {
     const isLab = (detectedClassType || "theory") === "lab";
     const credit = isLab ? 1 : 3;
     const formulaString = isLab
-      ? (course.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)")
-      : (course.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
+      ? (course.labFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)")
+      : (course.theoryFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
 
     const totalClassesForType = isLab
       ? (course.labTotalClasses !== undefined && course.labTotalClasses !== null ? course.labTotalClasses : 14)
@@ -357,14 +357,37 @@ function evaluateExcelFormula(formula, present, credit, totalClasses) {
     expr = expr.replace(/D5|Present/gi, present);
     expr = expr.replace(/Credit/gi, credit);
     
-    let roundMatch;
-    while ((roundMatch = expr.match(/ROUND\(([^,]+),\s*(\d+)\)/i)) !== null) {
-      const fullMatch = roundMatch[0];
-      const innerExpr = roundMatch[1];
-      const decimals = parseInt(roundMatch[2], 10);
-      
+    let match;
+    // ROUNDUP(expr, decimals)
+    while ((match = expr.match(/ROUNDUP\(([^,]+),\s*(\d+)\)/i)) !== null) {
+      const fullMatch = match[0];
+      const innerExpr = match[1];
+      const decimals = parseInt(match[2], 10);
       const innerVal = evalArithmetic(innerExpr);
-      const roundedVal = Math.round(innerVal * Math.pow(10, decimals)) / Math.pow(10, decimals);
+      const factor = Math.pow(10, decimals);
+      const roundedVal = Math.ceil(innerVal * factor) / factor;
+      expr = expr.replace(fullMatch, roundedVal);
+    }
+
+    // ROUNDDOWN(expr, decimals)
+    while ((match = expr.match(/ROUNDDOWN\(([^,]+),\s*(\d+)\)/i)) !== null) {
+      const fullMatch = match[0];
+      const innerExpr = match[1];
+      const decimals = parseInt(match[2], 10);
+      const innerVal = evalArithmetic(innerExpr);
+      const factor = Math.pow(10, decimals);
+      const roundedVal = Math.floor(innerVal * factor) / factor;
+      expr = expr.replace(fullMatch, roundedVal);
+    }
+
+    // ROUND(expr, decimals)
+    while ((match = expr.match(/ROUND\(([^,]+),\s*(\d+)\)/i)) !== null) {
+      const fullMatch = match[0];
+      const innerExpr = match[1];
+      const decimals = parseInt(match[2], 10);
+      const innerVal = evalArithmetic(innerExpr);
+      const factor = Math.pow(10, decimals);
+      const roundedVal = Math.round(innerVal * factor) / factor;
       expr = expr.replace(fullMatch, roundedVal);
     }
     

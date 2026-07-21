@@ -50,8 +50,8 @@ export default function TeacherAttendancePage({
   const [classType, setClassType] = useState("theory");
   const [saved, setSaved] = useState(false);
   const [studentStats, setStudentStats] = useState({});
-  const [theoryFormula, setTheoryFormula] = useState("=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
-  const [labFormula, setLabFormula] = useState("=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+  const [theoryFormula, setTheoryFormula] = useState("=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
+  const [labFormula, setLabFormula] = useState("=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
   const [theoryTotalClasses, setTheoryTotalClasses] = useState(28);
   const [labTotalClasses, setLabTotalClasses] = useState(14);
   const [formulaInput, setFormulaInput] = useState("");
@@ -113,8 +113,8 @@ export default function TeacherAttendancePage({
       setCourseId(course._id);
       setCourseName(course.name);
       setCourseCode(course.displayCode);
-      setTheoryFormula(course.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
-      setLabFormula(course.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+      setTheoryFormula(course.theoryFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
+      setLabFormula(course.labFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
       setTheoryTotalClasses(course.theoryTotalClasses !== undefined ? course.theoryTotalClasses : 28);
       setLabTotalClasses(course.labTotalClasses !== undefined ? course.labTotalClasses : 14);
 
@@ -139,8 +139,8 @@ export default function TeacherAttendancePage({
         setCourseId(firstCourse._id);
         setCourseName(firstCourse.name);
         setCourseCode(firstCourse.displayCode);
-        setTheoryFormula(firstCourse.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
-        setLabFormula(firstCourse.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+        setTheoryFormula(firstCourse.theoryFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
+        setLabFormula(firstCourse.labFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
         setTheoryTotalClasses(firstCourse.theoryTotalClasses !== undefined ? firstCourse.theoryTotalClasses : 28);
         setLabTotalClasses(firstCourse.labTotalClasses !== undefined ? firstCourse.labTotalClasses : 14);
       } else {
@@ -419,8 +419,8 @@ export default function TeacherAttendancePage({
       const res = await api.put(`/attendance/courses/${courseId}/formulas`, payload);
       const updatedCourse = res.data.course;
       
-      setTheoryFormula(updatedCourse.theoryFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
-      setLabFormula(updatedCourse.labFormula || "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
+      setTheoryFormula(updatedCourse.theoryFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
+      setLabFormula(updatedCourse.labFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
       setTheoryTotalClasses(updatedCourse.theoryTotalClasses !== undefined ? updatedCourse.theoryTotalClasses : 28);
       setLabTotalClasses(updatedCourse.labTotalClasses !== undefined ? updatedCourse.labTotalClasses : 14);
       setAppliedClassType(classType);
@@ -451,14 +451,37 @@ export default function TeacherAttendancePage({
       expr = expr.replace(/D5|Present/gi, present);
       expr = expr.replace(/Credit/gi, credit);
       
-      let roundMatch;
-      while ((roundMatch = expr.match(/ROUND\(([^,]+),\s*(\d+)\)/i)) !== null) {
-        const fullMatch = roundMatch[0];
-        const innerExpr = roundMatch[1];
-        const decimals = parseInt(roundMatch[2], 10);
-        
+      let match;
+      // ROUNDUP(expr, decimals)
+      while ((match = expr.match(/ROUNDUP\(([^,]+),\s*(\d+)\)/i)) !== null) {
+        const fullMatch = match[0];
+        const innerExpr = match[1];
+        const decimals = parseInt(match[2], 10);
         const innerVal = evalArithmetic(innerExpr);
-        const roundedVal = Math.round(innerVal * Math.pow(10, decimals)) / Math.pow(10, decimals);
+        const factor = Math.pow(10, decimals);
+        const roundedVal = Math.ceil(innerVal * factor) / factor;
+        expr = expr.replace(fullMatch, roundedVal);
+      }
+
+      // ROUNDDOWN(expr, decimals)
+      while ((match = expr.match(/ROUNDDOWN\(([^,]+),\s*(\d+)\)/i)) !== null) {
+        const fullMatch = match[0];
+        const innerExpr = match[1];
+        const decimals = parseInt(match[2], 10);
+        const innerVal = evalArithmetic(innerExpr);
+        const factor = Math.pow(10, decimals);
+        const roundedVal = Math.floor(innerVal * factor) / factor;
+        expr = expr.replace(fullMatch, roundedVal);
+      }
+
+      // ROUND(expr, decimals)
+      while ((match = expr.match(/ROUND\(([^,]+),\s*(\d+)\)/i)) !== null) {
+        const fullMatch = match[0];
+        const innerExpr = match[1];
+        const decimals = parseInt(match[2], 10);
+        const innerVal = evalArithmetic(innerExpr);
+        const factor = Math.pow(10, decimals);
+        const roundedVal = Math.round(innerVal * factor) / factor;
         expr = expr.replace(fullMatch, roundedVal);
       }
       return evalArithmetic(expr);
@@ -1141,8 +1164,8 @@ export default function TeacherAttendancePage({
                   <button
                     onClick={() => {
                       const defaultFormula = classType === "lab" 
-                        ? "=ROUND((4 + 6 * (Percentage - 75) / 25) * 1, 0)" 
-                        : "=ROUND((4 + 6 * (Percentage - 75) / 25) * 3, 0)";
+                        ? "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)" 
+                        : "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)";
                       const defaultTotal = classType === "lab" ? 14 : 28;
                       setFormulaInput(defaultFormula);
                       setTotalClassesInput(defaultTotal);

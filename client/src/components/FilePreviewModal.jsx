@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiX, FiDownload, FiFile, FiEye } from "react-icons/fi";
 import * as docx from "docx-preview";
+import JSZip from "jszip";
 
 export default function FilePreviewModal({ isOpen, onClose, file }) {
   const [loading, setLoading] = useState(false);
@@ -8,6 +9,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
   const [textContent, setTextContent] = useState("");
   const [fileCategory, setFileCategory] = useState("other");
   const [docxBuffer, setDocxBuffer] = useState(null);
+  const [pptxSlides, setPptxSlides] = useState([]);
   const docxRef = useRef(null);
 
   useEffect(() => {
@@ -33,6 +35,8 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
       category = "pdf";
     } else if (type.includes("word") || type.includes("docx") || ext === "docx" || ext === "doc") {
       category = "docx";
+    } else if (type.includes("powerpoint") || type.includes("presentation") || ext === "pptx" || ext === "ppt") {
+      category = "pptx";
     } else if (type.includes("text") || ext === "txt") {
       category = "txt";
     }
@@ -52,6 +56,48 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
         if (category === "docx") {
           const buffer = await blob.arrayBuffer();
           setDocxBuffer(buffer);
+        } else if (category === "pptx") {
+          try {
+            const buffer = await blob.arrayBuffer();
+            const zip = await JSZip.loadAsync(buffer);
+            const slideFiles = Object.keys(zip.files).filter((name) => {
+              const n = name.toLowerCase();
+              return (
+                (n.startsWith("ppt/slides/slide") || n.includes("/slides/slide") || n.includes("slides/slide")) &&
+                n.endsWith(".xml") &&
+                !n.includes("_rels") &&
+                !n.includes("slidelayout") &&
+                !n.includes("slidemaster")
+              );
+            });
+
+            slideFiles.sort((a, b) => {
+              const numA = parseInt((a.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
+              const numB = parseInt((b.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
+              return numA - numB;
+            });
+
+            const parsedSlides = [];
+            for (let i = 0; i < slideFiles.length; i++) {
+              const slideXmlText = await zip.files[slideFiles[i]].async("text");
+              const pMatches = slideXmlText.match(/<a:p[\s>][\s\S]*?<\/a:p>/g) || [];
+              const paragraphs = [];
+              for (const pXml of pMatches) {
+                const tMatches = pXml.match(/<a:t>([^<]*)<\/a:t>/g) || [];
+                const text = tMatches.map((m) => m.replace(/<\/?a:t>/g, "")).join("").trim();
+                if (text) {
+                  paragraphs.push(text);
+                }
+              }
+              parsedSlides.push({
+                slideNum: i + 1,
+                text: paragraphs.join("\n") || "[Visual Slide Presentation]"
+              });
+            }
+            setPptxSlides(parsedSlides);
+          } catch (err) {
+            console.error("PPTX client parse error:", err);
+          }
         } else if (category === "txt") {
           const text = await blob.text();
           setTextContent(text);
@@ -191,6 +237,22 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
             <audio src={blobUrl || downloadUrl} controls style={{ width: "100%" }} />
           ) : fileCategory === "docx" ? (
             <div ref={docxRef} style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", background: "#ffffff", padding: "20px", borderRadius: "10px" }} />
+          ) : fileCategory === "pptx" ? (
+            <div style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", padding: "12px", background: "#ffffff", borderRadius: "10px" }}>
+              <h4 style={{ margin: "0 0 16px", color: "#2c4b66", fontSize: "16px" }}>Presentation Slides Preview ({pptxSlides.length})</h4>
+              {pptxSlides.length === 0 ? (
+                <p style={{ color: "#64748b", fontStyle: "italic", textAlign: "center" }}>No slide text extracted. Please download file to view.</p>
+              ) : (
+                pptxSlides.map((slide, idx) => (
+                  <div key={idx} style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "12px", padding: "20px", marginBottom: "16px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                    <h5 style={{ color: "#0284c7", margin: "0 0 10px 0", fontSize: "15px", borderBottom: "1px solid #e2e8f0", paddingBottom: "6px" }}>Slide {slide.slideNum}</h5>
+                    <pre style={{ whiteSpace: "pre-wrap", fontFamily: "inherit", color: "#334155", margin: 0, fontSize: "14px", lineHeight: "1.6" }}>
+                      {slide.text}
+                    </pre>
+                  </div>
+                ))
+              )}
+            </div>
           ) : fileCategory === "txt" ? (
             <pre style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", background: "#ffffff", padding: "16px", borderRadius: "10px", whiteSpace: "pre-wrap", fontFamily: "monospace" }}>
               {textContent}

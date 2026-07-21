@@ -89,7 +89,11 @@ export default function StudentDashboard({
           url = URL.createObjectURL(rawBlob);
           setPreviewBlobUrl(url);
           setPreviewBlob(rawBlob);
-          setPreviewType(type || (previewFile.fileType?.toLowerCase().includes("pdf") ? "pdf" : 
+          const fileNameOrType = (previewFile.title || previewFile.originalName || previewFile.fileType || "").toLowerCase();
+          const isPpt = type === "pptx" || fileNameOrType.includes("pptx") || fileNameOrType.includes("ppt") || fileNameOrType.includes("presentation");
+
+          setPreviewType(type || (isPpt ? "pptx" : 
+            previewFile.fileType?.toLowerCase().includes("pdf") ? "pdf" : 
             previewFile.fileType?.toLowerCase().includes("video") ? "video" :
             previewFile.fileType?.toLowerCase().includes("audio") ? "audio" :
             previewFile.fileType?.toLowerCase().includes("image") ? "image" : "unsupported"));

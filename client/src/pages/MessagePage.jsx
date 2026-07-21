@@ -112,6 +112,7 @@ export default function MessagePage() {
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const messagesEndRef = useRef(null);
   const docxContainerRef = useRef(null);
@@ -482,17 +483,14 @@ export default function MessagePage() {
     };
 
     pc.ontrack = (event) => {
+      const incomingStream = (event.streams && event.streams[0]) ? event.streams[0] : new MediaStream([event.track]);
       if (remoteVideoRef.current) {
-        if (event.streams && event.streams[0]) {
-          remoteVideoRef.current.srcObject = event.streams[0];
-        } else {
-          let currentStream = remoteVideoRef.current.srcObject;
-          if (!currentStream || !(currentStream instanceof MediaStream)) {
-            currentStream = new MediaStream();
-            remoteVideoRef.current.srcObject = currentStream;
-          }
-          currentStream.addTrack(event.track);
-        }
+        remoteVideoRef.current.srcObject = incomingStream;
+        remoteVideoRef.current.play().catch((e) => console.log("remoteVideo play error:", e));
+      }
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = incomingStream;
+        remoteAudioRef.current.play().catch((e) => console.log("remoteAudio play error:", e));
       }
     };
 
@@ -1588,6 +1586,9 @@ export default function MessagePage() {
       {/* ===== Outgoing Call / Active Call Modal ===== */}
       {(callState === "calling" || callState === "active") && (
         <div style={{ position: "fixed", inset: 0, background: "#0a0a1a", zIndex: 9998, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          {/* Always mounted audio element for remote audio playback */}
+          <audio ref={remoteAudioRef} autoPlay playsInline style={{ display: "none" }} />
+
           {/* Video streams */}
           {callType === "video" && (
             <div style={{ position: "relative", width: "100%", maxWidth: "900px", height: "70vh", background: "#111", borderRadius: "20px", overflow: "hidden", marginBottom: "24px" }}>
@@ -1612,7 +1613,6 @@ export default function MessagePage() {
               </div>
               <h2 style={{ margin: "0 0 8px", fontSize: "24px" }}>{callPartner?.name}</h2>
               <p style={{ margin: 0, opacity: 0.6, fontSize: "15px" }}>{callState === "calling" ? "Calling..." : "Call in progress"}</p>
-              <audio ref={remoteVideoRef} autoPlay />
             </div>
           )}
 
@@ -1626,28 +1626,26 @@ export default function MessagePage() {
                 <FiVideo size={22} />
               </button>
             )}
-            {callType === "video" && (
-              <button 
-                onClick={toggleScreenShare} 
-                style={{ 
-                  width: 56, 
-                  height: 56, 
-                  borderRadius: "50%", 
-                  background: isScreenSharing ? "#10b981" : "rgba(255,255,255,0.15)", 
-                  border: "none", 
-                  color: "#fff", 
-                  cursor: "pointer", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center", 
-                  backdropFilter: "blur(8px)", 
-                  transition: "all 0.2s" 
-                }} 
-                title={isScreenSharing ? "Stop sharing screen" : "Share screen"}
-              >
-                <FiMonitor size={22} />
-              </button>
-            )}
+            <button 
+              onClick={toggleScreenShare} 
+              style={{ 
+                width: 56, 
+                height: 56, 
+                borderRadius: "50%", 
+                background: isScreenSharing ? "#10b981" : "rgba(255,255,255,0.15)", 
+                border: "none", 
+                color: "#fff", 
+                cursor: "pointer", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center", 
+                backdropFilter: "blur(8px)", 
+                transition: "all 0.2s" 
+              }} 
+              title={isScreenSharing ? "Stop sharing screen" : "Share screen"}
+            >
+              <FiMonitor size={22} />
+            </button>
             <button onClick={endCall} style={{ width: 68, height: 68, borderRadius: "50%", background: "#ef4444", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 20px rgba(239,68,68,0.6)" }} title="End call">
               <FiPhoneOff size={28} />
             </button>

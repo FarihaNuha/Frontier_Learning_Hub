@@ -21,6 +21,8 @@ import {
   FiClock,
   FiBell,
   FiSettings,
+  FiMenu,
+  FiX,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -30,6 +32,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
   const cid = courseId || courseInfo?._id;
 
   const [course, setCourse] = useState(courseInfo || null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(
     currentPage === "community-hub" ||
       currentPage === "community" ||
@@ -68,11 +71,33 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
 
   if (!cid) {
     return (
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h2>UFTB Moodle</h2>
+      <>
+        {/* Mobile Header Bar */}
+        <div className="mobile-sidebar-toggle-bar">
+          <button 
+            className="mobile-toggle-btn"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle Menu"
+          >
+            {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+          </button>
+          <span className="mobile-brand-title">UFTB Moodle</span>
           <span className="badge teacher">Teacher</span>
         </div>
+
+        {/* Backdrop overlay on mobile */}
+        {mobileOpen && (
+          <div 
+            className="mobile-sidebar-overlay"
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
+
+        <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`} onClick={() => setMobileOpen(false)}>
+          <div className="sidebar-header">
+            <h2>UFTB Moodle</h2>
+            <span className="badge teacher">Teacher</span>
+          </div>
         <div className="user-info">
           <div className="avatar">
             {user?.profilePicture ? (
@@ -180,15 +205,38 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           </button>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <h2>UFTB Moodle</h2>
+    <>
+      {/* Mobile Header Bar */}
+      <div className="mobile-sidebar-toggle-bar">
+        <button 
+          className="mobile-toggle-btn"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle Menu"
+        >
+          {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+        </button>
+        <span className="mobile-brand-title">UFTB Moodle</span>
         <span className="badge teacher">Teacher</span>
       </div>
+
+      {/* Backdrop overlay on mobile */}
+      {mobileOpen && (
+        <div 
+          className="mobile-sidebar-overlay"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`} onClick={() => setMobileOpen(false)}>
+        <div className="sidebar-header">
+          <h2>UFTB Moodle</h2>
+          <span className="badge teacher">Teacher</span>
+        </div>
       <div className="user-info">
         <div className="avatar">
           {user?.profilePicture ? (
@@ -371,5 +419,6 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
         </button>
       </div>
     </div>
+    </>
   );
 }

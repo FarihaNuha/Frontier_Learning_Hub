@@ -219,10 +219,10 @@ export default function StudentDashboard({
     const ft = fileType.toLowerCase();
     if (ft.includes("pdf"))
       return <FiFileText size={40} color="#EF4444" />;
-    if (ft.includes("word") || ft.includes("docx") || ft.includes("document"))
-      return <FiFileText size={40} color="#3B82F6" />;
     if (ft.includes("powerpoint") || ft.includes("pptx") || ft.includes("presentation"))
       return <FiFileText size={40} color="#F59E0B" />;
+    if (ft.includes("word") || ft.includes("docx") || ft.includes("wordprocessing") || ft.includes("msword"))
+      return <FiFileText size={40} color="#3B82F6" />;
     if (ft.includes("video") || ft.includes("mp4"))
       return <FiVideo size={40} color="#8B5CF6" />;
     return <FiFile size={40} color="#6B89A0" />;
@@ -232,9 +232,10 @@ export default function StudentDashboard({
     if (!fileType) return "File";
     const ft = fileType.toLowerCase();
     if (ft.includes("pdf")) return "PDF";
-    if (ft.includes("word") || ft.includes("docx") || ft.includes("document")) return "DOCX";
     if (ft.includes("powerpoint") || ft.includes("pptx") || ft.includes("presentation"))
       return "PPTX";
+    if (ft.includes("word") || ft.includes("docx") || ft.includes("wordprocessing") || ft.includes("msword"))
+      return "DOCX";
     if (ft.includes("video") || ft.includes("mp4")) return "Video";
     return "File";
   };

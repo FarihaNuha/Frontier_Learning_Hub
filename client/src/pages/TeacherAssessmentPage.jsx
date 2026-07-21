@@ -70,7 +70,16 @@ export default function TeacherAssessmentPage() {
 
   useEffect(() => {
     fetchAssessments();
-  }, []);
+    if (courseId) {
+      api.get(`/courses/${courseId}`)
+        .then((res) => {
+          if (res.data.course?.displayCode) {
+            setSelectedCourseCode(res.data.course.displayCode);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [courseId]);
 
   const fetchAssessments = async () => {
     setLoading(true);
@@ -150,6 +159,7 @@ export default function TeacherAssessmentPage() {
     <div className="dashboard-container">
       <TeacherSidebar
         currentPage="assessment"
+        courseId={courseId}
       />
 
       {/* MAIN CONTENT */}

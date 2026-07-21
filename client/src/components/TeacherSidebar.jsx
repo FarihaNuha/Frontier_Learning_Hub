@@ -309,6 +309,13 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           <FiActivity size={18} />
           <span>Activity Analytics</span>
         </button>
+        <button
+          className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
+          onClick={() => navigate(`/teacher/assessment/${cid}`)}
+        >
+          <FiFileText size={18} />
+          <span>Assessment Marksheet</span>
+        </button>
         
         {course?.joinCode && (
           <div

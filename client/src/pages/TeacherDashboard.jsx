@@ -268,9 +268,9 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     if (!fileType) return "FILE";
     const ft = fileType.toLowerCase();
     if (ft.includes("pdf")) return "PDF";
-    if (ft.includes("word") || ft.includes("docx") || ft.includes("document")) return "DOC";
     if (ft.includes("powerpoint") || ft.includes("pptx") || ft.includes("presentation"))
       return "PPT";
+    if (ft.includes("word") || ft.includes("docx") || ft.includes("wordprocessing") || ft.includes("msword")) return "DOC";
     if (ft.includes("video") || ft.includes("mp4")) return "VIDEO";
     return "FILE";
   };

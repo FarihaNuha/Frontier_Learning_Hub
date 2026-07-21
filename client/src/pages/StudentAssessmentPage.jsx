@@ -20,11 +20,19 @@ export default function StudentAssessmentPage() {
   const { id: courseId } = useParams(); // Selected course context if navigated from course dashboard
 
   const [assessments, setAssessments] = useState([]);
+  const [courseInfo, setCourseInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchAssessments();
-  }, []);
+    if (courseId) {
+      api.get(`/courses/${courseId}`)
+        .then((res) => setCourseInfo(res.data.course))
+        .catch(() => {});
+    } else {
+      setCourseInfo(null);
+    }
+  }, [courseId]);
 
   const fetchAssessments = async () => {
     setLoading(true);
@@ -38,19 +46,30 @@ export default function StudentAssessmentPage() {
     }
   };
 
+  const displayedAssessments = courseInfo
+    ? assessments.filter(
+        (a) => (a.courseCode || "").trim().toLowerCase() === (courseInfo.displayCode || "").trim().toLowerCase()
+      )
+    : assessments;
+
   return (
     <div className="dashboard-container">
       <StudentSidebar
         currentPage="assessment"
+        courseId={courseId}
       />
 
       {/* MAIN CONTENT */}
       <div className="main-content" style={{ padding: "30px" }}>
         <div className="top-bar">
           <div>
-            <h1>Personal Assessment Marksheet</h1>
+            <h1>
+              {courseInfo ? `${courseInfo.displayCode} Assessment Marksheet` : "Personal Assessment Marksheet"}
+            </h1>
             <p style={{ color: "#6b89a0", marginTop: 4 }}>
-              Securely view all your assessment component scores and total CA marks
+              {courseInfo
+                ? `Viewing your assessment component scores for ${courseInfo.displayCode} - ${courseInfo.name}`
+                : "Securely view all your assessment component scores and total CA marks"}
             </p>
           </div>
         </div>
@@ -64,7 +83,7 @@ export default function StudentAssessmentPage() {
             }}
           >
             <h2 style={{ margin: 0, fontSize: 18, color: "#2c4b66" }}>
-              My Assessment Scores
+              {courseInfo ? `${courseInfo.displayCode} Scores` : "My Assessment Scores"}
             </h2>
           </div>
 
@@ -72,11 +91,15 @@ export default function StudentAssessmentPage() {
             <div className="loading-state" style={{ padding: "40px 0" }}>
               <div className="spinner" style={{ margin: "0 auto" }}></div>
             </div>
-          ) : assessments.length === 0 ? (
+          ) : displayedAssessments.length === 0 ? (
             <div className="empty-state" style={{ padding: "60px 0" }}>
               <FiFileText size={48} color="#6B89A0" />
               <h3>No assessment records found</h3>
-              <p>Your teacher hasn't uploaded assessment marks for you yet</p>
+              <p>
+                {courseInfo
+                  ? `Your teacher hasn't uploaded assessment marks for ${courseInfo.displayCode} yet`
+                  : "Your teacher hasn't uploaded assessment marks for you yet"}
+              </p>
             </div>
           ) : (
             <div style={{ overflowX: "auto" }}>
@@ -92,7 +115,7 @@ export default function StudentAssessmentPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {assessments.map((record) => (
+                  {displayedAssessments.map((record) => (
                     <tr key={record._id}>
                       <td>
                         <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", fontWeight: 700 }}>

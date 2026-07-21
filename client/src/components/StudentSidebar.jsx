@@ -308,6 +308,13 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           <FiActivity size={18} />
           <span>Activity Analytics</span>
         </button>
+        <button
+          className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
+          onClick={() => navigate(`/student/assessment/${cid}`)}
+        >
+          <FiFileText size={18} />
+          <span>Assessment Marksheet</span>
+        </button>
       </div>
       <div className="sidebar-footer-fixed">
         <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>

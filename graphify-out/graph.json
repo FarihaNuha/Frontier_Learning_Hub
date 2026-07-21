@@ -1067,7 +1067,7 @@
       "label": "FilePreviewModal()",
       "file_type": "code",
       "source_file": "client/src/components/FilePreviewModal.jsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal_filepreviewmodal",
       "community": 0,
@@ -8292,7 +8292,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/components/FilePreviewModal.jsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "weight": 1.0,
       "source": "client_src_components_filepreviewmodal",
       "target": "client_src_components_filepreviewmodal_filepreviewmodal",
@@ -11489,7 +11489,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L183",
+      "source_location": "L187",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard_studentdashboard",
       "target": "client_src_services_apicache_fetchwithcache"
@@ -11792,7 +11792,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L183",
+      "source_location": "L187",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard_teacherdashboard",
       "target": "client_src_services_apicache_fetchwithcache"
@@ -11803,7 +11803,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L233",
+      "source_location": "L237",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard_teacherdashboard",
       "target": "client_src_services_apicache_invalidatecache"
@@ -19478,5 +19478,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4c4fb3eab964c683661a26b091c85b0c0454c2c6"
+  "built_at_commit": "43606539f0285282c7f91989c54c7e2c852246ec"
 }

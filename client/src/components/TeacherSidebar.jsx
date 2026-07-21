@@ -88,7 +88,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
         {/* Backdrop overlay on mobile */}
         {mobileOpen && (
           <div 
-            className="mobile-sidebar-overlay"
+            className="mobile-sidebar-overlay active"
             onClick={() => setMobileOpen(false)}
           />
         )}
@@ -227,7 +227,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
       {/* Backdrop overlay on mobile */}
       {mobileOpen && (
         <div 
-          className="mobile-sidebar-overlay"
+          className="mobile-sidebar-overlay active"
           onClick={() => setMobileOpen(false)}
         />
       )}

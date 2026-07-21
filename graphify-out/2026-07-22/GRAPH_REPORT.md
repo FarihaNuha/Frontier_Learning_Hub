@@ -1,7 +1,7 @@
 # Graph Report - UFTB_Moodle  (2026-07-22)
 
 ## Corpus Check
-- 110 files · ~94,253 words
+- 110 files · ~94,402 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b84e6cb0`
+- Built from commit: `fdfe8468`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

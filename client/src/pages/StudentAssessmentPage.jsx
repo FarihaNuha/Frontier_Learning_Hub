@@ -10,6 +10,7 @@ import {
   FiCalendar,
   FiArrowLeft,
   FiBookOpen,
+  FiInfo,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import StudentSidebar from "../components/StudentSidebar";
@@ -23,6 +24,7 @@ export default function StudentAssessmentPage() {
   const [courseInfo, setCourseInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [courseLoading, setCourseLoading] = useState(Boolean(courseId));
+  const [showRules, setShowRules] = useState(false);
 
   useEffect(() => {
     fetchAssessments();
@@ -84,6 +86,53 @@ export default function StudentAssessmentPage() {
                 : "Securely view all your assessment component scores and total CA marks"}
             </p>
           </div>
+        </div>
+
+        {/* ASSESSMENT STRUCTURE & RULES GUIDE */}
+        <div style={{
+          background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+          border: "1px solid #bae6fd",
+          borderRadius: 12,
+          padding: "16px 20px",
+          marginBottom: 20,
+        }}>
+          <div 
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }} 
+            onClick={() => setShowRules(!showRules)}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <FiInfo size={20} color="#0284c7" />
+              <strong style={{ color: "#0369a1", fontSize: 15 }}>Assessment Score Structure & Evaluation Rules</strong>
+            </div>
+            <span style={{ fontSize: 13, color: "#0284c7", fontWeight: 600 }}>
+              {showRules ? "Hide Rules ▲" : "View Breakdown Rules ▼"}
+            </span>
+          </div>
+          {showRules && (
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #bae6fd", fontSize: 13, color: "#334155" }}>
+              <p style={{ margin: "0 0 10px 0" }}>
+                Continuous Assessment (CA) scores are uploaded directly by your course teacher using standard Excel marksheets:
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+                <div style={{ background: "#ffffff", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <strong style={{ color: "#0369a1", display: "block" }}>1. Attendance Score</strong>
+                  Calculated based on your presence percentage throughout the semester.
+                </div>
+                <div style={{ background: "#ffffff", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <strong style={{ color: "#0369a1", display: "block" }}>2. Quiz & Tests</strong>
+                  Consolidates best performances from class quizzes and tests.
+                </div>
+                <div style={{ background: "#ffffff", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <strong style={{ color: "#0369a1", display: "block" }}>3. Assignment & Project</strong>
+                  Marks evaluated for submitted assignments and lab reports.
+                </div>
+                <div style={{ background: "#ffffff", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <strong style={{ color: "#0369a1", display: "block" }}>4. Presentation</strong>
+                  Scores awarded for oral presentations or viva performance.
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ASSESSMENT GRID/TABLE */}

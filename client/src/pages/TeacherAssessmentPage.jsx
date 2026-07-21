@@ -16,6 +16,7 @@ import {
   FiCheckCircle,
   FiAlertCircle,
   FiBookOpen,
+  FiInfo,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -31,6 +32,7 @@ export default function TeacherAssessmentPage() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourseCode, setSelectedCourseCode] = useState(null);
+  const [showRules, setShowRules] = useState(false);
   
   // Upload results summary state
   const [summary, setSummary] = useState(null);
@@ -142,6 +144,18 @@ export default function TeacherAssessmentPage() {
 
   const uniqueCourses = Object.keys(courseGroups);
 
+  const filteredUniqueCourses = uniqueCourses.filter((code) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const matchesCode = code.toLowerCase().includes(q);
+    const matchesStudent = (courseGroups[code] || []).some(
+      (item) =>
+        item.studentIdNumber.toLowerCase().includes(q) ||
+        (item.studentId?.name || "").toLowerCase().includes(q)
+    );
+    return matchesCode || matchesStudent;
+  });
+
   // Filter assessments based on selected course and search query
   const filteredAssessments = assessments.filter((item) => {
     const matchesCourse = selectedCourseCode
@@ -181,6 +195,86 @@ export default function TeacherAssessmentPage() {
           <p style={{ fontSize: 13, color: "#6b89a0", marginBottom: 16 }}>
             Upload an Excel (`.xlsx` or `.csv`) sheet. The system will automatically detect the Course Code (e.g. `Course Code: ENG 205`) and extract student marks for Quiz, Assignment, Presentation, and Attendance. Duplicates are automatically skipped.
           </p>
+
+          {/* EXCEL FORMAT RULES & GUIDELINES CARD */}
+          <div style={{
+            background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+            border: "1px solid #bae6fd",
+            borderRadius: 12,
+            padding: "16px 20px",
+            marginBottom: 20,
+          }}>
+            <div 
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }} 
+              onClick={() => setShowRules(!showRules)}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <FiInfo size={20} color="#0284c7" />
+                <strong style={{ color: "#0369a1", fontSize: 15 }}>Excel Marksheet Upload Format & Rules Guide</strong>
+              </div>
+              <span style={{ fontSize: 13, color: "#0284c7", fontWeight: 600 }}>
+                {showRules ? "Hide Guidelines ▲" : "View Rules & Format Guide ▼"}
+              </span>
+            </div>
+            {showRules && (
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #bae6fd", fontSize: 13, color: "#334155" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 14 }}>
+                  <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>1. Course Code Tag</strong>
+                    Include a cell in the first 5 rows containing: <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Course Code: CSE 201</code>
+                  </div>
+                  <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>2. Required Student ID Column</strong>
+                    Header must be named <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Student ID</code> or <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>ID of the Student</code>.
+                  </div>
+                  <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>3. Score Component Columns</strong>
+                    Headers for <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Attendance</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Quiz</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Assignment</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Presentation</code>, and <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Total</code>.
+                  </div>
+                </div>
+                <strong style={{ color: "#0369a1", fontSize: 13, display: "block", marginBottom: 6 }}>Sample Excel Layout:</strong>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", background: "#ffffff", fontSize: 12, border: "1px solid #cbd5e1" }}>
+                    <thead>
+                      <tr style={{ background: "#f1f5f9" }}>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Row</th>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col A</th>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col B</th>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col C</th>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col D</th>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col E</th>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col F</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>1</td>
+                        <td colSpan="6" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Course Code: ET 317</td>
+                      </tr>
+                      <tr>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>2</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Student ID</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Attendance</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Quiz</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Assignment</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Presentation</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Total</td>
+                      </tr>
+                      <tr>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>3</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>2202022</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>30</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>26</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>25</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>25</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#16a34a", fontWeight: "bold" }}>106</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
 
           <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div className="file-upload-area" style={{ width: "100%" }}>
@@ -282,11 +376,42 @@ export default function TeacherAssessmentPage() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 12,
                 }}
               >
                 <h2 style={{ margin: 0, fontSize: 18, color: "#2c4b66" }}>
                   Course Marksheets ({uniqueCourses.length})
                 </h2>
+                
+                {/* GLOBAL COURSE CARDS SEARCH BAR */}
+                <div style={{ position: "relative", width: "100%", maxWidth: 320 }}>
+                  <input
+                    type="text"
+                    placeholder="Search course code, session, or student..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                      padding: "8px 12px 8px 34px",
+                      borderRadius: 8,
+                      border: "1.5px solid #d4e7f5",
+                      fontSize: 13,
+                      width: "100%",
+                      outline: "none",
+                      background: "#f8fafc",
+                    }}
+                  />
+                  <FiSearch
+                    size={16}
+                    color="#6B89A0"
+                    style={{
+                      position: "absolute",
+                      left: 10,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  />
+                </div>
               </div>
 
               {loading ? (
@@ -299,10 +424,16 @@ export default function TeacherAssessmentPage() {
                   <h3>No course marksheets uploaded yet</h3>
                   <p>Please select and upload an Excel marksheet file above.</p>
                 </div>
+              ) : filteredUniqueCourses.length === 0 ? (
+                <div className="empty-state" style={{ padding: "40px 0" }}>
+                  <FiSearch size={40} color="#6B89A0" />
+                  <h3>No matching marksheets found</h3>
+                  <p>No course or student matches "{searchQuery}"</p>
+                </div>
               ) : (
                 <div style={{ padding: "24px" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
-                    {uniqueCourses.map((code) => {
+                    {filteredUniqueCourses.map((code) => {
                       const studentCount = courseGroups[code].length;
                       return (
                         <div

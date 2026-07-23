@@ -33,6 +33,7 @@ export const communityApi = {
 
   // Comments
   likeComment: (id) => api.post(`/community/comments/${id}/like`),
+  deleteComment: (id) => api.delete(`/community/comments/${id}`),
 
   // Private Messages
   getUnreadMessagesCount: () => api.get("/community/messages/unread-count"),

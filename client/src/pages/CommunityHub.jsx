@@ -276,13 +276,14 @@ export default function CommunityHub() {
 
 const getFileUrl = (url) => {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) {
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
     return url;
   }
+  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    return `http://${window.location.hostname}:5000${url}`;
+    return `http://${window.location.hostname}:5000${cleanUrl}`;
   }
-  return `${window.location.origin}${url}`;
+  return `${window.location.origin}${cleanUrl}`;
 };
 
 const renderAttachments = (attachments, onPreview) => {
@@ -403,6 +404,274 @@ const renderLectureAttachment = (lecture, onPreview) => {
   };
   return renderAttachments([file], onPreview);
 };
+
+function CommentItem({ comment, user, isCourse, courseId, postId, onlineUsers = [], onDelete }) {
+  const [replying, setReplying] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [replies, setReplies] = useState(comment.replies || []);
+  const [likes, setLikes] = useState(comment.likes || []);
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  const currentUserId = user?.id || user?._id;
+  const isLiked = likes.some((id) => (typeof id === "string" ? id === currentUserId : id._id === currentUserId || id === currentUserId));
+
+  const authorId = comment.author?._id || comment.author?.id || comment.author;
+  const canDelete = authorId === currentUserId || user?.role === "admin" || user?.role === "teacher";
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    try {
+      await communityApi.deleteComment(comment._id);
+      setIsDeleted(true);
+      if (onDelete) onDelete(comment._id);
+      toast.success("Comment deleted");
+    } catch (err) {
+      toast.error("Failed to delete comment");
+    }
+  };
+
+  const handleChildDelete = (childId) => {
+    setReplies(replies.filter((r) => r._id !== childId));
+  };
+
+  if (isDeleted) return null;
+
+  const handleLike = async () => {
+    try {
+      const res = await communityApi.likeComment(comment._id);
+      if (res.data.hasLiked) {
+        setLikes([...likes, currentUserId]);
+      } else {
+        setLikes(likes.filter((id) => (typeof id === "string" ? id !== currentUserId : id._id !== currentUserId)));
+      }
+    } catch (err) {
+      toast.error("Failed to like comment");
+    }
+  };
+
+  const handleReplySubmit = async (e) => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+    try {
+      let res;
+      if (isCourse && courseId) {
+        res = await communityApi.addCourseComment(courseId, postId, {
+          content: replyText,
+          parentCommentId: comment._id,
+        });
+      } else {
+        res = await communityApi.addPublicComment(postId, {
+          content: replyText,
+          parentCommentId: comment._id,
+        });
+      }
+
+      const newReply = {
+        ...res.data.comment,
+        author: {
+          _id: currentUserId,
+          name: user.name,
+          role: user.role,
+          profilePicture: user.profilePicture,
+        },
+      };
+
+      setReplies([...replies, newReply]);
+      setReplyText("");
+      setReplying(false);
+    } catch (err) {
+      toast.error("Failed to post reply");
+    }
+  };
+
+  return (
+    <div className="inline-comment-item" style={{ marginBottom: "12px" }}>
+      <div className="comment-avatar" style={{ position: "relative" }}>
+        {comment.author?.profilePicture ? (
+          <img
+            src={getFileUrl(comment.author.profilePicture)}
+            alt="Avatar"
+            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+          />
+        ) : (
+          comment.author?.name?.charAt(0).toUpperCase()
+        )}
+        {onlineUsers.includes(comment.author?._id || comment.author?.id) && (
+          <span
+            style={{
+              position: "absolute",
+              bottom: -1,
+              right: -1,
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              backgroundColor: "#10b981",
+              border: "1.5px solid var(--border-light, #ffffff)",
+              zIndex: 2,
+            }}
+            title="Online"
+          />
+        )}
+      </div>
+      <div style={{ flex: 1 }}>
+        <div className="comment-content-bubble">
+          <div
+            className="comment-author-name"
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", width: "100%" }}
+          >
+            <div>
+              {comment.author?.name}
+              <span className="comment-author-role">{comment.author?.role}</span>
+            </div>
+            {(user?.role === "teacher" || user?.role === "admin") &&
+              comment.author?._id !== user?.id &&
+              comment.author?._id !== user?._id &&
+              comment.author?.role === "student" && (
+                <button
+                  type="button"
+                  title="Block User"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#ef4444",
+                    cursor: "pointer",
+                    padding: "2px 6px",
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "11px",
+                    fontWeight: "600",
+                    gap: "2px",
+                  }}
+                  onClick={async () => {
+                    if (
+                      window.confirm(
+                        `Are you sure you want to suspend student ${comment.author?.name}? They will be logged out immediately and suspended from accessing the application.`
+                      )
+                    ) {
+                      try {
+                        await api.post(`/auth/users/${comment.author?._id}/block`);
+                        toast.success(`User ${comment.author?.name} has been suspended.`);
+                      } catch (err) {
+                        toast.error(err.response?.data?.error || "Failed to suspend user.");
+                      }
+                    }
+                  }}
+                >
+                  <FiSlash size={10} /> Suspend
+                </button>
+              )}
+          </div>
+          <p className="comment-text">{comment.content}</p>
+        </div>
+
+        {/* Comment Action Links (Like · Reply · Delete · Time) */}
+        <div style={{ display: "flex", alignItems: "center", gap: "14px", marginTop: "4px", paddingLeft: "8px", fontSize: "12px" }}>
+          <button
+            type="button"
+            onClick={handleLike}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: isLiked ? "700" : "600",
+              color: isLiked ? "#2563eb" : "#64748b",
+              padding: 0,
+              fontSize: "12px",
+            }}
+          >
+            {isLiked ? "👍 Liked" : "Like"} {likes.length > 0 && `(${likes.length})`}
+          </button>
+          <button
+            type="button"
+            onClick={() => setReplying(!replying)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "600",
+              color: "#64748b",
+              padding: 0,
+              fontSize: "12px",
+            }}
+          >
+            Reply
+          </button>
+          {canDelete && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontWeight: "600",
+                color: "#ef4444",
+                padding: 0,
+                fontSize: "12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "2px",
+              }}
+              title="Delete Comment"
+            >
+              <FiTrash2 size={11} /> Delete
+            </button>
+          )}
+          <span className="comment-time" style={{ fontSize: "11px", color: "#94a3b8" }}>
+            {new Date(comment.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+
+        {/* Inline Reply Input Box */}
+        {replying && (
+          <form onSubmit={handleReplySubmit} style={{ display: "flex", gap: "8px", marginTop: "8px", paddingLeft: "8px" }}>
+            <input
+              type="text"
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={`Reply to ${comment.author?.name || "comment"}...`}
+              style={{
+                flex: 1,
+                padding: "6px 14px",
+                borderRadius: "20px",
+                border: "1px solid #cbd5e1",
+                fontSize: "13px",
+                outline: "none",
+                background: "#ffffff",
+              }}
+              autoFocus
+            />
+            <button
+              type="submit"
+              className="btn-primary"
+              style={{ padding: "6px 14px", borderRadius: "16px", fontSize: "12px", background: "#3b8db3" }}
+            >
+              Reply
+            </button>
+          </form>
+        )}
+
+        {/* Nested Child Replies */}
+        {replies.length > 0 && (
+          <div style={{ marginTop: "10px", paddingLeft: "16px", borderLeft: "2px solid #e2e8f0" }}>
+            {replies.map((reply) => (
+              <CommentItem
+                key={reply._id}
+                comment={reply}
+                user={user}
+                isCourse={isCourse}
+                courseId={courseId}
+                postId={postId}
+                onlineUsers={onlineUsers}
+                onDelete={handleChildDelete}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function PostCard({ post, getCategoryIcon, onPostDeleted, onPostUpdated }) {
   const { user, onlineUsers } = useAuth();
@@ -543,7 +812,7 @@ function PostCard({ post, getCategoryIcon, onPostDeleted, onPostUpdated }) {
           <div className="author-avatar" style={{ position: "relative" }}>
             {authorPic ? (
               <img 
-                src={authorPic} 
+                src={getFileUrl(authorPic)} 
                 alt="Avatar" 
                 style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
               />
@@ -765,77 +1034,18 @@ function PostCard({ post, getCategoryIcon, onPostDeleted, onPostUpdated }) {
           ) : (
             <div className="inline-comments-list">
               {comments.map((comment) => (
-                <div key={comment._id} className="inline-comment-item">
-                  <div className="comment-avatar" style={{ position: "relative" }}>
-                    {comment.author?.profilePicture ? (
-                      <img 
-                        src={comment.author.profilePicture} 
-                        alt="Avatar" 
-                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
-                      />
-                    ) : (
-                      comment.author?.name?.charAt(0).toUpperCase()
-                    )}
-                    {onlineUsers.includes(comment.author?._id || comment.author?.id) && (
-                      <span 
-                        style={{
-                          position: "absolute",
-                          bottom: -1,
-                          right: -1,
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          backgroundColor: "#10b981",
-                          border: "1.5px solid var(--border-light, #ffffff)",
-                          zIndex: 2
-                        }}
-                        title="Online"
-                      />
-                    )}
-                  </div>
-                  <div className="comment-content-bubble">
-                    <div className="comment-author-name" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", width: "100%" }}>
-                      <div>
-                        {comment.author?.name}
-                        <span className="comment-author-role">{comment.author?.role}</span>
-                      </div>
-                      {(user?.role === "teacher" || user?.role === "admin") && comment.author?._id !== user?.id && comment.author?._id !== user?._id && comment.author?.role === "student" && (
-                        <button
-                          type="button"
-                          title="Block User"
-                          style={{
-                            background: "none",
-                            border: "none",
-                            color: "#ef4444",
-                            cursor: "pointer",
-                            padding: "2px 6px",
-                            display: "flex",
-                            alignItems: "center",
-                            fontSize: "11px",
-                            fontWeight: "600",
-                            gap: "2px"
-                          }}
-                          onClick={async () => {
-                            if (window.confirm(`Are you sure you want to suspend student ${comment.author?.name}? They will be logged out immediately and suspended from accessing the application.`)) {
-                              try {
-                                await api.post(`/auth/users/${comment.author?._id}/block`);
-                                toast.success(`User ${comment.author?.name} has been suspended.`);
-                              } catch (err) {
-                                toast.error(err.response?.data?.error || "Failed to suspend user.");
-                              }
-                            }
-                          }}
-                        >
-                          <FiSlash size={10} /> Suspend
-                        </button>
-                      )}
-                    </div>
-                    <p className="comment-text">{comment.content}</p>
-                    <span className="comment-time">
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
+                <CommentItem
+                  key={comment._id}
+                  comment={comment}
+                  user={user}
+                  isCourse={false}
+                  postId={post._id}
+                  onlineUsers={onlineUsers}
+                  onDelete={(deletedId) => {
+                    setComments(comments.filter((c) => c._id !== deletedId));
+                    setLocalCommentCount((prev) => Math.max(0, prev - 1));
+                  }}
+                />
               ))}
             </div>
           )}

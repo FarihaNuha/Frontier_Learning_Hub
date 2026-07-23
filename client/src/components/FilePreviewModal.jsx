@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import { FiX, FiDownload, FiFile, FiEye } from "react-icons/fi";
 import * as docx from "docx-preview";
 import JSZip from "jszip";
@@ -12,11 +13,23 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
   const [pptxSlides, setPptxSlides] = useState([]);
   const docxRef = useRef(null);
 
+  const getAbsoluteFileUrl = (rawUrl) => {
+    if (!rawUrl) return "";
+    if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://") || rawUrl.startsWith("blob:")) {
+      return rawUrl;
+    }
+    const backendHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000"
+      : window.location.origin;
+    return `${backendHost}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+  };
+
   useEffect(() => {
     if (!file || !isOpen) {
       setBlobUrl("");
       setTextContent("");
       setDocxBuffer(null);
+      setPptxSlides([]);
       return;
     }
 
@@ -45,10 +58,17 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
     const loadContent = async () => {
       setLoading(true);
       try {
-        const fileUrl = file.url || file.fileUrl || file.fileURL;
-        if (!fileUrl) throw new Error("No file URL");
+        const rawFileUrl = file.url || file.fileUrl || file.fileURL;
+        if (!rawFileUrl) throw new Error("No file URL");
+        const fullFileUrl = getAbsoluteFileUrl(rawFileUrl);
 
-        const res = await fetch(fileUrl);
+        if (category === "pdf") {
+          // Native browser PDF viewer renders directly via full URL
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(fullFileUrl);
         const blob = await res.blob();
         const createdUrl = URL.createObjectURL(blob);
         setBlobUrl(createdUrl);
@@ -72,26 +92,22 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
             });
 
             slideFiles.sort((a, b) => {
-              const numA = parseInt((a.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
-              const numB = parseInt((b.match(/slide_?(\d+)\.xml$/i) || [])[1] || "0", 10);
+              const numA = parseInt((a.match(/slide(\d+)\.xml$/i) || a.match(/(\d+)\.xml$/i) || [])[1] || "0", 10);
+              const numB = parseInt((b.match(/slide(\d+)\.xml$/i) || b.match(/(\d+)\.xml$/i) || [])[1] || "0", 10);
               return numA - numB;
             });
 
             const parsedSlides = [];
             for (let i = 0; i < slideFiles.length; i++) {
               const slideXmlText = await zip.files[slideFiles[i]].async("text");
-              const pMatches = slideXmlText.match(/<a:p[\s>][\s\S]*?<\/a:p>/g) || [];
-              const paragraphs = [];
-              for (const pXml of pMatches) {
-                const tMatches = pXml.match(/<a:t>([^<]*)<\/a:t>/g) || [];
-                const text = tMatches.map((m) => m.replace(/<\/?a:t>/g, "")).join("").trim();
-                if (text) {
-                  paragraphs.push(text);
-                }
-              }
+              const tMatches = slideXmlText.match(/<a:t[^>]*>([\s\S]*?)<\/a:t>/gi) || [];
+              const textLines = tMatches
+                .map((m) => m.replace(/<[^>]+>/g, "").trim())
+                .filter(Boolean);
+
               parsedSlides.push({
                 slideNum: i + 1,
-                text: paragraphs.join("\n") || "[Visual Slide Presentation]"
+                text: textLines.join("\n") || "[Slide Content]"
               });
             }
             setPptxSlides(parsedSlides);
@@ -134,11 +150,12 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
   if (!isOpen || !file) return null;
 
   const fileName = file.name || file.fileName || file.title || "File Preview";
-  const downloadUrl = file.url || file.fileUrl || file.fileURL;
+  const rawDownloadUrl = file.url || file.fileUrl || file.fileURL || "";
+  const downloadUrl = getAbsoluteFileUrl(rawDownloadUrl);
 
-  return (
+  const modalContent = (
     <div
-      className="share-modal-overlay"
+      className="file-preview-portal-overlay"
       onClick={onClose}
       style={{
         position: "fixed",
@@ -153,7 +170,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 999999,
+        zIndex: 9999999,
         padding: "16px",
         boxSizing: "border-box"
       }}
@@ -186,7 +203,6 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px", overflow: "hidden" }}>
-            <FiEye size={20} color="#3b8db3" />
             <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "700", color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {fileName}
             </h3>
@@ -228,20 +244,36 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
               <p style={{ fontWeight: 600 }}>Loading preview...</p>
             </div>
           ) : fileCategory === "pdf" ? (
-            <embed src={blobUrl || downloadUrl} type="application/pdf" style={{ width: "100%", height: "70vh", borderRadius: "10px" }} />
+            <iframe
+              src={`${downloadUrl}#toolbar=1`}
+              title={fileName}
+              style={{ width: "100%", height: "70vh", border: "none", borderRadius: "10px", background: "#ffffff" }}
+            />
           ) : fileCategory === "image" ? (
-            <img src={blobUrl || downloadUrl} alt={fileName} style={{ maxWidth: "100%", maxHeight: "70vh", objectFit: "contain", borderRadius: "10px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+            <img src={downloadUrl || blobUrl} alt={fileName} style={{ maxWidth: "100%", maxHeight: "70vh", objectFit: "contain", borderRadius: "10px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
           ) : fileCategory === "video" ? (
-            <video src={blobUrl || downloadUrl} controls style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: "10px" }} />
+            <video src={downloadUrl || blobUrl} controls style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: "10px" }} />
           ) : fileCategory === "audio" ? (
-            <audio src={blobUrl || downloadUrl} controls style={{ width: "100%" }} />
+            <audio src={downloadUrl || blobUrl} controls style={{ width: "100%" }} />
           ) : fileCategory === "docx" ? (
             <div ref={docxRef} style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", background: "#ffffff", padding: "20px", borderRadius: "10px" }} />
           ) : fileCategory === "pptx" ? (
             <div style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", padding: "12px", background: "#ffffff", borderRadius: "10px" }}>
-              <h4 style={{ margin: "0 0 16px", color: "#2c4b66", fontSize: "16px" }}>Presentation Slides Preview ({pptxSlides.length})</h4>
+              <h4 style={{ margin: "0 0 16px", color: "#2c4b66", fontSize: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>Presentation Slides ({pptxSlides.length})</span>
+                {downloadUrl && !downloadUrl.includes("localhost") && !downloadUrl.includes("127.0.0.1") && (
+                  <a href={`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(downloadUrl)}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "#0284c7" }}>
+                    View in Office Web
+                  </a>
+                )}
+              </h4>
               {pptxSlides.length === 0 ? (
-                <p style={{ color: "#64748b", fontStyle: "italic", textAlign: "center" }}>No slide text extracted. Please download file to view.</p>
+                <div style={{ textAlign: "center", padding: "30px 10px" }}>
+                  <p style={{ color: "#64748b", fontWeight: 500 }}>No readable text extracted from slides.</p>
+                  <a href={downloadUrl} download={fileName} className="btn-primary" style={{ display: "inline-block", marginTop: "10px", padding: "8px 16px" }}>
+                    Download PPTX File
+                  </a>
+                </div>
               ) : (
                 pptxSlides.map((slide, idx) => (
                   <div key={idx} style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "12px", padding: "20px", marginBottom: "16px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
@@ -301,4 +333,6 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 }

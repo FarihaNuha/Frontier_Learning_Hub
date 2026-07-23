@@ -589,6 +589,30 @@ exports.toggleLikeComment = async (req, res) => {
   }
 };
 
+exports.deleteComment = async (req, res) => {
+  try {
+    const comment = await CommunityComment.findById(req.params.id);
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    const isAuthor = comment.author.toString() === req.user.uid;
+    const isPrivileged = req.user.role === "admin" || req.user.role === "teacher";
+
+    if (!isAuthor && !isPrivileged) {
+      return res.status(403).json({ error: "Unauthorized to delete this comment" });
+    }
+
+    await CommunityComment.deleteMany({ parentCommentId: comment._id });
+    await CommunityComment.findByIdAndDelete(comment._id);
+
+    res.json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    console.error("Delete comment error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // ==================== PRIVATE MESSAGES ====================
 
 exports.sendMessage = async (req, res) => {

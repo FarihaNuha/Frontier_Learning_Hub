@@ -45,6 +45,7 @@ router.post(
 
 // Comments
 router.post("/comments/:id/like", verifyToken, ctrl.toggleLikeComment);
+router.delete("/comments/:id", verifyToken, ctrl.deleteComment);
 
 // Share post
 router.post("/posts/:postId/share", verifyToken, ctrl.sharePost);

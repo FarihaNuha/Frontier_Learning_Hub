@@ -171,7 +171,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     week: "",
     department: user?.department || "Software",
   });
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -192,14 +192,23 @@ export default function TeacherDashboard({ courseId, courseCode }) {
   };
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      if (selectedFile.size > 100 * 1024 * 1024) {
-        toast.error("File too large");
-        return;
+    const selectedFiles = Array.from(e.target.files || []);
+    if (selectedFiles.length > 0) {
+      const validFiles = selectedFiles.filter((f) => f.size <= 100 * 1024 * 1024);
+      if (validFiles.length < selectedFiles.length) {
+        toast.error("Some files exceed 100MB limit");
       }
-      setFile(selectedFile);
+      setFiles((prev) => {
+        const existingNames = new Set(prev.map((f) => f.name));
+        const newUnique = validFiles.filter((f) => !existingNames.has(f.name));
+        return [...prev, ...newUnique];
+      });
     }
+    e.target.value = "";
+  };
+
+  const handleRemoveFile = (indexToRemove) => {
+    setFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleInputChange = (e) =>
@@ -207,24 +216,38 @@ export default function TeacherDashboard({ courseId, courseCode }) {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) {
-      toast.error("Select a file");
+    if (!files || files.length === 0) {
+      toast.error("Select at least one file");
       return;
     }
     setLoading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("title", formData.title);
-    fd.append("course", courseCode || "");
-    fd.append("courseId", courseId || "");
-    fd.append("topic", formData.topic);
-    fd.append("week", formData.week);
-    fd.append("department", formData.department);
+    let successCount = 0;
     try {
-      await api.post("/lectures/upload", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      toast.success("Uploaded!");
+      for (let i = 0; i < files.length; i++) {
+        const currentFile = files[i];
+        const fd = new FormData();
+        fd.append("file", currentFile);
+
+        let fileTitle = formData.title.trim();
+        if (!fileTitle) {
+          fileTitle = currentFile.name.replace(/\.[^/.]+$/, "");
+        } else if (files.length > 1) {
+          fileTitle = `${fileTitle} (${i + 1})`;
+        }
+
+        fd.append("title", fileTitle);
+        fd.append("course", courseCode || "");
+        fd.append("courseId", courseId || "");
+        fd.append("topic", formData.topic);
+        fd.append("week", formData.week);
+        fd.append("department", formData.department);
+
+        await api.post("/lectures/upload", fd, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        successCount++;
+      }
+      toast.success(`${successCount} file(s) uploaded!`);
       setShowForm(false);
       setFormData({
         title: "",
@@ -233,11 +256,11 @@ export default function TeacherDashboard({ courseId, courseCode }) {
         week: "",
         department: user?.department || "Software",
       });
-      setFile(null);
+      setFiles([]);
       invalidateCache("/lectures");
       fetchLectures(true);
     } catch (error) {
-      toast.error("Upload failed");
+      toast.error(`Upload failed after ${successCount} file(s)`);
     } finally {
       setLoading(false);
     }
@@ -381,13 +404,13 @@ export default function TeacherDashboard({ courseId, courseCode }) {
             <form onSubmit={handleUpload} className="upload-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label>Title *</label>
+                  <label>Title {files.length > 1 ? "(Optional for multiple files)" : "*"}</label>
                   <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    required
+                    required={files.length <= 1}
                   />
                 </div>
                 {!courseId && (
@@ -447,27 +470,112 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                   </select>
                 </div>
               )}
-              <div className="form-group">
-                <label>File *</label>
+              <div className="form-group" style={{ marginTop: 16 }}>
+                <label style={{ fontSize: 16, fontWeight: 600, color: "#2d3748", marginBottom: 8, display: "block" }}>
+                  Upload Files
+                </label>
                 <div className="file-upload-area">
                   <input
                     type="file"
+                    multiple
                     onChange={handleFileChange}
                     accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.webm,.mp3,.wav,.ogg,.aac,.flac"
                     id="file-input"
                   />
-                  <label htmlFor="file-input" className="file-label">
-                    {file ? (
-                      <>
-                        <FiFile size={20} /> {file.name}
-                      </>
-                    ) : (
-                      <>
-                        <FiUpload size={20} /> Click to upload
-                      </>
-                    )}
+                  <label
+                    htmlFor="file-input"
+                    className="file-label"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 10,
+                      cursor: "pointer",
+                      padding: "26px",
+                      borderRadius: 12,
+                      border: "2px dashed #93c5fd",
+                      background: "#edf5ff",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <FiUpload size={22} style={{ color: "#334155" }} />
+                    <span style={{ fontSize: 16, fontWeight: 500, color: "#334155" }}>
+                      Click to upload file(s)
+                    </span>
                   </label>
                 </div>
+
+                {files.length > 0 && (
+                  <div style={{ marginTop: 20 }}>
+                    <label
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 600,
+                        color: "#334155",
+                        marginBottom: 10,
+                        display: "block",
+                      }}
+                    >
+                      Selected file(s) to upload:
+                    </label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {files.map((f, idx) => (
+                        <div
+                          key={`${f.name}-${idx}`}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "12px 16px",
+                            background: "#f8fafc",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: 10,
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                              overflow: "hidden",
+                              paddingRight: 10,
+                            }}
+                          >
+                            <FiFile size={18} style={{ color: "#64748b", flexShrink: 0 }} />
+                            <span
+                              style={{
+                                fontSize: 15,
+                                color: "#334155",
+                                fontWeight: 500,
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {f.name}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFile(idx)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#dc2626",
+                              fontSize: 14,
+                              fontWeight: 500,
+                              cursor: "pointer",
+                              padding: "4px 8px",
+                              flexShrink: 0,
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <button type="submit" className="btn-success" disabled={loading}>
                 {loading ? "Uploading..." : "Upload"}

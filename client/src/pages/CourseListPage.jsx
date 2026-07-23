@@ -111,7 +111,7 @@ export default function CourseListPage() {
   const [showJoin, setShowJoin] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    session: "",
+    session: "2024-25",
     displayCode: "",
     department: user?.department || "Software",
   });
@@ -531,14 +531,19 @@ export default function CourseListPage() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Session</label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.session}
                     onChange={(e) =>
                       setFormData({ ...formData, session: e.target.value })
                     }
-                    placeholder="e.g., 2025-26, Spring 2026"
-                  />
+                  >
+                    <option value="2020-21">2020-21</option>
+                    <option value="2021-22">2021-22</option>
+                    <option value="2022-23">2022-23</option>
+                    <option value="2023-24">2023-24</option>
+                    <option value="2024-25">2024-25</option>
+                    <option value="2025-26">2025-26</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Department</label>

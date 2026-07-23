@@ -904,47 +904,22 @@ export default function CourseAnalyticsPage() {
           </div>
         )}
 
-        {/* Modal Popup Box for Student Performance Analytics */}
+        {/* Student Performance Analytics Section (Inline Dashboard View) */}
         {(selectedStudent || loadingDetails) && (
           <div
-            className="modal-overlay"
-            onClick={() => {
-              setSelectedStudent(null);
-              setAnalytics(null);
-            }}
+            className="analytics-inline-card"
             style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.75)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 99999,
-              padding: "20px",
-              backdropFilter: "blur(5px)"
+              background: "var(--bg-card, #ffffff)",
+              color: "var(--text-primary, #1e293b)",
+              borderRadius: "20px",
+              padding: "24px 28px 32px",
+              marginTop: "28px",
+              boxShadow: "0 4px 25px rgba(0, 0, 0, 0.06)",
+              border: "1px solid var(--border-color, rgba(148, 163, 184, 0.2))",
+              position: "relative"
             }}
           >
-            <div
-              className="modal-content"
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                background: "var(--bg-card, #ffffff)",
-                color: "var(--text-primary, #1e293b)",
-                borderRadius: "20px",
-                padding: "24px 28px 32px",
-                maxWidth: "1150px",
-                width: "100%",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.3)",
-                border: "1px solid var(--border-color, rgba(148, 163, 184, 0.2))",
-                position: "relative"
-              }}
-            >
-              {/* Modal Header */}
+              {/* Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid var(--border-color, rgba(148,163,184,0.2))" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <FiActivity size={22} color="var(--pastel-blue-deep, #38bdf8)" />
@@ -952,28 +927,6 @@ export default function CourseAnalyticsPage() {
                     Student Performance Analytics {selectedStudent?.name ? `- ${selectedStudent.name}` : ""}
                   </h3>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedStudent(null);
-                    setAnalytics(null);
-                  }}
-                  style={{
-                    background: "rgba(148, 163, 184, 0.12)",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "36px",
-                    height: "36px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "var(--text-gray, #64748b)",
-                    cursor: "pointer",
-                    transition: "background 0.2s"
-                  }}
-                >
-                  <FiX size={20} />
-                </button>
               </div>
 
               {loadingDetails ? (
@@ -1604,7 +1557,6 @@ export default function CourseAnalyticsPage() {
             )} {/* end final tab */}
           </div>
         ) : null}
-            </div>
           </div>
         )}
       </div>

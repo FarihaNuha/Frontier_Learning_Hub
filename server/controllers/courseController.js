@@ -539,6 +539,12 @@ exports.getCourseStudentsAnalytics = async (req, res) => {
       });
     }
 
+    studentsAnalytics.sort((a, b) => {
+      const idA = String(a.studentIdNumber || "").trim();
+      const idB = String(b.studentIdNumber || "").trim();
+      return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: "base" });
+    });
+
     res.json({ students: studentsAnalytics });
   } catch (error) {
     console.error("Get course students analytics error:", error);

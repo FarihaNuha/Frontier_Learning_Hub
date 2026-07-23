@@ -12,7 +12,8 @@ import {
   FiUsers,
   FiInfo,
   FiCheckCircle,
-  FiAlertTriangle
+  FiAlertTriangle,
+  FiX
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import StudentSidebar from "../components/StudentSidebar";
@@ -56,13 +57,21 @@ export default function CourseAnalyticsPage() {
   const fetchRoster = async () => {
     try {
       const res = await api.get(`/courses/${id}/analytics/students`);
-      setStudents(res.data.students || []);
+      const fetchedStudents = res.data.students || [];
+      fetchedStudents.sort((a, b) => {
+        const idA = String(a.studentIdNumber || a.studentId || a.id || "").trim();
+        const idB = String(b.studentIdNumber || b.studentId || b.id || "").trim();
+        return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: "base" });
+      });
+      setStudents(fetchedStudents);
     } catch (error) {
       toast.error("Error loading student roster analytics");
     }
   };
 
   const fetchStudentDetails = async (studentId) => {
+    const targetStudent = students.find((s) => s.id === studentId);
+    if (targetStudent) setSelectedStudent(targetStudent);
     setLoadingDetails(true);
     try {
       const res = await api.get(`/courses/${id}/analytics/student/${studentId}`);
@@ -160,7 +169,7 @@ export default function CourseAnalyticsPage() {
 
     const size = 420;
     const center = size / 2;
-    const radius = 115;
+    const radius = 108;
     const levels = 4;
 
     const values = overrideValues || computeSpiderValues(summary);
@@ -179,34 +188,39 @@ export default function CourseAnalyticsPage() {
       : ["#00e5ff", "#3b82f6", "#a855f7", "#f59e0b", "#10b981"];
 
     // Class average benchmark data for comparison overlay
-    const benchmarkValues = summary.classAverage
+    const rawBenchmark = summary.classAverage
       ? (is3Axis
           ? [
-              summary.classAverage.attendance || 78,
-              summary.classAverage.assignment || 72,
-              summary.classAverage.quiz || 70
+              summary.classAverage.attendance ?? 78,
+              summary.classAverage.assignment ?? 72,
+              summary.classAverage.quiz ?? 70
             ]
           : [
-              summary.classAverage.attendance || 78,
-              summary.classAverage.assignment || 72,
-              summary.classAverage.quiz || 70,
-              summary.classAverage.presentation || 68,
-              summary.classAverage.assessment || 75
+              summary.classAverage.attendance ?? 78,
+              summary.classAverage.assignment ?? 72,
+              summary.classAverage.quiz ?? 70,
+              summary.classAverage.presentation ?? 68,
+              summary.classAverage.assessment ?? 75
             ])
       : (is3Axis ? [78, 72, 70] : [78, 72, 70, 68, 75]);
 
+    const benchmarkValues = rawBenchmark.map((v) => Math.min(100, Math.max(0, Number(v) || 0)));
+
     // Compute coordinates for any vertex at index (0..4) and value percentage (0..100)
     const getCoordinates = (index, valuePercent) => {
+      const clampedVal = Math.min(100, Math.max(0, Number(valuePercent) || 0));
       const angle = (2 * Math.PI / numAxes) * index - Math.PI / 2;
-      const dist = (valuePercent / 100) * radius;
+      const dist = (clampedVal / 100) * radius;
       return {
         x: center + dist * Math.cos(angle),
         y: center + dist * Math.sin(angle)
       };
     };
 
-    // Level polygons (25%, 50%, 75%, 100%)
+    // Level polygons (25%, 50%, 75%, 100%) - Solid, crisp web lines matching Image 2
     const levelPolygons = [];
+    const levelScaleTexts = [];
+
     for (let l = 1; l <= levels; l++) {
       const levelPercent = (l / levels) * 100;
       const points = [];
@@ -218,11 +232,26 @@ export default function CourseAnalyticsPage() {
         <polygon
           key={`level-${l}`}
           points={points.join(" ")}
-          fill={l === levels ? "rgba(15, 23, 42, 0.4)" : "none"}
-          stroke="rgba(56, 189, 248, 0.18)"
-          strokeWidth={l === levels ? "1.8" : "1"}
-          strokeDasharray={l % 2 === 0 ? "none" : "3 3"}
+          fill={l % 2 === 0 ? "rgba(148, 163, 184, 0.05)" : "none"}
+          stroke={l === levels ? "#94a3b8" : "rgba(148, 163, 184, 0.5)"}
+          strokeWidth={l === levels ? "2" : "1.2"}
         />
+      );
+
+      // Percentage scale label along top axis (25, 50, 75, 100)
+      const scaleCoord = getCoordinates(0, levelPercent);
+      levelScaleTexts.push(
+        <text
+          key={`scale-${l}`}
+          x={scaleCoord.x}
+          y={scaleCoord.y - 4}
+          fill="#64748b"
+          fontSize="10"
+          fontWeight="600"
+          textAnchor="middle"
+        >
+          {Math.round(levelPercent)}
+        </text>
       );
     }
 
@@ -239,14 +268,14 @@ export default function CourseAnalyticsPage() {
           y1={center}
           x2={edge.x}
           y2={edge.y}
-          stroke={isHovered ? "#00e5ff" : "rgba(56, 189, 248, 0.3)"}
-          strokeWidth={isHovered ? "2.5" : "1.5"}
+          stroke={isHovered ? "#38bdf8" : "rgba(148, 163, 184, 0.45)"}
+          strokeWidth={isHovered ? "2" : "1.4"}
           style={{ transition: "all 0.3s ease" }}
         />
       );
 
       // Position labels outside the outer ring with enough padding to stay inside card
-      const labelDist = radius + 32;
+      const labelDist = radius + 25;
       const angle = (2 * Math.PI / numAxes) * i - Math.PI / 2;
       const lx = center + labelDist * Math.cos(angle);
       const ly = center + labelDist * Math.sin(angle) + 4;
@@ -268,8 +297,8 @@ export default function CourseAnalyticsPage() {
           <text
             x={lx}
             y={ly - 6}
-            fill={isHovered ? axisColor : "rgba(255,255,255,0.7)"}
-            fontSize={isHovered ? "12" : "11"}
+            fill={isHovered ? axisColor : "var(--text-primary, #1e293b)"}
+            fontSize={isHovered ? "13" : "12"}
             fontWeight={isHovered ? "700" : "600"}
             textAnchor={textAnchor}
             style={{ transition: "all 0.2s ease" }}
@@ -307,20 +336,20 @@ export default function CourseAnalyticsPage() {
       .join(" ");
 
     return (
-      <div style={{ position: "relative", width: "100%", maxWidth: size, margin: "0 auto", overflow: "hidden" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: size + 40, margin: "0 auto", padding: "0 10px", overflow: "visible" }}>
         <svg
           width="100%"
           height={size}
-          viewBox={`0 0 ${size} ${size}`}
+          viewBox="-30 -10 480 430"
           className="analytics-radar-svg"
           style={{ overflow: "visible", display: "block" }}
         >
           <defs>
             {/* Colorful multi-stop gradient for student radar fill */}
             <radialGradient id="spiderGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="rgba(0, 229, 255, 0.45)" />
+              <stop offset="0%" stopColor="rgba(56, 189, 248, 0.45)" />
               <stop offset="60%" stopColor="rgba(168, 85, 247, 0.3)" />
-              <stop offset="100%" stopColor="rgba(59, 130, 246, 0.1)" />
+              <stop offset="100%" stopColor="rgba(59, 130, 246, 0.15)" />
             </radialGradient>
 
             {/* Class Benchmark gradient */}
@@ -328,21 +357,13 @@ export default function CourseAnalyticsPage() {
               <stop offset="0%" stopColor="rgba(245, 158, 11, 0.2)" />
               <stop offset="100%" stopColor="rgba(245, 158, 11, 0.02)" />
             </radialGradient>
-
-            {/* Glowing neon shadow filter */}
-            <filter id="spiderGlow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="6" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-
-            <filter id="pointGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
 
           {/* Level web background polygons */}
           {levelPolygons}
+
+          {/* Web scale numbers */}
+          {levelScaleTexts}
 
           {/* Axes lines */}
           {axesLines}
@@ -363,9 +384,8 @@ export default function CourseAnalyticsPage() {
           <polygon
             points={studentPoints}
             fill="url(#spiderGradient)"
-            stroke="#00e5ff"
-            strokeWidth="3"
-            filter="url(#spiderGlow)"
+            stroke="#38bdf8"
+            strokeWidth="2.5"
             style={{ transition: "all 0.4s ease" }}
           />
 
@@ -381,13 +401,13 @@ export default function CourseAnalyticsPage() {
                   r="3.5"
                   fill="#f59e0b"
                   stroke="#ffffff"
-                  strokeWidth="1"
+                  strokeWidth="1.5"
                   opacity="0.8"
                 />
               );
             })}
 
-          {/* Student Node Dots */}
+          {/* Student Node Dots matching Image 2 */}
           {values.map((v, i) => {
             const coord = getCoordinates(i, v);
             const isHovered = activeHoverAxis === i;
@@ -397,19 +417,17 @@ export default function CourseAnalyticsPage() {
                   <circle
                     cx={coord.x}
                     cy={coord.y}
-                    r="10"
-                    fill="rgba(0, 229, 255, 0.25)"
-                    filter="url(#pointGlow)"
+                    r="9"
+                    fill="rgba(56, 189, 248, 0.25)"
                   />
                 )}
                 <circle
                   cx={coord.x}
                   cy={coord.y}
-                  r={isHovered ? "6.5" : "5"}
+                  r={isHovered ? "6" : "5"}
                   fill="#ffffff"
-                  stroke={isHovered ? "#a855f7" : "#00e5ff"}
+                  stroke="#38bdf8"
                   strokeWidth="2.5"
-                  filter="url(#pointGlow)"
                   style={{ cursor: "pointer", transition: "all 0.2s ease" }}
                   onMouseEnter={() => setActiveHoverAxis(i)}
                   onMouseLeave={() => setActiveHoverAxis(null)}
@@ -886,7 +904,79 @@ export default function CourseAnalyticsPage() {
           </div>
         )}
 
-        {loadingDetails ? (
+        {/* Modal Popup Box for Student Performance Analytics */}
+        {(selectedStudent || loadingDetails) && (
+          <div
+            className="modal-overlay"
+            onClick={() => {
+              setSelectedStudent(null);
+              setAnalytics(null);
+            }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.75)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 99999,
+              padding: "20px",
+              backdropFilter: "blur(5px)"
+            }}
+          >
+            <div
+              className="modal-content"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "var(--bg-card, #ffffff)",
+                color: "var(--text-primary, #1e293b)",
+                borderRadius: "20px",
+                padding: "24px 28px 32px",
+                maxWidth: "1150px",
+                width: "100%",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.3)",
+                border: "1px solid var(--border-color, rgba(148, 163, 184, 0.2))",
+                position: "relative"
+              }}
+            >
+              {/* Modal Header */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid var(--border-color, rgba(148,163,184,0.2))" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <FiActivity size={22} color="var(--pastel-blue-deep, #38bdf8)" />
+                  <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
+                    Student Performance Analytics {selectedStudent?.name ? `- ${selectedStudent.name}` : ""}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedStudent(null);
+                    setAnalytics(null);
+                  }}
+                  style={{
+                    background: "rgba(148, 163, 184, 0.12)",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: "36px",
+                    height: "36px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--text-gray, #64748b)",
+                    cursor: "pointer",
+                    transition: "background 0.2s"
+                  }}
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+
+              {loadingDetails ? (
           <div className="card" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "60px 0" }}>
             <div className="spinner"></div>
             <p style={{ marginTop: 16, color: "var(--text-gray)" }}>Loading student activity graphs...</p>
@@ -1513,11 +1603,8 @@ export default function CourseAnalyticsPage() {
             </div>
             )} {/* end final tab */}
           </div>
-        ) : (
-          <div className="card" style={{ textAlign: "center", padding: "40px 0", color: "var(--text-gray)" }}>
-            <FiInfo size={32} style={{ marginBottom: 12 }} />
-            <h3>No Profile Selected</h3>
-            <p>Please click "Inspect Graph" on a student to load their activity metrics.</p>
+        ) : null}
+            </div>
           </div>
         )}
       </div>

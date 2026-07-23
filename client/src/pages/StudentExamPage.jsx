@@ -66,6 +66,7 @@ export default function StudentExamPage({
   const keyHandlerRef = useRef(null);
   const visHandlerRef = useRef(null);
   const blurHandlerRef = useRef(null);
+  const touchHandlerRef = useRef(null);
 
   useEffect(() => {
     if (finalCourseId) {
@@ -252,6 +253,12 @@ export default function StudentExamPage({
       doSubmit(examData, "devtools");
       return;
     }
+    if (e.altKey || e.metaKey || (e.ctrlKey && (e.key === "Tab" || e.key === "t" || e.key === "w" || e.key === "n" || e.key === "r"))) {
+      e.preventDefault();
+      e.stopPropagation();
+      doSubmit(examData, "tab_switch");
+      return;
+    }
   };
 
   const handleVisibility = (examData) => {
@@ -264,10 +271,10 @@ export default function StudentExamPage({
   const handleBlur = (examData) => {
     if (!examActive.current || submitting.current || examLocked) return;
     setTimeout(() => {
-      if (examActive.current && !submitting.current && document.hidden) {
+      if (examActive.current && !submitting.current && (!document.hasFocus() || document.hidden)) {
         doSubmit(examData, "tab_switch");
       }
-    }, 500);
+    }, 150);
   };
 
   const blockEvt = (e) => {
@@ -279,14 +286,14 @@ export default function StudentExamPage({
 
   const blockKeys = (e) => {
     if (!examActive.current) return;
-    if (e.ctrlKey || e.metaKey) {
-      const keys = ["c", "v", "x", "a", "u", "s", "p", "i", "j"];
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+      const keys = ["c", "v", "x", "a", "u", "s", "p", "i", "j", "tab", "t", "w", "n", "r"];
       if (keys.includes(e.key.toLowerCase())) {
         e.preventDefault();
         return false;
       }
     }
-    if (e.key === "PrintScreen") {
+    if (e.key === "PrintScreen" || e.key === "F11" || e.key === "F5") {
       e.preventDefault();
       return false;
     }
@@ -298,6 +305,14 @@ export default function StudentExamPage({
     keyHandlerRef.current = (e) => handleKeyDown(e, examData);
     visHandlerRef.current = () => handleVisibility(examData);
     blurHandlerRef.current = () => handleBlur(examData);
+    touchHandlerRef.current = (e) => {
+      if (!examActive.current) return;
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
 
     document.addEventListener("fullscreenchange", fsHandlerRef.current);
     document.addEventListener("webkitfullscreenchange", fsHandlerRef.current);
@@ -310,6 +325,16 @@ export default function StudentExamPage({
     document.addEventListener("contextmenu", blockEvt);
     document.addEventListener("keydown", blockKeys);
     document.addEventListener("keyup", blockKeys);
+
+    // Touchpad & touchscreen multi-finger gesture protection
+    if (touchHandlerRef.current) {
+      document.addEventListener("touchstart", touchHandlerRef.current, { passive: false });
+      document.addEventListener("touchmove", touchHandlerRef.current, { passive: false });
+      document.addEventListener("pointerdown", touchHandlerRef.current, { passive: false });
+      document.addEventListener("pointermove", touchHandlerRef.current, { passive: false });
+      document.addEventListener("gesturestart", blockEvt, { passive: false });
+      document.addEventListener("gesturechange", blockEvt, { passive: false });
+    }
   };
 
   const removeAllListeners = () => {
@@ -325,6 +350,14 @@ export default function StudentExamPage({
     }
     if (blurHandlerRef.current) {
       window.removeEventListener("blur", blurHandlerRef.current);
+    }
+    if (touchHandlerRef.current) {
+      document.removeEventListener("touchstart", touchHandlerRef.current);
+      document.removeEventListener("touchmove", touchHandlerRef.current);
+      document.removeEventListener("pointerdown", touchHandlerRef.current);
+      document.removeEventListener("pointermove", touchHandlerRef.current);
+      document.removeEventListener("gesturestart", blockEvt);
+      document.removeEventListener("gesturechange", blockEvt);
     }
     document.removeEventListener("copy", blockEvt);
     document.removeEventListener("paste", blockEvt);

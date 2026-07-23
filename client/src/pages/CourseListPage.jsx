@@ -116,6 +116,7 @@ export default function CourseListPage() {
     department: user?.department || "Software",
   });
   const [joinCode, setJoinCode] = useState("");
+  const [joinNoticeMessage, setJoinNoticeMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef(null);
@@ -224,7 +225,9 @@ export default function CourseListPage() {
     }
     try {
       const res = await api.post("/courses/join", { code: joinCode });
-      toast.success(res.data.message);
+      if (res.data?.message) {
+        setJoinNoticeMessage(res.data.message);
+      }
       setShowJoin(false);
       setJoinCode("");
       invalidateCache("/courses");
@@ -832,6 +835,75 @@ export default function CourseListPage() {
           </div>
         )}
       </div>
+
+      {/* Join Request Popup Modal */}
+      {joinNoticeMessage && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.55)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          padding: "20px",
+          backdropFilter: "blur(3px)"
+        }}>
+          <div style={{
+            background: "var(--bg-card, #ffffff)",
+            color: "var(--text-primary, #1e293b)",
+            borderRadius: "16px",
+            padding: "28px 24px 24px",
+            maxWidth: "460px",
+            width: "100%",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            textAlign: "center",
+            border: "1px solid var(--border-color, #e2e8f0)"
+          }}>
+            <div style={{
+              width: "56px",
+              height: "56px",
+              borderRadius: "50%",
+              background: "rgba(59, 141, 179, 0.12)",
+              color: "var(--pastel-blue-deep, #3B8DB3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+              fontSize: "26px"
+            }}>
+              📋
+            </div>
+            <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 700, color: "var(--text-primary)" }}>
+              Notice
+            </h3>
+            <p style={{ margin: "0 0 24px 0", fontSize: "14px", lineHeight: "1.6", color: "var(--text-secondary, #475569)" }}>
+              {joinNoticeMessage}
+            </p>
+            <button
+              type="button"
+              onClick={() => setJoinNoticeMessage("")}
+              className="btn-primary"
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "10px",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                background: "linear-gradient(135deg, #7EC8E3 0%, #3B8DB3 100%)",
+                color: "#ffffff",
+                border: "none"
+              }}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

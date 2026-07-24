@@ -106,17 +106,41 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
     handleCopyLink("📋 Link copied! Paste it in Instagram");
   };
 
+  const getExtensionFromMime = (mimeType, originalUrl) => {
+    if (originalUrl) {
+      const cleanPath = originalUrl.split("?")[0];
+      const lastSegment = cleanPath.split("/").pop() || "";
+      if (lastSegment.includes(".")) {
+        const ext = lastSegment.substring(lastSegment.lastIndexOf(".")).toLowerCase();
+        if ([".pdf", ".pptx", ".ppt", ".docx", ".doc", ".xlsx", ".xls", ".png", ".jpg", ".jpeg"].includes(ext)) {
+          return ext;
+        }
+      }
+    }
+    if (!mimeType) return ".pdf";
+    if (mimeType.includes("pdf")) return ".pdf";
+    if (mimeType.includes("presentation") || mimeType.includes("powerpoint")) return ".pptx";
+    if (mimeType.includes("word") || mimeType.includes("document")) return ".docx";
+    if (mimeType.includes("sheet") || mimeType.includes("excel")) return ".xlsx";
+    if (mimeType.includes("png")) return ".png";
+    if (mimeType.includes("jpeg") || mimeType.includes("jpg")) return ".jpg";
+    return ".pdf";
+  };
+
   const handleSystemShare = async () => {
     if (navigator.share) {
       try {
         if (fileUrl) {
-          toast.loading("Preparing document for sharing...", { id: "share-prep" });
+          toast.loading("Preparing document file for sharing...", { id: "share-prep" });
           const absoluteFileUrl = getAbsoluteFileUrl(fileUrl);
           
           const response = await fetch(absoluteFileUrl);
           const blob = await response.blob();
           
-          const fileName = absoluteFileUrl.split("/").pop()?.split("?")[0] || (isLecture ? `${postTitle}.pdf` : "document.pdf");
+          const ext = getExtensionFromMime(blob.type, absoluteFileUrl);
+          const safeTitle = postTitle ? postTitle.trim().replace(/[/\\?%*:|"<>]/g, "_") : "document";
+          const fileName = safeTitle.endsWith(ext) ? safeTitle : `${safeTitle}${ext}`;
+          
           const file = new File([blob], fileName, { type: blob.type || "application/pdf" });
           
           const shareData = {
@@ -128,7 +152,7 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
           toast.dismiss("share-prep");
           if (navigator.canShare && navigator.canShare(shareData)) {
             await navigator.share(shareData);
-            toast.success("Shared successfully!");
+            toast.success("Document file shared successfully!");
             onClose();
             return;
           }
@@ -351,23 +375,24 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
                   onClick={handleSystemShare}
                   style={{
                     width: "100%",
-                    padding: "10px 14px",
-                    background: "#f1f5f9",
-                    color: "#334155",
-                    border: "1px solid #cbd5e1",
+                    padding: "12px 14px",
+                    background: fileUrl ? "linear-gradient(135deg, #0284c7, #3b82f6)" : "#f1f5f9",
+                    color: fileUrl ? "#ffffff" : "#334155",
+                    border: fileUrl ? "none" : "1px solid #cbd5e1",
                     borderRadius: "10px",
-                    fontSize: "13px",
+                    fontSize: "14px",
                     fontWeight: "600",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "6px",
+                    gap: "8px",
                     cursor: "pointer",
-                    marginBottom: "16px"
+                    marginBottom: "16px",
+                    boxShadow: fileUrl ? "0 4px 12px rgba(2, 132, 199, 0.25)" : "none"
                   }}
                 >
-                  <FiShare2 size={16} />
-                  <span>Share via Device Options...</span>
+                  <FiShare2 size={18} />
+                  <span>{fileUrl ? "📂 Send Direct File (PDF / PPTX)" : "Share via Device Options..."}</span>
                 </button>
               )}
 

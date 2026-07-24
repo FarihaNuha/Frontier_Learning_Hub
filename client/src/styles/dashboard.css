@@ -2163,3 +2163,75 @@ body.dark-theme .analytics-gantt-svg rect[fill="rgba(255, 255, 255, 0.04)"] {
   }
 }
 
+/* ==================================================================
+   UNIVERSAL RESPONSIVE BREAKPOINTS (Phone, Tablet, Laptop, Desktop, TV)
+   ================================================================== */
+
+/* Extra Small Phones (< 360px) */
+@media (max-width: 360px) {
+  .main-content {
+    padding: 12px 6px !important;
+  }
+  .top-bar h1 {
+    font-size: 16px !important;
+  }
+  .stat-card, .course-card {
+    padding: 12px !important;
+  }
+}
+
+/* Tablets & Small Laptops (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .courses-grid, .stats-grid, .analytics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+  .main-content {
+    padding: 24px 20px !important;
+  }
+}
+
+/* Laptops & Standard Desktops (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .courses-grid, .stats-grid, .analytics-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px !important;
+  }
+  .main-content {
+    padding: 30px 28px !important;
+  }
+}
+
+/* Large Displays & TV Screens (1441px - 1920px) */
+@media (min-width: 1441px) and (max-width: 1920px) {
+  .main-content {
+    max-width: 1600px !important;
+    margin: 0 auto !important;
+    padding: 36px 40px !important;
+  }
+  .courses-grid, .stats-grid, .analytics-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 28px !important;
+  }
+}
+
+/* Ultra-Wide Displays & 4K TV Screens (> 1920px) */
+@media (min-width: 1921px) {
+  .main-content {
+    max-width: 2000px !important;
+    margin: 0 auto !important;
+    padding: 48px 60px !important;
+  }
+  .courses-grid, .stats-grid, .analytics-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 32px !important;
+  }
+  .top-bar h1 {
+    font-size: 28px !important;
+  }
+  .nav-item {
+    font-size: 15px !important;
+    padding: 14px 18px !important;
+  }
+}
+

@@ -88,11 +88,16 @@ export default function StudentAttendancePage({
 
     try {
       setLoading(true);
-      // For students, don't pass classType — let the server auto-detect from teacher's records
-      const [attRes, statsRes] = await Promise.all([
+      // Fetch courseInfo and attendance data together in Promise.all to prevent flickering
+      const [courseRes, attRes, statsRes] = await Promise.all([
+        api.get(`/courses/${id}`).catch(() => null),
         api.get(`/attendance?courseId=${id}`),
         api.get(`/attendance/stats?courseId=${id}&month=${gridMonth}&year=${gridYear}`),
       ]);
+
+      if (courseRes?.data?.course) {
+        setCourseInfo(courseRes.data.course);
+      }
 
       console.log("Attendance records for course:", id);
       console.log("Records found:", attRes.data.attendance?.length || 0);
@@ -104,7 +109,6 @@ export default function StudentAttendancePage({
       if (statsRes.data?.classType) {
         setClassType(statsRes.data.classType);
       }
-
 
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth();
@@ -211,6 +215,24 @@ export default function StudentAttendancePage({
         <div className="main-content">
           <div className="loading-state">
             <p>Loading attendance...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <StudentSidebar
+          currentPage="attendance"
+          courseInfo={courseInfo}
+          courseId={finalCourseId}
+        />
+        <div className="main-content">
+          <div className="loading-state" style={{ padding: "60px 0" }}>
+            <div className="spinner" style={{ margin: "0 auto" }}></div>
+            <p style={{ marginTop: "12px", color: "#6B89A0" }}>Loading attendance...</p>
           </div>
         </div>
       </div>

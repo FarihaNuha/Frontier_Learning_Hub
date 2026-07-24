@@ -128,13 +128,17 @@ export default function StudentExamPage({
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Get exams for THIS SPECIFIC COURSE only
-      const [examsRes, subsRes] = await Promise.all([
+      // Get exams and courseInfo for THIS SPECIFIC COURSE together
+      const [courseRes, examsRes, subsRes] = await Promise.all([
+        api.get(`/courses/${finalCourseId}`).catch(() => null),
         api.get(`/exams?courseId=${finalCourseId}`),
         api.get("/exams/my-submissions"),
       ]);
-      setExams(examsRes.data.exams);
-      setSubmissions(subsRes.data.submissions);
+      if (courseRes?.data?.course) {
+        setCourseInfo(courseRes.data.course);
+      }
+      setExams(examsRes.data.exams || []);
+      setSubmissions(subsRes.data.submissions || []);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load exams");

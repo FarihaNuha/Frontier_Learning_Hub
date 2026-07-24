@@ -167,20 +167,26 @@ export default function StudentAssignmentPage({
 
   const fetchData = async (forceRefresh = false) => {
     try {
-      const [assignData, subData] = await Promise.all([
+      setLoading(true);
+      const [courseData, assignData, subData] = await Promise.all([
+        fetchWithCache(`/courses/${finalCourseId}`, { forceRefresh }).catch(() => null),
         fetchWithCache(`/assignments?courseId=${finalCourseId}`, { forceRefresh }),
         fetchWithCache("/assignments/my-submissions", { forceRefresh }),
       ]);
 
+      if (courseData?.course) {
+        setCourseInfo(courseData.course);
+      }
+
       // Filter assignments for this course only
-      const courseAssignments = (assignData.assignments || []).filter(
+      const courseAssignments = (assignData?.assignments || []).filter(
         (a) => a.courseId === finalCourseId || a.course === finalCourseCode,
       );
 
       // Filter submissions for this course and current student only
       const currentUserId = (user?.id || user?._id || "").toString();
       const courseAssignmentIds = courseAssignments.map(a => a._id.toString());
-      const courseSubmissions = (subData.submissions || []).filter(s => {
+      const courseSubmissions = (subData?.submissions || []).filter(s => {
         const aId = s.assignmentId?._id || s.assignmentId;
         const subStudentId = (s.studentId?._id || s.studentId || "").toString();
         const matchesStudent = !currentUserId || subStudentId === currentUserId;

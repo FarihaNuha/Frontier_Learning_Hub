@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
 import "../styles/dashboard.css";
@@ -27,7 +27,8 @@ import {
 export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const cid = courseId || courseInfo?._id;
+  const { id: urlParamId } = useParams();
+  const cid = courseId || courseInfo?._id || urlParamId;
 
   const [course, setCourse] = useState(courseInfo || null);
   const [mobileOpen, setMobileOpen] = useState(false);

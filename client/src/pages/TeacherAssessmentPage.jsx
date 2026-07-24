@@ -109,7 +109,13 @@ export default function TeacherAssessmentPage() {
       const res = await api.post("/assessments/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      toast.success("Marksheet processed successfully!");
+      if (res.data?.savedCount === 0 && res.data?.duplicateCount > 0) {
+        toast.error(`⚠️ Info already exists! Marks for all ${res.data.duplicateCount} students were already uploaded.`);
+      } else if (res.data?.duplicateCount > 0) {
+        toast.success(`Marksheet processed: ${res.data.savedCount} saved, ${res.data.duplicateCount} duplicate(s) skipped.`);
+      } else {
+        toast.success("Marksheet processed successfully!");
+      }
       setSummary(res.data);
       setFile(null);
       // Reset file input element

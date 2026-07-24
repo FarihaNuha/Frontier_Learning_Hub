@@ -26,18 +26,63 @@ exports.uploadMarksheet = async (req, res) => {
       return res.status(400).json({ error: "The uploaded sheet is empty" });
     }
 
-    // 1. Automatic Course Code Detection (from first 5 rows)
+    // 1. Automatic Metadata Detection (Course Code, Session, Department from first 10 rows)
     let courseCode = "";
-    for (let r = 0; r < Math.min(rows.length, 5); r++) {
+    let session = "";
+    let department = "";
+
+    for (let r = 0; r < Math.min(rows.length, 10); r++) {
       const row = rows[r];
-      if (!row) continue;
-      for (const cell of row) {
-        if (cell && typeof cell === "string" && cell.toLowerCase().includes("course code:")) {
-          courseCode = cell.split(/course code:\s*/i)[1]?.trim();
-          break;
+      if (!row || !Array.isArray(row)) continue;
+
+      for (let c = 0; c < row.length; c++) {
+        const cell = row[c];
+        if (cell === undefined || cell === null) continue;
+        const cellStr = String(cell).trim();
+        const cellLower = cellStr.toLowerCase();
+
+        // 1. Course Code Detection
+        if (!courseCode && cellLower.includes("course code")) {
+          if (cellLower.includes("course code:")) {
+            const extracted = cellStr.split(/course code:\s*/i)[1]?.split(/[\n,;]/)[0]?.trim();
+            if (extracted) courseCode = extracted;
+          }
+          if (!courseCode && row[c + 1] !== undefined && row[c + 1] !== null) {
+            const nextVal = String(row[c + 1]).trim();
+            if (nextVal && !nextVal.toLowerCase().includes("session") && !nextVal.toLowerCase().includes("dept")) {
+              courseCode = nextVal;
+            }
+          }
+        }
+
+        // 2. Session Detection
+        if (!session && cellLower.includes("session")) {
+          if (cellLower.includes("session:") || cellLower.includes("session :")) {
+            const extracted = cellStr.split(/session\s*:\s*/i)[1]?.split(/[\n,;]/)[0]?.trim();
+            if (extracted) session = extracted;
+          }
+          if (!session && row[c + 1] !== undefined && row[c + 1] !== null) {
+            const nextVal = String(row[c + 1]).trim();
+            if (nextVal && !nextVal.toLowerCase().includes("course") && !nextVal.toLowerCase().includes("dept")) {
+              session = nextVal;
+            }
+          }
+        }
+
+        // 3. Department Detection
+        if (!department && (cellLower.includes("dept") || cellLower.includes("department"))) {
+          if (cellLower.includes("dept:") || cellLower.includes("department:") || cellLower.includes("dept :") || cellLower.includes("department :")) {
+            const extracted = cellStr.split(/(?:dept|department)\s*:\s*/i)[1]?.split(/[\n,;]/)[0]?.trim();
+            if (extracted) department = extracted;
+          }
+          if (!department && row[c + 1] !== undefined && row[c + 1] !== null) {
+            const nextVal = String(row[c + 1]).trim();
+            if (nextVal && !nextVal.toLowerCase().includes("course") && !nextVal.toLowerCase().includes("session")) {
+              department = nextVal;
+            }
+          }
         }
       }
-      if (courseCode) break;
     }
 
     if (!courseCode) {
@@ -48,9 +93,15 @@ exports.uploadMarksheet = async (req, res) => {
       });
     }
 
-    // Retrieve courseId from Course model for notification link
+    // Retrieve Course model doc for notification link and fallbacks
     const courseDoc = await Course.findOne({ displayCode: courseCode.trim().toUpperCase() });
     const courseId = courseDoc ? courseDoc._id : null;
+    if (!session && courseDoc?.session) {
+      session = courseDoc.session;
+    }
+    if (!department && courseDoc?.department) {
+      department = courseDoc.department;
+    }
 
     // 2. Find the header row (has 'ID of the Student' or 'Student ID' or 'ID')
     let headerRowIndex = -1;
@@ -122,10 +173,15 @@ exports.uploadMarksheet = async (req, res) => {
       const presentation = getNum(presentationColIndex);
       const totalMarks = getNum(totalColIndex);
 
-      // 5. Duplicate Record Detection
-      const existingRecord = await Assessment.findOne({ studentIdNumber, courseCode });
+      // 5. Duplicate Record Detection (checks studentIdNumber, courseCode, session, department)
+      const existingRecord = await Assessment.findOne({
+        studentIdNumber,
+        courseCode,
+        session,
+        department
+      });
       if (existingRecord) {
-        duplicateRecords.push({ studentIdNumber, courseCode });
+        duplicateRecords.push({ studentIdNumber, courseCode, session, department });
         continue;
       }
 
@@ -133,18 +189,34 @@ exports.uploadMarksheet = async (req, res) => {
       const studentUser = await User.findOne({ studentId: studentIdNumber, role: "student" });
       const studentId = studentUser ? studentUser._id : null;
 
+      // Try dropping legacy unique index if still present in MongoDB
+      try {
+        await Assessment.collection.dropIndex("studentIdNumber_1_courseCode_1");
+      } catch (e) {}
+
       // 6. Save Assessment record
-      const record = await Assessment.create({
-        studentIdNumber,
-        studentId,
-        courseCode,
-        attendance,
-        quiz,
-        assignment,
-        presentation,
-        totalMarks,
-        uploadedBy: req.user.uid,
-      });
+      let record;
+      try {
+        record = await Assessment.create({
+          studentIdNumber,
+          studentId,
+          courseCode,
+          session,
+          department,
+          attendance,
+          quiz,
+          assignment,
+          presentation,
+          totalMarks,
+          uploadedBy: req.user.uid,
+        });
+      } catch (err) {
+        if (err.code === 11000) {
+          duplicateRecords.push({ studentIdNumber, courseCode, session, department });
+          continue;
+        }
+        throw err;
+      }
 
       if (studentId) {
         // Delete any existing marksheet notifications for this course to avoid duplicates
@@ -210,6 +282,8 @@ exports.uploadMarksheet = async (req, res) => {
     res.json({
       success: true,
       courseCode,
+      session,
+      department,
       totalProcessed: savedRecords.length + duplicateRecords.length,
       savedCount: savedRecords.length,
       duplicateCount: duplicateRecords.length,
@@ -265,24 +339,30 @@ exports.getTeacherAssessments = async (req, res) => {
   }
 };
 
-// Delete all assessment records for a specific course uploaded by the logged-in teacher
+// Delete all assessment records for a specific course + session + department uploaded by logged-in teacher
 exports.deleteCourseAssessment = async (req, res) => {
   try {
     const { courseCode } = req.params;
+    const { session, department } = req.query;
     if (!courseCode) {
       return res.status(400).json({ error: "Course code is required" });
     }
 
-    const assessmentsToDelete = await Assessment.find({
+    const query = {
       courseCode,
       uploadedBy: req.user.uid
-    });
+    };
+    if (session !== undefined && session !== "undefined") {
+      query.session = session;
+    }
+    if (department !== undefined && department !== "undefined") {
+      query.department = department;
+    }
+
+    const assessmentsToDelete = await Assessment.find(query);
     const studentIds = assessmentsToDelete.map(a => a.studentId).filter(Boolean);
 
-    const result = await Assessment.deleteMany({
-      courseCode,
-      uploadedBy: req.user.uid
-    });
+    const result = await Assessment.deleteMany(query);
 
     if (studentIds.length > 0) {
       await Notification.deleteMany({

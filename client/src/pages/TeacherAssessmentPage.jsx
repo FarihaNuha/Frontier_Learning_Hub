@@ -31,7 +31,7 @@ export default function TeacherAssessmentPage() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCourseCode, setSelectedCourseCode] = useState(null);
+  const [selectedCourseGroup, setSelectedCourseGroup] = useState(null);
   const [showRules, setShowRules] = useState(false);
   
   // Upload results summary state
@@ -41,13 +41,15 @@ export default function TeacherAssessmentPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  const handleDeleteCourse = async (courseCode) => {
+  const handleDeleteCourse = async (targetGroup) => {
     setDeleting(true);
     try {
-      await api.delete(`/assessments/course/${courseCode}`);
+      const { courseCode, session, department } = targetGroup;
+      const url = `/assessments/course/${encodeURIComponent(courseCode)}?session=${encodeURIComponent(session || '')}&department=${encodeURIComponent(department || '')}`;
+      await api.delete(url);
       toast.success(`Marksheet for ${courseCode} deleted successfully`);
       setDeleteTarget(null);
-      setSelectedCourseCode(null);
+      setSelectedCourseGroup(null);
       fetchAssessments();
     } catch (error) {
       toast.error(error.response?.data?.error || "Failed to delete marksheet");
@@ -72,15 +74,6 @@ export default function TeacherAssessmentPage() {
 
   useEffect(() => {
     fetchAssessments();
-    if (courseId) {
-      api.get(`/courses/${courseId}`)
-        .then((res) => {
-          if (res.data.course?.displayCode) {
-            setSelectedCourseCode(res.data.course.displayCode);
-          }
-        })
-        .catch(() => {});
-    }
   }, [courseId]);
 
   const fetchAssessments = async () => {
@@ -132,42 +125,66 @@ export default function TeacherAssessmentPage() {
     }
   };
 
-  // Group assessments by courseCode
+  // Group assessments by courseCode + session + department
   const courseGroups = assessments.reduce((acc, item) => {
-    const code = item.courseCode;
-    if (!acc[code]) {
-      acc[code] = [];
+    const code = item.courseCode || "UNKNOWN";
+    const sess = item.session || "";
+    const dept = item.department || "";
+    const key = `${code}|||${sess}|||${dept}`;
+    if (!acc[key]) {
+      acc[key] = {
+        key,
+        courseCode: code,
+        session: sess,
+        department: dept,
+        items: []
+      };
     }
-    acc[code].push(item);
+    acc[key].items.push(item);
     return acc;
   }, {});
 
-  const uniqueCourses = Object.keys(courseGroups);
+  const uniqueCourseGroups = Object.values(courseGroups);
 
-  const filteredUniqueCourses = uniqueCourses.filter((code) => {
+  const filteredUniqueCourseGroups = uniqueCourseGroups.filter((group) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase().trim();
-    const matchesCode = code.toLowerCase().includes(q);
-    const matchesStudent = (courseGroups[code] || []).some(
+    const matchesCode = group.courseCode.toLowerCase().includes(q);
+    const matchesSession = group.session.toLowerCase().includes(q);
+    const matchesDept = group.department.toLowerCase().includes(q);
+    const matchesStudent = group.items.some(
       (item) =>
         item.studentIdNumber.toLowerCase().includes(q) ||
         (item.studentId?.name || "").toLowerCase().includes(q)
     );
-    return matchesCode || matchesStudent;
+    return matchesCode || matchesSession || matchesDept || matchesStudent;
   });
 
-  // Filter assessments based on selected course and search query
-  const filteredAssessments = assessments.filter((item) => {
-    const matchesCourse = selectedCourseCode
-      ? item.courseCode.toLowerCase() === selectedCourseCode.toLowerCase()
-      : true;
+  // Hierarchical Grouping: Department -> Session -> Marksheet Cards
+  const deptSessionGroups = filteredUniqueCourseGroups.reduce((acc, group) => {
+    const dept = group.department ? group.department.toUpperCase() : "GENERAL / OTHER DEPT";
+    const sess = group.session ? group.session : "GENERAL SESSION";
+    if (!acc[dept]) {
+      acc[dept] = {};
+    }
+    if (!acc[dept][sess]) {
+      acc[dept][sess] = [];
+    }
+    acc[dept][sess].push(group);
+    return acc;
+  }, {});
 
-    const matchesSearch =
-      item.studentIdNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.studentId?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesCourse && matchesSearch;
-  });
+  // Filter assessments based on selected group and search query
+  const filteredAssessments = selectedCourseGroup
+    ? (courseGroups[selectedCourseGroup.key]?.items || []).filter((item) => {
+        if (!searchQuery.trim()) return true;
+        const q = searchQuery.toLowerCase().trim();
+        return (
+          item.studentIdNumber.toLowerCase().includes(q) ||
+          (item.studentId?.name || "").toLowerCase().includes(q)
+        );
+      })
+    : [];
 
   return (
     <div className="dashboard-container">
@@ -220,8 +237,8 @@ export default function TeacherAssessmentPage() {
               <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #bae6fd", fontSize: 13, color: "#334155" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 14 }}>
                   <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>1. Course Code Tag</strong>
-                    Include a cell in the first 5 rows containing: <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Course Code: CSE 201</code>
+                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>1. Header Tags (Course Code, Session, Dept)</strong>
+                    Include cells in the first 10 rows containing: <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Course Code: CC 483</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Session: 2024-25</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Dept: EDTE</code>
                   </div>
                   <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                     <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>2. Required Student ID Column</strong>
@@ -249,7 +266,9 @@ export default function TeacherAssessmentPage() {
                     <tbody>
                       <tr>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>1</td>
-                        <td colSpan="6" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Course Code: ET 317</td>
+                        <td colSpan="2" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Course Code: CC 483</td>
+                        <td colSpan="2" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Session: 2024-25</td>
+                        <td colSpan="2" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Dept: EDTE</td>
                       </tr>
                       <tr>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>2</td>
@@ -351,6 +370,8 @@ export default function TeacherAssessmentPage() {
               </h4>
               <div style={{ display: "flex", gap: 24, flexWrap: "wrap", fontSize: 14 }}>
                 <p><strong>Detected Course Code:</strong> <span className="status-badge ontime">{summary.courseCode}</span></p>
+                {summary.session && <p><strong>Session:</strong> <span style={{ background: "#f1f5f9", color: "#475569", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.session}</span></p>}
+                {summary.department && <p><strong>Dept:</strong> <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.department}</span></p>}
                 <p><strong>Total Rows:</strong> {summary.totalProcessed}</p>
                 <p><strong>Successfully Saved:</strong> <span style={{ color: "#16a34a", fontWeight: "bold" }}>{summary.savedCount}</span></p>
                 <p><strong>Duplicate Rows Skipped:</strong> <span style={{ color: "#dc2626", fontWeight: "bold" }}>{summary.duplicateCount}</span></p>
@@ -366,7 +387,7 @@ export default function TeacherAssessmentPage() {
 
         {/* ASSESSMENT MARKS LIST */}
         <div className="table-container">
-          {selectedCourseCode === null ? (
+          {selectedCourseGroup === null ? (
             // CARDS GRID VIEW
             <div>
               <div
@@ -381,14 +402,14 @@ export default function TeacherAssessmentPage() {
                 }}
               >
                 <h2 style={{ margin: 0, fontSize: 18, color: "#2c4b66" }}>
-                  Course Marksheets ({uniqueCourses.length})
+                  Course Marksheets ({uniqueCourseGroups.length})
                 </h2>
                 
                 {/* GLOBAL COURSE CARDS SEARCH BAR */}
-                <div style={{ position: "relative", width: "100%", maxWidth: 320 }}>
+                <div style={{ position: "relative", width: "100%", maxWidth: 340 }}>
                   <input
                     type="text"
-                    placeholder="Search course code, session, or student..."
+                    placeholder="Search course code, session, dept, or student..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
@@ -418,100 +439,132 @@ export default function TeacherAssessmentPage() {
                 <div className="loading-state" style={{ padding: "40px 0" }}>
                   <div className="spinner" style={{ margin: "0 auto" }}></div>
                 </div>
-              ) : uniqueCourses.length === 0 ? (
+              ) : uniqueCourseGroups.length === 0 ? (
                 <div className="empty-state" style={{ padding: "60px 0" }}>
                   <FiFileText size={48} color="#6B89A0" />
                   <h3>No course marksheets uploaded yet</h3>
                   <p>Please select and upload an Excel marksheet file above.</p>
                 </div>
-              ) : filteredUniqueCourses.length === 0 ? (
+              ) : filteredUniqueCourseGroups.length === 0 ? (
                 <div className="empty-state" style={{ padding: "40px 0" }}>
                   <FiSearch size={40} color="#6B89A0" />
                   <h3>No matching marksheets found</h3>
-                  <p>No course or student matches "{searchQuery}"</p>
+                  <p>No course, session, department, or student matches "{searchQuery}"</p>
                 </div>
               ) : (
-                <div style={{ padding: "24px" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
-                    {filteredUniqueCourses.map((code) => {
-                      const studentCount = courseGroups[code].length;
-                      return (
-                        <div
-                          key={code}
-                          onClick={() => setSelectedCourseCode(code)}
-                          className="assessment-course-card"
-                        >
-                          {/* Card Accent Line */}
-                          <div style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "6px",
-                            height: "100%",
-                            background: "#3B8DB3"
-                          }}></div>
+                <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "28px" }}>
+                  {Object.entries(deptSessionGroups).map(([deptName, sessionsMap]) => (
+                    <div key={deptName} style={{ background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                      {/* Department Section Header */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "12px", borderBottom: "2px solid #3B8DB3", marginBottom: "20px" }}>
+                        <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "6px 14px", borderRadius: "8px", fontWeight: 700, fontSize: "14px", display: "inline-flex", alignItems: "center", gap: "6px", letterSpacing: "0.3px" }}>
+                          🏛️ Dept: {deptName}
+                        </span>
+                      </div>
 
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
-                            <span style={{
-                              background: "#E8F4FD",
-                              color: "#3B8DB3",
-                              padding: "6px 12px",
-                              borderRadius: "20px",
-                              fontSize: "13px",
-                              fontWeight: 700,
-                              letterSpacing: "0.5px"
-                            }}>
-                              {code}
-                            </span>
-                            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteTarget({ type: "course", value: code });
-                                }}
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  color: "#ef4444",
-                                  padding: "4px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  borderRadius: "4px",
-                                  transition: "background 0.2s"
-                                }}
-                                title="Delete Marksheet"
-                              >
-                                <FiTrash2 size={18} />
-                              </button>
-                              <FiBookOpen size={24} color="#3B8DB3" />
+                      {/* Sessions under this Department (Sorted in Descending Order) */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                        {Object.entries(sessionsMap)
+                          .sort(([sessA], [sessB]) => sessB.localeCompare(sessA, undefined, { numeric: true }))
+                          .map(([sessionName, groupsList]) => (
+                          <div key={sessionName}>
+                            {/* Session Sub-header */}
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569", background: "#f1f5f9", padding: "4px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                                📅 Session: {sessionName}
+                              </span>
+                              <span style={{ fontSize: "12px", color: "#64748b" }}>
+                                ({groupsList.length} {groupsList.length === 1 ? "Marksheet" : "Marksheets"})
+                              </span>
+                            </div>
+
+                            {/* Marksheet Cards Grid */}
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
+                              {groupsList.map((group) => {
+                                const studentCount = group.items.length;
+                                return (
+                                  <div
+                                    key={group.key}
+                                    onClick={() => setSelectedCourseGroup(group)}
+                                    className="assessment-course-card"
+                                    style={{ position: "relative", cursor: "pointer" }}
+                                  >
+                                    {/* Card Accent Line */}
+                                    <div style={{
+                                      position: "absolute",
+                                      top: 0,
+                                      left: 0,
+                                      width: "6px",
+                                      height: "100%",
+                                      background: "#3B8DB3"
+                                    }}></div>
+
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
+                                      <span style={{
+                                        background: "#E8F4FD",
+                                        color: "#3B8DB3",
+                                        padding: "6px 12px",
+                                        borderRadius: "20px",
+                                        fontSize: "13px",
+                                        fontWeight: 700,
+                                        letterSpacing: "0.5px"
+                                      }}>
+                                        {group.courseCode}
+                                      </span>
+                                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteTarget({ type: "course", value: group });
+                                          }}
+                                          style={{
+                                            background: "none",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            color: "#ef4444",
+                                            padding: "4px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            borderRadius: "4px",
+                                            transition: "background 0.2s"
+                                          }}
+                                          title="Delete Marksheet"
+                                        >
+                                          <FiTrash2 size={18} />
+                                        </button>
+                                        <FiBookOpen size={24} color="#3B8DB3" />
+                                      </div>
+                                    </div>
+
+                                    <h3 style={{ fontSize: "16px", color: "#2c4b66", margin: "0 0 6px 0", fontWeight: 600 }}>
+                                      Assessment Marksheet
+                                    </h3>
+                                    <p style={{ color: "#6b89a0", fontSize: "14px", margin: 0 }}>
+                                      Students Uploaded: <strong style={{ color: "#2c4b66" }}>{studentCount}</strong>
+                                    </p>
+
+                                    <div style={{
+                                      marginTop: "16px",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "6px",
+                                      color: "#3B8DB3",
+                                      fontSize: "13px",
+                                      fontWeight: 600
+                                    }}>
+                                      <span>View Student Marks</span>
+                                      <span>→</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
-
-                          <h3 style={{ fontSize: "18px", color: "#2c4b66", margin: "0 0 8px 0", fontWeight: 600 }}>
-                            Assessment Marksheet
-                          </h3>
-                          <p style={{ color: "#6b89a0", fontSize: "14px", margin: 0 }}>
-                            Students Uploaded: <strong style={{ color: "#2c4b66" }}>{studentCount}</strong>
-                          </p>
-
-                          <div style={{
-                            marginTop: "16px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            color: "#3B8DB3",
-                            fontSize: "13px",
-                            fontWeight: 600
-                          }}>
-                            <span>View Student Marks</span>
-                            <span>→</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -531,7 +584,7 @@ export default function TeacherAssessmentPage() {
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <button
-                    onClick={() => setSelectedCourseCode(null)}
+                    onClick={() => setSelectedCourseGroup(null)}
                     className="btn-secondary"
                     style={{
                       display: "inline-flex",
@@ -547,15 +600,25 @@ export default function TeacherAssessmentPage() {
                   >
                     <FiArrowLeft size={14} /> Back to Courses
                   </button>
-                  <h2 style={{ margin: 0, fontSize: 18, color: "#2c4b66" }}>
-                    Marksheet for <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", fontWeight: 700, marginLeft: 6 }}>{selectedCourseCode}</span>
+                  <h2 style={{ margin: 0, fontSize: 18, color: "#2c4b66", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    Marksheet for <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", fontWeight: 700 }}>{selectedCourseGroup?.courseCode}</span>
+                    {selectedCourseGroup?.session && (
+                      <span style={{ background: "#f1f5f9", color: "#475569", padding: "3px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 }}>
+                        Session: {selectedCourseGroup.session}
+                      </span>
+                    )}
+                    {selectedCourseGroup?.department && (
+                      <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "3px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 }}>
+                        Dept: {selectedCourseGroup.department}
+                      </span>
+                    )}
                   </h2>
                 </div>
 
                 {/* SEARCH & ACTIONS */}
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                   <button
-                    onClick={() => setDeleteTarget({ type: "course", value: selectedCourseCode })}
+                    onClick={() => setDeleteTarget({ type: "course", value: selectedCourseGroup })}
                     className="btn-secondary"
                     style={{
                       display: "inline-flex",
@@ -680,7 +743,9 @@ export default function TeacherAssessmentPage() {
               {deleteTarget.type === "course" ? (
                 <p style={{ margin: 0, fontSize: "15px", color: "#2C4B66", lineHeight: "1.5" }}>
                   Are you sure you want to delete the entire assessment marksheet for course{" "}
-                  <strong>{deleteTarget.value}</strong>? This will permanently remove all student marks associated with this marksheet. This action cannot be undone.
+                  <strong>{deleteTarget.value?.courseCode}</strong>
+                  {deleteTarget.value?.session && ` (Session: ${deleteTarget.value.session})`}
+                  {deleteTarget.value?.department && ` (Dept: ${deleteTarget.value.department})`}? This will permanently remove all student marks associated with this marksheet. This action cannot be undone.
                 </p>
               ) : (
                 <p style={{ margin: 0, fontSize: "15px", color: "#2C4B66", lineHeight: "1.5" }}>

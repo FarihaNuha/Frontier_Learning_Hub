@@ -14,6 +14,14 @@ const assessmentSchema = new mongoose.Schema({
     type: String,
     required: [true, "Course code is required"],
   },
+  session: {
+    type: String,
+    default: "",
+  },
+  department: {
+    type: String,
+    default: "",
+  },
   attendance: {
     type: Number,
     default: 0,
@@ -45,7 +53,14 @@ const assessmentSchema = new mongoose.Schema({
   },
 });
 
-// Compound unique index to prevent duplicate records for the same student in the same course
-assessmentSchema.index({ studentIdNumber: 1, courseCode: 1 }, { unique: true });
+// Compound index for student assessment records per course, session, and department
+assessmentSchema.index({ studentIdNumber: 1, courseCode: 1, session: 1, department: 1 });
 
-module.exports = mongoose.model("Assessment", assessmentSchema);
+const Assessment = mongoose.model("Assessment", assessmentSchema);
+
+// Drop old legacy unique index if it still exists in MongoDB database collection
+Assessment.collection.dropIndex("studentIdNumber_1_courseCode_1").catch(() => {
+  // Index already dropped or doesn't exist
+});
+
+module.exports = Assessment;

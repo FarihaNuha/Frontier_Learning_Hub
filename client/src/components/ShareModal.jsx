@@ -128,38 +128,54 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
   };
 
   const handleSystemShare = async () => {
-    if (navigator.share) {
-      try {
-        if (fileUrl) {
-          toast.loading("Preparing document file for sharing...", { id: "share-prep" });
-          const absoluteFileUrl = getAbsoluteFileUrl(fileUrl);
-          
-          const response = await fetch(absoluteFileUrl);
-          const blob = await response.blob();
-          
-          const ext = getExtensionFromMime(blob.type, absoluteFileUrl);
-          const safeTitle = postTitle ? postTitle.trim().replace(/[/\\?%*:|"<>]/g, "_") : "document";
-          const fileName = safeTitle.endsWith(ext) ? safeTitle : `${safeTitle}${ext}`;
-          
-          const file = new File([blob], fileName, { type: blob.type || "application/pdf" });
-          
-          const shareData = {
-            files: [file],
-            title: postTitle,
-            text: defaultText,
-          };
-          
-          toast.dismiss("share-prep");
-          if (navigator.canShare && navigator.canShare(shareData)) {
-            await navigator.share(shareData);
-            toast.success("Document file shared successfully!");
-            onClose();
-            return;
-          }
-        }
+    try {
+      if (fileUrl) {
+        toast.loading("Preparing document file for sharing...", { id: "share-prep" });
         
-        // Fallback if no fileUrl or canShare fails
+        let blob;
+        try {
+          const res = await api.get(fileUrl, { responseType: "blob" });
+          blob = res.data;
+        } catch (e) {
+          const absoluteFileUrl = getAbsoluteFileUrl(fileUrl);
+          const response = await fetch(absoluteFileUrl);
+          blob = await response.blob();
+        }
+
+        const absoluteFileUrl = getAbsoluteFileUrl(fileUrl);
+        const ext = getExtensionFromMime(blob.type, absoluteFileUrl);
+        const safeTitle = postTitle ? postTitle.trim().replace(/[/\\?%*:|"<>]/g, "_") : "document";
+        const fileName = safeTitle.endsWith(ext) ? safeTitle : `${safeTitle}${ext}`;
+        
+        const file = new File([blob], fileName, { type: blob.type || "application/pdf" });
+        
+        const shareData = {
+          files: [file],
+          title: postTitle,
+        };
+        
         toast.dismiss("share-prep");
+
+        if (navigator.canShare && navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+          toast.success("Document file shared successfully!");
+          onClose();
+          return;
+        }
+
+        // If file sharing is not supported on this browser (e.g. desktop), download the file!
+        const link = document.createElement("a");
+        link.href = absoluteFileUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("📄 Document file downloaded to your device!");
+        onClose();
+        return;
+      }
+      
+      if (navigator.share) {
         await navigator.share({
           title: postTitle,
           text: defaultText + (fileDownloadUrl ? `\n\n📄 Document: ${fileDownloadUrl}` : ""),
@@ -167,15 +183,29 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
         });
         toast.success("Shared successfully!");
         onClose();
-      } catch (err) {
-        toast.dismiss("share-prep");
-        if (err.name !== "AbortError") {
-          toast.error("Error sharing file");
-          console.error("Native share error:", err);
-        }
+      } else {
+        handleCopyLink();
       }
-    } else {
-      handleCopyLink();
+    } catch (err) {
+      toast.dismiss("share-prep");
+      if (err.name === "AbortError") {
+        return; // User closed native share window
+      }
+      if (fileUrl) {
+        try {
+          const absoluteFileUrl = getAbsoluteFileUrl(fileUrl);
+          const link = document.createElement("a");
+          link.href = absoluteFileUrl;
+          link.download = postTitle || "document";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          toast.success("📄 Document downloaded!");
+          onClose();
+          return;
+        } catch (e) {}
+      }
+      toast.error("Sharing not supported on this browser.");
     }
   };
 

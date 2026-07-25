@@ -18,6 +18,10 @@ exports.createPublicPost = async (req, res) => {
       return res.status(400).json({ error: "Content is required" });
     }
 
+    if ((category === "announcement" || category === "resource") && req.user.role !== "teacher" && req.user.role !== "admin") {
+      return res.status(403).json({ error: "Only teachers can post announcements or resources" });
+    }
+
     let attachments = [];
     if (req.files && req.files.length > 0) {
       attachments = req.files.map((file) => ({
@@ -282,6 +286,10 @@ exports.createCoursePost = async (req, res) => {
 
     if (!content) {
       return res.status(400).json({ error: "Content is required" });
+    }
+
+    if ((category === "announcement" || category === "resource") && req.user.role !== "teacher" && req.user.role !== "admin") {
+      return res.status(403).json({ error: "Only teachers can post announcements or resources" });
     }
 
     const course = await Course.findById(courseId);
@@ -950,6 +958,10 @@ exports.updatePost = async (req, res) => {
     // Only the author can update their post
     if (post.author.toString() !== req.user.uid) {
       return res.status(403).json({ error: "You are not authorized to edit this post" });
+    }
+
+    if ((category === "announcement" || category === "resource") && req.user.role !== "teacher" && req.user.role !== "admin") {
+      return res.status(403).json({ error: "Only teachers can post announcements or resources" });
     }
 
     if (title !== undefined) post.title = title || "Untitled";

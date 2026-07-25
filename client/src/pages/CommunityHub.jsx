@@ -169,12 +169,15 @@ export default function CommunityHub() {
     }
   };
 
+  const isTeacherOrAdmin = user?.role === "teacher" || user?.role === "admin";
+  const canCreateInCurrentTab = isTeacherOrAdmin || (selectedCategory !== "announcement" && selectedCategory !== "resource");
+
   return (
     <div className="community-container">
       {user?.role === "teacher" ? (
-        <TeacherSidebar currentPage="community" />
+        <TeacherSidebar currentPage="community-hub" />
       ) : (
-        <StudentSidebar currentPage="community" />
+        <StudentSidebar currentPage="community-hub" />
       )}
 
       <div className="community-main">
@@ -185,12 +188,14 @@ export default function CommunityHub() {
                 <h1>Community Feed</h1>
                 <p>Join discussions with all students and teachers</p>
               </div>
-              <button
-                className="create-post-btn"
-                onClick={() => setShowCreateModal(true)}
-              >
-                <FiPlus size={18} /> New Post
-              </button>
+              {canCreateInCurrentTab && (
+                <button
+                  className="create-post-btn"
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  <FiPlus size={18} /> New Post
+                </button>
+              )}
             </div>
 
             <div className="category-filters">
@@ -233,15 +238,29 @@ export default function CommunityHub() {
               </div>
             ) : posts.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-icon">💬</div>
-                <h3>No posts yet</h3>
-                <p>Be the first to start a discussion!</p>
-                <button
-                  className="btn-primary"
-                  onClick={() => setShowCreateModal(true)}
-                >
-                  Create First Post
-                </button>
+                <div className="empty-icon">
+                  {selectedCategory === "announcement" ? "📢" : selectedCategory === "resource" ? "📚" : "💬"}
+                </div>
+                <h3>
+                  {selectedCategory === "announcement"
+                    ? "No announcements yet"
+                    : selectedCategory === "resource"
+                    ? "No resources yet"
+                    : "No posts yet"}
+                </h3>
+                {canCreateInCurrentTab ? (
+                  <>
+                    <p>Be the first to start a discussion!</p>
+                    <button
+                      className="btn-primary"
+                      onClick={() => setShowCreateModal(true)}
+                    >
+                      Create First Post
+                    </button>
+                  </>
+                ) : (
+                  <p>No {selectedCategory === "announcement" ? "announcements" : "resources"} have been posted yet.</p>
+                )}
               </div>
             ) : (
               <div className="posts-feed">
@@ -1084,6 +1103,7 @@ function PostCard({ post, getCategoryIcon, onPostDeleted, onPostUpdated }) {
 }
 
 function CreatePostModal({ onClose, onCreatePost }) {
+  const { user } = useAuth();
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("general");
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -1141,20 +1161,24 @@ function CreatePostModal({ onClose, onCreatePost }) {
               >
                 <FiHelpCircle size={14} /> Question
               </button>
-              <button
-                type="button"
-                className={`category-option ${category === "announcement" ? "selected" : ""}`}
-                onClick={() => setCategory("announcement")}
-              >
-                <FiBell size={14} /> Announcement
-              </button>
-              <button
-                type="button"
-                className={`category-option ${category === "resource" ? "selected" : ""}`}
-                onClick={() => setCategory("resource")}
-              >
-                <FiBookOpen size={14} /> Resource
-              </button>
+              {(user?.role === "teacher" || user?.role === "admin") && (
+                <>
+                  <button
+                    type="button"
+                    className={`category-option ${category === "announcement" ? "selected" : ""}`}
+                    onClick={() => setCategory("announcement")}
+                  >
+                    <FiBell size={14} /> Announcement
+                  </button>
+                  <button
+                    type="button"
+                    className={`category-option ${category === "resource" ? "selected" : ""}`}
+                    onClick={() => setCategory("resource")}
+                  >
+                    <FiBookOpen size={14} /> Resource
+                  </button>
+                </>
+              )}
             </div>
           </div>
           <div className="form-group">
@@ -1224,6 +1248,7 @@ function CreatePostModal({ onClose, onCreatePost }) {
 }
 
 function EditPostModal({ post, onClose, onUpdatePost }) {
+  const { user } = useAuth();
   const [content, setContent] = useState(post.content || "");
   const [category, setCategory] = useState(post.category || "general");
   const [existingAttachments, setExistingAttachments] = useState(post.attachments || []);
@@ -1286,20 +1311,24 @@ function EditPostModal({ post, onClose, onUpdatePost }) {
               >
                 <FiHelpCircle size={14} /> Question
               </button>
-              <button
-                type="button"
-                className={`category-option ${category === "announcement" ? "selected" : ""}`}
-                onClick={() => setCategory("announcement")}
-              >
-                <FiBell size={14} /> Announcement
-              </button>
-              <button
-                type="button"
-                className={`category-option ${category === "resource" ? "selected" : ""}`}
-                onClick={() => setCategory("resource")}
-              >
-                <FiBookOpen size={14} /> Resource
-              </button>
+              {(user?.role === "teacher" || user?.role === "admin") && (
+                <>
+                  <button
+                    type="button"
+                    className={`category-option ${category === "announcement" ? "selected" : ""}`}
+                    onClick={() => setCategory("announcement")}
+                  >
+                    <FiBell size={14} /> Announcement
+                  </button>
+                  <button
+                    type="button"
+                    className={`category-option ${category === "resource" ? "selected" : ""}`}
+                    onClick={() => setCategory("resource")}
+                  >
+                    <FiBookOpen size={14} /> Resource
+                  </button>
+                </>
+              )}
             </div>
           </div>
           <div className="form-group">

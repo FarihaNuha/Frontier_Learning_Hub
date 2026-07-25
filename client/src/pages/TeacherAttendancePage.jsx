@@ -13,6 +13,8 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiUser,
+  FiUserPlus,
+  FiPlus,
   FiLogOut,
   FiList,
   FiFileText,
@@ -67,6 +69,124 @@ export default function TeacherAttendancePage({
   });
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState(null);
   const [previewPdfTitle, setPreviewPdfTitle] = useState("");
+
+  // Manual row (student) and manual column (date session) states
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [manualStudentIdNumber, setManualStudentIdNumber] = useState("");
+  const [manualStudentName, setManualStudentName] = useState("");
+  const [manualStudentStatus, setManualStudentStatus] = useState("present");
+
+  const [showAddDateModal, setShowAddDateModal] = useState(false);
+  const [manualDateInput, setManualDateInput] = useState("");
+
+  const getStoredManualStudents = () => {
+    if (!courseId) return [];
+    const storageKey = `manual_students_${courseId}`;
+    let fromStorage = [];
+    try {
+      fromStorage = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    } catch (e) {}
+
+    const fromHistory = [];
+    if (attendanceHistory && attendanceHistory.length > 0) {
+      attendanceHistory.forEach((att) => {
+        (att.records || []).forEach((r) => {
+          if (r.studentId && r.studentId.toString().startsWith("manual_")) {
+            if (!fromHistory.some((h) => h.studentIdNumber === r.studentIdNumber)) {
+              fromHistory.push({
+                _id: r.studentId,
+                studentId: r.studentId,
+                studentName: r.studentName,
+                studentEmail: r.studentEmail || `${r.studentIdNumber}@student.edu`,
+                studentIdNumber: r.studentIdNumber,
+                name: r.studentName,
+              });
+            }
+          }
+        });
+      });
+    }
+
+    const combined = [...fromStorage];
+    fromHistory.forEach((h) => {
+      if (!combined.some((c) => c.studentIdNumber === h.studentIdNumber)) {
+        combined.push(h);
+      }
+    });
+    return combined;
+  };
+
+  const handleAddManualStudent = () => {
+    if (!manualStudentIdNumber.trim() || !manualStudentName.trim()) {
+      toast.error("Please provide both Student ID and Name");
+      return;
+    }
+    const newStudentId = `manual_${Date.now()}`;
+    const newStudentObj = {
+      _id: newStudentId,
+      studentId: newStudentId,
+      studentName: manualStudentName.trim(),
+      studentEmail: `${manualStudentIdNumber.trim()}@student.edu`,
+      studentIdNumber: manualStudentIdNumber.trim(),
+      name: manualStudentName.trim(),
+    };
+
+    if (courseId) {
+      const storageKey = `manual_students_${courseId}`;
+      let savedManuals = [];
+      try {
+        savedManuals = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      } catch (e) {}
+      if (!savedManuals.some((s) => s.studentIdNumber === newStudentObj.studentIdNumber)) {
+        savedManuals.push(newStudentObj);
+        localStorage.setItem(storageKey, JSON.stringify(savedManuals));
+      }
+    }
+
+    const newRecord = {
+      studentId: newStudentId,
+      studentName: manualStudentName.trim(),
+      studentEmail: `${manualStudentIdNumber.trim()}@student.edu`,
+      studentIdNumber: manualStudentIdNumber.trim(),
+      status: manualStudentStatus,
+    };
+
+    setRecords((prev) => {
+      if (prev.some((r) => r.studentIdNumber === newRecord.studentIdNumber)) {
+        return prev;
+      }
+      return [...prev, newRecord];
+    });
+
+    setStudentStats((prev) => ({
+      ...prev,
+      [newStudentId]: {
+        present: manualStudentStatus === "present" ? 1 : 0,
+        totalClasses: 1,
+        attendanceMarks: 0,
+        percentage: manualStudentStatus === "present" ? 100 : 0,
+      },
+    }));
+    setSaved(false);
+    toast.success(`Saved manual student row for this course: ${manualStudentName.trim()} (${manualStudentIdNumber.trim()})`);
+    setManualStudentIdNumber("");
+    setManualStudentName("");
+    setManualStudentStatus("present");
+    setShowAddStudentModal(false);
+  };
+
+  const handleAddManualDate = () => {
+    if (!manualDateInput) {
+      toast.error("Please pick a valid date");
+      return;
+    }
+    const parts = manualDateInput.split("-");
+    const newDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    setSelectedDate(newDate);
+    setViewMode("mark");
+    toast.success(`Created custom date session column for: ${manualDateInput}`);
+    setShowAddDateModal(false);
+  };
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -173,7 +293,16 @@ export default function TeacherAttendancePage({
       const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
 
       const studentsRes = await api.get(`/attendance/students/${courseId}`);
-      const students = studentsRes.data.students;
+      const enrolledStudents = studentsRes.data.students || [];
+      const manualStudents = getStoredManualStudents();
+
+      // Combine enrolled students with course-persisted manual students
+      const students = [...enrolledStudents];
+      manualStudents.forEach((m) => {
+        if (!students.some((s) => (s.studentId && s.studentId === m.studentIdNumber) || s._id === m._id)) {
+          students.push(m);
+        }
+      });
 
       const existingRes = await api.get(
         `/attendance?courseId=${courseId}&date=${dateStr}&classType=${classType}`,
@@ -185,22 +314,23 @@ export default function TeacherAttendancePage({
       ) {
         const existing = existingRes.data.attendance[0];
         
-        // Merge currently enrolled students with existing saved records to include newly joined students
+        // Merge enrolled + manual students with existing saved records
         const existingRecordsMap = new Map(
           existing.records.map((r) => [r.studentId.toString(), r])
         );
 
         const mergedRecords = students.map((s) => {
-          const existingRec = existingRecordsMap.get(s._id.toString());
+          const sId = (s._id || s.studentId).toString();
+          const existingRec = existingRecordsMap.get(sId);
           if (existingRec) {
             return existingRec;
           } else {
             return {
-              studentId: s._id,
-              studentName: s.name,
-              studentEmail: s.email,
-              studentIdNumber: s.studentId || "",
-              status: "absent", // Default to absent for newly joined student
+              studentId: s._id || s.studentId,
+              studentName: s.name || s.studentName,
+              studentEmail: s.email || s.studentEmail || "",
+              studentIdNumber: s.studentIdNumber || s.studentId || "",
+              status: "absent",
             };
           }
         });
@@ -210,10 +340,10 @@ export default function TeacherAttendancePage({
       } else {
         setSaved(false);
         const initialRecords = students.map((s) => ({
-          studentId: s._id,
-          studentName: s.name,
-          studentEmail: s.email,
-          studentIdNumber: s.studentId || "",
+          studentId: s._id || s.studentId,
+          studentName: s.name || s.studentName,
+          studentEmail: s.email || s.studentEmail || "",
+          studentIdNumber: s.studentIdNumber || s.studentId || "",
           status: "present",
         }));
         setRecords(initialRecords);
@@ -232,16 +362,32 @@ export default function TeacherAttendancePage({
     try {
       const stats = {};
       for (const student of studentList) {
-        const res = await api.get(
-          `/attendance/stats?studentId=${student._id}&courseId=${courseId}&classType=${classType}`,
-        );
-        stats[student._id] = {
-          present: res.data.present,
-          totalClasses: res.data.totalClasses,
-          attendanceMarks: res.data.attendanceMarks,
-          percentage: res.data.percentage,
-          maxAttendanceMarks: res.data.maxAttendanceMarks,
-        };
+        const sId = student._id || student.studentId || student.id;
+        if (!sId || sId.toString().startsWith("manual_")) {
+          const currentRecord = records.find(r => r.studentId === sId);
+          stats[sId] = {
+            present: currentRecord && currentRecord.status === "present" ? 1 : 0,
+            totalClasses: 1,
+            attendanceMarks: 0,
+            percentage: currentRecord && currentRecord.status === "present" ? 100 : 0,
+            maxAttendanceMarks: 30,
+          };
+          continue;
+        }
+        try {
+          const res = await api.get(
+            `/attendance/stats?studentId=${sId}&courseId=${courseId}&classType=${classType}`,
+          );
+          stats[sId] = {
+            present: res.data.present,
+            totalClasses: res.data.totalClasses,
+            attendanceMarks: res.data.attendanceMarks,
+            percentage: res.data.percentage,
+            maxAttendanceMarks: res.data.maxAttendanceMarks,
+          };
+        } catch (err) {
+          stats[sId] = { present: 0, totalClasses: 1, attendanceMarks: 0, percentage: 0 };
+        }
       }
       setStudentStats(stats);
     } catch (error) {
@@ -266,9 +412,16 @@ export default function TeacherAttendancePage({
     try {
       setLoading(true);
       
-      // Fetch currently enrolled students first to build the grid
       const studentsRes = await api.get(`/attendance/students/${courseId}`);
-      const enrolledStudents = studentsRes.data.students;
+      const enrolledStudents = studentsRes.data.students || [];
+      const manualStudents = getStoredManualStudents();
+
+      const allCourseStudents = [...enrolledStudents];
+      manualStudents.forEach((m) => {
+        if (!allCourseStudents.some((s) => (s.studentId && s.studentId === m.studentIdNumber) || s._id === m._id)) {
+          allCourseStudents.push(m);
+        }
+      });
 
       const res = await api.get(`/attendance?courseId=${courseId}&classType=${classType}`);
       if (res.data.role !== "teacher") return;
@@ -282,11 +435,11 @@ export default function TeacherAttendancePage({
         (a, b) => new Date(a) - new Date(b),
       );
 
-      const students = enrolledStudents.map((s) => ({
-        id: s._id,
-        name: s.name,
-        email: s.email,
-        studentIdNumber: s.studentId || "",
+      const students = allCourseStudents.map((s) => ({
+        id: s._id || s.studentId,
+        name: s.name || s.studentName,
+        email: s.email || s.studentEmail || "",
+        studentIdNumber: s.studentIdNumber || s.studentId || "",
       }));
 
       const matrix = students.map((student) => {
@@ -994,15 +1147,17 @@ export default function TeacherAttendancePage({
                 </p>
               </div>
             </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 20 }}>
-              <div className="form-group" style={{ flex: 1 }}>
-                <label>Class Type</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 20 }}>
+              <div className="form-group">
+                <label style={{ fontWeight: 600, fontSize: 14, color: "#374151", marginBottom: 6, display: "block" }}>
+                  Class Type
+                </label>
                 {(() => {
                   const hasTheory = attendanceHistory.some(a => a.classType === "theory");
                   const hasLab = attendanceHistory.some(a => a.classType === "lab");
                   const lockedType = hasTheory ? "theory" : hasLab ? "lab" : appliedClassType;
                   return (
-                    <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                       {["theory", "lab"].map((type) => {
                         const isActive = classType === type;
                         const isDisabled = lockedType !== null && lockedType !== type;
@@ -1019,7 +1174,7 @@ export default function TeacherAttendancePage({
                               setClassType(type);
                             }}
                             style={{
-                              padding: "8px 18px",
+                              padding: "9px 22px",
                               border: isActive ? "2px solid #3B8DB3" : "2px solid #e2e8f0",
                               borderRadius: 8,
                               background: isActive ? "#3B8DB3" : "white",
@@ -1029,12 +1184,15 @@ export default function TeacherAttendancePage({
                               opacity: isDisabled ? 0.5 : 1,
                               fontSize: 13,
                               transition: "all 0.2s",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6
                             }}
                             title={isDisabled ? `Disabled: ${lockedType} is active` : ""}
                           >
                             {type === "theory" ? "Theory" : "Lab"}
                             {lockedType === type && (
-                              <span style={{ marginLeft: 6, fontSize: 11, background: "#10B981", color: "white", borderRadius: 4, padding: "1px 5px" }}>
+                              <span style={{ fontSize: 11, background: "#10B981", color: "white", borderRadius: 4, padding: "2px 6px" }}>
                                 Active
                               </span>
                             )}
@@ -1045,33 +1203,102 @@ export default function TeacherAttendancePage({
                   );
                 })()}
               </div>
-              {!saved && (
-                <div
-                  className="form-group"
-                  style={{ flex: 0, alignSelf: "flex-end" }}
+
+              {/* Action Buttons Row - Rectangular side-by-side layout directly below Class Type */}
+              <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 2 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddStudentModal(true)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "10px 20px",
+                    background: "#3b82f6",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontSize: 13,
+                    whiteSpace: "nowrap",
+                    boxShadow: "0 2px 4px rgba(59, 130, 246, 0.2)"
+                  }}
+                  title="Manually add a student row if missing"
                 >
+                  <FiUserPlus size={16} /> + Add Row (Student)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDateModal(true)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "10px 20px",
+                    background: "#8b5cf6",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontSize: 13,
+                    whiteSpace: "nowrap",
+                    boxShadow: "0 2px 4px rgba(139, 92, 246, 0.2)"
+                  }}
+                  title="Manually add a custom class date session column"
+                >
+                  <FiCalendar size={16} /> + Add Column (Date)
+                </button>
+                {!saved ? (
                   <button
-                    className="btn-success"
+                    type="button"
                     onClick={handleSaveAttendance}
                     disabled={loading}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 24px",
+                      background: "#10b981",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 8,
+                      fontWeight: 600,
+                      cursor: loading ? "not-allowed" : "pointer",
+                      fontSize: 13,
+                      whiteSpace: "nowrap",
+                      width: "auto",
+                      boxShadow: "0 2px 4px rgba(16, 185, 129, 0.2)"
+                    }}
                   >
                     <FiSave size={16} /> {loading ? "Saving..." : "Save"}
                   </button>
-                </div>
-              )}
-              {saved && (
-                <div
-                  className="form-group"
-                  style={{ flex: 0, alignSelf: "flex-end" }}
-                >
+                ) : (
                   <button
-                    className="btn-primary"
+                    type="button"
                     onClick={() => setSaved(false)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 24px",
+                      background: "#3b8db3",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 8,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontSize: 13,
+                      whiteSpace: "nowrap",
+                      width: "auto",
+                      boxShadow: "0 2px 4px rgba(59, 141, 179, 0.2)"
+                    }}
                   >
                     <FiEdit size={16} /> Edit
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
             <div
               style={{
@@ -1761,6 +1988,176 @@ export default function TeacherAttendancePage({
                     background: "#ffffff",
                   }}
                 />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MANUAL ADD STUDENT (ROW) MODAL */}
+        {showAddStudentModal && (
+          <div
+            className="modal-overlay"
+            onClick={() => setShowAddStudentModal(false)}
+            style={{
+              position: "fixed",
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: "rgba(15, 23, 42, 0.75)",
+              backdropFilter: "blur(4px)",
+              zIndex: 99999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 20
+            }}
+          >
+            <div
+              className="modal-content"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "var(--bg-card, #ffffff)",
+                color: "var(--text-primary, #1e293b)",
+                borderRadius: 16,
+                padding: "24px 28px",
+                maxWidth: 450,
+                width: "100%",
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+                  <FiUserPlus style={{ color: "#3b82f6" }} /> Add Manual Student Row
+                </h3>
+                <button
+                  onClick={() => setShowAddStudentModal(false)}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b" }}
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+              <p style={{ fontSize: 13, color: "#64748b", marginTop: 0, marginBottom: 16 }}>
+                Manually insert a student row if missing from attendance list.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Student ID Number</label>
+                  <input
+                    type="text"
+                    value={manualStudentIdNumber}
+                    onChange={(e) => setManualStudentIdNumber(e.target.value)}
+                    placeholder="e.g. 20210084"
+                    style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 14 }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Student Full Name</label>
+                  <input
+                    type="text"
+                    value={manualStudentName}
+                    onChange={(e) => setManualStudentName(e.target.value)}
+                    placeholder="e.g. Shakil Ahmed"
+                    style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 14 }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Initial Attendance Status</label>
+                  <select
+                    value={manualStudentStatus}
+                    onChange={(e) => setManualStudentStatus(e.target.value)}
+                    style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 14 }}
+                  >
+                    <option value="present">Present (P)</option>
+                    <option value="absent">Absent (A)</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 24 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddStudentModal(false)}
+                  style={{ padding: "8px 16px", background: "#f1f5f9", border: "none", borderRadius: 8, color: "#475569", fontWeight: 600, cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddManualStudent}
+                  style={{ padding: "8px 20px", background: "#3b82f6", border: "none", borderRadius: 8, color: "white", fontWeight: 600, cursor: "pointer" }}
+                >
+                  Add Student Row
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MANUAL ADD DATE (COLUMN) MODAL */}
+        {showAddDateModal && (
+          <div
+            className="modal-overlay"
+            onClick={() => setShowAddDateModal(false)}
+            style={{
+              position: "fixed",
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: "rgba(15, 23, 42, 0.75)",
+              backdropFilter: "blur(4px)",
+              zIndex: 99999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 20
+            }}
+          >
+            <div
+              className="modal-content"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "var(--bg-card, #ffffff)",
+                color: "var(--text-primary, #1e293b)",
+                borderRadius: 16,
+                padding: "24px 28px",
+                maxWidth: 420,
+                width: "100%",
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+                  <FiCalendar style={{ color: "#8b5cf6" }} /> Add Custom Class Session Date
+                </h3>
+                <button
+                  onClick={() => setShowAddDateModal(false)}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b" }}
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+              <p style={{ fontSize: 13, color: "#64748b", marginTop: 0, marginBottom: 16 }}>
+                Select a custom class date to create a new attendance column/session.
+              </p>
+              <div>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Class Session Date</label>
+                <input
+                  type="date"
+                  value={manualDateInput}
+                  onChange={(e) => setManualDateInput(e.target.value)}
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 14 }}
+                />
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 24 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDateModal(false)}
+                  style={{ padding: "8px 16px", background: "#f1f5f9", border: "none", borderRadius: 8, color: "#475569", fontWeight: 600, cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddManualDate}
+                  style={{ padding: "8px 20px", background: "#8b5cf6", border: "none", borderRadius: 8, color: "white", fontWeight: 600, cursor: "pointer" }}
+                >
+                  Create Date Session Column
+                </button>
               </div>
             </div>
           </div>

@@ -904,30 +904,82 @@ export default function CourseAnalyticsPage() {
           </div>
         )}
 
-        {/* Student Performance Analytics Section (Inline Dashboard View) */}
-        {(selectedStudent || loadingDetails) && (
-          <div
-            className="analytics-inline-card"
-            style={{
-              background: "var(--bg-card, #ffffff)",
-              color: "var(--text-primary, #1e293b)",
-              borderRadius: "20px",
-              padding: "24px 28px 32px",
-              marginTop: "28px",
-              boxShadow: "0 4px 25px rgba(0, 0, 0, 0.06)",
-              border: "1px solid var(--border-color, rgba(148, 163, 184, 0.2))",
-              position: "relative"
-            }}
-          >
-              {/* Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid var(--border-color, rgba(148,163,184,0.2))" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <FiActivity size={22} color="var(--pastel-blue-deep, #38bdf8)" />
-                  <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-                    Student Performance Analytics {selectedStudent?.name ? `- ${selectedStudent.name}` : ""}
-                  </h3>
+        {/* Student Performance Analytics Section */}
+        {user?.role === "teacher" ? (
+          (selectedStudent || loadingDetails) && (
+            <div
+              className="modal-overlay"
+              onClick={(e) => {
+                if (e.target.className === "modal-overlay") {
+                  setSelectedStudent(null);
+                  setAnalytics(null);
+                }
+              }}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(15, 23, 42, 0.75)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+                zIndex: 9999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "20px",
+              }}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  background: "var(--bg-card, #ffffff)",
+                  color: "var(--text-primary, #1e293b)",
+                  borderRadius: "24px",
+                  padding: "28px 32px 36px",
+                  maxWidth: "1150px",
+                  width: "100%",
+                  maxHeight: "90vh",
+                  overflowY: "auto",
+                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                  border: "1px solid var(--border-color, rgba(148, 163, 184, 0.2))",
+                  position: "relative",
+                }}
+              >
+                {/* Header */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid var(--border-color, rgba(148,163,184,0.2))" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <FiActivity size={22} color="var(--pastel-blue-deep, #38bdf8)" />
+                    <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
+                      Student Performance Analytics {selectedStudent?.name ? `- ${selectedStudent.name}` : ""}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSelectedStudent(null);
+                      setAnalytics(null);
+                    }}
+                    style={{
+                      background: "rgba(239, 68, 68, 0.1)",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#ef4444",
+                      padding: "8px 14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      borderRadius: "10px",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <FiX size={18} />
+                    <span>Close</span>
+                  </button>
                 </div>
-              </div>
 
               {loadingDetails ? (
           <div className="card" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "60px 0" }}>
@@ -1554,10 +1606,244 @@ export default function CourseAnalyticsPage() {
                 </div>
               )}
             </div>
-            )} {/* end final tab */}
+            )}
           </div>
         ) : null}
+            </div>
           </div>
+        )
+      ) : (
+        /* Student Dashboard: Inline Card View */
+        (selectedStudent || loadingDetails) && (
+            <div
+              className="analytics-inline-card"
+              style={{
+                background: "var(--bg-card, #ffffff)",
+                color: "var(--text-primary, #1e293b)",
+                borderRadius: "20px",
+                padding: "24px 28px 32px",
+                marginTop: "28px",
+                boxShadow: "0 4px 25px rgba(0, 0, 0, 0.06)",
+                border: "1px solid var(--border-color, rgba(148, 163, 184, 0.2))",
+                position: "relative"
+              }}
+            >
+              {/* Header */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid var(--border-color, rgba(148,163,184,0.2))" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <FiActivity size={22} color="var(--pastel-blue-deep, #38bdf8)" />
+                  <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
+                    Student Performance Analytics {selectedStudent?.name ? `- ${selectedStudent.name}` : ""}
+                  </h3>
+                </div>
+              </div>
+
+              {loadingDetails ? (
+                <div className="card" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "60px 0" }}>
+                  <div className="spinner"></div>
+                  <p style={{ marginTop: 16, color: "var(--text-gray)" }}>Loading student activity graphs...</p>
+                </div>
+              ) : selectedStudent && analytics ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                  {/* Summary metrics header row */}
+                  <div className="lectures-grid">
+                    {/* Activity Gauge */}
+                    <div className="card" style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                      <div style={{ position: "relative", width: 80, height: 80 }}>
+                        <svg width="80" height="80" viewBox="0 0 36 36">
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="rgba(255, 255, 255, 0.08)"
+                            strokeWidth="3.5"
+                          />
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke={analytics.summary.gradeColor}
+                            strokeWidth="3.5"
+                            strokeDasharray={`${analytics.summary.activityScore}, 100`}
+                          />
+                        </svg>
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            fontSize: 16,
+                            fontWeight: 700
+                          }}
+                        >
+                          {analytics.summary.activityScore}%
+                        </div>
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: 13, color: "var(--text-gray)" }}>Overall Performance</h4>
+                        <p style={{ fontSize: 18, fontWeight: 700, color: "var(--text-dark)", marginTop: 4 }}>
+                          {analytics.summary.gradeLabel}
+                        </p>
+                        <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 2 }}>
+                          Based on weighted metrics
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Attendance KPI */}
+                    <div className="card" style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                      <div
+                        style={{
+                          background: "rgba(16, 185, 129, 0.12)",
+                          color: "#10b981",
+                          padding: 12,
+                          borderRadius: 12
+                        }}
+                      >
+                        <FiCalendar size={24} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: 13, color: "var(--text-gray)" }}>Attendance Ratio</h4>
+                        <p style={{ fontSize: 20, fontWeight: 700, color: "var(--text-dark)", marginTop: 4 }}>
+                          {analytics.summary.attendancePercent}%
+                        </p>
+                        <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 2 }}>
+                          Present: {analytics.summary.presentCount} / {analytics.summary.totalAttendanceCount} classes
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Assignments KPI */}
+                    <div className="card" style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                      <div
+                        style={{
+                          background: "rgba(59, 130, 246, 0.12)",
+                          color: "#3b82f6",
+                          padding: 12,
+                          borderRadius: 12
+                        }}
+                      >
+                        <FiFileText size={24} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: 13, color: "var(--text-gray)" }}>Assignments Average</h4>
+                        <p style={{ fontSize: 20, fontWeight: 700, color: "var(--text-dark)", marginTop: 4 }}>
+                          {analytics.summary.assignmentAverage}%
+                        </p>
+                        <p style={{ fontSize: 11, color: "var(--text-gray)", marginTop: 2 }}>
+                          Submitted: {analytics.summary.completedAssignments} / {analytics.summary.totalAssignments} tasks
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* TAB NAVIGATION */}
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 6,
+                      background: "rgba(248,250,252,0.06)",
+                      border: "1px solid rgba(148,163,184,0.15)",
+                      borderRadius: 16,
+                      padding: 5,
+                      marginBottom: 22,
+                      width: "fit-content",
+                      backdropFilter: "blur(12px)",
+                      boxShadow: "0 2px 16px rgba(0,0,0,0.15)"
+                    }}
+                  >
+                    <button
+                      onClick={() => setActiveTab("continuous")}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "10px 22px", borderRadius: 12,
+                        border: activeTab === "continuous"
+                          ? "1px solid rgba(56,189,248,0.5)"
+                          : "1px solid transparent",
+                        cursor: "pointer", fontSize: 13, fontWeight: 700,
+                        letterSpacing: "0.02em",
+                        transition: "all 0.25s ease",
+                        background: activeTab === "continuous"
+                          ? "linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(125,211,252,0.12) 100%)"
+                          : "transparent",
+                        color: activeTab === "continuous" ? "#38bdf8" : "rgba(148,163,184,0.7)",
+                        boxShadow: activeTab === "continuous"
+                          ? "0 0 16px rgba(56,189,248,0.18)"
+                          : "none"
+                      }}
+                    >
+                      <FiActivity size={15} />
+                      Continuous Performance
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("final")}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "10px 22px", borderRadius: 12,
+                        border: activeTab === "final"
+                          ? "1px solid rgba(52,211,153,0.5)"
+                          : "1px solid transparent",
+                        cursor: "pointer", fontSize: 13, fontWeight: 700,
+                        letterSpacing: "0.02em",
+                        transition: "all 0.25s ease",
+                        background: activeTab === "final"
+                          ? "linear-gradient(135deg, rgba(52,211,153,0.2) 0%, rgba(16,185,129,0.12) 100%)"
+                          : "transparent",
+                        color: activeTab === "final" ? "#34d399" : "rgba(148,163,184,0.7)",
+                        boxShadow: activeTab === "final"
+                          ? "0 0 16px rgba(52,211,153,0.18)"
+                          : "none"
+                      }}
+                    >
+                      <FiAward size={15} />
+                      Final Evaluation
+                    </button>
+                  </div>
+
+                  {/* TAB 1: Continuous */}
+                  {activeTab === "continuous" && (
+                    <div className="card" style={{ marginBottom: 24 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                        <div style={{ width: 3, height: 16, borderRadius: 4, background: "linear-gradient(#38bdf8, #818cf8)" }} />
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#38bdf8" }}>Live Performance Radar</span>
+                        <span style={{ fontSize: 11, color: "var(--text-gray)" }}>— Based on live website activity</span>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 24, alignItems: "start" }}>
+                        <div style={{ overflow: "hidden", padding: "6px 0" }}>
+                          {renderRadarChart(analytics.summary, computeContinuousValues(analytics.summary))}
+                        </div>
+                        {renderInsightsPanel(analytics.summary, computeContinuousValues(analytics.summary))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TAB 2: Final Evaluation */}
+                  {activeTab === "final" && (
+                    <div className="card">
+                      {analytics.summary.assessment ? (
+                        <>
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 24, alignItems: "start" }}>
+                            <div style={{ overflow: "hidden", padding: "10px 0" }}>
+                              {renderRadarChart(analytics.summary)}
+                            </div>
+                            {renderInsightsPanel(analytics.summary)}
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ textAlign: "center", padding: "40px 0" }}>
+                          <FiAward size={40} style={{ color: "rgba(16,185,129,0.3)", marginBottom: 12 }} />
+                          <h4 style={{ color: "var(--text-gray)", fontWeight: 600, marginBottom: 8 }}>No Assessment Marksheet Yet</h4>
+                          <p style={{ fontSize: 12, color: "var(--text-gray)", maxWidth: 320, margin: "0 auto" }}>
+                            Once the teacher uploads the final assessment marksheet for this course,
+                            the official evaluation results will appear here.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          )
         )}
       </div>
     </div>

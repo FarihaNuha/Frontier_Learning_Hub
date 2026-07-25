@@ -14,6 +14,14 @@ const assessmentSchema = new mongoose.Schema({
     type: String,
     required: [true, "Course code is required"],
   },
+  level: {
+    type: String,
+    default: "",
+  },
+  term: {
+    type: String,
+    default: "",
+  },
   session: {
     type: String,
     default: "",
@@ -53,8 +61,8 @@ const assessmentSchema = new mongoose.Schema({
   },
 });
 
-// Compound index for student assessment records per course, session, and department
-assessmentSchema.index({ studentIdNumber: 1, courseCode: 1, session: 1, department: 1 });
+// Compound index for student assessment records per course, level, term, session, and department
+assessmentSchema.index({ studentIdNumber: 1, courseCode: 1, level: 1, term: 1, session: 1, department: 1 });
 
 const Assessment = mongoose.model("Assessment", assessmentSchema);
 

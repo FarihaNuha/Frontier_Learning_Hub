@@ -44,8 +44,8 @@ export default function TeacherAssessmentPage() {
   const handleDeleteCourse = async (targetGroup) => {
     setDeleting(true);
     try {
-      const { courseCode, session, department } = targetGroup;
-      const url = `/assessments/course/${encodeURIComponent(courseCode)}?session=${encodeURIComponent(session || '')}&department=${encodeURIComponent(department || '')}`;
+      const { courseCode, level, term, department } = targetGroup;
+      const url = `/assessments/course/${encodeURIComponent(courseCode)}?level=${encodeURIComponent(level || '')}&term=${encodeURIComponent(term || '')}&department=${encodeURIComponent(department || '')}`;
       await api.delete(url);
       toast.success(`Marksheet for ${courseCode} deleted successfully`);
       setDeleteTarget(null);
@@ -131,17 +131,19 @@ export default function TeacherAssessmentPage() {
     }
   };
 
-  // Group assessments by courseCode + session + department
+  // Group assessments by courseCode + level + term + department
   const courseGroups = assessments.reduce((acc, item) => {
     const code = item.courseCode || "UNKNOWN";
-    const sess = item.session || "";
+    const lvl = item.level || "";
+    const trm = item.term || "";
     const dept = item.department || "";
-    const key = `${code}|||${sess}|||${dept}`;
+    const key = `${code}|||${lvl}|||${trm}|||${dept}`;
     if (!acc[key]) {
       acc[key] = {
         key,
         courseCode: code,
-        session: sess,
+        level: lvl,
+        term: trm,
         department: dept,
         items: []
       };
@@ -156,27 +158,38 @@ export default function TeacherAssessmentPage() {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase().trim();
     const matchesCode = group.courseCode.toLowerCase().includes(q);
-    const matchesSession = group.session.toLowerCase().includes(q);
+    const matchesLevel = group.level.toLowerCase().includes(q);
+    const matchesTerm = group.term.toLowerCase().includes(q);
     const matchesDept = group.department.toLowerCase().includes(q);
     const matchesStudent = group.items.some(
       (item) =>
         item.studentIdNumber.toLowerCase().includes(q) ||
-        (item.studentId?.name || "").toLowerCase().includes(q)
+        (item.studentId?.name || "").toLowerCase().includes(q) ||
+        (item.session || "").toLowerCase().includes(q)
     );
-    return matchesCode || matchesSession || matchesDept || matchesStudent;
+    return matchesCode || matchesLevel || matchesTerm || matchesDept || matchesStudent;
   });
 
-  // Hierarchical Grouping: Department -> Session -> Marksheet Cards
-  const deptSessionGroups = filteredUniqueCourseGroups.reduce((acc, group) => {
+  // Hierarchical Grouping: Department -> Level & Term -> Marksheet Cards
+  const deptLevelTermGroups = filteredUniqueCourseGroups.reduce((acc, group) => {
     const dept = group.department ? group.department.toUpperCase() : "GENERAL / OTHER DEPT";
-    const sess = group.session ? group.session : "GENERAL SESSION";
+    let levelTerm = "";
+    if (group.level || group.term) {
+      const cleanLvl = group.level ? group.level.replace(/^level\s*:?\s*/i, "").trim() : "";
+      const cleanTrm = group.term ? group.term.replace(/^term\s*:?\s*/i, "").trim() : "";
+      const lvlStr = cleanLvl ? `Level: ${cleanLvl}` : "";
+      const trmStr = cleanTrm ? `Term: ${cleanTrm}` : "";
+      levelTerm = `${lvlStr} ${trmStr}`.trim();
+    } else {
+      levelTerm = "GENERAL LEVEL & TERM";
+    }
     if (!acc[dept]) {
       acc[dept] = {};
     }
-    if (!acc[dept][sess]) {
-      acc[dept][sess] = [];
+    if (!acc[dept][levelTerm]) {
+      acc[dept][levelTerm] = [];
     }
-    acc[dept][sess].push(group);
+    acc[dept][levelTerm].push(group);
     return acc;
   }, {});
 
@@ -243,12 +256,12 @@ export default function TeacherAssessmentPage() {
               <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #bae6fd", fontSize: 13, color: "#334155" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 14 }}>
                   <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>1. Header Tags (Course Code, Session, Dept)</strong>
-                    Include cells in the first 10 rows containing: <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Course Code: CC 483</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Session: 2024-25</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Dept: EDTE</code>
+                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>1. Header Tags (Course Code, Level, Term, Dept)</strong>
+                    Include cells in top rows containing: <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Course Code: CC 483</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Level: Level 2</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Term: Term 1</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Dept: EDTE</code>
                   </div>
                   <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>2. Required Student ID Column</strong>
-                    Header must be named <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Student ID</code> or <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>ID of the Student</code>.
+                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>2. Required Student ID & Session Columns</strong>
+                    Headers must include <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Student ID</code> and a per-student <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Session</code> column (e.g. 2021-22).
                   </div>
                   <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                     <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>3. Score Component Columns</strong>
@@ -267,18 +280,21 @@ export default function TeacherAssessmentPage() {
                         <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col D</th>
                         <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col E</th>
                         <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col F</th>
+                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col G</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>1</td>
                         <td colSpan="2" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Course Code: CC 483</td>
-                        <td colSpan="2" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Session: 2024-25</td>
-                        <td colSpan="2" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Dept: EDTE</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Level: Level 2</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Term: Term 1</td>
+                        <td colSpan="3" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Dept: EDTE</td>
                       </tr>
                       <tr>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>2</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Student ID</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Session</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Attendance</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Quiz</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Assignment</td>
@@ -288,6 +304,7 @@ export default function TeacherAssessmentPage() {
                       <tr>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>3</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>2202022</td>
+                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#475569", fontWeight: "bold" }}>2021-22</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>30</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>26</td>
                         <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>25</td>
@@ -376,7 +393,8 @@ export default function TeacherAssessmentPage() {
               </h4>
               <div style={{ display: "flex", gap: 24, flexWrap: "wrap", fontSize: 14 }}>
                 <p><strong>Detected Course Code:</strong> <span className="status-badge ontime">{summary.courseCode}</span></p>
-                {summary.session && <p><strong>Session:</strong> <span style={{ background: "#f1f5f9", color: "#475569", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.session}</span></p>}
+                {summary.level && <p><strong>Level:</strong> <span style={{ background: "#f1f5f9", color: "#475569", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.level}</span></p>}
+                {summary.term && <p><strong>Term:</strong> <span style={{ background: "#f1f5f9", color: "#475569", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.term}</span></p>}
                 {summary.department && <p><strong>Dept:</strong> <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.department}</span></p>}
                 <p><strong>Total Rows:</strong> {summary.totalProcessed}</p>
                 <p><strong>Successfully Saved:</strong> <span style={{ color: "#16a34a", fontWeight: "bold" }}>{summary.savedCount}</span></p>
@@ -415,7 +433,7 @@ export default function TeacherAssessmentPage() {
                 <div style={{ position: "relative", width: "100%", maxWidth: 340 }}>
                   <input
                     type="text"
-                    placeholder="Search course code, session, dept, or student..."
+                    placeholder="Search course code, level, term, dept, or student..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
@@ -455,11 +473,11 @@ export default function TeacherAssessmentPage() {
                 <div className="empty-state" style={{ padding: "40px 0" }}>
                   <FiSearch size={40} color="#6B89A0" />
                   <h3>No matching marksheets found</h3>
-                  <p>No course, session, department, or student matches "{searchQuery}"</p>
+                  <p>No course, level, term, department, or student matches "{searchQuery}"</p>
                 </div>
               ) : (
                 <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "28px" }}>
-                  {Object.entries(deptSessionGroups).map(([deptName, sessionsMap]) => (
+                  {Object.entries(deptLevelTermGroups).map(([deptName, levelTermsMap]) => (
                     <div key={deptName} style={{ background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
                       {/* Department Section Header */}
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "12px", borderBottom: "2px solid #3B8DB3", marginBottom: "20px" }}>
@@ -468,16 +486,16 @@ export default function TeacherAssessmentPage() {
                         </span>
                       </div>
 
-                      {/* Sessions under this Department (Sorted in Descending Order) */}
+                      {/* Level & Term under this Department */}
                       <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                        {Object.entries(sessionsMap)
-                          .sort(([sessA], [sessB]) => sessB.localeCompare(sessA, undefined, { numeric: true }))
-                          .map(([sessionName, groupsList]) => (
-                          <div key={sessionName}>
-                            {/* Session Sub-header */}
+                        {Object.entries(levelTermsMap)
+                          .sort(([ltA], [ltB]) => ltA.localeCompare(ltB, undefined, { numeric: true }))
+                          .map(([levelTermName, groupsList]) => (
+                          <div key={levelTermName}>
+                            {/* Level & Term Sub-header */}
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
                               <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569", background: "#f1f5f9", padding: "4px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                                📅 Session: {sessionName}
+                                🎓 {levelTermName}
                               </span>
                               <span style={{ fontSize: "12px", color: "#64748b" }}>
                                 ({groupsList.length} {groupsList.length === 1 ? "Marksheet" : "Marksheets"})
@@ -608,9 +626,14 @@ export default function TeacherAssessmentPage() {
                   </button>
                   <h2 style={{ margin: 0, fontSize: 18, color: "#2c4b66", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     Marksheet for <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", fontWeight: 700 }}>{selectedCourseGroup?.courseCode}</span>
-                    {selectedCourseGroup?.session && (
+                    {selectedCourseGroup?.level && (
                       <span style={{ background: "#f1f5f9", color: "#475569", padding: "3px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 }}>
-                        Session: {selectedCourseGroup.session}
+                        Level: {selectedCourseGroup.level.replace(/^level\s*:?\s*/i, '')}
+                      </span>
+                    )}
+                    {selectedCourseGroup?.term && (
+                      <span style={{ background: "#f1f5f9", color: "#475569", padding: "3px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 }}>
+                        Term: {selectedCourseGroup.term.replace(/^term\s*:?\s*/i, '')}
                       </span>
                     )}
                     {selectedCourseGroup?.department && (
@@ -646,7 +669,7 @@ export default function TeacherAssessmentPage() {
                   <div style={{ position: "relative" }}>
                     <input
                       type="text"
-                      placeholder="Search student ID or Name..."
+                      placeholder="Search student ID, Name, or Session..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       style={{
@@ -654,7 +677,7 @@ export default function TeacherAssessmentPage() {
                         border: "1px solid #E2EEF6",
                         borderRadius: 8,
                         fontSize: 14,
-                        width: 220,
+                        width: 240,
                       }}
                     />
                     <FiSearch
@@ -681,32 +704,38 @@ export default function TeacherAssessmentPage() {
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Course Code</th>
-                        <th>Attendance Score</th>
-                        <th>Quiz Score</th>
-                        <th>Assignment Score</th>
-                        <th>Presentation Score</th>
-                        <th>Total CA Marks</th>
+                        <th style={{ textAlign: "center" }}>Student ID</th>
+                        <th style={{ textAlign: "center" }}>Name</th>
+                        <th style={{ textAlign: "center" }}>Session</th>
+                        <th style={{ textAlign: "center" }}>Course Code</th>
+                        <th style={{ textAlign: "center" }}>Attendance Score</th>
+                        <th style={{ textAlign: "center" }}>Quiz Score</th>
+                        <th style={{ textAlign: "center" }}>Assignment Score</th>
+                        <th style={{ textAlign: "center" }}>Presentation Score</th>
+                        <th style={{ textAlign: "center" }}>Total CA Marks</th>
                         <th style={{ textAlign: "center" }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredAssessments.map((record) => (
                         <tr key={record._id}>
-                          <td style={{ fontWeight: 700 }}>{record.studentIdNumber}</td>
-                          <td style={{ fontWeight: 600 }}>{record.studentId?.name || "N/A"}</td>
-                          <td>
-                            <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3" }}>
+                          <td style={{ fontWeight: 700, textAlign: "center" }}>{record.studentIdNumber}</td>
+                          <td style={{ fontWeight: 600, textAlign: "center" }}>{record.studentId?.name || "N/A"}</td>
+                          <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                            <span style={{ background: "#f1f5f9", color: "#475569", padding: "4px 10px", borderRadius: 4, fontWeight: 600, fontSize: 12, whiteSpace: "nowrap", display: "inline-block" }}>
+                              {record.session || "N/A"}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: "center" }}>
+                            <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", whiteSpace: "nowrap" }}>
                               {record.courseCode}
                             </span>
                           </td>
-                          <td>{record.attendance}</td>
-                          <td>{record.quiz}</td>
-                          <td>{record.assignment}</td>
-                          <td>{record.presentation}</td>
-                          <td style={{ fontWeight: 700, color: "#10b981" }}>{record.totalMarks}</td>
+                          <td style={{ textAlign: "center" }}>{record.attendance}</td>
+                          <td style={{ textAlign: "center" }}>{record.quiz}</td>
+                          <td style={{ textAlign: "center" }}>{record.assignment}</td>
+                          <td style={{ textAlign: "center" }}>{record.presentation}</td>
+                          <td style={{ fontWeight: 700, color: "#10b981", textAlign: "center" }}>{record.totalMarks}</td>
                           <td style={{ textAlign: "center" }}>
                             <button
                               onClick={() => setDeleteTarget({ type: "single", value: record })}

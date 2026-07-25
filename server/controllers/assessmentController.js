@@ -26,9 +26,10 @@ exports.uploadMarksheet = async (req, res) => {
       return res.status(400).json({ error: "The uploaded sheet is empty" });
     }
 
-    // 1. Automatic Metadata Detection (Course Code, Session, Department from first 10 rows)
+    // 1. Automatic Metadata Detection (Course Code, Level, Term, Department from first 10 rows)
     let courseCode = "";
-    let session = "";
+    let level = "";
+    let term = "";
     let department = "";
 
     for (let r = 0; r < Math.min(rows.length, 10); r++) {
@@ -49,27 +50,35 @@ exports.uploadMarksheet = async (req, res) => {
           }
           if (!courseCode && row[c + 1] !== undefined && row[c + 1] !== null) {
             const nextVal = String(row[c + 1]).trim();
-            if (nextVal && !nextVal.toLowerCase().includes("session") && !nextVal.toLowerCase().includes("dept")) {
+            if (nextVal && !nextVal.toLowerCase().includes("level") && !nextVal.toLowerCase().includes("term") && !nextVal.toLowerCase().includes("dept")) {
               courseCode = nextVal;
             }
           }
         }
 
-        // 2. Session Detection
-        if (!session && cellLower.includes("session")) {
-          if (cellLower.includes("session:") || cellLower.includes("session :")) {
-            const extracted = cellStr.split(/session\s*:\s*/i)[1]?.split(/[\n,;]/)[0]?.trim();
-            if (extracted) session = extracted;
-          }
-          if (!session && row[c + 1] !== undefined && row[c + 1] !== null) {
-            const nextVal = String(row[c + 1]).trim();
-            if (nextVal && !nextVal.toLowerCase().includes("course") && !nextVal.toLowerCase().includes("dept")) {
-              session = nextVal;
-            }
+        // 2. Level Detection
+        if (!level && cellLower.includes("level")) {
+          const cleaned = cellStr.replace(/^level\s*:?\s*/i, "").trim();
+          if (cleaned) {
+            level = cleaned;
+          } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+            const nextVal = String(row[c + 1]).replace(/^level\s*:?\s*/i, "").trim();
+            if (nextVal) level = nextVal;
           }
         }
 
-        // 3. Department Detection
+        // 3. Term Detection
+        if (!term && cellLower.includes("term")) {
+          const cleaned = cellStr.replace(/^term\s*:?\s*/i, "").trim();
+          if (cleaned) {
+            term = cleaned;
+          } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+            const nextVal = String(row[c + 1]).replace(/^term\s*:?\s*/i, "").trim();
+            if (nextVal) term = nextVal;
+          }
+        }
+
+        // 4. Department Detection
         if (!department && (cellLower.includes("dept") || cellLower.includes("department"))) {
           if (cellLower.includes("dept:") || cellLower.includes("department:") || cellLower.includes("dept :") || cellLower.includes("department :")) {
             const extracted = cellStr.split(/(?:dept|department)\s*:\s*/i)[1]?.split(/[\n,;]/)[0]?.trim();
@@ -77,7 +86,7 @@ exports.uploadMarksheet = async (req, res) => {
           }
           if (!department && row[c + 1] !== undefined && row[c + 1] !== null) {
             const nextVal = String(row[c + 1]).trim();
-            if (nextVal && !nextVal.toLowerCase().includes("course") && !nextVal.toLowerCase().includes("session")) {
+            if (nextVal && !nextVal.toLowerCase().includes("course") && !nextVal.toLowerCase().includes("level")) {
               department = nextVal;
             }
           }
@@ -96,9 +105,6 @@ exports.uploadMarksheet = async (req, res) => {
     // Retrieve Course model doc for notification link and fallbacks
     const courseDoc = await Course.findOne({ displayCode: courseCode.trim().toUpperCase() });
     const courseId = courseDoc ? courseDoc._id : null;
-    if (!session && courseDoc?.session) {
-      session = courseDoc.session;
-    }
     if (!department && courseDoc?.department) {
       department = courseDoc.department;
     }
@@ -131,6 +137,7 @@ exports.uploadMarksheet = async (req, res) => {
 
     // 3. Dynamically map column indexes from header row
     const headerRow = rows[headerRowIndex];
+    const sessionColIndex = headerRow.findIndex(c => c && typeof c === "string" && c.toLowerCase().includes("session"));
     const attendanceColIndex = headerRow.findIndex(c => c && typeof c === "string" && c.toLowerCase().includes("attendance"));
     const quizColIndex = headerRow.findIndex(c => c && typeof c === "string" && (
       c.toLowerCase().includes("quiz") || 
@@ -159,6 +166,11 @@ exports.uploadMarksheet = async (req, res) => {
         continue; // skip headers or SL numbers misread as student ID
       }
 
+      // Per-student Session column extraction
+      const studentSession = sessionColIndex !== -1 && row[sessionColIndex] !== undefined && row[sessionColIndex] !== null
+        ? String(row[sessionColIndex]).trim()
+        : "";
+
       // Helper to parse cell as number
       const getNum = (colIndex) => {
         if (colIndex === -1 || colIndex === undefined) return 0;
@@ -173,15 +185,17 @@ exports.uploadMarksheet = async (req, res) => {
       const presentation = getNum(presentationColIndex);
       const totalMarks = getNum(totalColIndex);
 
-      // 5. Duplicate Record Detection (checks studentIdNumber, courseCode, session, department)
+      // 5. Duplicate Record Detection
       const existingRecord = await Assessment.findOne({
         studentIdNumber,
         courseCode,
-        session,
-        department
+        level,
+        term,
+        department,
+        session: studentSession
       });
       if (existingRecord) {
-        duplicateRecords.push({ studentIdNumber, courseCode, session, department });
+        duplicateRecords.push({ studentIdNumber, courseCode, level, term, department, session: studentSession });
         continue;
       }
 
@@ -201,8 +215,10 @@ exports.uploadMarksheet = async (req, res) => {
           studentIdNumber,
           studentId,
           courseCode,
-          session,
+          level,
+          term,
           department,
+          session: studentSession,
           attendance,
           quiz,
           assignment,
@@ -212,7 +228,7 @@ exports.uploadMarksheet = async (req, res) => {
         });
       } catch (err) {
         if (err.code === 11000) {
-          duplicateRecords.push({ studentIdNumber, courseCode, session, department });
+          duplicateRecords.push({ studentIdNumber, courseCode, level, term, department, session: studentSession });
           continue;
         }
         throw err;
@@ -282,7 +298,8 @@ exports.uploadMarksheet = async (req, res) => {
     res.json({
       success: true,
       courseCode,
-      session,
+      level,
+      term,
       department,
       totalProcessed: savedRecords.length + duplicateRecords.length,
       savedCount: savedRecords.length,
@@ -339,24 +356,40 @@ exports.getTeacherAssessments = async (req, res) => {
   }
 };
 
-// Delete all assessment records for a specific course + session + department uploaded by logged-in teacher
+// Delete all assessment records for a specific course + level + term + department uploaded by logged-in teacher
 exports.deleteCourseAssessment = async (req, res) => {
   try {
     const { courseCode } = req.params;
-    const { session, department } = req.query;
+    const { level, term, department } = req.query;
     if (!courseCode) {
       return res.status(400).json({ error: "Course code is required" });
     }
 
     const query = {
-      courseCode,
+      courseCode: { $regex: new RegExp(`^${courseCode.trim()}$`, "i") },
       uploadedBy: req.user.uid
     };
-    if (session !== undefined && session !== "undefined") {
-      query.session = session;
+
+    const conditions = [];
+
+    if (level && level !== "undefined" && level !== "null") {
+      conditions.push({ level });
+    } else {
+      conditions.push({ $or: [{ level: "" }, { level: null }, { level: { $exists: false } }] });
     }
-    if (department !== undefined && department !== "undefined") {
-      query.department = department;
+
+    if (term && term !== "undefined" && term !== "null") {
+      conditions.push({ term });
+    } else {
+      conditions.push({ $or: [{ term: "" }, { term: null }, { term: { $exists: false } }] });
+    }
+
+    if (department && department !== "undefined" && department !== "null") {
+      conditions.push({ department: { $regex: new RegExp(`^${department.trim()}$`, "i") } });
+    }
+
+    if (conditions.length > 0) {
+      query.$and = conditions;
     }
 
     const assessmentsToDelete = await Assessment.find(query);

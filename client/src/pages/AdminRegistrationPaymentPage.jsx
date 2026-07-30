@@ -84,15 +84,12 @@ export default function AdminRegistrationPaymentPage() {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
                 <FiCreditCard size={22} />
               </div>
               <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Registration Payment Management</h1>
             </div>
-            <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
-              Track, inspect, and export all semester course registration online payments and fee records.
-            </p>
           </div>
 
           <button onClick={handleExportCSV} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", background: "#16a34a", color: "#ffffff", border: "none", borderRadius: "10px", fontWeight: 600, fontSize: "14px", cursor: "pointer" }}>
@@ -114,17 +111,19 @@ export default function AdminRegistrationPaymentPage() {
           </form>
 
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-            <option value="all">All Payment Statuses</option>
+            <option value="all">All Statuses</option>
             <option value="Paid">Paid</option>
-            <option value="Pending">Pending</option>
-            <option value="Failed">Failed</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="Unpaid">Unpaid</option>
           </select>
 
           <select value={sessionFilter} onChange={(e) => setSessionFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
             <option value="all">All Sessions</option>
+            <option value="2025-26">2025-26</option>
+            <option value="2024-25">2024-25</option>
             <option value="2023-24">2023-24</option>
             <option value="2022-23">2022-23</option>
+            <option value="2021-22">2021-22</option>
+            <option value="2020-21">2020-21</option>
           </select>
         </div>
 
@@ -155,7 +154,7 @@ export default function AdminRegistrationPaymentPage() {
                     <td style={{ padding: "10px 14px" }}>{p.session}</td>
                     <td style={{ padding: "10px 14px", fontWeight: 700, color: "#1e293b" }}>৳{p.totalAmount} BDT</td>
                     <td style={{ padding: "10px 14px" }}>
-                      <span style={{ padding: "3px 10px", borderRadius: "10px", fontWeight: 700, fontSize: "11.5px", background: p.paymentStatus === "Paid" ? "#dcfce7" : p.paymentStatus === "Failed" || p.paymentStatus === "Cancelled" ? "#fee2e2" : "#fef3c7", color: p.paymentStatus === "Paid" ? "#166534" : p.paymentStatus === "Failed" || p.paymentStatus === "Cancelled" ? "#991b1b" : "#b45309" }}>
+                      <span style={{ padding: "3px 10px", borderRadius: "10px", fontWeight: 700, fontSize: "11.5px", background: p.paymentStatus === "Paid" ? "#dcfce7" : "#fee2e2", color: p.paymentStatus === "Paid" ? "#166534" : "#b91c1c" }}>
                         {p.paymentStatus}
                       </span>
                     </td>

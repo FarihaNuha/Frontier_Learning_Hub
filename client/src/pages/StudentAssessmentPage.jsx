@@ -11,6 +11,9 @@ import {
   FiArrowLeft,
   FiBookOpen,
   FiInfo,
+  FiAlertCircle,
+  FiX,
+  FiEdit3,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import StudentSidebar from "../components/StudentSidebar";
@@ -25,6 +28,10 @@ export default function StudentAssessmentPage() {
   const [loading, setLoading] = useState(true);
   const [courseLoading, setCourseLoading] = useState(Boolean(courseId));
   const [showRules, setShowRules] = useState(false);
+
+  const [selectedRecordForIssue, setSelectedRecordForIssue] = useState(null);
+  const [issueMessage, setIssueMessage] = useState("");
+  const [submittingIssue, setSubmittingIssue] = useState(false);
 
   useEffect(() => {
     fetchAssessments();
@@ -53,6 +60,35 @@ export default function StudentAssessmentPage() {
       toast.error("Failed to load your assessment marks");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenIssueModal = (record) => {
+    setSelectedRecordForIssue(record);
+    setIssueMessage("");
+  };
+
+  const handleSubmitIssue = async (e) => {
+    e.preventDefault();
+    if (!issueMessage || !issueMessage.trim()) {
+      toast.error("Please explain the issue regarding your assessment marks.");
+      return;
+    }
+    setSubmittingIssue(true);
+    try {
+      await api.post("/results/request-correction", {
+        courseCode: selectedRecordForIssue.courseCode,
+        courseTitle: selectedRecordForIssue.courseCode,
+        teacherEmail: selectedRecordForIssue.teacherEmail || "",
+        studentMessage: `[Assessment Marksheet Issue] ${issueMessage.trim()}`,
+      });
+      toast.success("Correction request submitted to course teacher!");
+      setSelectedRecordForIssue(null);
+      setIssueMessage("");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to submit correction request.");
+    } finally {
+      setSubmittingIssue(false);
     }
   };
 
@@ -173,6 +209,7 @@ export default function StudentAssessmentPage() {
                     <th>Assignment Score</th>
                     <th>Presentation Score</th>
                     <th>Total CA Marks</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -190,6 +227,26 @@ export default function StudentAssessmentPage() {
                       <td style={{ fontWeight: 700, color: "#10b981", fontSize: 15 }}>
                         {record.totalMarks}
                       </td>
+                      <td>
+                        <button
+                          onClick={() => handleOpenIssueModal(record)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            padding: "6px 12px",
+                            borderRadius: "8px",
+                            background: "#e0f2fe",
+                            color: "#0369a1",
+                            border: "1px solid #bae6fd",
+                            fontWeight: 600,
+                            fontSize: "12.5px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <FiEdit3 size={14} /> Request Correction
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -198,6 +255,49 @@ export default function StudentAssessmentPage() {
           )}
         </div>
       </div>
+
+      {/* Correction Request Modal */}
+      {selectedRecordForIssue && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+          <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", maxWidth: "520px", width: "100%", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+              <h3 style={{ margin: 0, color: "#0f172a", fontSize: "18px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <FiAlertCircle color="#3b8db3" size={20} /> Request Assessment Mark Correction
+              </h3>
+              <FiX size={20} color="#64748b" cursor="pointer" onClick={() => setSelectedRecordForIssue(null)} />
+            </div>
+
+            <div style={{ background: "#f8fafc", padding: "12px 16px", borderRadius: "10px", marginBottom: "16px", border: "1px solid #e2e8f0" }}>
+              <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#1e293b" }}>Course Code: {selectedRecordForIssue.courseCode}</div>
+              <div style={{ fontSize: "12.5px", color: "#64748b", marginTop: "4px" }}>
+                CA Total: {selectedRecordForIssue.totalMarks} Marks (Attendance: {selectedRecordForIssue.attendance}, Quiz: {selectedRecordForIssue.quiz}, Assignment: {selectedRecordForIssue.assignment}, Presentation: {selectedRecordForIssue.presentation})
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitIssue}>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
+                Explain Discrepancy / Error Detail *
+              </label>
+              <textarea
+                rows={4}
+                value={issueMessage}
+                onChange={(e) => setIssueMessage(e.target.value)}
+                placeholder="e.g. My Quiz 2 marks were miscalculated or my presentation score was not updated..."
+                style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13.5px", outline: "none", boxSizing: "border-box", marginBottom: "20px" }}
+              />
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button type="button" onClick={() => setSelectedRecordForIssue(null)} style={{ padding: "10px 18px", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#475569", fontWeight: 600, fontSize: "13px", cursor: "pointer" }}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={submittingIssue} style={{ padding: "10px 20px", borderRadius: "8px", border: "none", background: "#3b8db3", color: "#ffffff", fontWeight: 700, fontSize: "13px", cursor: submittingIssue ? "not-allowed" : "pointer" }}>
+                  {submittingIssue ? "Sending..." : "Submit Correction Request"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

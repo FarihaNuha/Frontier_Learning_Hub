@@ -14,6 +14,7 @@ router.post("/import/students", verifyToken, checkRole("admin"), ctrl.importStud
 router.post("/import/teachers", verifyToken, checkRole("admin"), ctrl.importTeachers);
 router.post("/import/courses", verifyToken, checkRole("admin"), ctrl.importCourses);
 router.post("/import/advisers", verifyToken, checkRole("admin"), ctrl.importAdvisers);
+router.post("/import-advisers", verifyToken, checkRole("admin"), ctrl.importAdvisers);
 
 // Manual Edit & Delete Endpoints
 router.put("/students/:id", verifyToken, checkRole("admin"), ctrl.updateStudent);

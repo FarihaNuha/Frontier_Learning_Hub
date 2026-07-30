@@ -3,7 +3,7 @@ import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
-import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX } from "react-icons/fi";
+import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX, FiSearch, FiFilter, FiPlus } from "react-icons/fi";
 
 export default function AdminCourses() {
   const [courses, setCourses] = useState([]);
@@ -13,6 +13,33 @@ export default function AdminCourses() {
   // Inline editing states
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+
+  // Search & Filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deptFilter, setDeptFilter] = useState("all");
+  const [levelFilter, setLevelFilter] = useState("all");
+  const [termFilter, setTermFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+
+  const uniqueDepts = Array.from(new Set(courses.map((c) => c.department).filter(Boolean))).sort();
+  const uniqueLevels = Array.from(new Set(courses.map((c) => String(c.level || "")).filter(Boolean))).sort();
+  const uniqueTerms = Array.from(new Set(courses.map((c) => String(c.term || "")).filter(Boolean))).sort();
+  const uniqueTypes = Array.from(new Set(courses.map((c) => c.courseType).filter(Boolean))).sort();
+
+  const filteredCourses = courses.filter((c) => {
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !query ||
+      [c.courseCode, c.courseTitle, c.department, c.program, c.level, c.term, c.courseType]
+        .some((f) => String(f || "").toLowerCase().includes(query));
+
+    const matchesDept = deptFilter === "all" || (c.department || "").toLowerCase() === deptFilter.toLowerCase();
+    const matchesLevel = levelFilter === "all" || String(c.level || "").toLowerCase() === levelFilter.toLowerCase();
+    const matchesTerm = termFilter === "all" || String(c.term || "").toLowerCase() === termFilter.toLowerCase();
+    const matchesType = typeFilter === "all" || (c.courseType || "").toLowerCase() === typeFilter.toLowerCase();
+
+    return matchesSearch && matchesDept && matchesLevel && matchesTerm && matchesType;
+  });
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -59,6 +86,32 @@ export default function AdminCourses() {
       setEditingId(null);
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to update course.");
+    }
+  };
+
+  const handleAddCourse = async () => {
+    const newCourse = {
+      courseCode: `CRS-${Date.now().toString().slice(-4)}`,
+      courseTitle: "New Course Title",
+      courseType: "Theory",
+      creditHours: 3,
+      department: "EDTE",
+      program: "B.Sc. in Educational Technology and Engineering",
+      level: "1",
+      term: "1",
+      isNewRow: true,
+    };
+
+    try {
+      const res = await api.post("/ums/admin/import/courses", { courses: [newCourse] });
+      toast.success("New course row created!");
+      if (res.data?.courses) {
+        setCourses([...courses, ...res.data.courses.map(c => ({ ...c, isNewRow: true }))]);
+      } else {
+        fetchCourses();
+      }
+    } catch (err) {
+      toast.error("Failed to add new course row.");
     }
   };
 
@@ -136,7 +189,6 @@ export default function AdminCourses() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
           <div>
             <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Manage Courses</h1>
-            <p style={{ margin: "4px 0 0 0", color: "#64748b" }}>Import master syllabus, edit or delete courses manually</p>
           </div>
 
           <div style={{ display: "flex", gap: "12px" }}>
@@ -176,6 +228,26 @@ export default function AdminCourses() {
               <span>Download Template</span>
             </button>
 
+            <button
+              onClick={handleAddCourse}
+              style={{
+                background: "#10b981",
+                color: "#ffffff",
+                border: "none",
+                padding: "12px 18px",
+                borderRadius: "8px",
+                fontWeight: "600",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(16, 185, 129, 0.2)",
+              }}
+            >
+              <FiPlus size={18} />
+              <span>Add New Course</span>
+            </button>
+
             <label style={{
               background: "var(--pastel-blue-deep, #3B8DB3)",
               color: "#ffffff",
@@ -212,6 +284,100 @@ export default function AdminCourses() {
           </div>
         </div>
 
+        {/* Search & Filter Bar */}
+        <div style={{
+          background: "#ffffff",
+          borderRadius: "12px",
+          padding: "16px 20px",
+          marginBottom: "24px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+          border: "1px solid #e2e8f0",
+          display: "flex",
+          gap: "14px",
+          flexWrap: "wrap",
+          alignItems: "center"
+        }}>
+          <div style={{ flex: "1 1 260px", position: "relative" }}>
+            <FiSearch style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
+            <input
+              type="text"
+              placeholder="Search by Code, Title, Dept, Program..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "9px 12px 9px 38px",
+                borderRadius: "8px",
+                border: "1px solid #cbd5e1",
+                fontSize: "13.5px",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}>
+              <FiFilter size={15} /> Filters:
+            </span>
+
+            {/* Department Filter */}
+            <select
+              value={deptFilter}
+              onChange={(e) => setDeptFilter(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", fontWeight: 600, background: "#ffffff", color: "#334155" }}
+            >
+              <option value="all">All Depts</option>
+              {uniqueDepts.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+
+            {/* Level Filter */}
+            <select
+              value={levelFilter}
+              onChange={(e) => setLevelFilter(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", fontWeight: 600, background: "#ffffff", color: "#334155" }}
+            >
+              <option value="all">All Levels</option>
+              {uniqueLevels.map(l => <option key={l} value={l}>{l.toLowerCase().includes("level") ? l : `Level ${l}`}</option>)}
+            </select>
+
+            {/* Term Filter */}
+            <select
+              value={termFilter}
+              onChange={(e) => setTermFilter(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", fontWeight: 600, background: "#ffffff", color: "#334155" }}
+            >
+              <option value="all">All Terms</option>
+              {uniqueTerms.map(t => <option key={t} value={t}>{t.toLowerCase().includes("term") ? t : `Term ${t}`}</option>)}
+            </select>
+
+            {/* Type Filter */}
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", fontWeight: 600, background: "#ffffff", color: "#334155" }}
+            >
+              <option value="all">All Types</option>
+              {uniqueTypes.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+
+            {(searchQuery || deptFilter !== "all" || levelFilter !== "all" || termFilter !== "all" || typeFilter !== "all") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setDeptFilter("all");
+                  setLevelFilter("all");
+                  setTermFilter("all");
+                  setTypeFilter("all");
+                }}
+                style={{ padding: "8px 14px", borderRadius: "8px", border: "none", background: "#f1f5f9", color: "#64748b", fontSize: "12.5px", fontWeight: 600, cursor: "pointer" }}
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
+        </div>
+
         <div style={{
           background: "#ffffff",
           borderRadius: "12px",
@@ -220,15 +386,15 @@ export default function AdminCourses() {
           overflowX: "auto"
         }}>
           <h3 style={{ margin: "0 0 20px 0", color: "#1e293b", display: "flex", alignItems: "center", gap: "8px" }}>
-            <FiList /> Course Catalog
+            <FiList /> Course Catalog ({filteredCourses.length})
           </h3>
 
           {loading ? (
             <div>Loading courses...</div>
-          ) : courses.length === 0 ? (
+          ) : filteredCourses.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
               <FiAlertCircle size={36} style={{ marginBottom: "12px" }} />
-              <div>No course catalog records. Import Excel file to begin.</div>
+              <div>No course records match your search/filter criteria.</div>
             </div>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
@@ -245,7 +411,13 @@ export default function AdminCourses() {
                 </tr>
               </thead>
               <tbody>
-                {courses.map((course) => {
+                {[...filteredCourses].sort((a, b) => {
+                  const isNewA = a.isNewRow || String(a.courseCode || "").startsWith("CRS-");
+                  const isNewB = b.isNewRow || String(b.courseCode || "").startsWith("CRS-");
+                  if (isNewA && !isNewB) return 1;
+                  if (!isNewA && isNewB) return -1;
+                  return 0;
+                }).map((course) => {
                   const isEditing = editingId === course._id;
 
                   return (
@@ -279,11 +451,10 @@ export default function AdminCourses() {
                           <select
                             value={editFormData.courseType || "Theory"}
                             onChange={(e) => setEditFormData({ ...editFormData, courseType: e.target.value })}
-                            style={{ padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1" }}
+                            style={{ padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "13px", fontWeight: "600" }}
                           >
                             <option value="Theory">Theory</option>
                             <option value="Sessional">Sessional</option>
-                            <option value="Lab">Lab</option>
                           </select>
                         ) : (
                           course.courseType
@@ -303,24 +474,39 @@ export default function AdminCourses() {
                       </td>
                       <td style={{ padding: "12px" }}>
                         {isEditing ? (
-                          <input
-                            type="text"
-                            value={editFormData.department || ""}
+                          <select
+                            value={editFormData.department || "EDTE"}
                             onChange={(e) => setEditFormData({ ...editFormData, department: e.target.value })}
-                            style={{ padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1", width: "100px" }}
-                          />
+                            style={{ padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "13px", fontWeight: 600 }}
+                          >
+                            <option value="EDTE">EDTE</option>
+                            <option value="IRE">IRE</option>
+                            <option value="CySE">CySE</option>
+                            <option value="DSE">DSE</option>
+                            <option value="SWE">SWE</option>
+                          </select>
                         ) : (
                           course.department
                         )}
                       </td>
                       <td style={{ padding: "12px" }}>
                         {isEditing ? (
-                          <input
-                            type="text"
-                            value={editFormData.program || ""}
+                          <select
+                            value={editFormData.program || "B.Sc. in Educational Technology and Engineering"}
                             onChange={(e) => setEditFormData({ ...editFormData, program: e.target.value })}
-                            style={{ padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1", width: "100px" }}
-                          />
+                            style={{ padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "12px", width: "170px" }}
+                          >
+                            <option value="B.Sc. in Educational Technology and Engineering">B.Sc. in Educational Technology and Engineering</option>
+                            <option value="M.Sc. in Educational Technology and Engineering">M.Sc. in Educational Technology and Engineering</option>
+                            <option value="B.Sc. in Internet of Things and Robotics Engineering">B.Sc. in Internet of Things and Robotics Engineering</option>
+                            <option value="M.Sc. in Internet of Things and Robotics Engineering">M.Sc. in Internet of Things and Robotics Engineering</option>
+                            <option value="B.Sc. in Software Engineering">B.Sc. in Software Engineering</option>
+                            <option value="M.Sc. in Software Engineering">M.Sc. in Software Engineering</option>
+                            <option value="B.Sc. in Cyber Security Engineering">B.Sc. in Cyber Security Engineering</option>
+                            <option value="M.Sc. in Cyber Security Engineering">M.Sc. in Cyber Security Engineering</option>
+                            <option value="B.Sc. in Data Science Engineering">B.Sc. in Data Science Engineering</option>
+                            <option value="M.Sc. in Data Science Engineering">M.Sc. in Data Science Engineering</option>
+                          </select>
                         ) : (
                           course.program || "-"
                         )}
@@ -328,20 +514,24 @@ export default function AdminCourses() {
                       <td style={{ padding: "12px" }}>
                         {isEditing ? (
                           <div style={{ display: "flex", gap: "4px" }}>
-                            <input
-                              type="text"
-                              placeholder="Level"
-                              value={editFormData.level || ""}
+                            <select
+                              value={editFormData.level || "1"}
                               onChange={(e) => setEditFormData({ ...editFormData, level: e.target.value })}
-                              style={{ padding: "4px", borderRadius: "4px", border: "1px solid #cbd5e1", width: "60px" }}
-                            />
-                            <input
-                              type="text"
-                              placeholder="Term"
-                              value={editFormData.term || ""}
+                              style={{ padding: "4px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "12px" }}
+                            >
+                              <option value="1">Level 1</option>
+                              <option value="2">Level 2</option>
+                              <option value="3">Level 3</option>
+                              <option value="4">Level 4</option>
+                            </select>
+                            <select
+                              value={editFormData.term || "1"}
                               onChange={(e) => setEditFormData({ ...editFormData, term: e.target.value })}
-                              style={{ padding: "4px", borderRadius: "4px", border: "1px solid #cbd5e1", width: "60px" }}
-                            />
+                              style={{ padding: "4px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "12px" }}
+                            >
+                              <option value="1">Term 1</option>
+                              <option value="2">Term 2</option>
+                            </select>
                           </div>
                         ) : (
                           <>

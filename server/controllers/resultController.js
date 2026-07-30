@@ -122,11 +122,15 @@ const validateResultRows = async (teacherUser, rows, resultType = "Final") => {
 
   // ---- ONE-TIME assignment check (runs ONCE before the row loop) ----
   if (cleanExcelCode) {
-    if (assignedSet.size === 0) {
+    const isCodeAssigned = Array.from(assignedSet).some(k => k.startsWith(`${cleanExcelCode}|`)) ||
+      (teacherProfile?.assignedCourses || []).some(ac => normalizeCode(ac.courseCode || ac.courseName || "") === cleanExcelCode) ||
+      (teacherLmsCourses || []).some(c => normalizeCode(c.displayCode || c.courseCode || "") === cleanExcelCode);
+
+    if (assignedSet.size === 0 && !isCodeAssigned) {
       errors.push("No assigned courses found for your account. Please contact the admin to assign courses before uploading results.");
     } else {
       const lookupKey = `${cleanExcelCode}|${excelSession}|${excelLdig}|${excelTdig}`;
-      if (!assignedSet.has(lookupKey)) {
+      if (!assignedSet.has(lookupKey) && !isCodeAssigned) {
         errors.push("Upload blocked — Excel data does not match any assigned course.");
         errors.push(`  Your Excel file contains:`);
         errors.push(`    Course Code : ${excelCourseCodeRaw  || "(not found in Excel)"}`);
@@ -1246,10 +1250,10 @@ exports.getStudentPublishedResults = async (req, res) => {
         );
       }
 
-      let cEnd = r.correctionWindowEnd || uBatch?.correctionWindowEnd || null;
+      let cEnd = uBatch?.correctionWindowEnd || r.correctionWindowEnd || null;
 
       // Check if Admin Notice set a deadline Date for this session/level/term/resultType
-      if (!cEnd && r.session && r.level && r.term) {
+      if (r.session && r.level && r.term) {
         const lDigit = String(r.level).replace(/\D/g, "");
         const tDigit = String(r.term).replace(/\D/g, "");
         const matchedNotice = deadlineNotices.find(n => {
@@ -1315,12 +1319,13 @@ exports.createCorrectionRequest = async (req, res) => {
       return res.status(400).json({ error: "Please write a message explaining the correction issue." });
     }
 
-    const uploadBatch = await ResultUpload.findById(uploadId);
-    if (!uploadBatch) {
-      return res.status(404).json({ error: "Result batch not found." });
+    let uploadBatch = uploadId ? await ResultUpload.findById(uploadId) : null;
+    if (!uploadBatch && courseCode) {
+      const cleanC = courseCode.replace(/\s+/g, "").toUpperCase();
+      uploadBatch = await ResultUpload.findOne({ courseCode: { $regex: new RegExp(cleanC, "i") } });
     }
 
-    if (uploadBatch.correctionWindowEnd && new Date() > new Date(uploadBatch.correctionWindowEnd)) {
+    if (uploadBatch && uploadBatch.correctionWindowEnd && new Date() > new Date(uploadBatch.correctionWindowEnd)) {
       return res.status(400).json({
         error: `Correction deadline passed on ${new Date(uploadBatch.correctionWindowEnd).toLocaleString()}. Further requests are locked.`,
       });
@@ -1339,30 +1344,33 @@ exports.createCorrectionRequest = async (req, res) => {
     }
 
     const reqDoc = await ResultCorrectionRequest.create({
-      uploadId: uploadBatch._id,
+      uploadId: uploadBatch ? uploadBatch._id : null,
       resultId: resultId || null,
       student: req.user._id || req.user.id,
       studentId: actualStudentId || "Student",
       studentName: req.user.name || "Student",
-      teacherEmail: teacherEmail || uploadBatch.teacherEmail,
-      courseCode: courseCode || uploadBatch.courseCode,
-      courseTitle: courseTitle || uploadBatch.courseTitle,
+      teacherEmail: teacherEmail || uploadBatch?.teacherEmail || "",
+      courseCode: courseCode || uploadBatch?.courseCode || "",
+      courseTitle: courseTitle || uploadBatch?.courseTitle || "",
       studentMessage: studentMessage.trim(),
     });
 
     // Notify Course Teacher
-    const teacherUser = await User.findOne({ email: (teacherEmail || uploadBatch.teacherEmail).toLowerCase() });
-    if (teacherUser) {
-      try {
-        const notif = await Notification.create({
-          userId: teacherUser._id,
-          title: `Result Issue Reported: ${courseCode || uploadBatch.courseCode}`,
-          message: `Student ${req.user.name} (${req.user.studentId}) submitted a result correction request for ${courseCode || uploadBatch.courseCode}.`,
-          type: "general",
-        });
-        const io = getIO();
-        if (io) io.emit("new_notification", { userId: teacherUser._id.toString(), notif });
-      } catch (err) {}
+    const targetTeacherEmail = teacherEmail || uploadBatch?.teacherEmail;
+    if (targetTeacherEmail) {
+      const teacherUser = await User.findOne({ email: targetTeacherEmail.toLowerCase() });
+      if (teacherUser) {
+        try {
+          const notif = await Notification.create({
+            userId: teacherUser._id,
+            title: `Result Issue Reported: ${courseCode || uploadBatch?.courseCode || ""}`,
+            message: `Student ${req.user.name} (${req.user.studentId || ""}) submitted a result correction request for ${courseCode || uploadBatch?.courseCode || ""}.`,
+            type: "general",
+          });
+          const io = getIO();
+          if (io) io.emit("new_notification", { userId: teacherUser._id.toString(), notif });
+        } catch (err) {}
+      }
     }
 
     res.json({ message: "Correction request sent to course teacher successfully!", request: reqDoc });

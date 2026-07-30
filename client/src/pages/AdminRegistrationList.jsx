@@ -74,15 +74,12 @@ export default function AdminRegistrationList() {
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "28px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
               <FiClipboard size={22} />
             </div>
             <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Academic Registration Records</h1>
           </div>
-          <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
-            Master list of all student course registration submissions and adviser approvals.
-          </p>
         </div>
 
         {/* Dropdown Filters & Search Bar */}

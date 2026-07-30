@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const registrationCalendarSchema = new mongoose.Schema({
+  program: {
+    type: String,
+    default: "B.Sc. in Educational Technology and Engineering",
+  },
   session: {
     type: String,
     required: true,

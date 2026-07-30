@@ -40,6 +40,13 @@ export default function CourseRegistrationPage() {
       try {
         const res = await api.get(`/registration/available-courses?level=Level-${level}&term=Term-${term}`);
         setData(res.data);
+        if (res.data?.student) {
+          const s = res.data.student;
+          if (String(s.currentLevel) !== String(level) || String(s.currentTerm) !== String(term)) {
+            toast.error(`Registration Restricted: You are currently assigned to Level-${s.currentLevel} Term-${s.currentTerm}. You cannot register for Level-${level} Term-${term}.`);
+            navigate("/student/level-term", { replace: true });
+          }
+        }
       } catch (err) {
         toast.error("Failed to load available course list.");
       } finally {
@@ -47,7 +54,7 @@ export default function CourseRegistrationPage() {
       }
     };
     fetchAvailable();
-  }, [level, term]);
+  }, [level, term, navigate]);
 
   const toggleCourse = (id) => {
     if (selectedIds.includes(id)) {

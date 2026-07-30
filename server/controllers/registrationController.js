@@ -98,19 +98,31 @@ exports.getAvailableCourses = async (req, res) => {
       });
     }
 
-    // Check calendar window
-    const calendar = await RegistrationCalendar.findOne({
-      $and: [
-        {
-          $or: [
-            { department: { $regex: new RegExp(dept, "i") } },
-            { department: { $regex: new RegExp(deptKeywords.slice(0, 4), "i") } },
-          ]
-        },
-        { level: { $regex: new RegExp(levelStr, "i") } },
-        { term: { $regex: new RegExp(termStr, "i") } },
-      ]
-    });
+    // Check calendar window (Program specific if specified, fallback to Dept/Level/Term)
+    let calendar = null;
+    if (student.program) {
+      calendar = await RegistrationCalendar.findOne({
+        program: { $regex: new RegExp(student.program.replace(/[^a-zA-Z0-9\s]/g, ""), "i") },
+        level: { $regex: new RegExp(levelStr, "i") },
+        term: { $regex: new RegExp(termStr, "i") },
+      });
+    }
+
+    if (!calendar) {
+      calendar = await RegistrationCalendar.findOne({
+        $and: [
+          {
+            $or: [
+              { department: "All Departments" },
+              { department: { $regex: new RegExp(dept, "i") } },
+              { department: { $regex: new RegExp(deptKeywords.slice(0, 4), "i") } },
+            ]
+          },
+          { level: { $regex: new RegExp(levelStr, "i") } },
+          { term: { $regex: new RegExp(termStr, "i") } },
+        ]
+      });
+    }
 
     res.json({
       student,
@@ -147,22 +159,55 @@ exports.submitRegistration = async (req, res) => {
     const levelStr = `Level-${student.currentLevel}`;
     const termStr = `Term-${student.currentTerm}`;
 
-    // Fetch calendar constraints
-    const calendar = await RegistrationCalendar.findOne({
-      department: student.department,
-      level: { $regex: new RegExp(levelStr, "i") },
-      term: { $regex: new RegExp(termStr, "i") },
-    });
+    // Fetch calendar constraints (matching student program if specified)
+    let calendar = null;
+    if (student.program) {
+      calendar = await RegistrationCalendar.findOne({
+        program: { $regex: new RegExp(student.program.replace(/[^a-zA-Z0-9\s]/g, ""), "i") },
+        level: { $regex: new RegExp(levelStr, "i") },
+        term: { $regex: new RegExp(termStr, "i") },
+      });
+    }
+
+    if (!calendar) {
+      calendar = await RegistrationCalendar.findOne({
+        department: student.department,
+        level: { $regex: new RegExp(levelStr, "i") },
+        term: { $regex: new RegExp(termStr, "i") },
+      });
+    }
 
     if (calendar) {
       const now = new Date();
       if (!calendar.isOpen || now < new Date(calendar.startDate) || now > new Date(calendar.endDate)) {
         return res.status(400).json({ error: "Registration period is currently closed for your semester." });
       }
+
+      if (calendar.program) {
+        const isRuleMsc = calendar.program.toLowerCase().includes("m.sc");
+        const isStudMsc = (student.program || "").toLowerCase().includes("m.sc");
+        if (isRuleMsc !== isStudMsc) {
+          return res.status(400).json({ error: `Registration Blocked: Registration Rule (${calendar.program}) does not match your assigned program (${student.program || "B.Sc."}).` });
+        }
+      }
     }
 
     // Fetch full course objects
     const courses = await CourseImport.find({ _id: { $in: selectedCourseIds } });
+
+    // Strict Scope Check: Ensure all courses match the student's assigned Department/Program
+    for (const c of courses) {
+      if (c.department && student.department) {
+        const cDeptKey = c.department.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        const sDeptKey = student.department.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        if (!cDeptKey.includes(sDeptKey.slice(0, 4)) && !sDeptKey.includes(cDeptKey.slice(0, 4))) {
+          return res.status(400).json({
+            error: `Registration Blocked: Course ${c.courseCode} (${c.courseTitle}) belongs to ${c.department}. You can only register for your assigned department (${student.department}).`
+          });
+        }
+      }
+    }
+
     const selectedCoursesData = courses.map((c) => ({
       courseCode: c.courseCode,
       courseTitle: c.courseTitle,

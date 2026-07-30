@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
 import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
 import {
   FiCalendar,
   FiPlus,
@@ -17,13 +18,7 @@ import "../styles/dashboard.css";
 export default function AdminCalendarManagementPage() {
   const [publishedCalendar, setPublishedCalendar] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-
-  // Upload Modal State
-  const [fileUrl, setFileUrl] = useState("");
-  const [sessionHeader, setSessionHeader] = useState("Session: 2020-2021, 2021-2022, 2022-2023");
-  const [termHeader, setTermHeader] = useState("Term: January 2026");
-  const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const fetchPublishedCalendar = async () => {
     setLoading(true);
@@ -43,31 +38,200 @@ export default function AdminCalendarManagementPage() {
     fetchPublishedCalendar();
   }, []);
 
-  const handleBroadcastSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
+  // Strict Excel Parser & Validator
+  const parseAcademicCalendarExcel = (matrix) => {
+    if (!matrix || matrix.length < 7) {
+      throw new Error("Invalid format! Sheet has insufficient rows.");
+    }
+
+    const row5Str = JSON.stringify(matrix[5] || []).toLowerCase();
+    const row6Str = JSON.stringify(matrix[6] || []).toLowerCase();
+
+    const isEventsPresent = row5Str.includes("events");
+    const isHolidayPresent = row5Str.includes("holiday");
+    const isDatePresent = row6Str.includes("date");
+    const isActivitiesPresent = row6Str.includes("activities");
+
+    if (!isEventsPresent || !isHolidayPresent || !isDatePresent || !isActivitiesPresent) {
+      throw new Error("Invalid file format! Please download and use the official Academic Calendar Template.");
+    }
+
+    const university = matrix[0]?.[0] ? String(matrix[0][0]).trim() : "University of Frontier Technology, Bangladesh";
+    const title = matrix[1]?.[0] ? String(matrix[1][0]).trim() : "B.Sc. Academic Calendar for the Semester: January 2026 and July 2026";
+    const session = matrix[2]?.[0] ? String(matrix[2][0]).trim() : "Session: 2020-2021, 2021-2022, 2022-2023";
+    const termHeader = matrix[3]?.[0] ? String(matrix[3][0]).trim() : "Term: January 2026";
+
+    const events = [];
+    const importantDates = [];
+    const holidays = [];
+
+    let currentLeftSection = "events";
+
+    for (let r = 7; r < matrix.length; r++) {
+      const row = matrix[r] || [];
+
+      const colA = String(row[0] || "").trim();
+      const colB = String(row[1] || "").trim();
+      const colC = String(row[2] || "").trim();
+
+      const colE = String(row[4] || "").trim();
+      const colF = String(row[5] || "").trim();
+      const colG = String(row[6] || "").trim();
+
+      if (colA.toLowerCase().includes("important dates")) {
+        currentLeftSection = "importantDates";
+        continue;
+      }
+
+      if (colA.toUpperCase() === "DATE" && colC.toUpperCase() === "ACTIVITIES") {
+        continue;
+      }
+
+      if (colA && colC) {
+        if (currentLeftSection === "events") {
+          events.push({ date: colA, duration: colB, activity: colC });
+        } else {
+          importantDates.push({ date: colA, duration: colB, activity: colC });
+        }
+      }
+
+      if (colE && colG) {
+        if (colE.toUpperCase() !== "DATE" && colG.toUpperCase() !== "EVENTS") {
+          holidays.push({ date: colE, days: colF, event: colG });
+        }
+      }
+    }
+
+    return {
+      university,
+      title,
+      session,
+      termHeader,
+      events: events.length > 0 ? events : DEFAULT_CALENDAR_DATA.events,
+      importantDates: importantDates.length > 0 ? importantDates : DEFAULT_CALENDAR_DATA.importantDates,
+      holidays: holidays.length > 0 ? holidays : DEFAULT_CALENDAR_DATA.holidays,
+    };
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const toastId = toast.loading("Processing calendar file...");
 
     try {
-      const payload = {
-        title: "B.Sc. Academic Calendar for the Semester: January 2026 and July 2026",
-        session: sessionHeader || "Session: 2020-2021, 2021-2022, 2022-2023",
-        termHeader: termHeader || "Term: January 2026",
-        fileUrl: fileUrl.trim(),
-        fileType: fileUrl.trim().endsWith(".pdf") ? "pdf" : "image",
-        events: DEFAULT_CALENDAR_DATA.events,
-        importantDates: DEFAULT_CALENDAR_DATA.importantDates,
-        holidays: DEFAULT_CALENDAR_DATA.holidays,
-      };
+      const isExcel = file.name.endsWith(".xlsx") || file.name.endsWith(".xls");
 
-      const res = await api.post("/service/calendar/published", payload);
-      toast.success("Official Academic Calendar published & broadcasted to all Teacher and Student dashboards!");
-      setPublishedCalendar(res.data.publishedCalendar);
-      setShowUploadModal(false);
+      if (isExcel) {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const parsedData = parseAcademicCalendarExcel(matrix);
+
+        const payload = {
+          university: parsedData.university,
+          title: parsedData.title,
+          session: parsedData.session,
+          termHeader: parsedData.termHeader,
+          events: parsedData.events,
+          importantDates: parsedData.importantDates,
+          holidays: parsedData.holidays,
+        };
+
+        const res = await api.post("/service/calendar/published", payload);
+        setPublishedCalendar(res.data.publishedCalendar);
+        toast.success("Academic Calendar updated successfully from Excel!", { id: toastId });
+      } else {
+        // Upload PDF / Document File
+        const formData = new FormData();
+        formData.append("calendarFile", file);
+
+        const uploadRes = await api.post("/service/calendar/upload-file", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        const payload = {
+          title: publishedCalendar?.title || DEFAULT_CALENDAR_DATA.title,
+          session: publishedCalendar?.session || DEFAULT_CALENDAR_DATA.session,
+          termHeader: publishedCalendar?.termHeader || DEFAULT_CALENDAR_DATA.termHeader,
+          fileUrl: uploadRes.data.fileUrl,
+          fileType: file.name.endsWith(".pdf") ? "pdf" : "image",
+          events: publishedCalendar?.events || DEFAULT_CALENDAR_DATA.events,
+          importantDates: publishedCalendar?.importantDates || DEFAULT_CALENDAR_DATA.importantDates,
+          holidays: publishedCalendar?.holidays || DEFAULT_CALENDAR_DATA.holidays,
+        };
+
+        const res = await api.post("/service/calendar/published", payload);
+        setPublishedCalendar(res.data.publishedCalendar);
+        toast.success("Academic Calendar document published!", { id: toastId });
+      }
     } catch (err) {
-      toast.error("Failed to publish academic calendar.");
+      toast.error(err.message || "Failed to parse/upload academic calendar.", { id: toastId });
     } finally {
-      setSubmitting(false);
+      setUploading(false);
+      e.target.value = "";
     }
+  };
+
+  const handleDownloadAcademicCalendarTemplate = () => {
+    const templateAOA = [
+      ["University of Frontier Technology, Bangladesh", "", "", "", "", "", ""],
+      ["B.Sc. Academic Calendar for the Semester: January 2026 and July 2026", "", "", "", "", "", ""],
+      ["Session: 2020-2021, 2021-2022, 2022-2023", "", "", "", "", "", ""],
+      ["Term: January 2026", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", ""],
+      ["Events", "", "", "", "Holiday List", "", ""],
+      ["DATE", "DURATION", "ACTIVITIES", "", "DATE", "DAYS", "EVENTS"],
+      ["11 Apr to 13 June", "7 W", "Classes", "", "14 Apr, 2026", "1", "Bengali New Year's Day"],
+      ["16 June to 30 June", "2 W", "Midterm Examination", "", "01 May, 2026", "0", "May day, *Buddha Purnima"],
+      ["01 July to 22 Aug", "7 W", "Classes", "", "23 May to 03 Jun", "10", "*Eid al-Adha, Summer Vacation"],
+      ["23 Aug to 25 Aug", "3 D", "Semester Final Preparatory Leave", "", "26 Jun, 2026", "0", "*Ashura"],
+      ["29 Aug to 13 Sep", "2 W 1 D", "Final Examination", "", "26 July, 2026", "0", "University Day"],
+      ["Important Dates", "", "", "", "", "", ""],
+      ["DATE", "DURATION", "ACTIVITIES", "", "", "", ""],
+      ["11 Apr to 17 Apr", "1 W", "Course offer", "", "05 Aug, 2026", "1", "July Mass Uprising Day"],
+      ["18 Apr to 01 May", "2 W", "Registration without fine", "", "12 Aug, 2026", "1", "Akhiri Chahar Shambah"],
+      ["02 May to 08 May", "1 W", "Registration with fine (as per rules) and Add/Drop without fine", "", "26 Aug, 2026", "1", "*Eid-e-Milad-un-Nabi (S)"],
+      ["09 May to 15 May", "1 W", "Registration/Add/Drop with fine (as per policy) and with Approval of VC", "", "04 Sep, 2026", "0", "Janmashtami"],
+      ["09 June to 15 June", "", "Midterm admit card", "", "24 Sep, 2026", "0", "*Fateha-e-Yazdaham"],
+      ["20 July", "", "Submission of midterm exam result", "", "", "", ""],
+      ["25 July", "", "Publication of midterm exam result", "", "", "", ""],
+      ["25 Aug", "", "Publication of all results except final", "", "", "", ""],
+      ["22 Aug to 28 Aug", "", "Final Exam admit card", "", "", "", ""],
+      ["28 Sep", "", "Submission of final exam result", "", "", "", ""],
+      ["30 Sep", "", "Publication of final exam result", "", "", "", ""],
+      ["03 Oct", "", "Next semester class start", "", "", "", ""],
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(templateAOA);
+
+    ws["!cols"] = [
+      { wch: 22 },
+      { wch: 12 },
+      { wch: 48 },
+      { wch: 4 },
+      { wch: 20 },
+      { wch: 8 },
+      { wch: 38 },
+    ];
+
+    ws["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
+      { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } },
+      { s: { r: 5, c: 0 }, e: { r: 5, c: 2 } },
+      { s: { r: 5, c: 4 }, e: { r: 5, c: 6 } },
+      { s: { r: 12, c: 0 }, e: { r: 12, c: 2 } },
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Academic_Calendar");
+    XLSX.writeFile(wb, "Academic_Calendar_Template.xlsx");
   };
 
   return (
@@ -78,36 +242,61 @@ export default function AdminCalendarManagementPage() {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
                 <FiCalendar size={22} />
               </div>
               <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Academic Calendar Management</h1>
             </div>
-            <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
-              Upload, fix, and publish official university academic calendars directly to all teacher and student dashboards.
-            </p>
           </div>
 
-          <button
-            onClick={() => setShowUploadModal(true)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "11px 22px",
-              background: "#3b8db3",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "10px",
-              fontWeight: 700,
-              fontSize: "14px",
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(59,141,179,0.3)",
-            }}
-          >
-            <FiUploadCloud size={18} /> Upload & Broadcast Calendar
-          </button>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button
+              onClick={handleDownloadAcademicCalendarTemplate}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "11px 18px",
+                background: "#ffffff",
+                color: "#1e293b",
+                border: "1px solid #cbd5e1",
+                borderRadius: "10px",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+              }}
+            >
+              <FiUploadCloud style={{ transform: "rotate(180deg)" }} size={18} /> Download Template
+            </button>
+
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "11px 22px",
+                background: "#3b8db3",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "10px",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(59,141,179,0.3)",
+              }}
+            >
+              <FiUploadCloud size={18} />
+              <span>{uploading ? "Uploading..." : "Upload & Broadcast Calendar"}</span>
+              <input
+                type="file"
+                accept=".xlsx,.xls,.pdf"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+                disabled={uploading}
+              />
+            </label>
+          </div>
         </div>
 
         {/* Official Academic Calendar Card Display */}
@@ -117,150 +306,10 @@ export default function AdminCalendarManagementPage() {
           <OfficialAcademicCalendarCard
             customData={publishedCalendar}
             fileUrl={publishedCalendar?.fileUrl}
-            onUploadClick={() => setShowUploadModal(true)}
             isAdmin={true}
           />
         )}
       </div>
-
-      {/* Upload & Broadcast Modal */}
-      {showUploadModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(15, 23, 42, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            padding: "20px",
-          }}
-        >
-          <div
-            style={{
-              background: "#ffffff",
-              borderRadius: "16px",
-              width: "100%",
-              maxWidth: "540px",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Modal Header */}
-            <div
-              style={{
-                padding: "20px 24px",
-                background: "linear-gradient(135deg, #3B8DB3, #2C4B66)",
-                color: "#ffffff",
-                display: "flex",
-                justify: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <FiUploadCloud size={20} />
-                <h3 style={{ margin: 0, fontSize: "17px", fontWeight: 700 }}>Upload & Broadcast Academic Calendar</h3>
-              </div>
-              <FiX size={20} cursor="pointer" onClick={() => setShowUploadModal(false)} />
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleBroadcastSubmit} style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
-                  Academic Sessions Header:
-                </label>
-                <input
-                  type="text"
-                  value={sessionHeader}
-                  onChange={(e) => setSessionHeader(e.target.value)}
-                  placeholder="e.g. Session: 2020-2021, 2021-2022, 2022-2023"
-                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box" }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
-                  Semester / Term Header:
-                </label>
-                <input
-                  type="text"
-                  value={termHeader}
-                  onChange={(e) => setTermHeader(e.target.value)}
-                  placeholder="e.g. Term: January 2026"
-                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box" }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
-                  Select File from Device (PDF, Excel, DOCX, PNG, JPG):
-                </label>
-                <input
-                  type="file"
-                  accept=".pdf,.png,.jpg,.jpeg,.xlsx,.xls,.docx,.doc"
-                  onChange={async (e) => {
-                    const selectedFile = e.target.files[0];
-                    if (!selectedFile) return;
-                    const formData = new FormData();
-                    formData.append("calendarFile", selectedFile);
-                    toast.loading("Uploading file...", { id: "uploading" });
-                    try {
-                      const res = await api.post("/service/calendar/upload-file", formData, {
-                        headers: { "Content-Type": "multipart/form-data" },
-                      });
-                      setFileUrl(res.data.fileUrl);
-                      toast.success(`Uploaded ${selectedFile.name}`, { id: "uploading" });
-                    } catch (err) {
-                      toast.error("File upload failed.", { id: "uploading" });
-                    }
-                  }}
-                  style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box", background: "#f8fafc" }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
-                  Or Direct Document / File URL:
-                </label>
-                <input
-                  type="text"
-                  value={fileUrl}
-                  onChange={(e) => setFileUrl(e.target.value)}
-                  placeholder="Direct document URL (e.g. https://.../calendar.pdf)"
-                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box" }}
-                />
-                <span style={{ fontSize: "11.5px", color: "#64748b", marginTop: "4px", display: "block" }}>
-                  Supported formats: <strong>PDF, Excel (.xlsx), Word (.docx), or Image (PNG/JPG)</strong>. Uploading will instantly publish the official calendar to every student & teacher dashboard.
-                </span>
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "12px" }}>
-                <button
-                  type="button"
-                  onClick={() => setShowUploadModal(false)}
-                  style={{ padding: "10px 18px", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#475569", fontWeight: 600, fontSize: "13px", cursor: "pointer" }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{ padding: "10px 20px", borderRadius: "8px", border: "none", background: "#3b8db3", color: "#ffffff", fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
-                >
-                  <FiGlobe size={15} /> {submitting ? "Broadcasting..." : "Publish & Broadcast to All"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

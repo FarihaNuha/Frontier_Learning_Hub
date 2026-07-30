@@ -115,7 +115,7 @@ export default function StudentLevelTermPage() {
         )}
 
         {/* Due Payment Alert Banner & Online Banking Button */}
-        {reg && paymentInfo && !paymentInfo.isPaid && (
+        {reg && reg.status !== "Rejected" && reg.status !== "rejected" && paymentInfo && !paymentInfo.isPaid && (
           <div
             style={{
               background: "linear-gradient(135deg, #fff7ed, #ffedd5)",

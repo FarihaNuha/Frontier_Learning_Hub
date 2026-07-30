@@ -1,7 +1,7 @@
 # Graph Report - UFTB_Moodle  (2026-07-30)
 
 ## Corpus Check
-- 191 files · ~187,952 words
+- 191 files · ~187,879 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -73,7 +73,6 @@
 - verifyToken
 - registrationRoutes.js
 - User.js
-- react-scripts
 - umsAdminRoutes.js
 - Adviser.js
 - AuthContext.jsx
@@ -105,6 +104,7 @@
 - Transcript.js
 - courseRoutes.js
 - StudentExamPage.jsx
+- react-scripts
 
 ## God Nodes (most connected - your core abstractions)
 1. `useAuth()` - 63 edges
@@ -152,8 +152,8 @@ Cohesion: 0.07
 Nodes (41): addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest, Course, createCoursePost(), createPublicPost() (+33 more)
 
 ### Community 4 - "User.js"
-Cohesion: 0.22
-Nodes (7): verifyToken(), ctrl, router, { verifyToken, checkRole }, ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 5 - "assignmentController.js"
 Cohesion: 0.05
@@ -185,7 +185,7 @@ Nodes (18): concurrently, author, dependencies, concurrently, nodemon, descripti
 
 ### Community 12 - "dependencies"
 Cohesion: 0.13
-Nodes (15): dependencies, jspdf-autotable, jszip, react-hot-toast, socket.io-client, @testing-library/dom, @testing-library/user-event, web-vitals (+7 more)
+Nodes (15): dependencies, jspdf-autotable, react-hot-toast, react-scripts, socket.io-client, @testing-library/dom, @testing-library/user-event, web-vitals (+7 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.15
@@ -221,7 +221,7 @@ Nodes (20): GlobalNotificationBell(), AuthContext, AuthProvider(), getActiveStat
 
 ### Community 22 - "authMiddleware.js"
 Cohesion: 0.22
-Nodes (7): checkRole(), ctrl, router, { verifyToken, checkRole }, ctrl, router, { verifyToken, checkRole }
+Nodes (7): verifyToken(), ctrl, router, { verifyToken, checkRole }, ctrl, router, { verifyToken, checkRole }
 
 ### Community 23 - "scripts"
 Cohesion: 0.11
@@ -284,8 +284,8 @@ Cohesion: 0.25
 Nodes (5): Assessment, assessmentSchema, mongoose, Assessment, mongoose
 
 ### Community 51 - "useAuth"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.22
+Nodes (7): checkRole(), ctrl, router, { verifyToken, checkRole }, ctrl, router, { verifyToken, checkRole }
 
 ### Community 52 - "apiCache.js"
 Cohesion: 0.23
@@ -340,8 +340,8 @@ Cohesion: 0.13
 Nodes (15): createAuditLog(), graduateStudent(), promoteStudentsBatch(), { createAuditLog }, createNotice(), deleteNotice(), { getIO }, Notice (+7 more)
 
 ### Community 70 - "adminRoutes.js"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.29
+Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
 
 ### Community 71 - "attendanceRoutes.js"
 Cohesion: 0.50
@@ -380,8 +380,8 @@ Cohesion: 0.15
 Nodes (11): answerSchema, examSubmissionSchema, mongoose, Assignment, cron, Exam, ExamSubmission, { getIO } (+3 more)
 
 ### Community 93 - "courseRoutes.js"
-Cohesion: 0.29
-Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 97 - "StudentExamPage.jsx"
 Cohesion: 0.22

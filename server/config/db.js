@@ -1,11 +1,26 @@
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
+  const primaryUri = process.env.MONGODB_URI;
+  const fallbackUri = "mongodb://127.0.0.1:27017/uftb_moodle";
+
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+    if (primaryUri) {
+      try {
+        const conn = await mongoose.connect(primaryUri, {
+          serverSelectionTimeoutMS: 3000,
+        });
+        console.log(`✅ MongoDB Primary Connected: ${conn.connection.host}`);
+        return;
+      } catch (primaryErr) {
+        console.warn(`⚠️ Primary MongoDB Connection Failed (${primaryErr.message}). Switching to Local MongoDB...`);
+      }
+    }
+
+    const conn = await mongoose.connect(fallbackUri, {
       serverSelectionTimeoutMS: 5000,
     });
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`✅ MongoDB Local Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
     console.log("🔄 Retrying MongoDB connection in 5 seconds...");

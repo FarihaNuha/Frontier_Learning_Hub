@@ -20,6 +20,10 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  program: {
+    type: String,
+    default: "BSc. Eng in EDTE",
+  },
   assignedLevelTerm: {
     type: String,
     default: "",

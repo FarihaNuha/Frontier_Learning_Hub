@@ -151,15 +151,12 @@ export default function AdminNoticeManagementPage() {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
                 <FiClipboard size={22} />
               </div>
               <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Official Notice Management</h1>
             </div>
-            <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
-              Create, edit, pin, schedule, and attach PDFs/Images to official university notices.
-            </p>
           </div>
 
           <button

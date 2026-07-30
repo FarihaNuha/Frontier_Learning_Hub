@@ -166,6 +166,13 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <span>Academic Calendar</span>
           </button>
           <button
+            className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/student/notices") ? "active" : ""}`}
+            onClick={() => navigate("/student/notices")}
+          >
+            <FiBell size={18} />
+            <span>Notice Board</span>
+          </button>
+          <button
             className={`nav-item ${currentPage === "payments" || window.location.pathname.includes("/student/registration-payments") ? "active" : ""}`}
             onClick={() => navigate("/student/registration-payments")}
           >

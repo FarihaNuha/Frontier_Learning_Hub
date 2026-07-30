@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
 
 const adviserSchema = new mongoose.Schema({
+  teacherId: {
+    type: String,
+    default: "",
+  },
+  teacherName: {
+    type: String,
+    default: "",
+  },
   teacherEmail: {
     type: String,
     required: true,
@@ -8,11 +16,11 @@ const adviserSchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    required: true,
+    default: "",
   },
   program: {
     type: String,
-    required: true,
+    default: "",
   },
   session: {
     type: String,

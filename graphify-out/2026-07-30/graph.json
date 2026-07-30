@@ -340,7 +340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_dependencies_jszip",
-      "community": 12,
+      "community": 107,
       "norm_label": "jszip"
     },
     {
@@ -350,7 +350,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_json_jszip",
-      "community": 12,
+      "community": 107,
       "norm_label": "jszip"
     },
     {
@@ -460,7 +460,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "client_package_dependencies_react_scripts",
-      "community": 62,
+      "community": 12,
       "norm_label": "react-scripts"
     },
     {
@@ -470,7 +470,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "react_scripts",
-      "community": 62,
+      "community": 12,
       "norm_label": "react-scripts"
     },
     {
@@ -6607,7 +6607,7 @@
       "label": "getStudentCorrectionRequests()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1379",
+      "source_location": "L1378",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getstudentcorrectionrequests",
       "community": 37,
@@ -6617,7 +6617,7 @@
       "label": "getTeacherCorrectionRequests()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1392",
+      "source_location": "L1391",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getteachercorrectionrequests",
       "community": 37,
@@ -6627,7 +6627,7 @@
       "label": "replyToCorrectionRequest()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1406",
+      "source_location": "L1405",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_replytocorrectionrequest",
       "community": 37,
@@ -6637,7 +6637,7 @@
       "label": "batchUpdateMarks()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1442",
+      "source_location": "L1441",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_batchupdatemarks",
       "community": 37,
@@ -7300,7 +7300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware",
-      "community": 93,
+      "community": 70,
       "norm_label": "authmiddleware.js"
     },
     {
@@ -7310,7 +7310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_jwt",
-      "community": 93,
+      "community": 70,
       "norm_label": "jwt"
     },
     {
@@ -7320,7 +7320,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_user",
-      "community": 93,
+      "community": 70,
       "norm_label": "user"
     },
     {
@@ -7330,7 +7330,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_verifytoken",
-      "community": 4,
+      "community": 22,
       "norm_label": "verifytoken()"
     },
     {
@@ -7340,7 +7340,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_checkrole",
-      "community": 22,
+      "community": 51,
       "norm_label": "checkrole()"
     },
     {
@@ -9700,7 +9700,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_resultroutes",
-      "community": 4,
+      "community": 51,
       "norm_label": "resultroutes.js"
     },
     {
@@ -9710,7 +9710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_resultroutes_router",
-      "community": 4,
+      "community": 51,
       "norm_label": "router"
     },
     {
@@ -9720,7 +9720,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_resultroutes_verifytoken_checkrole",
-      "community": 4,
+      "community": 51,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9730,7 +9730,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_resultroutes_ctrl",
-      "community": 4,
+      "community": 51,
       "norm_label": "ctrl"
     },
     {
@@ -25381,7 +25381,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1442",
+      "source_location": "L1441",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_batchupdatemarks",
@@ -25481,7 +25481,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1379",
+      "source_location": "L1378",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_getstudentcorrectionrequests",
@@ -25501,7 +25501,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1392",
+      "source_location": "L1391",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_getteachercorrectionrequests",
@@ -25561,7 +25561,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1406",
+      "source_location": "L1405",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_replytocorrectionrequest",
@@ -25951,7 +25951,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1450",
+      "source_location": "L1449",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_batchupdatemarks",
       "target": "server_controllers_resultcontroller_resultupload"
@@ -26204,7 +26204,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1381",
+      "source_location": "L1380",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_getstudentcorrectionrequests",
       "target": "server_controllers_resultcontroller_resultcorrectionrequest"
@@ -26215,7 +26215,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1395",
+      "source_location": "L1394",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_getteachercorrectionrequests",
       "target": "server_controllers_resultcontroller_resultcorrectionrequest"
@@ -26226,7 +26226,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1411",
+      "source_location": "L1410",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_replytocorrectionrequest",
       "target": "server_controllers_resultcontroller_resultcorrectionrequest"
@@ -26236,7 +26236,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1480",
+      "source_location": "L1479",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_batchupdatemarks",
       "target": "server_controllers_resultcontroller_parseoptionalnumber",
@@ -26358,7 +26358,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1430",
+      "source_location": "L1429",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_replytocorrectionrequest",
       "target": "server_socket_getio"

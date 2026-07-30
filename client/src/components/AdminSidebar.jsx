@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { 
@@ -14,30 +14,29 @@ import {
   FiShield,
   FiBell,
   FiClipboard,
-  FiCalendar
+  FiCalendar,
+  FiChevronDown,
+  FiChevronUp,
 } from "react-icons/fi";
 
 export default function AdminSidebar() {
   const { logout, user } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const menuItems = [
-    { path: "/admin/dashboard", label: "Dashboard", icon: <FiGrid size={18} /> },
-    { path: "/admin/students", label: "Students", icon: <FiUsers size={18} /> },
-    { path: "/admin/teachers", label: "Teachers", icon: <FiUsers size={18} /> },
-    { path: "/admin/courses", label: "Courses", icon: <FiBookOpen size={18} /> },
-    { path: "/admin/advisers", label: "Adviser Assignment", icon: <FiBookmark size={18} /> },
-    { path: "/admin/notices", label: "Notice Management", icon: <FiClipboard size={18} /> },
-    { path: "/admin/academic-calendar", label: "Academic Calendar", icon: <FiCalendar size={18} /> },
-    { path: "/admin/calendar", label: "Registration Calendar", icon: <FiBookmark size={18} /> },
-    { path: "/admin/registration-payments", label: "Registration Payments", icon: <FiGrid size={18} /> },
-    { path: "/admin/registrations", label: "Registration Records", icon: <FiBookOpen size={18} /> },
-    { path: "/admin/results", label: "Result Publication", icon: <FiAward size={18} /> },
-    { path: "/admin/progression", label: "Academic Progression", icon: <FiTrendingUp size={18} /> },
-    { path: "/admin/audit-logs", label: "System Audit Logs", icon: <FiShield size={18} /> },
-    { path: "/admin/settings", label: "Settings", icon: <FiSettings size={18} /> },
-  ];
+  const isStudentsActive =
+    location.pathname === "/admin/students" || location.pathname === "/admin/progression";
+
+  const isTeachersActive =
+    location.pathname === "/admin/teachers" || location.pathname === "/admin/advisers";
+
+  const isRegistrationActive =
+    location.pathname === "/admin/calendar" ||
+    location.pathname === "/admin/registration-payments" ||
+    location.pathname === "/admin/registrations";
+
+  const [studentsOpen, setStudentsOpen] = useState(isStudentsActive);
+  const [teachersOpen, setTeachersOpen] = useState(isTeachersActive);
+  const [registrationOpen, setRegistrationOpen] = useState(isRegistrationActive);
 
   return (
     <div className="sidebar admin-sidebar" style={{
@@ -62,32 +61,374 @@ export default function AdminSidebar() {
       </div>
 
       <div className="sidebar-menu" style={{ flex: 1, padding: "20px 16px", overflowY: "auto" }}>
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <Link 
-              key={item.path} 
-              to={item.path} 
-              className={`sidebar-menu-item ${isActive ? "active" : ""}`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                padding: "12px 16px",
-                borderRadius: "8px",
-                color: isActive ? "var(--white, #ffffff)" : "var(--text-main, #2C4B66)",
-                background: isActive ? "var(--pastel-blue-deep, #3B8DB3)" : "transparent",
-                textDecoration: "none",
-                marginBottom: "8px",
-                fontWeight: isActive ? "600" : "500",
-                transition: "all 0.2s"
-              }}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+        {/* Dashboard */}
+        <Link 
+          to="/admin/dashboard" 
+          className={`sidebar-menu-item ${location.pathname === "/admin/dashboard" ? "active" : ""}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: location.pathname === "/admin/dashboard" ? "#ffffff" : "#2C4B66",
+            background: location.pathname === "/admin/dashboard" ? "#3B8DB3" : "transparent",
+            textDecoration: "none",
+            marginBottom: "8px",
+            fontWeight: location.pathname === "/admin/dashboard" ? "600" : "500",
+          }}
+        >
+          <FiGrid size={18} />
+          <span>Dashboard</span>
+        </Link>
+
+        {/* Expandable Students Section (Merged Student Directory & Academic Progression) */}
+        <div style={{ marginBottom: "8px" }}>
+          <button
+            onClick={() => setStudentsOpen(!studentsOpen)}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              color: isStudentsActive ? "#3B8DB3" : "#2C4B66",
+              background: isStudentsActive ? "#E8F4FD" : "transparent",
+              border: "none",
+              fontWeight: "600",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <FiUsers size={18} />
+              <span>Students</span>
+            </div>
+            {studentsOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+          </button>
+
+          {studentsOpen && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px", paddingLeft: "16px" }}>
+              <Link
+                to="/admin/students"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/students" ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/students" ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/students" ? "600" : "500",
+                }}
+              >
+                <FiUsers size={16} />
+                <span>Student Directory</span>
+              </Link>
+              <Link
+                to="/admin/progression"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/progression" ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/progression" ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/progression" ? "600" : "500",
+                }}
+              >
+                <FiTrendingUp size={16} />
+                <span>Academic Progression</span>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Expandable Teachers Section (Merged Teacher Directory & Adviser Alignment) */}
+        <div style={{ marginBottom: "8px" }}>
+          <button
+            onClick={() => setTeachersOpen(!teachersOpen)}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              color: isTeachersActive ? "#3B8DB3" : "#2C4B66",
+              background: isTeachersActive ? "#E8F4FD" : "transparent",
+              border: "none",
+              fontWeight: "600",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <FiUsers size={18} />
+              <span>Teachers</span>
+            </div>
+            {teachersOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+          </button>
+
+          {teachersOpen && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px", paddingLeft: "16px" }}>
+              <Link
+                to="/admin/teachers"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/teachers" ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/teachers" ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/teachers" ? "600" : "500",
+                }}
+              >
+                <FiUsers size={16} />
+                <span>Teacher Directory</span>
+              </Link>
+              <Link
+                to="/admin/advisers"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/advisers" ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/advisers" ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/advisers" ? "600" : "500",
+                }}
+              >
+                <FiBookmark size={16} />
+                <span>Adviser Alignment</span>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Courses */}
+        <Link 
+          to="/admin/courses" 
+          className={`sidebar-menu-item ${location.pathname === "/admin/courses" ? "active" : ""}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: location.pathname === "/admin/courses" ? "#ffffff" : "#2C4B66",
+            background: location.pathname === "/admin/courses" ? "#3B8DB3" : "transparent",
+            textDecoration: "none",
+            marginBottom: "8px",
+            fontWeight: location.pathname === "/admin/courses" ? "600" : "500",
+          }}
+        >
+          <FiBookOpen size={18} />
+          <span>Courses</span>
+        </Link>
+
+        {/* Notice Management */}
+        <Link 
+          to="/admin/notices" 
+          className={`sidebar-menu-item ${location.pathname === "/admin/notices" ? "active" : ""}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: location.pathname === "/admin/notices" ? "#ffffff" : "#2C4B66",
+            background: location.pathname === "/admin/notices" ? "#3B8DB3" : "transparent",
+            textDecoration: "none",
+            marginBottom: "8px",
+            fontWeight: location.pathname === "/admin/notices" ? "600" : "500",
+          }}
+        >
+          <FiClipboard size={18} />
+          <span>Notice Management</span>
+        </Link>
+
+        {/* Academic Calendar */}
+        <Link 
+          to="/admin/academic-calendar" 
+          className={`sidebar-menu-item ${location.pathname === "/admin/academic-calendar" ? "active" : ""}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: location.pathname === "/admin/academic-calendar" ? "#ffffff" : "#2C4B66",
+            background: location.pathname === "/admin/academic-calendar" ? "#3B8DB3" : "transparent",
+            textDecoration: "none",
+            marginBottom: "8px",
+            fontWeight: location.pathname === "/admin/academic-calendar" ? "600" : "500",
+          }}
+        >
+          <FiCalendar size={18} />
+          <span>Academic Calendar</span>
+        </Link>
+
+        {/* Expandable Registration Section (Merged Calendar, Payments, Records) */}
+        <div style={{ marginBottom: "8px" }}>
+          <button
+            onClick={() => setRegistrationOpen(!registrationOpen)}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              color: isRegistrationActive ? "#3B8DB3" : "#2C4B66",
+              background: isRegistrationActive ? "#E8F4FD" : "transparent",
+              border: "none",
+              fontWeight: "600",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <FiBookmark size={18} />
+              <span>Registration</span>
+            </div>
+            {registrationOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+          </button>
+
+          {registrationOpen && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px", paddingLeft: "16px" }}>
+              <Link
+                to="/admin/calendar"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/calendar" ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/calendar" ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/calendar" ? "600" : "500",
+                }}
+              >
+                <FiCalendar size={16} />
+                <span>Registration Calendar</span>
+              </Link>
+              <Link
+                to="/admin/registration-payments"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/registration-payments" ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/registration-payments" ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/registration-payments" ? "600" : "500",
+                }}
+              >
+                <FiGrid size={16} />
+                <span>Registration Payments</span>
+              </Link>
+              <Link
+                to="/admin/registrations"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/registrations" ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/registrations" ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/registrations" ? "600" : "500",
+                }}
+              >
+                <FiBookOpen size={16} />
+                <span>Registration Records</span>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Result Publication */}
+        <Link 
+          to="/admin/results" 
+          className={`sidebar-menu-item ${location.pathname === "/admin/results" ? "active" : ""}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: location.pathname === "/admin/results" ? "#ffffff" : "#2C4B66",
+            background: location.pathname === "/admin/results" ? "#3B8DB3" : "transparent",
+            textDecoration: "none",
+            marginBottom: "8px",
+            fontWeight: location.pathname === "/admin/results" ? "600" : "500",
+          }}
+        >
+          <FiAward size={18} />
+          <span>Result Publication</span>
+        </Link>
+
+        {/* System Audit Logs */}
+        <Link 
+          to="/admin/audit-logs" 
+          className={`sidebar-menu-item ${location.pathname === "/admin/audit-logs" ? "active" : ""}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: location.pathname === "/admin/audit-logs" ? "#ffffff" : "#2C4B66",
+            background: location.pathname === "/admin/audit-logs" ? "#3B8DB3" : "transparent",
+            textDecoration: "none",
+            marginBottom: "8px",
+            fontWeight: location.pathname === "/admin/audit-logs" ? "600" : "500",
+          }}
+        >
+          <FiShield size={18} />
+          <span>System Audit Logs</span>
+        </Link>
+
+        {/* Settings */}
+        <Link 
+          to="/admin/settings" 
+          className={`sidebar-menu-item ${location.pathname === "/admin/settings" ? "active" : ""}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: location.pathname === "/admin/settings" ? "#ffffff" : "#2C4B66",
+            background: location.pathname === "/admin/settings" ? "#3B8DB3" : "transparent",
+            textDecoration: "none",
+            marginBottom: "8px",
+            fontWeight: location.pathname === "/admin/settings" ? "600" : "500",
+          }}
+        >
+          <FiSettings size={18} />
+          <span>Settings</span>
+        </Link>
       </div>
 
       <div className="sidebar-footer" style={{

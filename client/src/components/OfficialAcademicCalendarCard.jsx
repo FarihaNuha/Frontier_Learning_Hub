@@ -50,8 +50,62 @@ export default function OfficialAcademicCalendarCard({ customData, fileUrl, onUp
   const importantDatesList = data.importantDates?.length > 0 ? data.importantDates : DEFAULT_CALENDAR_DATA.importantDates;
   const holidaysList = data.holidays?.length > 0 ? data.holidays : DEFAULT_CALENDAR_DATA.holidays;
 
+  const handlePrint = () => {
+    const cardEl = document.getElementById("official-academic-calendar-card");
+    if (!cardEl) {
+      window.print();
+      return;
+    }
+
+    const printWindow = window.open("", "_blank", "width=1050,height=850");
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Academic Calendar - University of Frontier Technology, Bangladesh</title>
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 10mm;
+            }
+            body {
+              font-family: 'Times New Roman', Times, serif, system-ui;
+              margin: 0;
+              padding: 10px;
+              background: #ffffff;
+              color: #000000;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            * {
+              box-sizing: border-box;
+            }
+            .no-print {
+              display: none !important;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+          </style>
+        </head>
+        <body>
+          ${cardEl.outerHTML}
+          <script>
+            setTimeout(() => {
+              window.print();
+              window.close();
+            }, 350);
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   return (
     <div
+      id="official-academic-calendar-card"
       style={{
         background: "#ffffff",
         borderRadius: "16px",
@@ -62,7 +116,30 @@ export default function OfficialAcademicCalendarCard({ customData, fileUrl, onUp
         color: "#000000",
       }}
     >
-
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden !important;
+          }
+          #official-academic-calendar-card,
+          #official-academic-calendar-card * {
+            visibility: visible !important;
+          }
+          #official-academic-calendar-card {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            border: 1.5px solid #000000 !important;
+            padding: 16px !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
 
       {/* University Document Header */}
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
@@ -91,38 +168,6 @@ export default function OfficialAcademicCalendarCard({ customData, fileUrl, onUp
           {data.termHeader || DEFAULT_CALENDAR_DATA.termHeader}
         </div>
       </div>
-
-      {/* Published File Download Banner if fileUrl is attached */}
-      {fileUrl && (
-        <div
-          style={{
-            marginBottom: "20px",
-            textAlign: "center",
-            background: "#f8fafc",
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #e2e8f0",
-            fontFamily: "system-ui, -apple-system, sans-serif",
-          }}
-        >
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              color: "#3b8db3",
-              fontWeight: 700,
-              fontSize: "13.5px",
-              textDecoration: "none",
-            }}
-          >
-            <FiFileText size={16} /> Download Official Academic Calendar Document (PDF/Image)
-          </a>
-        </div>
-      )}
 
       {/* Two Column Table Layout */}
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", border: "1.5px solid #000000" }}>
@@ -227,6 +272,62 @@ export default function OfficialAcademicCalendarCard({ customData, fileUrl, onUp
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Download Action at Very Bottom of Card */}
+      <div
+        className="no-print"
+        style={{
+          marginTop: "24px",
+          textAlign: "center",
+          fontFamily: "system-ui, -apple-system, sans-serif",
+          display: "flex",
+          justifyContent: "center",
+          gap: "12px",
+        }}
+      >
+        {fileUrl ? (
+          <a
+            href={fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "#3b8db3",
+              color: "#ffffff",
+              padding: "10px 24px",
+              borderRadius: "8px",
+              fontWeight: 700,
+              fontSize: "14px",
+              textDecoration: "none",
+              boxShadow: "0 2px 8px rgba(59, 141, 179, 0.25)",
+            }}
+          >
+            <FiDownload size={18} /> Download Official Academic Calendar (PDF / File)
+          </a>
+        ) : (
+          <button
+            onClick={handlePrint}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "#3b8db3",
+              color: "#ffffff",
+              border: "none",
+              padding: "10px 24px",
+              borderRadius: "8px",
+              fontWeight: 700,
+              fontSize: "14px",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(59, 141, 179, 0.25)",
+            }}
+          >
+            <FiDownload size={18} /> Download / Print Academic Calendar
+          </button>
+        )}
       </div>
     </div>
   );

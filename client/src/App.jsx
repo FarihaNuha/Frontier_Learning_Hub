@@ -60,6 +60,7 @@ const AdminAuditLogsPage = lazy(() => import("./pages/AdminAuditLogsPage"));
 // Service Modules Pages
 const AdminNoticeManagementPage = lazy(() => import("./pages/AdminNoticeManagementPage"));
 const TeacherNoticePage = lazy(() => import("./pages/TeacherNoticePage"));
+const StudentNoticePage = lazy(() => import("./pages/StudentNoticePage"));
 const AdminCalendarManagementPage = lazy(() => import("./pages/AdminCalendarManagementPage"));
 const AcademicCalendarViewPage = lazy(() => import("./pages/AcademicCalendarViewPage"));
 
@@ -649,6 +650,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <TeacherNoticePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/notices"
+            element={
+              <ProtectedRoute>
+                <StudentNoticePage />
               </ProtectedRoute>
             }
           />

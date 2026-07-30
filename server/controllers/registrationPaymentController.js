@@ -404,27 +404,97 @@ exports.getStudentPaymentHistory = async (req, res) => {
   }
 };
 
-// 6. Admin Get All Registration Payments
+// 6. Admin Get All Registration Payments (Including Unpaid Students)
 exports.getAdminRegistrationPayments = async (req, res) => {
   try {
     const { status, session, department, search } = req.query;
 
-    const query = {};
-    if (status && status !== "all") query.paymentStatus = status;
-    if (session && session !== "all") query.session = session;
-    if (department && department !== "all") query.department = department;
+    // Fetch existing payment records
+    const existingPayments = await RegistrationPayment.find({}).sort({ createdAt: -1 }).lean();
 
-    if (search && search.trim()) {
-      const qRegex = new RegExp(search.trim(), "i");
-      query.$or = [{ studentId: qRegex }, { studentName: qRegex }, { transactionId: qRegex }];
+    // Fetch all submitted/active registrations
+    const allRegistrations = await Registration.find({}).sort({ createdAt: -1 }).lean();
+
+    // Fetch student profiles for name/dept lookup
+    const allStudents = await Student.find({}).lean();
+    const studentMap = new Map();
+    allStudents.forEach(s => studentMap.set(String(s.studentId || "").trim(), s));
+
+    const paymentMap = new Map();
+
+    // 1. First add real payment records
+    existingPayments.forEach((p) => {
+      const sId = String(p.studentId || "").trim();
+      const key = `${sId}_${p.session || ""}_${p.level || ""}_${p.term || ""}`;
+      paymentMap.set(key, {
+        ...p,
+        paymentStatus: p.paymentStatus === "Paid" ? "Paid" : "Unpaid",
+      });
+    });
+
+    // 2. Add course registrations ONLY for students who actually registered
+    allRegistrations.forEach((reg) => {
+      const sId = String(reg.studentId || "").trim();
+      if (!sId) return;
+      const key = `${sId}_${reg.session || ""}_${reg.level || ""}_${reg.term || ""}`;
+
+      if (!paymentMap.has(key)) {
+        const std = studentMap.get(sId);
+        const feeCalc = calculateRegistrationFee(reg.selectedCourses || []);
+        const totalAmount = feeCalc.totalAmount + (reg.additionalFees || 0);
+
+        paymentMap.set(key, {
+          _id: `REG-UNPAID-${reg._id}`,
+          studentId: reg.studentId,
+          studentName: std?.name || reg.studentName || "Student",
+          department: reg.department || std?.department || "EDTE",
+          level: reg.level || (std?.currentLevel ? `Level-${std.currentLevel}` : "Level-1"),
+          term: reg.term || (std?.currentTerm ? `Term-${std.currentTerm}` : "Term-1"),
+          session: reg.session || std?.session || "2023-24",
+          totalAmount: reg.paymentStatus === "Paid" ? (reg.totalPayable || totalAmount) : totalAmount,
+          paymentStatus: reg.paymentStatus === "Paid" ? "Paid" : "Unpaid",
+          transactionId: reg.paymentStatus === "Paid" ? `TXN_${reg._id}` : "-",
+          paymentDate: reg.paymentStatus === "Paid" ? reg.updatedAt : null,
+          createdAt: reg.createdAt || new Date(),
+        });
+      } else if (reg.paymentStatus === "Paid") {
+        const existing = paymentMap.get(key);
+        existing.paymentStatus = "Paid";
+        if (existing.transactionId === "-") existing.transactionId = `TXN_${reg._id}`;
+      }
+    });
+
+    const synthesizedList = Array.from(paymentMap.values());
+
+    // Filter by status (Paid vs Unpaid)
+    let filtered = synthesizedList;
+    if (status && status !== "all") {
+      filtered = filtered.filter((p) => p.paymentStatus === status);
     }
 
-    const payments = await RegistrationPayment.find(query)
-      .sort({ createdAt: -1 })
-      .lean();
+    // Filter by session
+    if (session && session !== "all") {
+      filtered = filtered.filter((p) => p.session === session);
+    }
 
-    res.json({ payments });
+    // Filter by department
+    if (department && department !== "all") {
+      filtered = filtered.filter((p) => p.department === department);
+    }
+
+    // Filter by search
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      filtered = filtered.filter((p) =>
+        String(p.studentId || "").toLowerCase().includes(q) ||
+        String(p.studentName || "").toLowerCase().includes(q) ||
+        String(p.transactionId || "").toLowerCase().includes(q)
+      );
+    }
+
+    res.json({ payments: filtered });
   } catch (error) {
+    console.error("getAdminRegistrationPayments error:", error);
     res.status(500).json({ error: error.message });
   }
 };

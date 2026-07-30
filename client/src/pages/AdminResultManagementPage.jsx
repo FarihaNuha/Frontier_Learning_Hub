@@ -86,6 +86,9 @@ export default function AdminResultManagementPage() {
         targetAudience: "Teachers",
         deadlineDate: cutoffInput,
         resultType: currentType,
+        session: dlSession,
+        level: dlLevel,
+        term: dlTerm,
       });
       toast.success(`${currentType} Cutoff Deadline saved for ${dlLevel} ${dlTerm} (${dlSession})! Teachers notified successfully.`);
     } catch (err) {

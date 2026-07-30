@@ -385,7 +385,6 @@ exports.uploadResultExcel = async (req, res) => {
 // 1b. Get Active Result Deadlines for Teachers (set by Admin)
 exports.getResultDeadlines = async (req, res) => {
   try {
-    // Fetch the most recent Midterm and Final deadline notices
     const midtermDeadline = await Notice.findOne({
       resultDeadlineType: "Midterm",
       targetAudience: { $in: ["Teachers", "All"] },
@@ -396,9 +395,15 @@ exports.getResultDeadlines = async (req, res) => {
       targetAudience: { $in: ["Teachers", "All"] },
     }).sort({ createdAt: -1 }).lean();
 
+    const allDeadlines = await Notice.find({
+      deadlineDate: { $ne: null },
+      targetAudience: { $in: ["Teachers", "All"] },
+    }).sort({ createdAt: -1 }).lean();
+
     res.json({
       midtermDeadline: midtermDeadline || null,
       finalDeadline: finalDeadline || null,
+      allDeadlines: allDeadlines || [],
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -408,10 +413,16 @@ exports.getResultDeadlines = async (req, res) => {
 // 2. Get Teacher Results
 exports.getTeacherResults = async (req, res) => {
   try {
-    const teacherId = req.user._id || req.user.id;
+    const teacherId = req.user.id || req.user.uid || req.user._id;
+    const teacherEmail = (req.user.email || "").toLowerCase().trim();
     const { resultType } = req.query;
 
-    const query = { teacher: teacherId };
+    const query = {
+      $or: [
+        { teacher: teacherId },
+        { teacherEmail: teacherEmail }
+      ]
+    };
     if (resultType && resultType !== "all") {
       query.resultType = resultType;
     }
@@ -955,10 +966,12 @@ exports.setDeadlineAndNotice = async (req, res) => {
       noticeContent: _noticeContent,
       targetAudience,
       resultType,
-      // Midterm cutoff card sends these alternate field names:
       title: _title,
       content: _content,
       deadlineDate,
+      session,
+      level,
+      term,
     } = req.body;
 
     // Support both field naming conventions
@@ -991,6 +1004,9 @@ exports.setDeadlineAndNotice = async (req, res) => {
       category: "Academic",
       deadlineDate: resolvedDeadline ? new Date(resolvedDeadline) : null,
       resultDeadlineType,
+      session: session || "",
+      level: level || "",
+      term: term || "",
     });
 
     // Format deadline for display

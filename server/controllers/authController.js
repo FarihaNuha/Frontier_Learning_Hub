@@ -187,6 +187,27 @@ exports.login = async (req, res) => {
     if (!isMatch)
       return res.status(401).json({ error: "Invalid email or password" });
 
+    // Mark user as registered and set accountStatus to active
+    if (!user.isRegistered) {
+      user.isRegistered = true;
+      await user.save();
+    }
+
+    const Student = require("../models/Student");
+    const Teacher = require("../models/Teacher");
+
+    if (user.role === "student") {
+      await Student.updateOne(
+        { $or: [{ universityEmail: user.email }, { studentId: user.studentId }] },
+        { accountStatus: "active" }
+      );
+    } else if (user.role === "teacher") {
+      await Teacher.updateOne(
+        { email: user.email },
+        { accountStatus: "active" }
+      );
+    }
+
     const token = generateToken(user);
     res.json({
       token,

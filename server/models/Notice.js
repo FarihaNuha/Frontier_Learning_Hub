@@ -80,6 +80,18 @@ const noticeSchema = new mongoose.Schema({
     enum: ["Midterm", "Final", null],
     default: null,
   },
+  session: {
+    type: String,
+    default: "",
+  },
+  level: {
+    type: String,
+    default: "",
+  },
+  term: {
+    type: String,
+    default: "",
+  },
 });
 
 noticeSchema.index({ isPinned: -1, createdAt: -1 });

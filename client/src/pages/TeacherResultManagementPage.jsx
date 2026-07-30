@@ -44,6 +44,7 @@ export default function TeacherResultManagementPage() {
 
   // Admin-set deadlines
   const [deadlines, setDeadlines] = useState({ midtermDeadline: null, finalDeadline: null });
+  const [assignedCourses, setAssignedCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = React.useRef(null);
@@ -65,8 +66,16 @@ export default function TeacherResultManagementPage() {
     } catch (err) {}
   };
 
+  const fetchAssignedCourses = async () => {
+    try {
+      const res = await api.get("/courses/teacher-summary");
+      setAssignedCourses(res.data.courses || []);
+    } catch (err) {}
+  };
+
   useEffect(() => {
     fetchDeadlines();
+    fetchAssignedCourses();
   }, []);
 
   // Initialize editableRowMarks when viewBatch opens
@@ -467,9 +476,55 @@ export default function TeacherResultManagementPage() {
     }
   };
 
-  const filteredUploads = uploads.filter((u) => {
-    const matchesTab = activeStatusTab === "all" || u.status.toLowerCase() === activeStatusTab.toLowerCase();
-    if (!matchesTab) return false;
+  const normalizeCode = (c) => String(c || "").replace(/\s+/g, "").toUpperCase();
+  const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
+
+  // Combine uploads with assignedCourses to automatically generate cards for unuploaded assigned courses
+  const existingUploadKeys = new Set();
+  uploads.forEach((u) => {
+    const code = normalizeCode(u.courseCode);
+    const sess = String(u.session || "").trim();
+    const ldig = extractDigit(u.level);
+    const tdig = extractDigit(u.term);
+    if (code) {
+      existingUploadKeys.add(`${code}_${sess}_${ldig}_${tdig}`);
+    }
+  });
+
+  const combinedBatches = [...uploads];
+  assignedCourses.forEach((ac) => {
+    const rawCode = ac.displayCode || ac.courseCode || ac.name || ac.courseTitle || "";
+    const code = normalizeCode(rawCode);
+    const sess = String(ac.session || "2023-24").trim();
+
+    const ltParts = (ac.levelTerm || "").split(/\s*-\s*/);
+    const rawLevel = ac.level || ltParts[0] || "Level 1";
+    const rawTerm = ac.term || ltParts[1] || "Term 1";
+
+    const ldig = extractDigit(rawLevel);
+    const tdig = extractDigit(rawTerm);
+    const key = `${code}_${sess}_${ldig}_${tdig}`;
+
+    if (code && !existingUploadKeys.has(key)) {
+      existingUploadKeys.add(key);
+      combinedBatches.push({
+        _id: `auto_${code}_${sess}_${ldig}_${tdig}`,
+        isAutoCard: true,
+        courseCode: ac.displayCode || ac.courseCode || code,
+        courseTitle: ac.name || ac.courseTitle || ac.displayCode || "Course",
+        department: ac.department || "EDTE",
+        session: sess,
+        level: rawLevel,
+        term: rawTerm,
+        totalRecords: 0,
+        resultType: resultTypeTab,
+        status: "Pending Upload",
+        results: [],
+      });
+    }
+  });
+
+  const filteredUploads = combinedBatches.filter((u) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.trim().toLowerCase();
     return (
@@ -482,7 +537,7 @@ export default function TeacherResultManagementPage() {
   });
 
   const matchingSuggestions = searchQuery.trim()
-    ? uploads
+    ? combinedBatches
         .filter((u) => {
           const q = searchQuery.trim().toLowerCase();
           return (
@@ -515,6 +570,55 @@ export default function TeacherResultManagementPage() {
     if (!t) return "Term 1";
     const str = String(t).trim();
     return /^term/i.test(str) ? str : `Term ${str}`;
+  };
+
+  const getSectionDeadline = (session, level, term) => {
+    const cardSess = String(session || "").trim();
+    const cardLdig = extractDigit(level);
+    const cardTdig = extractDigit(term);
+
+    const all = deadlines.allDeadlines || [];
+    const match = all.find((n) => {
+      const typeMatch = !n.resultDeadlineType || n.resultDeadlineType === resultTypeTab || (n.title || "").includes(resultTypeTab);
+      if (!typeMatch) return false;
+
+      const nSess = String(n.session || "").trim();
+      const nTitleContent = `${n.title || ""} ${n.content || ""}`;
+
+      if (nSess) {
+        if (nSess !== cardSess) return false;
+      } else if (cardSess && !nTitleContent.includes(cardSess)) {
+        return false;
+      }
+
+      const nLdig = extractDigit(n.level) || extractDigit((nTitleContent.match(/level[-_\s]*\d+/i) || [])[0]);
+      if (nLdig && cardLdig && nLdig !== cardLdig) return false;
+
+      const nTdig = extractDigit(n.term) || extractDigit((nTitleContent.match(/term[-_\s]*\d+/i) || [])[0]);
+      if (nTdig && cardTdig && nTdig !== cardTdig) return false;
+
+      return true;
+    });
+
+    if (match) return match;
+
+    const singleDl = resultTypeTab === "Midterm" ? deadlines.midtermDeadline : deadlines.finalDeadline;
+    if (singleDl) {
+      const sSess = String(singleDl.session || "").trim();
+      const sTitleContent = `${singleDl.title || ""} ${singleDl.content || ""}`;
+      const sLdig = extractDigit(singleDl.level) || extractDigit((sTitleContent.match(/level[-_\s]*\d+/i) || [])[0]);
+      const sTdig = extractDigit(singleDl.term) || extractDigit((sTitleContent.match(/term[-_\s]*\d+/i) || [])[0]);
+
+      const sessMatches = sSess ? sSess === cardSess : sTitleContent.includes(cardSess);
+      const levelMatches = sLdig ? sLdig === cardLdig : sTitleContent.toLowerCase().includes(`level-${cardLdig}`) || sTitleContent.toLowerCase().includes(`level ${cardLdig}`);
+      const termMatches = sTdig ? sTdig === cardTdig : sTitleContent.toLowerCase().includes(`term-${cardTdig}`) || sTitleContent.toLowerCase().includes(`term ${cardTdig}`);
+
+      if (sessMatches && levelMatches && termMatches) {
+        return singleDl;
+      }
+    }
+
+    return null;
   };
 
   // Group uploads into sections by Department, Session, and Level-Term (like Assessment Marksheet)
@@ -740,34 +844,6 @@ export default function TeacherResultManagementPage() {
             >
               <FiDownload size={16} /> Fixed Excel Template
             </button>
-
-            <button
-              onClick={() => {
-                if (isAdminDeadlinePassed) {
-                  toast.error("Submission deadline has passed. Uploading marksheets is locked.");
-                  return;
-                }
-                setShowUploadModal(true);
-              }}
-              disabled={isAdminDeadlinePassed}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "10px 20px",
-                background: isAdminDeadlinePassed ? "#cbd5e1" : "#3b8db3",
-                color: isAdminDeadlinePassed ? "#94a3b8" : "#ffffff",
-                border: "none",
-                borderRadius: "10px",
-                fontWeight: 600,
-                fontSize: "14px",
-                cursor: isAdminDeadlinePassed ? "not-allowed" : "pointer",
-                boxShadow: isAdminDeadlinePassed ? "none" : "0 4px 12px rgba(59,141,179,0.2)",
-              }}
-              title={isAdminDeadlinePassed ? "Submission deadline passed. Uploads locked." : `Upload ${resultTypeTab} Excel`}
-            >
-              <FiUpload size={16} /> {isAdminDeadlinePassed ? "Upload Locked" : `Upload ${resultTypeTab} Excel`}
-            </button>
           </div>
         </div>
 
@@ -807,87 +883,6 @@ export default function TeacherResultManagementPage() {
           </button>
         </div>
 
-        {/* Admin Deadline Banners */}
-        {(() => {
-          const activeDl = resultTypeTab === "Midterm" ? deadlines.midtermDeadline : deadlines.finalDeadline;
-          if (!activeDl) return null;
-
-          const dlDate = activeDl.deadlineDate ? new Date(activeDl.deadlineDate) : null;
-          const now = new Date();
-          const isExpired = dlDate && dlDate < now;
-          const msLeft = dlDate ? dlDate - now : null;
-          const daysLeft = msLeft ? Math.ceil(msLeft / (1000 * 60 * 60 * 24)) : null;
-          const hoursLeft = msLeft ? Math.ceil(msLeft / (1000 * 60 * 60)) : null;
-
-          const timeLabel = isExpired
-            ? "⛔ Deadline Passed"
-            : daysLeft > 1
-              ? `⏳ ${daysLeft} days remaining`
-              : hoursLeft > 0
-                ? `🔴 Only ${hoursLeft} hours left!`
-                : "🔴 Less than 1 hour remaining!";
-
-          return (
-            <div style={{
-              background: isExpired ? "linear-gradient(135deg, #fee2e2, #fecaca)" : daysLeft <= 2 ? "linear-gradient(135deg, #fef3c7, #fde68a)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
-              border: `1.5px solid ${isExpired ? "#fca5a5" : daysLeft <= 2 ? "#f59e0b" : "#3b8db3"}`,
-              borderRadius: "12px",
-              padding: "16px 20px",
-              marginBottom: "20px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "14px",
-            }}>
-              <div style={{ fontSize: "28px", lineHeight: 1 }}>📋</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                  <strong style={{ fontSize: "14.5px", color: isExpired ? "#991b1b" : daysLeft <= 2 ? "#92400e" : "#0369a1" }}>
-                    {activeDl.title}
-                  </strong>
-                  <span style={{
-                    padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px",
-                    background: isExpired ? "#dc2626" : daysLeft <= 2 ? "#f59e0b" : "#3b8db3",
-                    color: "#fff"
-                  }}>
-                    {timeLabel}
-                  </span>
-                </div>
-                <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#475569" }}>{activeDl.content}</p>
-                {dlDate && (
-                  <p style={{ margin: "6px 0 0 0", fontSize: "12.5px", fontWeight: 700, color: isExpired ? "#dc2626" : "#0369a1" }}>
-                    🗓️ Deadline: {dlDate.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })}
-                  </p>
-                )}
-              </div>
-            </div>
-          );
-        })()}
-
-        <div style={{ display: "flex", gap: "10px", marginBottom: "24px", flexWrap: "wrap" }}>
-          {(resultTypeTab === "Midterm"
-            ? ["all", "draft", "published"]
-            : ["all", "draft", "published"]
-          ).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveStatusTab(tab)}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "8px",
-                border: activeStatusTab === tab ? "none" : "1px solid #cbd5e1",
-                background: activeStatusTab === tab ? "#3b8db3" : "#ffffff",
-                color: activeStatusTab === tab ? "#ffffff" : "#475569",
-                fontWeight: 600,
-                fontSize: "13px",
-                cursor: "pointer",
-                textTransform: "capitalize",
-              }}
-            >
-              {tab === "all" ? `All ${resultTypeTab} Batches` : tab}
-            </button>
-          ))}
-        </div>
-
         {/* Grouped Department, Session, Level-Term Card Sections */}
         {loading ? (
           <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading result batches...</div>
@@ -896,203 +891,272 @@ export default function TeacherResultManagementPage() {
             <FiAward size={48} style={{ opacity: 0.3, marginBottom: "12px" }} />
             <h3>No {resultTypeTab} result batches found</h3>
             <p style={{ fontSize: "14px", margin: 0 }}>
-              {searchQuery ? `No batches matching "${searchQuery}"` : `Click "Upload ${resultTypeTab} Excel" to import course results.`}
+              {searchQuery ? `No batches matching "${searchQuery}"` : `No assigned courses or result batches found.`}
             </p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-            {Object.entries(groupedSections).map(([sectionTitle, sectionBatches]) => (
-              <div key={sectionTitle} style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
-                {/* Section Header */}
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "16px", marginBottom: "20px", borderBottom: "2px solid #e0f2fe" }}>
-                  <FiLayers size={20} color="#3b8db3" />
-                  <h3 style={{ margin: 0, color: "#0f172a", fontSize: "18px" }}>{sectionTitle}</h3>
-                  <span style={{ marginLeft: "auto", background: "#e0f2fe", color: "#0369a1", fontWeight: 700, padding: "4px 12px", borderRadius: "20px", fontSize: "12px" }}>
-                    {sectionBatches.length} Course Batches
-                  </span>
-                </div>
+            {Object.entries(groupedSections).map(([sectionTitle, sectionBatches]) => {
+              const sampleBatch = sectionBatches[0] || {};
+              const sectionDl = getSectionDeadline(sampleBatch.session, sampleBatch.level, sampleBatch.term);
+              const secDlDate = sectionDl?.deadlineDate ? new Date(sectionDl.deadlineDate) : null;
+              const isSecDlPassed = Boolean(secDlDate && secDlDate < new Date());
 
-                {/* Course Cards Grid */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
-                  {sectionBatches.map((batch) => (
-                    <div
-                      key={batch._id}
-                      style={{
-                        background: "#f8fafc",
+              return (
+                <div key={sectionTitle} style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
+                  {/* Section Header */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "16px", marginBottom: "20px", borderBottom: "2px solid #e0f2fe" }}>
+                    <FiLayers size={20} color="#3b8db3" />
+                    <h3 style={{ margin: 0, color: "#0f172a", fontSize: "18px" }}>{sectionTitle}</h3>
+                    <span style={{ marginLeft: "auto", background: "#e0f2fe", color: "#0369a1", fontWeight: 700, padding: "4px 12px", borderRadius: "20px", fontSize: "12px" }}>
+                      {sectionBatches.length} Course Batches
+                    </span>
+                  </div>
+
+                  {/* Targeted Section Deadline Notice Banner (Appears ONLY on matching section) */}
+                  {sectionDl && (() => {
+                    const now = new Date();
+                    const isExpired = secDlDate && secDlDate < now;
+                    const msLeft = secDlDate ? secDlDate - now : null;
+                    const daysLeft = msLeft ? Math.ceil(msLeft / (1000 * 60 * 60 * 24)) : null;
+                    const hoursLeft = msLeft ? Math.ceil(msLeft / (1000 * 60 * 60)) : null;
+
+                    const timeLabel = isExpired
+                      ? "⛔ Deadline Passed"
+                      : daysLeft > 1
+                        ? `⏳ ${daysLeft} days remaining`
+                        : hoursLeft > 0
+                          ? `🔴 Only ${hoursLeft} hours left!`
+                          : "🔴 Less than 1 hour remaining!";
+
+                    return (
+                      <div style={{
+                        background: isExpired ? "linear-gradient(135deg, #fee2e2, #fecaca)" : daysLeft <= 2 ? "linear-gradient(135deg, #fef3c7, #fde68a)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+                        border: `1.5px solid ${isExpired ? "#fca5a5" : daysLeft <= 2 ? "#f59e0b" : "#3b8db3"}`,
                         borderRadius: "12px",
-                        padding: "20px",
-                        border: batch.status === "Correction Requested" ? "1.5px solid #f87171" : "1px solid #e2e8f0",
+                        padding: "16px 20px",
+                        marginBottom: "20px",
                         display: "flex",
-                        flexDirection: "column",
-                        justify: "space-between",
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                          <span style={{ background: "#e0f2fe", color: "#0369a1", fontWeight: 800, padding: "3px 8px", borderRadius: "6px", fontSize: "12.5px" }}>
-                            {batch.courseCode}
-                          </span>
-                          <span
-                            style={{
-                              padding: "3px 10px",
-                              borderRadius: "12px",
-                              fontWeight: 700,
-                              fontSize: "11.5px",
-                              background:
-                                batch.status === "Published" ? "#dcfce7" :
-                                batch.status === "Verified" ? "#e0f2fe" :
-                                batch.status === "Submitted" ? "#fef3c7" :
-                                batch.status === "Correction Requested" ? "#fee2e2" : "#f1f5f9",
-                              color:
-                                batch.status === "Published" ? "#166534" :
-                                batch.status === "Verified" ? "#0369a1" :
-                                batch.status === "Submitted" ? "#b45309" :
-                                batch.status === "Correction Requested" ? "#991b1b" : "#475569",
-                            }}
-                          >
-                            {batch.resultType === "Midterm" && batch.status === "Published" ? "Published (Direct to Students)" : batch.status}
-                          </span>
+                        alignItems: "flex-start",
+                        gap: "14px",
+                      }}>
+                        <div style={{ fontSize: "28px", lineHeight: 1 }}>📋</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                            <strong style={{ fontSize: "14.5px", color: isExpired ? "#991b1b" : daysLeft <= 2 ? "#92400e" : "#0369a1" }}>
+                              {sectionDl.title}
+                            </strong>
+                            <span style={{
+                              padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px",
+                              background: isExpired ? "#dc2626" : daysLeft <= 2 ? "#f59e0b" : "#3b8db3",
+                              color: "#fff"
+                            }}>
+                              {timeLabel}
+                            </span>
+                          </div>
+                          <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#475569" }}>{sectionDl.content}</p>
+                          {secDlDate && (
+                            <p style={{ margin: "6px 0 0 0", fontSize: "12.5px", fontWeight: 700, color: isExpired ? "#dc2626" : "#0369a1" }}>
+                              🗓️ Deadline: {secDlDate.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })}
+                            </p>
+                          )}
                         </div>
+                      </div>
+                    );
+                  })()}
 
-                        <h4 style={{ margin: "0 0 6px 0", fontSize: "16px", color: "#0f172a" }}>{batch.courseTitle}</h4>
-                        <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "14px" }}>
-                          Records: <strong>{batch.totalRecords} Students</strong> • Type: <strong>{batch.resultType || resultTypeTab}</strong>
-                        </div>
+                  {/* Course Cards Grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
+                    {sectionBatches.map((batch) => (
+                      <div
+                        key={batch._id}
+                        style={{
+                          background: "#f8fafc",
+                          borderRadius: "12px",
+                          padding: "20px",
+                          border: batch.status === "Correction Requested" ? "1.5px solid #f87171" : "1px solid #e2e8f0",
+                          display: "flex",
+                          flexDirection: "column",
+                          justify: "space-between",
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                            <span style={{ background: "#e0f2fe", color: "#0369a1", fontWeight: 800, padding: "3px 8px", borderRadius: "6px", fontSize: "12.5px" }}>
+                              {batch.courseCode}
+                            </span>
+                            <span
+                              style={{
+                                padding: "3px 10px",
+                                borderRadius: "12px",
+                                fontWeight: 700,
+                                fontSize: "11.5px",
+                                background:
+                                  batch.status === "Published" ? "#dcfce7" :
+                                  batch.status === "Verified" ? "#e0f2fe" :
+                                  batch.status === "Submitted" ? "#fef3c7" :
+                                  batch.status === "Correction Requested" ? "#fee2e2" :
+                                  batch.isAutoCard ? "#f1f5f9" : "#f1f5f9",
+                                color:
+                                  batch.status === "Published" ? "#166534" :
+                                  batch.status === "Verified" ? "#0369a1" :
+                                  batch.status === "Submitted" ? "#b45309" :
+                                  batch.status === "Correction Requested" ? "#991b1b" : "#64748b",
+                              }}
+                            >
+                              {batch.isAutoCard ? "Pending Upload" : (batch.resultType === "Midterm" && batch.status === "Published" ? "Published (Direct to Students)" : batch.status)}
+                            </span>
+                          </div>
 
-                        {batch.resultType === "Midterm" && (
-                          <div style={{
-                            marginTop: "10px",
-                            background: batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#fef2f2" : "#f0f9ff",
-                            border: `1px solid ${batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#fca5a5" : "#bae6fd"}`,
-                            padding: "10px 12px",
-                            borderRadius: "8px",
-                            fontSize: "12px"
-                          }}>
-                            <div style={{ fontWeight: 700, color: batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#dc2626" : "#0369a1", marginBottom: "6px" }}>
-                              {batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd)
-                                ? `🔒 Marksheet Locked (Expired on: ${new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })})`
-                                : batch.correctionWindowEnd
-                                ? `🔓 Open for Student Corrections until: ${new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}`
-                                : "🔓 Open for Student Corrections (No Deadline Set)"}
-                            </div>
-                            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", marginTop: "6px" }}>
-                              <input
-                                type="datetime-local"
-                                value={timerValues[batch._id] || formatForDateTimeInput(batch.correctionWindowEnd) || ""}
-                                onChange={(e) => handleTimerChange(batch._id, e.target.value)}
-                                style={{ padding: "5px 10px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", background: "#ffffff" }}
-                              />
-                              <button
-                                onClick={() => handleSaveTimer(batch._id)}
-                                style={{ padding: "5px 12px", background: "#0284c7", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 700, fontSize: "11.5px", cursor: "pointer" }}
-                              >
-                                Save Timer
-                              </button>
-                              {batch.correctionWindowEnd && (
+                          <h4 style={{ margin: "0 0 6px 0", fontSize: "16px", color: "#0f172a" }}>{batch.courseTitle}</h4>
+                          <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "14px" }}>
+                            Records: <strong>{batch.totalRecords || 0} Students</strong> • Type: <strong>{batch.resultType || resultTypeTab}</strong>
+                          </div>
+
+                          {!batch.isAutoCard && batch.resultType === "Midterm" && (
+                            <div style={{
+                              marginTop: "10px",
+                              background: batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#fef2f2" : "#f0f9ff",
+                              border: `1px solid ${batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#fca5a5" : "#bae6fd"}`,
+                              padding: "10px 12px",
+                              borderRadius: "8px",
+                              fontSize: "12px"
+                            }}>
+                              <div style={{ fontWeight: 700, color: batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#dc2626" : "#0369a1", marginBottom: "6px" }}>
+                                {batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd)
+                                  ? `🔒 Marksheet Locked (Expired on: ${new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })})`
+                                  : batch.correctionWindowEnd
+                                  ? `🔓 Open for Student Corrections until: ${new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}`
+                                  : "🔓 Open for Student Corrections (No Deadline Set)"}
+                              </div>
+                              <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", marginTop: "6px" }}>
+                                <input
+                                  type="datetime-local"
+                                  value={timerValues[batch._id] || formatForDateTimeInput(batch.correctionWindowEnd) || ""}
+                                  onChange={(e) => handleTimerChange(batch._id, e.target.value)}
+                                  style={{ padding: "5px 10px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", background: "#ffffff" }}
+                                />
                                 <button
-                                  onClick={() => handleSetCorrectionDeadline(batch._id, null)}
-                                  style={{ padding: "5px 10px", background: "#ffffff", color: "#64748b", border: "1px solid #cbd5e1", borderRadius: "6px", fontWeight: 600, fontSize: "11.5px", cursor: "pointer" }}
+                                  onClick={() => handleSaveTimer(batch._id)}
+                                  style={{ padding: "5px 12px", background: "#0284c7", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 700, fontSize: "11.5px", cursor: "pointer" }}
                                 >
-                                  Clear
+                                  Save Timer
                                 </button>
-                              )}
+                                {batch.correctionWindowEnd && (
+                                  <button
+                                    onClick={() => handleSetCorrectionDeadline(batch._id, null)}
+                                    style={{ padding: "5px 10px", background: "#ffffff", color: "#64748b", border: "1px solid #cbd5e1", borderRadius: "6px", fontWeight: 600, fontSize: "11.5px", cursor: "pointer" }}
+                                  >
+                                    Clear
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {batch.status === "Correction Requested" && batch.correctionComment && (
-                          <div style={{ background: "#fef2f2", borderLeft: "3px solid #ef4444", padding: "8px 12px", borderRadius: "4px", fontSize: "12px", color: "#991b1b", marginBottom: "12px" }}>
-                            <strong>Correction Note:</strong> {batch.correctionComment}
-                          </div>
-                        )}
-                      </div>
+                          {batch.status === "Correction Requested" && batch.correctionComment && (
+                            <div style={{ background: "#fef2f2", borderLeft: "3px solid #ef4444", padding: "8px 12px", borderRadius: "4px", fontSize: "12px", color: "#991b1b", marginBottom: "12px" }}>
+                              <strong>Correction Note:</strong> {batch.correctionComment}
+                            </div>
+                          )}
+                        </div>
 
-                      <div style={{ display: "flex", gap: "8px", marginTop: "12px", flexWrap: "wrap", alignItems: "center" }}>
-                        {(batch.status === "Draft" || batch.status === "Correction Requested") && (
+                        <div style={{ display: "flex", gap: "8px", marginTop: "12px", flexWrap: "wrap", alignItems: "center" }}>
+                          {!batch.isAutoCard && (batch.status === "Draft" || batch.status === "Correction Requested") && (
+                            <button
+                              onClick={() => handleSubmitToAdmin(batch)}
+                              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "8px 12px", background: "#16a34a", color: "#fff", border: "none", borderRadius: "6px", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}
+                            >
+                              <FiSend size={13} /> {batch.resultType === "Midterm" ? "Publish to Students" : "Submit"}
+                            </button>
+                          )}
+
+                          {!batch.isAutoCard && batch.resultType === "Midterm" && (
+                            <button
+                              onClick={() => setViewRequestsBatch(batch)}
+                              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "8px 12px", background: "#e0f2fe", color: "#0369a1", border: "1px solid #7dd3fc", borderRadius: "6px", fontWeight: 700, fontSize: "12px", cursor: "pointer" }}
+                            >
+                              <FiMessageSquare size={13} />
+                              Student Issues ({teacherRequests.filter((r) => r.uploadId === batch._id || (r.courseCode === batch.courseCode && r.status !== "Resolved")).length})
+                            </button>
+                          )}
+
+                          {/* Per-Card Excel Upload / Update Button (Locked if section deadline passed) */}
                           <button
-                            onClick={() => handleSubmitToAdmin(batch)}
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "8px 12px", background: "#16a34a", color: "#fff", border: "none", borderRadius: "6px", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}
+                            onClick={() => {
+                              if (isSecDlPassed) {
+                                toast.error("Submission deadline has passed. Marksheets cannot be uploaded or modified.");
+                                return;
+                              }
+                              setUpdatingBatch(batch.isAutoCard ? null : batch);
+                              setShowUploadModal(true);
+                            }}
+                            disabled={isSecDlPassed}
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "4px",
+                              padding: "8px 12px",
+                              background: isSecDlPassed ? "#e2e8f0" : "#3b8db3",
+                              color: isSecDlPassed ? "#94a3b8" : "#ffffff",
+                              border: "none",
+                              borderRadius: "6px",
+                              fontWeight: 600,
+                              fontSize: "12px",
+                              cursor: isSecDlPassed ? "not-allowed" : "pointer",
+                            }}
+                            title={isSecDlPassed ? "Submission deadline passed. Uploads locked." : batch.isAutoCard ? "Upload Excel marksheet" : "Re-upload Excel to update marksheet"}
                           >
-                            <FiSend size={13} /> {batch.resultType === "Midterm" ? "Publish to Students" : "Submit"}
+                            <FiUpload size={13} /> {isSecDlPassed ? "Upload Locked 🔒" : batch.isAutoCard ? "Upload Excel" : "Update Marksheet"}
                           </button>
-                        )}
 
-                        {batch.resultType === "Midterm" && (
                           <button
-                            onClick={() => setViewRequestsBatch(batch)}
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "8px 12px", background: "#e0f2fe", color: "#0369a1", border: "1px solid #7dd3fc", borderRadius: "6px", fontWeight: 700, fontSize: "12px", cursor: "pointer" }}
+                            onClick={() => {
+                              if (batch.isAutoCard) {
+                                toast("No marksheet uploaded yet for this course.");
+                                return;
+                              }
+                              setViewBatch(viewBatch?._id === batch._id ? null : batch);
+                            }}
+                            style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "8px 12px", background: "#ffffff", border: "1px solid #cbd5e1", color: "#334155", borderRadius: "6px", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}
                           >
-                            <FiMessageSquare size={13} />
-                            Student Issues ({teacherRequests.filter((r) => r.uploadId === batch._id || (r.courseCode === batch.courseCode && r.status !== "Resolved")).length})
+                            <FiEye size={13} /> View Marksheet
                           </button>
-                        )}
 
-                        <button
-                          onClick={() => {
-                            if (isAdminDeadlinePassed) {
-                              toast.error("Submission deadline has passed. Marksheets cannot be updated.");
-                              return;
-                            }
-                            setUpdatingBatch(batch);
-                            setShowUploadModal(true);
-                          }}
-                          disabled={isAdminDeadlinePassed}
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "4px",
-                            padding: "8px 12px",
-                            background: isAdminDeadlinePassed ? "#e2e8f0" : "#3b8db3",
-                            color: isAdminDeadlinePassed ? "#94a3b8" : "#ffffff",
-                            border: "none",
-                            borderRadius: "6px",
-                            fontWeight: 600,
-                            fontSize: "12px",
-                            cursor: isAdminDeadlinePassed ? "not-allowed" : "pointer",
-                          }}
-                          title={isAdminDeadlinePassed ? "Submission deadline passed. Updates locked." : "Re-upload Excel to update marksheet"}
-                        >
-                          <FiUpload size={13} /> {isAdminDeadlinePassed ? "Locked" : "Update Marksheet"}
-                        </button>
-
-                        <button
-                          onClick={() => setViewBatch(viewBatch?._id === batch._id ? null : batch)}
-                          style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "8px 12px", background: "#ffffff", border: "1px solid #cbd5e1", color: "#334155", borderRadius: "6px", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}
-                        >
-                          <FiEye size={13} /> View Marksheet
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            if (isAdminDeadlinePassed) {
-                              toast.error("Submission deadline has passed. Marksheets cannot be deleted.");
-                              return;
-                            }
-                            handleDeleteBatch(batch._id);
-                          }}
-                          disabled={isAdminDeadlinePassed}
-                          style={{
-                            padding: "8px 10px",
-                            background: isAdminDeadlinePassed ? "#f1f5f9" : "#fee2e2",
-                            color: isAdminDeadlinePassed ? "#cbd5e1" : "#ef4444",
-                            border: "none",
-                            borderRadius: "6px",
-                            fontWeight: 600,
-                            fontSize: "12px",
-                            cursor: isAdminDeadlinePassed ? "not-allowed" : "pointer",
-                          }}
-                          title={isAdminDeadlinePassed ? "Submission deadline passed. Deletion locked." : "Delete Marksheet Batch"}
-                        >
-                          <FiTrash2 size={13} />
-                        </button>
+                          {!batch.isAutoCard && (
+                            <button
+                              onClick={() => {
+                                if (isSecDlPassed) {
+                                  toast.error("Submission deadline has passed. Marksheets cannot be deleted.");
+                                  return;
+                                }
+                                handleDeleteBatch(batch._id);
+                              }}
+                              disabled={isSecDlPassed}
+                              style={{
+                                padding: "8px 10px",
+                                background: isSecDlPassed ? "#f1f5f9" : "#fee2e2",
+                                color: isSecDlPassed ? "#cbd5e1" : "#ef4444",
+                                border: "none",
+                                borderRadius: "6px",
+                                fontWeight: 600,
+                                fontSize: "12px",
+                                cursor: isSecDlPassed ? "not-allowed" : "pointer",
+                              }}
+                              title={isSecDlPassed ? "Submission deadline passed. Deletion locked." : "Delete Marksheet Batch"}
+                            >
+                              <FiTrash2 size={13} />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

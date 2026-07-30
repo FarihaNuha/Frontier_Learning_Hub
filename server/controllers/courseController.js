@@ -113,7 +113,7 @@ exports.getMyCourses = async (req, res) => {
             (t.assignedCourses || []).some(
               (ac) =>
                 (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
-                (ac.courseName && (c.name || "").toLowerCase().includes(ac.courseName.toLowerCase()))
+                (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
             )
           );
 
@@ -175,7 +175,7 @@ exports.getMyCourses = async (req, res) => {
         courses = courses.filter((c) => {
           const code = (c.displayCode || "").trim().toUpperCase();
           const name = (c.name || "").trim().toLowerCase();
-          return assignedCodes.has(code) || assignedNames.some((n) => n && (name.includes(n) || n.includes(name)));
+          return assignedCodes.has(code) || assignedNames.some((n) => n && name === n);
         });
       }
 
@@ -188,7 +188,7 @@ exports.getMyCourses = async (req, res) => {
         const matchAssigned = teacherProfile?.assignedCourses?.find(
           (ac) =>
             (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
-            (ac.courseName && (c.name || "").toLowerCase().includes(ac.courseName.toLowerCase()))
+            (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
         );
 
         let rawLevel = matchAssigned?.level || c.level || matchImport?.level || "";
@@ -313,7 +313,7 @@ exports.getTeacherDashboardSummary = async (req, res) => {
       let matchImport = courseImports.find(ci => ci.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase());
       let matchAssigned = TeacherProfile?.assignedCourses?.find(ac =>
         (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
-        (ac.courseName && (c.name || "").toLowerCase().includes(ac.courseName.toLowerCase()))
+        (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
       );
 
       let rawLevel = c.level || matchImport?.level || matchAssigned?.level || "";

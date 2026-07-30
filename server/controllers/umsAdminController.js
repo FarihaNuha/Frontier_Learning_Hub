@@ -469,9 +469,10 @@ exports.getStudents = async (req, res) => {
     const students = await Student.find().lean();
     const enriched = students.map((s) => {
       const isSignedUp = registeredEmails.has((s.universityEmail || "").toLowerCase().trim());
+      const isActive = isSignedUp || (s.accountStatus || "").toLowerCase() === "active";
       return {
         ...s,
-        accountStatus: isSignedUp ? "active" : "inactive",
+        accountStatus: isActive ? "active" : "inactive",
       };
     });
 
@@ -497,10 +498,12 @@ exports.getTeachers = async (req, res) => {
     });
 
     const enriched = teachers.map((t) => {
-      const isSignedUp = registeredEmails.has((t.email || "").toLowerCase().trim());
+      const email = (t.email || "").toLowerCase().trim();
+      const isSignedUp = registeredEmails.has(email);
+      const isActive = isSignedUp || (t.accountStatus || "").toLowerCase() === "active";
       return {
         ...t,
-        accountStatus: isSignedUp ? "active" : "inactive",
+        accountStatus: isActive ? "active" : "inactive",
       };
     });
 
@@ -556,11 +559,13 @@ exports.getAdvisers = async (req, res) => {
     const enriched = advisers.map((a) => {
       const email = (a.teacherEmail || "").toLowerCase().trim();
       const teacherInfo = teacherMap[email] || {};
+      const isSignedUp = registeredEmailSet.has(email);
+      const isActive = isSignedUp || (teacherInfo.accountStatus || "").toLowerCase() === "active";
       return {
         ...a,
         teacherId: a.teacherId || teacherInfo.teacherId || "",
         teacherName: a.teacherName || teacherInfo.name || "",
-        accountStatus: registeredEmailSet.has(email) ? "active" : "inactive",
+        accountStatus: isActive ? "active" : "inactive",
       };
     });
 

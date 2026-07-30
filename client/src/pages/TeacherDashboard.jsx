@@ -30,11 +30,16 @@ import {
   FiShare2,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
-import TeacherSidebar from "../components/TeacherSidebar";
+import TeacherHomeDashboard from "../components/TeacherHomeDashboard";
 
 export default function TeacherDashboard({ courseId, courseCode }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // If no courseId is provided (e.g. at /teacher/dashboard), render the main overview dashboard
+  if (!courseId) {
+    return <TeacherHomeDashboard />;
+  }
   const [lectures, setLectures] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);

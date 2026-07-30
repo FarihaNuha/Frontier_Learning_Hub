@@ -640,6 +640,10 @@ exports.sendMessage = async (req, res) => {
       return res.status(404).json({ error: "Receiver not found" });
     }
 
+    if (receiver.role === "admin" || receiver.role === "superadmin" || (receiver.name || "").toLowerCase().includes("super admin")) {
+      return res.status(403).json({ error: "Messaging Super Admin is not permitted." });
+    }
+
     const sender = await User.findById(req.user.uid);
     if (sender && sender.role === "student" && receiver.role === "teacher") {
       const now = new Date();
@@ -742,6 +746,11 @@ exports.getInbox = async (req, res) => {
 exports.getConversation = async (req, res) => {
   try {
     const { userId } = req.params;
+    const targetUser = await User.findById(userId).lean();
+
+    if (targetUser && (targetUser.role === "admin" || targetUser.role === "superadmin" || (targetUser.name || "").toLowerCase().includes("super admin"))) {
+      return res.status(403).json({ error: "Messaging Super Admin is not permitted." });
+    }
 
     const messages = await PrivateMessage.find({
       $or: [
@@ -848,7 +857,11 @@ exports.getUsers = async (req, res) => {
     const currentUserId = req.user.uid;
     const { courseId } = req.query;
 
-    let filter = { _id: { $ne: currentUserId } };
+    let filter = {
+      _id: { $ne: currentUserId },
+      role: { $nin: ["admin", "superadmin"] },
+      name: { $not: /super admin/i },
+    };
 
     if (courseId) {
       const Course = require("../models/Course");
@@ -861,8 +874,15 @@ exports.getUsers = async (req, res) => {
       }
     }
 
-    const users = await User.find(filter).select(
+    let users = await User.find(filter).select(
       "name email role department profilePicture"
+    );
+
+    users = users.filter(
+      (u) =>
+        u.role !== "admin" &&
+        u.role !== "superadmin" &&
+        !String(u.name || "").toLowerCase().includes("super admin")
     );
 
     // Map each user to include their last message and unread count

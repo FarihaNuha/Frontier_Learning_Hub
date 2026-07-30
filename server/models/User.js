@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Password is required"],
     minlength: 6,
+    maxlength: 100, // Safe buffer for the hashed 60-character bcrypt output
   },
   role: {
     type: String,
@@ -38,6 +39,10 @@ const userSchema = new mongoose.Schema({
   },
   fcmToken: String,
   isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  isRegistered: {
     type: Boolean,
     default: false,
   },

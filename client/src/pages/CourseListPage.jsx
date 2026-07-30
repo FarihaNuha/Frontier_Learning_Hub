@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
@@ -15,6 +15,7 @@ import {
   FiCalendar,
   FiSearch,
   FiX,
+  FiBookOpen,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -121,6 +122,53 @@ export default function CourseListPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef(null);
 
+  const [sessionFilter, setSessionFilter] = useState("all");
+  const [levelFilter, setLevelFilter] = useState("all");
+  const [termFilter, setTermFilter] = useState("all");
+  const assignedGroups = useMemo(() => {
+    const map = new Map();
+    (courses || []).forEach((c) => {
+      let lvlNum = "";
+      let trmNum = "";
+      if (c.level) {
+        const m = c.level.match(/\d/);
+        if (m) lvlNum = m[0];
+      }
+      if (!lvlNum && c.displayCode) {
+        const m = c.displayCode.match(/(\d)\d{2}/);
+        if (m) lvlNum = m[1];
+      }
+
+      if (c.term) {
+        const m = c.term.match(/\d/);
+        if (m) trmNum = m[0];
+      }
+      if (!trmNum && c.displayCode) {
+        const m = c.displayCode.match(/\d(\d)\d/);
+        if (m) trmNum = m[1];
+      }
+
+      if (lvlNum && trmNum) {
+        const key = `L${lvlNum}T${trmNum}_${c.session || ""}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            key,
+            levelNum: lvlNum,
+            termNum: trmNum,
+            session: c.session || "",
+            label: `Level ${lvlNum} • Term ${trmNum}`,
+            levelValue: `level-${lvlNum}`,
+            termValue: `term-${trmNum}`,
+            count: 1,
+          });
+        } else {
+          map.get(key).count += 1;
+        }
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => Number(a.levelNum) - Number(b.levelNum) || Number(a.termNum) - Number(b.termNum));
+  }, [courses]);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -140,6 +188,37 @@ export default function CourseListPage() {
   if (!user) return null;
 
   const filterCourse = (course, q) => {
+    if (sessionFilter !== "all" && course.session && course.session !== sessionFilter) {
+      return false;
+    }
+
+    if (levelFilter !== "all") {
+      const levelNum = levelFilter.replace(/[^0-9]/g, "");
+      const courseLvlClean = (course.level || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const courseCodeClean = (course.displayCode || "").toLowerCase();
+
+      const levelMatches =
+        courseLvlClean.includes(`level${levelNum}`) ||
+        courseLvlClean.includes(`l${levelNum}`) ||
+        (levelNum && Boolean(courseCodeClean.match(new RegExp(`^[a-z]*\\s*${levelNum}`))));
+
+      if (!levelMatches) return false;
+    }
+
+    if (termFilter !== "all") {
+      const termNum = termFilter.replace(/[^0-9]/g, "");
+      const courseTermClean = (course.term || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const courseLvlClean = (course.level || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const courseCodeClean = (course.displayCode || "").toLowerCase();
+
+      const termMatches =
+        courseTermClean.includes(`term${termNum}`) ||
+        courseTermClean.includes(`t${termNum}`) ||
+        courseLvlClean.includes(`term${termNum}`) ||
+        (termNum && Boolean(courseCodeClean.match(new RegExp(`^[a-z]*\\s*\\d${termNum}`))));
+
+      if (!termMatches) return false;
+    }
     if (!q.trim()) return true;
     const query = q.trim().toLowerCase();
     const queryNoSpace = query.replace(/\s+/g, "");
@@ -151,13 +230,17 @@ export default function CourseListPage() {
     const codeNoSpace = code.replace(/\s+/g, "");
 
     const session = (course.session || "").toLowerCase();
+    const level = (course.level || "").toLowerCase();
+    const term = (course.term || "").toLowerCase();
 
     return (
       name.includes(query) ||
       nameNoSpace.includes(queryNoSpace) ||
       code.includes(query) ||
       codeNoSpace.includes(queryNoSpace) ||
-      session.includes(query)
+      session.includes(query) ||
+      level.includes(query) ||
+      term.includes(query)
     );
   };
 
@@ -182,7 +265,8 @@ export default function CourseListPage() {
   const fetchCourses = async (forceRefresh = false) => {
     try {
       const data = await fetchWithCache("/courses/my", { forceRefresh });
-      setCourses(data.courses || []);
+      const list = Array.isArray(data) ? data : (data?.courses || []);
+      setCourses(list);
     } catch (error) {
       console.error(error);
     } finally {
@@ -468,28 +552,6 @@ export default function CourseListPage() {
               )}
             </div>
 
-            {user?.role === "teacher" && (
-              <button
-                className="btn-primary"
-                onClick={() => {
-                  setShowCreate(!showCreate);
-                  setShowJoin(false);
-                }}
-              >
-                <FiPlus size={16} /> Create Course
-              </button>
-            )}
-            {user?.role === "student" && (
-              <button
-                className="btn-primary"
-                onClick={() => {
-                  setShowJoin(!showJoin);
-                  setShowCreate(false);
-                }}
-              >
-                <FiLogIn size={16} /> Join Course
-              </button>
-            )}
           </div>
         </div>
 
@@ -625,12 +687,243 @@ export default function CourseListPage() {
           </div>
         )}
 
-        {/* Course List */}
-        <h2 style={{ marginBottom: 20 }}>
-          {searchQuery.trim()
-            ? `Search Results (${filteredCourses.length})`
-            : `All Courses (${courses.length})`}
-        </h2>
+        {/* Course List & Filters */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+          <h2 style={{ margin: 0 }}>
+            {searchQuery.trim()
+              ? `Search Results (${filteredCourses.length})`
+              : `All Courses (${filteredCourses.length})`}
+          </h2>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            {/* Session Filter */}
+            {user?.role !== "student" && (
+              <select
+                value={sessionFilter}
+                onChange={(e) => setSessionFilter(e.target.value)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  border: "1.5px solid #3B8DB3",
+                  background: "#ffffff",
+                  color: "#2C4B66",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  outline: "none"
+                }}
+              >
+                <option value="all">All Sessions</option>
+                <option value="2022-23">Session 2022-23</option>
+                <option value="2023-24">Session 2023-24</option>
+                <option value="2024-25">Session 2024-25</option>
+              </select>
+            )}
+
+            {/* Level Filter */}
+            <select
+              value={levelFilter}
+              onChange={(e) => setLevelFilter(e.target.value)}
+              style={{
+                padding: "6px 12px",
+                borderRadius: "8px",
+                border: "1.5px solid #3B8DB3",
+                background: "#ffffff",
+                color: "#2C4B66",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                outline: "none"
+              }}
+            >
+              <option value="all">All Levels</option>
+              {user?.role === "teacher" &&
+              Array.from(
+                new Set(
+                  courses
+                    .map((c) => {
+                      if (c.level) return c.level.toLowerCase();
+                      if (c.displayCode) {
+                        const m = c.displayCode.match(/(\d)\d{2}/);
+                        if (m) return `level-${m[1]}`;
+                      }
+                      return null;
+                    })
+                    .filter(Boolean)
+                )
+              ).length > 0
+                ? Array.from(
+                    new Set(
+                      courses
+                        .map((c) => {
+                          if (c.level) return c.level.toLowerCase();
+                          if (c.displayCode) {
+                            const m = c.displayCode.match(/(\d)\d{2}/);
+                            if (m) return `level-${m[1]}`;
+                          }
+                          return null;
+                        })
+                        .filter(Boolean)
+                    )
+                  )
+                    .sort()
+                    .map((lvl) => {
+                      const num = lvl.replace("level-", "").replace("level", "");
+                      return (
+                        <option key={lvl} value={`level-${num}`}>
+                          Level-{num}
+                        </option>
+                      );
+                    })
+                : [1, 2, 3, 4].map((num) => (
+                    <option key={num} value={`level-${num}`}>
+                      Level-{num}
+                    </option>
+                  ))}
+            </select>
+
+            {/* Term Filter */}
+            <select
+              value={termFilter}
+              onChange={(e) => setTermFilter(e.target.value)}
+              style={{
+                padding: "6px 12px",
+                borderRadius: "8px",
+                border: "1.5px solid #3B8DB3",
+                background: "#ffffff",
+                color: "#2C4B66",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                outline: "none"
+              }}
+            >
+              <option value="all">All Terms</option>
+              {user?.role === "teacher" &&
+              Array.from(
+                new Set(
+                  courses
+                    .map((c) => {
+                      if (c.term) return c.term.toLowerCase();
+                      if (c.displayCode) {
+                        const m = c.displayCode.match(/\d(\d)\d/);
+                        if (m) return `term-${m[1]}`;
+                      }
+                      return null;
+                    })
+                    .filter(Boolean)
+                )
+              ).length > 0
+                ? Array.from(
+                    new Set(
+                      courses
+                        .map((c) => {
+                          if (c.term) return c.term.toLowerCase();
+                          if (c.displayCode) {
+                            const m = c.displayCode.match(/\d(\d)\d/);
+                            if (m) return `term-${m[1]}`;
+                          }
+                          return null;
+                        })
+                        .filter(Boolean)
+                    )
+                  )
+                    .sort()
+                    .map((trm) => {
+                      const num = trm.replace("term-", "").replace("term", "");
+                      return (
+                        <option key={trm} value={`term-${num}`}>
+                          Term-{num}
+                        </option>
+                      );
+                    })
+                : [1, 2].map((num) => (
+                    <option key={num} value={`term-${num}`}>
+                      Term-{num}
+                    </option>
+                  ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Assigned Level & Term Quick Filter Bar */}
+        {user?.role === "teacher" && assignedGroups.length > 0 && (
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", padding: "12px 18px", borderRadius: "12px", marginBottom: "24px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "13px", fontWeight: 700, color: "#334155", display: "flex", alignItems: "center", gap: "6px" }}>
+              <FiBookOpen size={16} color="#0284c7" /> Assigned Level & Term Classes:
+            </span>
+
+            <button
+              onClick={() => {
+                setLevelFilter("all");
+                setTermFilter("all");
+                setSessionFilter("all");
+              }}
+              style={{
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontSize: "12.5px",
+                fontWeight: 700,
+                cursor: "pointer",
+                border: levelFilter === "all" && termFilter === "all" ? "1.5px solid #0284c7" : "1px solid #cbd5e1",
+                background: levelFilter === "all" && termFilter === "all" ? "#e0f2fe" : "#ffffff",
+                color: levelFilter === "all" && termFilter === "all" ? "#0369a1" : "#475569",
+                boxShadow: levelFilter === "all" && termFilter === "all" ? "0 2px 6px rgba(2,132,199,0.2)" : "none",
+                transition: "all 0.2s ease",
+              }}
+            >
+              ✨ All Courses ({courses.length})
+            </button>
+
+            {assignedGroups.map((g) => {
+              const isActive =
+                levelFilter === g.levelValue &&
+                termFilter === g.termValue &&
+                (sessionFilter === "all" || sessionFilter === g.session);
+
+              return (
+                <button
+                  key={g.key}
+                  onClick={() => {
+                    setLevelFilter(g.levelValue);
+                    setTermFilter(g.termValue);
+                    if (g.session) setSessionFilter(g.session);
+                  }}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: "20px",
+                    fontSize: "12.5px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    border: isActive ? "1.5px solid #16a34a" : "1px solid #cbd5e1",
+                    background: isActive ? "#dcfce7" : "#ffffff",
+                    color: isActive ? "#15803d" : "#334155",
+                    boxShadow: isActive ? "0 2px 6px rgba(22,163,74,0.15)" : "none",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <span>🎓 Level {g.levelNum} • Term {g.termNum}</span>
+                  {g.session && <span style={{ opacity: 0.75, fontSize: "11px" }}>({g.session})</span>}
+                  <span
+                    style={{
+                      background: isActive ? "#16a34a" : "#e2e8f0",
+                      color: isActive ? "#ffffff" : "#475569",
+                      padding: "1px 6px",
+                      borderRadius: "10px",
+                      fontSize: "11px",
+                      fontWeight: 800,
+                    }}
+                  >
+                    {g.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {courses.length === 0 ? (
           <div className="empty-state">
@@ -699,11 +992,18 @@ export default function CourseListPage() {
                       <p className="classroom-course-code">
                         {course.displayCode}
                       </p>
-                      {course.session && (
-                        <p className="classroom-course-session">
-                          {course.session}
-                        </p>
-                      )}
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "4px" }}>
+                        {course.session && (
+                          <span style={{ background: "rgba(255,255,255,0.25)", color: "#ffffff", padding: "2px 8px", borderRadius: "10px", fontSize: "11px", fontWeight: "600" }}>
+                            {course.session}
+                          </span>
+                        )}
+                        {course.level && course.term && (
+                          <span style={{ background: "rgba(255,255,255,0.25)", color: "#ffffff", padding: "2px 8px", borderRadius: "10px", fontSize: "11px", fontWeight: "600" }}>
+                            {course.level.replace("Level-", "L")} • {course.term.replace("Term-", "T")}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -743,96 +1043,7 @@ export default function CourseListPage() {
                       )}
                     </div>
 
-                    {/* Actions Area */}
-                    <div className="classroom-actions" style={{ gap: 8, display: "flex", flexWrap: "wrap", alignItems: "center" }}>
-                      {/* Teacher Actions */}
-                      {user?.role === "teacher" && (
-                        <>
-                          <div
-                            className="join-code-container"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 4,
-                              background: "rgba(59, 141, 179, 0.08)",
-                              padding: "4px 8px",
-                              borderRadius: 6,
-                              marginRight: "auto"
-                            }}
-                          >
-                            <span style={{ fontSize: 10, color: "var(--text-gray)", fontWeight: 600 }}>
-                              Code:
-                            </span>
-                            <span
-                              style={{
-                                fontWeight: 700,
-                                fontSize: 11,
-                                color: "var(--pastel-blue-deep)",
-                              }}
-                            >
-                              {course.joinCode}
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                copyJoinCode(course.joinCode);
-                              }}
-                              style={{
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                padding: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                color: "var(--text-gray)"
-                              }}
-                            >
-                              <FiCopy size={11} />
-                            </button>
-                          </div>
 
-                          <button
-                            onClick={(e) => handleTakeAttendance(course._id, e)}
-                            style={{
-                              background: "var(--pastel-blue-deep)",
-                              color: "white",
-                              border: "none",
-                              padding: "4px 10px",
-                              borderRadius: 6,
-                              cursor: "pointer",
-                              fontSize: 11,
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 4,
-                            }}
-                          >
-                            <FiCalendar size={11} /> Attendance
-                          </button>
-                        </>
-                      )}
-
-                      {/* Student Actions */}
-                      {user?.role === "student" && (
-                        <button
-                          onClick={(e) => handleViewAttendance(course._id, e)}
-                          style={{
-                            background: "rgba(59, 141, 179, 0.08)",
-                            color: "var(--pastel-blue-deep)",
-                            border: "none",
-                            padding: "4px 10px",
-                            borderRadius: 6,
-                            cursor: "pointer",
-                            fontSize: 11,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 4,
-                            marginLeft: "auto"
-                          }}
-                        >
-                          <FiCalendar size={11} /> View Attendance
-                        </button>
-                      )}
-                    </div>
                   </div>
                 </div>
               );

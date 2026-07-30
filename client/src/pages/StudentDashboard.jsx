@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as docx from "docx-preview";
 import { useAuth } from "../contexts/AuthContext";
@@ -751,7 +751,7 @@ export default function StudentDashboard({
                       boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)",
                       minHeight: 0
                     }}>
-                      {/* Floating Slide Canvas — Full Proportional Slide Container */}
+                      {/* Floating Slide Canvas ΓÇö Full Proportional Slide Container */}
                       <div style={{ 
                         flex: 1, 
                         display: "flex", 
@@ -794,7 +794,7 @@ export default function StudentDashboard({
                             transition: "background 0.2s"
                           }}
                         >
-                          ← Previous Slide
+                          ΓåÉ Previous Slide
                         </button>
                         
                         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
@@ -833,7 +833,7 @@ export default function StudentDashboard({
                             transition: "background 0.2s"
                           }}
                         >
-                          Next Slide →
+                          Next Slide ΓåÆ
                         </button>
                       </div>
                     </div>

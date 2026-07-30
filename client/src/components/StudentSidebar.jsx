@@ -22,6 +22,9 @@ import {
   FiSettings,
   FiMenu,
   FiX,
+  FiAward,
+  FiRefreshCw,
+  FiCreditCard,
 } from "react-icons/fi";
 
 export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
@@ -127,6 +130,48 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <FiBookOpen size={18} />
             <span>My Courses</span>
           </button>
+          <button
+            className={`nav-item ${currentPage === "results" || window.location.pathname.includes("/student/results") ? "active" : ""}`}
+            onClick={() => navigate("/student/results")}
+          >
+            <FiAward size={18} />
+            <span>Result Publication</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "academic-profile" || window.location.pathname.includes("/student/academic-profile") ? "active" : ""}`}
+            onClick={() => navigate("/student/academic-profile")}
+          >
+            <FiUser size={18} />
+            <span>Academic Profile</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "transcript" || window.location.pathname.includes("/student/transcript") ? "active" : ""}`}
+            onClick={() => navigate("/student/transcript")}
+          >
+            <FiFileText size={18} />
+            <span>Academic Transcript</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "retake-registration" || window.location.pathname.includes("/student/retake-registration") ? "active" : ""}`}
+            onClick={() => navigate("/student/retake-registration")}
+          >
+            <FiRefreshCw size={18} />
+            <span>Retake Registration</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "calendar" || window.location.pathname.includes("/academic-calendar") ? "active" : ""}`}
+            onClick={() => navigate("/academic-calendar")}
+          >
+            <FiCalendar size={18} />
+            <span>Academic Calendar</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "payments" || window.location.pathname.includes("/student/registration-payments") ? "active" : ""}`}
+            onClick={() => navigate("/student/registration-payments")}
+          >
+            <FiCreditCard size={18} />
+            <span>Registration Payments</span>
+          </button>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <button
               className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
@@ -186,6 +231,13 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           >
             <FiFileText size={18} />
             <span>Assessment Marksheet</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "course-registration" ? "active" : ""}`}
+            onClick={() => navigate("/student/course-registration")}
+          >
+            <FiCalendar size={18} />
+            <span>Course Registration</span>
           </button>
         </div>
         <div className="sidebar-footer-fixed">

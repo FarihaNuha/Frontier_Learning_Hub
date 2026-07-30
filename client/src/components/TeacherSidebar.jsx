@@ -8,6 +8,7 @@ import {
   FiFileText,
   FiCalendar,
   FiUser,
+  FiUsers,
   FiLogOut,
   FiArrowLeft,
   FiBookOpen,
@@ -20,9 +21,13 @@ import {
   FiMail,
   FiClock,
   FiBell,
+  FiClipboard,
   FiSettings,
   FiMenu,
   FiX,
+  FiCheck,
+  FiAward,
+  FiRefreshCw,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -127,6 +132,48 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           >
             <FiBookOpen size={18} />
             <span>My Courses</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "enrolled-students" || window.location.pathname.includes("/enrolled-students") ? "active" : ""}`}
+            onClick={() => navigate("/teacher/enrolled-students")}
+          >
+            <FiUsers size={18} />
+            <span>Enrolled Students</span>
+          </button>
+          <button
+            className={`nav-item ${window.location.pathname.includes("/teacher/registration-approval") ? "active" : ""}`}
+            onClick={() => navigate("/teacher/registration-approval")}
+          >
+            <FiCheck size={18} />
+            <span>Registration Approval</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "results" || window.location.pathname.includes("/teacher/results") ? "active" : ""}`}
+            onClick={() => navigate("/teacher/results")}
+          >
+            <FiAward size={18} />
+            <span>Result Publication</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "retake-approval" || window.location.pathname.includes("/teacher/retake-approval") ? "active" : ""}`}
+            onClick={() => navigate("/teacher/retake-approval")}
+          >
+            <FiRefreshCw size={18} />
+            <span>Retake Approval</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "calendar" || window.location.pathname.includes("/academic-calendar") ? "active" : ""}`}
+            onClick={() => navigate("/academic-calendar")}
+          >
+            <FiCalendar size={18} />
+            <span>Academic Calendar</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/teacher/notices") ? "active" : ""}`}
+            onClick={() => navigate("/teacher/notices")}
+          >
+            <FiClipboard size={18} />
+            <span>Notice Board</span>
           </button>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <button
@@ -364,39 +411,13 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           <FiFileText size={18} />
           <span>Assessment Marksheet</span>
         </button>
-        
-        {course?.joinCode && (
-          <div
-            style={{
-              padding: "10px 16px",
-              fontSize: 11,
-              color: "#6B89A0",
-              background: "#E8F4FD",
-              borderRadius: 8,
-              margin: "4px 0",
-              textAlign: "center"
-            }}
-          >
-            <span>Join Code: </span>
-            <strong style={{ letterSpacing: 2, fontSize: 14, color: "#3B8DB3" }}>
-              {course.joinCode}
-            </strong>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(course.joinCode);
-                toast.success("Copied!");
-              }}
-              style={{
-                marginLeft: 6,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              <FiCopy size={12} color="#3B8DB3" />
-            </button>
-          </div>
-        )}
+        <button
+          className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/teacher/notices") ? "active" : ""}`}
+          onClick={() => navigate("/teacher/notices")}
+        >
+          <FiClipboard size={18} />
+          <span>Notice Board</span>
+        </button>
       </div>
       <div className="sidebar-footer-fixed">
         <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>

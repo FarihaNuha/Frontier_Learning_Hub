@@ -86,6 +86,13 @@ app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/courses", require("./routes/courseRoutes"));
 app.use("/api/community", require("./routes/communityRoutes"));
 app.use("/api/assessments", require("./routes/assessmentRoutes"));
+app.use("/api/ums/admin", require("./routes/umsAdminRoutes"));
+app.use("/api/registration", require("./routes/registrationRoutes"));
+app.use("/api/announcements", require("./routes/announcementRoutes"));
+app.use("/api/results", require("./routes/resultRoutes"));
+app.use("/api/academic", require("./routes/academicRoutes"));
+app.use("/api/service", require("./routes/serviceRoutes"));
+app.use("/api/registration-payments", require("./routes/registrationPaymentRoutes"));
 
 // ==================== TEST ROUTES ====================
 app.get("/api/test", (req, res) => {
@@ -129,4 +136,15 @@ server.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
   console.log(`📡 API test endpoint: http://localhost:${PORT}/api/test`);
   console.log(`🔌 Socket.IO ready`);
+});
+
+// Prevent unhandled promise rejections from crashing the server
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("⚠️  Unhandled Rejection at:", promise, "reason:", reason);
+  // Do NOT exit the process — log and continue
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("⚠️  Uncaught Exception:", err.message, err.stack);
+  // Do NOT exit the process — log and continue
 });

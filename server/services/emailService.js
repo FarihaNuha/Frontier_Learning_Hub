@@ -293,6 +293,72 @@ const emailTemplates = {
       `
     };
   },
+
+  // New Official Notice Published
+  newNotice: (recipientName, noticeTitle, category, authorName, contentSnippet) => ({
+    subject: `📢 Official Notice: ${noticeTitle}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #2C4B66, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
+          <h2 style="color: white; margin: 0;">UFTB Moodle Official Notice</h2>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
+          <h3 style="color: #2C4B66;">Hello ${recipientName},</h3>
+          <p>An official university notice has been published:</p>
+          <div style="background: #E8F4FD; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Notice Title:</strong> ${noticeTitle}</p>
+            <p style="margin: 5px 0;"><strong>Category:</strong> ${category || "General"}</p>
+            <p style="margin: 5px 0;"><strong>Issued By:</strong> ${authorName || "Registrar"}</p>
+            <hr style="border: 0; border-top: 1px solid #cce2f0; margin: 10px 0;" />
+            <p style="margin: 5px 0; font-style: italic;">${contentSnippet || ""}</p>
+          </div>
+          <a href="${clientUrl}/student/dashboard" style="display: inline-block; background: linear-gradient(135deg, #2C4B66, #3B8DB3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View Full Notice on Dashboard</a>
+        </div>
+      </div>
+    `,
+  }),
+
+  // Course Registration Submitted
+  courseRegistrationSubmitted: (studentName, studentId, session, levelTerm, totalCredits) => ({
+    subject: `📝 Course Registration Submitted (${levelTerm})`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
+          <h2 style="color: white; margin: 0;">UFTB Moodle Course Registration</h2>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
+          <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
+          <p>Your course registration request for <strong>${levelTerm} (${session})</strong> has been submitted to your adviser.</p>
+          <div style="background: #E8F4FD; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Student ID:</strong> ${studentId}</p>
+            <p style="margin: 5px 0;"><strong>Total Registered Credits:</strong> ${totalCredits}</p>
+            <p style="margin: 5px 0;"><strong>Status:</strong> Pending Adviser Approval</p>
+          </div>
+          <p style="color: #64748b; font-size: 13px;">You will receive an email update once your adviser reviews your registration.</p>
+        </div>
+      </div>
+    `,
+  }),
+
+  // Course Registration Approved
+  courseRegistrationApproved: (studentName, levelTerm, session) => ({
+    subject: `✅ Course Registration Approved (${levelTerm})`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #10B981, #059669); padding: 20px; border-radius: 10px 10px 0 0;">
+          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
+          <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
+          <p>Your course registration for <strong>${levelTerm} (${session})</strong> has been <strong>APPROVED</strong> by your adviser.</p>
+          <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; margin: 15px 0; color: #0369a1;">
+            <strong>Your enrolled courses are now active!</strong> You can access lectures, assignments, and exams directly from your Student Dashboard.
+          </div>
+          <a href="${clientUrl}/courses" style="display: inline-block; background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">View My Courses</a>
+        </div>
+      </div>
+    `,
+  }),
 };
 
 // ==================== EMAIL QUEUE ====================

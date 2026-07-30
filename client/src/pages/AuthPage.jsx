@@ -45,7 +45,7 @@ export default function AuthPage() {
     setError("");
     try {
       const result = await login(formData.email, formData.password);
-      navigate("/courses");
+      navigate("/dashboard");
     } catch (err) {
       setError(
         err.response?.data?.error || "Something went wrong. Please try again.",
@@ -176,11 +176,12 @@ export default function AuthPage() {
                 <div className="password-input-wrapper">
                   <input
                     type={showResetPassword ? "text" : "password"}
-                    placeholder="Enter new password (min 6 chars)"
+                    placeholder="Enter new password (6-20 chars)"
                     value={newPassword}
                     onChange={(e) => { setNewPassword(e.target.value); setError(""); }}
                     required
                     minLength="6"
+                    maxLength="20"
                   />
                   <button
                     type="button"
@@ -292,11 +293,12 @@ export default function AuthPage() {
                   <input
                     type={showRegisterPassword ? "text" : "password"}
                     name="password"
-                    placeholder="Enter your password"
+                    placeholder="Enter your password (6-20 chars)"
                     value={formData.password}
                     onChange={handleChange}
                     required={!isLogin}
                     minLength="6"
+                    maxLength="20"
                   />
                   <button
                     type="button"
@@ -371,6 +373,7 @@ export default function AuthPage() {
                   value={formData.password}
                   onChange={handleChange}
                   required={isLogin}
+                  maxLength="20"
                 />
                 <button
                   type="button"

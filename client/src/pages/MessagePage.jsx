@@ -269,7 +269,15 @@ export default function MessagePage() {
       const courseId = new URLSearchParams(window.location.search).get("courseId");
       const params = courseId ? { courseId } : {};
       const res = await communityApi.getUsers(params);
-      setUsers(res.data.users.filter((u) => u._id !== (user?.id || user?._id)));
+      setUsers(
+        (res.data.users || []).filter(
+          (u) =>
+            u._id !== (user?.id || user?._id) &&
+            u.role !== "admin" &&
+            u.role !== "superadmin" &&
+            !String(u.name || "").toLowerCase().includes("super admin")
+        )
+      );
     } catch (error) { console.error(error); }
   };
 
@@ -277,13 +285,21 @@ export default function MessagePage() {
     try {
       setLoading(true);
       const res = await communityApi.getConversation(id);
-      setMessages(res.data.messages);
+      setMessages(res.data.messages || []);
       const otherUser =
-        res.data.messages[0]?.sender._id === (user?.id || user?._id)
+        res.data.messages[0]?.sender?._id === (user?.id || user?._id)
           ? res.data.messages[0]?.receiver
           : res.data.messages[0]?.sender;
       setSelectedUser(otherUser);
-    } catch (error) { console.error(error); } finally { setLoading(false); }
+    } catch (error) {
+      if (error.response?.status === 403) {
+        toast.error("Messaging Super Admin is disabled.");
+        navigate("/community/messages");
+        setSelectedUser(null);
+      } else {
+        console.error(error);
+      }
+    } finally { setLoading(false); }
   };
 
   const fetchContactRequests = async () => {

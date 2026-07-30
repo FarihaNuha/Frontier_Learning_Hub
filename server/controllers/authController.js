@@ -12,28 +12,111 @@ const generateToken = (user) => {
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, studentId, role, department } = req.body;
-    if (!name || !email || !password || !department) {
+    const { email, password } = req.body;
+    if (!email || !password) {
       return res
         .status(400)
         .json({ error: "Please provide all required fields" });
     }
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ error: "A user with this email already exists" });
+    if (password.length > 20) {
+      return res.status(400).json({ error: "Password cannot be longer than 20 characters." });
     }
+
+    const emailLower = email.toLowerCase().trim();
+
+    // Lookup email in Student and Teacher imported collections
+    const Student = require("../models/Student");
+    const Teacher = require("../models/Teacher");
+
+    let matchedRecord = null;
+    let assignedRole = "";
+    let assignedDept = "";
+    let assignedName = "";
+    let studentId = "";
+
+    const studentRecord = await Student.findOne({ universityEmail: emailLower });
+    if (studentRecord) {
+      matchedRecord = studentRecord;
+      assignedRole = "student";
+      assignedDept = studentRecord.department || "EDTE";
+      assignedName = studentRecord.name;
+      studentId = studentRecord.studentId;
+    } else {
+      const teacherRecord = await Teacher.findOne({ email: emailLower });
+      if (teacherRecord) {
+        matchedRecord = teacherRecord;
+        assignedRole = "teacher";
+        assignedDept = teacherRecord.department || "EDTE";
+        assignedName = teacherRecord.name;
+      }
+    }
+
+    // Check if an existing User document exists for this email
+    let existingUser = await User.findOne({ email: emailLower });
+
+    if (!matchedRecord && !existingUser) {
+      return res.status(400).json({
+        error: "You are not authorized to sign up. Please contact the administrator to add your record.",
+      });
+    }
+
+    // If existingUser exists and user has ALREADY completed custom registration before:
+    if (existingUser && existingUser.isRegistered === true) {
+      return res.status(400).json({
+        error: "A user with this email has already registered. Please login with your password or use forgot password.",
+      });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    if (existingUser) {
+      // User was pre-seeded/imported, update password and mark as registered
+      existingUser.password = hashedPassword;
+      existingUser.isRegistered = true;
+      if (assignedName) existingUser.name = assignedName;
+      if (assignedRole) existingUser.role = assignedRole;
+      if (assignedDept) existingUser.department = assignedDept;
+      if (studentId) existingUser.studentId = studentId;
+
+      await existingUser.save();
+
+      if (assignedRole === "student" || existingUser.role === "student") {
+        await Student.updateOne({ universityEmail: emailLower }, { accountStatus: "Active" });
+      }
+
+      const token = generateToken(existingUser);
+      return res.status(200).json({
+        token,
+        user: {
+          id: existingUser._id,
+          name: existingUser.name,
+          email: existingUser.email,
+          role: existingUser.role,
+          department: existingUser.department,
+          studentId: existingUser.studentId,
+          profilePicture: existingUser.profilePicture,
+          emailNotifications: existingUser.emailNotifications,
+        },
+      });
+    }
+
+    // Create new User
     const user = await User.create({
-      name,
-      email,
+      name: assignedName || req.body.name || "User",
+      email: emailLower,
       password: hashedPassword,
-      ...(role === "student" && studentId ? { studentId } : {}),
-      role: role || "student",
-      department,
+      ...(assignedRole === "student" && studentId ? { studentId } : {}),
+      role: assignedRole || "student",
+      department: assignedDept || "EDTE",
+      isRegistered: true,
     });
+
+    // Mark accountStatus as active if student
+    if (assignedRole === "student") {
+      await Student.updateOne({ universityEmail: emailLower }, { accountStatus: "Active" });
+    }
+
     const token = generateToken(user);
     res.status(201).json({
       token,
@@ -121,17 +204,12 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (name) user.name = name;
-    if (department) {
-      const validDepts = ["EDTE", "IRE", "Software", "Cyber", "DataScience", "General"];
-      if (validDepts.includes(department)) {
-        user.department = department;
-      } else {
-        return res.status(400).json({ error: "Invalid department" });
-      }
+    if (name) user.name = name.trim();
+    if (department !== undefined && department !== null) {
+      user.department = String(department).trim();
     }
     if (user.role === "student" && studentId !== undefined) {
-      user.studentId = studentId;
+      user.studentId = String(studentId).trim();
     }
     if (profilePicture !== undefined) {
       user.profilePicture = profilePicture;
@@ -221,6 +299,9 @@ exports.resetPassword = async (req, res) => {
     }
     if (newPassword.length < 6) {
       return res.status(400).json({ error: "Password must be at least 6 characters long." });
+    }
+    if (newPassword.length > 20) {
+      return res.status(400).json({ error: "Password cannot be longer than 20 characters." });
     }
 
     const user = await User.findOne({ 

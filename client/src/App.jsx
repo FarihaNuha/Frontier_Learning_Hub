@@ -8,6 +8,12 @@ import GlobalSettingsPortal from "./components/GlobalSettingsPortal";
 
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminStudents = lazy(() => import("./pages/AdminStudents"));
+const AdminTeachers = lazy(() => import("./pages/AdminTeachers"));
+const AdminCourses = lazy(() => import("./pages/AdminCourses"));
+const AdminAdvisers = lazy(() => import("./pages/AdminAdvisers"));
+const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
 const StudentAssignmentPage = lazy(() => import("./pages/StudentAssignmentPage"));
 const TeacherAssignmentPage = lazy(() => import("./pages/TeacherAssignmentPage"));
@@ -27,6 +33,39 @@ const StudentAssessmentPage = lazy(() => import("./pages/StudentAssessmentPage")
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const CourseAnalyticsPage = lazy(() => import("./pages/CourseAnalyticsPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+
+// Phase 2 & 3 Pages
+const StudentLevelTermPage = lazy(() => import("./pages/StudentLevelTermPage"));
+const CourseRegistrationPage = lazy(() => import("./pages/CourseRegistrationPage"));
+const AcademicRegistrationPage = lazy(() => import("./pages/AcademicRegistrationPage"));
+const TeacherRegistrationApprovalPage = lazy(() => import("./pages/TeacherRegistrationApprovalPage"));
+const TeacherEnrolledStudentsPage = lazy(() => import("./pages/TeacherEnrolledStudentsPage"));
+const AdminRegistrationCalendar = lazy(() => import("./pages/AdminRegistrationCalendar"));
+const AdminPaymentManagement = lazy(() => import("./pages/AdminPaymentManagement"));
+const AdminRegistrationList = lazy(() => import("./pages/AdminRegistrationList"));
+
+// Phase 4 Pages
+const TeacherResultManagementPage = lazy(() => import("./pages/TeacherResultManagementPage"));
+const AdminResultManagementPage = lazy(() => import("./pages/AdminResultManagementPage"));
+const StudentAcademicResultsPage = lazy(() => import("./pages/StudentAcademicResultsPage"));
+
+// Phase 5 Pages
+const StudentAcademicProfilePage = lazy(() => import("./pages/StudentAcademicProfilePage"));
+const StudentTranscriptPage = lazy(() => import("./pages/StudentTranscriptPage"));
+const StudentRetakeRegistrationPage = lazy(() => import("./pages/StudentRetakeRegistrationPage"));
+const TeacherRetakeApprovalPage = lazy(() => import("./pages/TeacherRetakeApprovalPage"));
+const AdminProgressionPage = lazy(() => import("./pages/AdminProgressionPage"));
+const AdminAuditLogsPage = lazy(() => import("./pages/AdminAuditLogsPage"));
+
+// Service Modules Pages
+const AdminNoticeManagementPage = lazy(() => import("./pages/AdminNoticeManagementPage"));
+const TeacherNoticePage = lazy(() => import("./pages/TeacherNoticePage"));
+const AdminCalendarManagementPage = lazy(() => import("./pages/AdminCalendarManagementPage"));
+const AcademicCalendarViewPage = lazy(() => import("./pages/AcademicCalendarViewPage"));
+
+// Registration Payment Pages
+const StudentRegistrationPaymentPage = lazy(() => import("./pages/StudentRegistrationPaymentPage"));
+const AdminRegistrationPaymentPage = lazy(() => import("./pages/AdminRegistrationPaymentPage"));
 
 // Fixed ProtectedRoute - checks token and user state
 function ProtectedRoute({ children }) {
@@ -87,6 +126,10 @@ function RoleRouter() {
     return <Navigate to="/student/dashboard" replace />;
   }
 
+  if (user?.role === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
   return <Navigate to="/auth" replace />;
 }
 function AppContent() {
@@ -135,6 +178,104 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <TeacherDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin UMS Routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/students"
+            element={
+              <ProtectedRoute>
+                <AdminStudents />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/teachers"
+            element={
+              <ProtectedRoute>
+                <AdminTeachers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/courses"
+            element={
+              <ProtectedRoute>
+                <AdminCourses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/advisers"
+            element={
+              <ProtectedRoute>
+                <AdminAdvisers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute>
+                <AdminSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/calendar"
+            element={
+              <ProtectedRoute>
+                <AdminRegistrationCalendar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payments"
+            element={
+              <ProtectedRoute>
+                <AdminPaymentManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/registrations"
+            element={
+              <ProtectedRoute>
+                <AdminRegistrationList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/registration-approval"
+            element={
+              <ProtectedRoute>
+                <TeacherRegistrationApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/level-term/:level/:term"
+            element={
+              <ProtectedRoute>
+                <StudentLevelTermPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/registration/:level/:term"
+            element={
+              <ProtectedRoute>
+                <CourseRegistrationPage />
               </ProtectedRoute>
             }
           />
@@ -203,6 +344,22 @@ function AppContent() {
             }
           />
           <Route
+            path="/teacher/enrolled-students"
+            element={
+              <ProtectedRoute>
+                <TeacherEnrolledStudentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses/:id/students"
+            element={
+              <ProtectedRoute>
+                <TeacherEnrolledStudentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/teacher/analytics/:id"
             element={
               <ProtectedRoute>
@@ -216,7 +373,15 @@ function AppContent() {
             path="/student/dashboard"
             element={
               <ProtectedRoute>
-                <StudentDashboard />
+                <CourseListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/course-registration"
+            element={
+              <ProtectedRoute>
+                <AcademicRegistrationPage />
               </ProtectedRoute>
             }
           />
@@ -394,6 +559,134 @@ function AppContent() {
             }
           />
 
+          {/* Phase 4 Result Management Routes */}
+          <Route
+            path="/teacher/results"
+            element={
+              <ProtectedRoute>
+                <TeacherResultManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/results"
+            element={
+              <ProtectedRoute>
+                <AdminResultManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/results"
+            element={
+              <ProtectedRoute>
+                <StudentAcademicResultsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Phase 5 Routes */}
+          <Route
+            path="/student/academic-profile"
+            element={
+              <ProtectedRoute>
+                <StudentAcademicProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/transcript"
+            element={
+              <ProtectedRoute>
+                <StudentTranscriptPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/retake-registration"
+            element={
+              <ProtectedRoute>
+                <StudentRetakeRegistrationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/retake-approval"
+            element={
+              <ProtectedRoute>
+                <TeacherRetakeApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/progression"
+            element={
+              <ProtectedRoute>
+                <AdminProgressionPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/audit-logs"
+            element={
+              <ProtectedRoute>
+                <AdminAuditLogsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Service Module Routes */}
+          <Route
+            path="/admin/notices"
+            element={
+              <ProtectedRoute>
+                <AdminNoticeManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/notices"
+            element={
+              <ProtectedRoute>
+                <TeacherNoticePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/academic-calendar"
+            element={
+              <ProtectedRoute>
+                <AdminCalendarManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/academic-calendar"
+            element={
+              <ProtectedRoute>
+                <AcademicCalendarViewPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Registration Payment Routes */}
+          <Route
+            path="/student/registration-payments"
+            element={
+              <ProtectedRoute>
+                <StudentRegistrationPaymentPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/registration-payments"
+            element={
+              <ProtectedRoute>
+                <AdminRegistrationPaymentPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Settings Route */}
           <Route
             path="/settings"
@@ -404,8 +697,9 @@ function AppContent() {
             }
           />
 
-          {/* Default Routes */}
-          <Route path="/" element={<Navigate to="/courses" replace />} />
+          {/* Default Routes - RoleRouter handles role-based redirect */}
+          <Route path="/dashboard" element={<RoleRouter />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/auth" replace />} />
         </Routes>
       </Suspense>

@@ -28,12 +28,19 @@ const verifyToken = async (req, res, next) => {
       return res.status(401).json({ error: "Your account has been suspended." });
     }
 
-    req.user = decoded;
+    req.user = {
+      id: dbUser._id.toString(),
+      uid: dbUser._id.toString(),
+      email: dbUser.email,
+      role: dbUser.role,
+      name: dbUser.name,
+      department: dbUser.department,
+    };
     console.log(
       "✅ Token verified for user:",
-      decoded.uid,
+      req.user.email,
       "Role:",
-      decoded.role,
+      req.user.role,
     );
     next();
   } catch (error) {

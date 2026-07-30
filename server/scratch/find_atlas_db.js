@@ -2,7 +2,7 @@ const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const mongoose = require("mongoose");
 
-const uri = "mongodb+srv://farihanuha356_db_user:nuha2202022@cluster01.uchfnx6.mongodb.net/test?retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI;
 
 async function findDatabases() {
   try {

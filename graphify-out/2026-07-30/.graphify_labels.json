@@ -61,6 +61,7 @@
   "59": "verifyToken",
   "60": "registrationRoutes.js",
   "61": "User.js",
+  "62": "react-scripts",
   "63": "umsAdminRoutes.js",
   "64": "Adviser.js",
   "65": "AuthContext.jsx",
@@ -91,6 +92,5 @@
   "90": "RetakeRequest.js",
   "92": "Transcript.js",
   "93": "courseRoutes.js",
-  "97": "StudentExamPage.jsx",
-  "107": "react-scripts"
+  "97": "StudentExamPage.jsx"
 }

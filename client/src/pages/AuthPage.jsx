@@ -16,7 +16,7 @@ export default function AuthPage() {
     email: "",
     password: "",
     studentId: "",
-    department: "Software",
+    department: "EDTE",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ export default function AuthPage() {
     setLoading(true);
     setError("");
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await login(formData.email.trim(), formData.password);
       navigate("/dashboard");
     } catch (err) {
       setError(
@@ -62,7 +62,7 @@ export default function AuthPage() {
     try {
       const result = await register({
         name: formData.name,
-        email: formData.email,
+        email: formData.email.trim(),
         password: formData.password,
         studentId: formData.studentId,
         role: role,
@@ -318,12 +318,11 @@ export default function AuthPage() {
                   onChange={handleChange}
                   required={!isLogin}
                 >
-                  <option value="Software">Software Engineering</option>
                   <option value="EDTE">EDTE</option>
                   <option value="IRE">IRE</option>
-                  <option value="Cyber">Cyber Security</option>
-                  <option value="DataScience">Data Science</option>
-                  <option value="General">General</option>
+                  <option value="CySE">CySE</option>
+                  <option value="DSE">DSE</option>
+                  <option value="SWE">SWE</option>
                 </select>
               </div>
             </div>

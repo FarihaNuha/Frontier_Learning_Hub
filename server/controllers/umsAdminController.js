@@ -15,8 +15,8 @@ exports.getStats = async (req, res) => {
     const advisers = await Adviser.find().lean();
     const courses = await CourseImport.find().lean();
 
-    // Fetch signed up user emails from User collection
-    const registeredUsers = await User.find({}, "email role").lean();
+    // Fetch signed up user emails from User collection (where user has completed signup)
+    const registeredUsers = await User.find({ isRegistered: true }, "email role").lean();
     const registeredEmailSet = new Set(
       registeredUsers.map((u) => (u.email || "").toLowerCase().trim()).filter(Boolean)
     );
@@ -141,7 +141,7 @@ exports.importStudents = async (req, res) => {
           admissionSemester: String(admissionSemester !== undefined && admissionSemester !== null ? admissionSemester : "").trim(),
           currentLevel: currentLevel !== undefined && currentLevel !== null ? Number(currentLevel) : 1,
           currentTerm: currentTerm !== undefined && currentTerm !== null ? Number(currentTerm) : 1,
-          accountStatus: String(accountStatus !== undefined && accountStatus !== null ? accountStatus : "active").trim(),
+          accountStatus: String(accountStatus !== undefined && accountStatus !== null ? accountStatus : "inactive").trim(),
         },
         { upsert: true, new: true }
       );
@@ -461,7 +461,7 @@ exports.importAdvisers = async (req, res) => {
 exports.getStudents = async (req, res) => {
   try {
     const User = require("../models/User");
-    const registeredUsers = await User.find({}, "email").lean();
+    const registeredUsers = await User.find({ isRegistered: true }, "email").lean();
     const registeredEmails = new Set(
       registeredUsers.map((u) => (u.email || "").toLowerCase().trim()).filter(Boolean)
     );
@@ -484,7 +484,7 @@ exports.getStudents = async (req, res) => {
 exports.getTeachers = async (req, res) => {
   try {
     const User = require("../models/User");
-    const registeredUsers = await User.find({}, "email").lean();
+    const registeredUsers = await User.find({ isRegistered: true }, "email").lean();
     const registeredEmails = new Set(
       registeredUsers.map((u) => (u.email || "").toLowerCase().trim()).filter(Boolean)
     );
@@ -548,7 +548,7 @@ exports.getAdvisers = async (req, res) => {
       if (t.email) teacherMap[t.email.toLowerCase().trim()] = t;
     });
 
-    const registeredUsers = await User.find({}, "email").lean();
+    const registeredUsers = await User.find({ isRegistered: true }, "email").lean();
     const registeredEmailSet = new Set(
       registeredUsers.map((u) => (u.email || "").toLowerCase().trim()).filter(Boolean)
     );

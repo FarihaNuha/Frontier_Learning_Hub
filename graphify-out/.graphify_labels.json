@@ -90,7 +90,21 @@
   "88": "CommunityPost.js",
   "89": "docx-preview",
   "90": "RetakeRequest.js",
+  "91": "uploadResultExcel",
   "92": "Transcript.js",
   "93": "courseRoutes.js",
-  "97": "StudentExamPage.jsx"
+  "94": "ExamSubmission.js",
+  "95": "academicRoutes.js",
+  "96": "AcademicProfile.js",
+  "97": "StudentExamPage.jsx",
+  "98": "CGPARecord.js",
+  "99": "CommunityComment.js",
+  "100": "CommunityPost.js",
+  "101": "Course.js",
+  "102": "PrivateMessage.js",
+  "103": "ResultCorrectionRequest.js",
+  "104": "ResultLog.js",
+  "105": "ResultUpload.js",
+  "106": "jszip",
+  "107": "@testing-library/user-event"
 }

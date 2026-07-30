@@ -197,7 +197,7 @@ export default function AdminStudents() {
             admissionSemester: String(findVal(["Admission Semester", "admissionSemester", "Semester", "semester"])) || `${sessVal.split("-")[0] || "Spring"} 2022`,
             currentLevel: lvl || 1,
             currentTerm: trm || 1,
-            accountStatus: String(findVal(["Account Status", "accountStatus", "Status", "status"]) || "active"),
+            accountStatus: String(findVal(["Account Status", "accountStatus", "Status", "status"]) || "inactive"),
           };
         });
 

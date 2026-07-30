@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    enum: ["EDTE", "IRE", "Software", "Cyber", "DataScience", "General"],
+    enum: ["EDTE", "IRE", "CySE", "DSE", "SWE", "Software", "Cyber", "DataScience", "General"],
     required: [true, "Department is required"],
   },
   fcmToken: String,

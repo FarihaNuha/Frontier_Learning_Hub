@@ -51,19 +51,24 @@ exports.register = async (req, res) => {
       }
     }
 
-    // Check if an existing User document exists for this email
-    let existingUser = await User.findOne({ email: emailLower });
+    // Check if an existing User document exists for this email (case-insensitive)
+    let existingUser = await User.findOne({
+      $or: [
+        { email: emailLower },
+        { email: { $regex: new RegExp(`^${emailLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+      ]
+    });
 
     if (!matchedRecord && !existingUser) {
       return res.status(400).json({
-        error: "You are not authorized to sign up. Please contact the administrator to add your record.",
+        error: `Email '${email}' is not in the university student/teacher directory. Please contact the administrator.`,
       });
     }
 
     // If existingUser exists and user has ALREADY completed custom registration before:
     if (existingUser && existingUser.isRegistered === true) {
       return res.status(400).json({
-        error: "A user with this email has already registered. Please login with your password or use forgot password.",
+        error: `An account for ${emailLower} is already registered. Please click 'Sign In' to log in with your password.`,
       });
     }
 
@@ -82,7 +87,15 @@ exports.register = async (req, res) => {
       await existingUser.save();
 
       if (assignedRole === "student" || existingUser.role === "student") {
-        await Student.updateOne({ universityEmail: emailLower }, { accountStatus: "Active" });
+        await Student.updateOne(
+          { $or: [{ universityEmail: emailLower }, { studentId: studentId || existingUser.studentId }] },
+          { accountStatus: "active" }
+        );
+      } else if (assignedRole === "teacher" || existingUser.role === "teacher") {
+        await Teacher.updateOne(
+          { email: emailLower },
+          { accountStatus: "active" }
+        );
       }
 
       const token = generateToken(existingUser);
@@ -107,14 +120,22 @@ exports.register = async (req, res) => {
       email: emailLower,
       password: hashedPassword,
       ...(assignedRole === "student" && studentId ? { studentId } : {}),
-      role: assignedRole || "student",
-      department: assignedDept || "EDTE",
+      role: assignedRole || req.body.role || "student",
+      department: req.body.department || assignedDept || "EDTE",
       isRegistered: true,
     });
 
-    // Mark accountStatus as active if student
-    if (assignedRole === "student") {
-      await Student.updateOne({ universityEmail: emailLower }, { accountStatus: "Active" });
+    // Mark accountStatus as active if student or teacher
+    if (assignedRole === "student" || user.role === "student") {
+      await Student.updateOne(
+        { $or: [{ universityEmail: emailLower }, { studentId: studentId }] },
+        { accountStatus: "active" }
+      );
+    } else if (assignedRole === "teacher" || user.role === "teacher") {
+      await Teacher.updateOne(
+        { email: emailLower },
+        { accountStatus: "active" }
+      );
     }
 
     const token = generateToken(user);
@@ -145,7 +166,16 @@ exports.login = async (req, res) => {
         .status(400)
         .json({ error: "Please provide email and password" });
     }
-    const user = await User.findOne({ email });
+
+    const emailClean = (email || "").toLowerCase().trim();
+
+    const user = await User.findOne({
+      $or: [
+        { email: emailClean },
+        { email: { $regex: new RegExp(`^${emailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+      ]
+    });
+
     if (!user)
       return res.status(401).json({ error: "Invalid email or password" });
 

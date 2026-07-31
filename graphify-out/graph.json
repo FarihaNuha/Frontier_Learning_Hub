@@ -240,7 +240,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_user_event",
-      "community": 136,
+      "community": 108,
       "norm_label": "@testing-library/user-event"
     },
     {
@@ -250,7 +250,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "testing_library_user_event",
-      "community": 136,
+      "community": 108,
       "norm_label": "@testing-library/user-event"
     },
     {
@@ -260,7 +260,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_dependencies_axios",
-      "community": 140,
+      "community": 12,
       "norm_label": "axios"
     },
     {
@@ -270,7 +270,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_json_axios",
-      "community": 140,
+      "community": 12,
       "norm_label": "axios"
     },
     {
@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 12,
+      "community": 123,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 12,
+      "community": 123,
       "norm_label": "docx-preview"
     },
     {
@@ -340,7 +340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_dependencies_jszip",
-      "community": 137,
+      "community": 128,
       "norm_label": "jszip"
     },
     {
@@ -350,7 +350,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_json_jszip",
-      "community": 137,
+      "community": 128,
       "norm_label": "jszip"
     },
     {
@@ -2100,7 +2100,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_communityhub",
-      "community": 42,
+      "community": 51,
       "norm_label": "communityhub.jsx"
     },
     {
@@ -2110,7 +2110,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_rendercontentwithlinks",
-      "community": 42,
+      "community": 51,
       "norm_label": "rendercontentwithlinks()"
     },
     {
@@ -2120,7 +2120,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_communityhub",
-      "community": 42,
+      "community": 51,
       "norm_label": "communityhub()"
     },
     {
@@ -2130,7 +2130,7 @@
       "source_location": "L296",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_getfileurl",
-      "community": 42,
+      "community": 51,
       "norm_label": "getfileurl()"
     },
     {
@@ -2140,7 +2140,7 @@
       "source_location": "L308",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_renderattachments",
-      "community": 42,
+      "community": 51,
       "norm_label": "renderattachments()"
     },
     {
@@ -2150,7 +2150,7 @@
       "source_location": "L417",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_renderlectureattachment",
-      "community": 42,
+      "community": 51,
       "norm_label": "renderlectureattachment()"
     },
     {
@@ -2160,7 +2160,7 @@
       "source_location": "L427",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_commentitem",
-      "community": 42,
+      "community": 51,
       "norm_label": "commentitem()"
     },
     {
@@ -2170,7 +2170,7 @@
       "source_location": "L695",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_postcard",
-      "community": 42,
+      "community": 51,
       "norm_label": "postcard()"
     },
     {
@@ -2180,7 +2180,7 @@
       "source_location": "L1105",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_createpostmodal",
-      "community": 42,
+      "community": 51,
       "norm_label": "createpostmodal()"
     },
     {
@@ -2190,7 +2190,7 @@
       "source_location": "L1250",
       "_origin": "ast",
       "id": "client_src_pages_communityhub_editpostmodal",
-      "community": 42,
+      "community": 51,
       "norm_label": "editpostmodal()"
     },
     {
@@ -2220,7 +2220,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity",
-      "community": 51,
+      "community": 42,
       "norm_label": "coursecommunity.jsx"
     },
     {
@@ -2230,7 +2230,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_rendercontentwithlinks",
-      "community": 51,
+      "community": 42,
       "norm_label": "rendercontentwithlinks()"
     },
     {
@@ -2240,7 +2240,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursecommunity",
-      "community": 51,
+      "community": 42,
       "norm_label": "coursecommunity()"
     },
     {
@@ -2250,7 +2250,7 @@
       "source_location": "L460",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_getfileurl",
-      "community": 51,
+      "community": 42,
       "norm_label": "getfileurl()"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_location": "L472",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderattachments",
-      "community": 51,
+      "community": 42,
       "norm_label": "renderattachments()"
     },
     {
@@ -2270,7 +2270,7 @@
       "source_location": "L581",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderlectureattachment",
-      "community": 51,
+      "community": 42,
       "norm_label": "renderlectureattachment()"
     },
     {
@@ -2280,7 +2280,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_commentitem",
-      "community": 51,
+      "community": 42,
       "norm_label": "commentitem()"
     },
     {
@@ -2290,7 +2290,7 @@
       "source_location": "L859",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursepostcard",
-      "community": 51,
+      "community": 42,
       "norm_label": "coursepostcard()"
     },
     {
@@ -2300,7 +2300,7 @@
       "source_location": "L1286",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_editpostmodal",
-      "community": 51,
+      "community": 42,
       "norm_label": "editpostmodal()"
     },
     {
@@ -3534,6 +3534,106 @@
       "norm_label": "test()"
     },
     {
+      "label": "check_student_registrations.js",
+      "file_type": "code",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_check_student_registrations",
+      "community": 121,
+      "norm_label": "check_student_registrations.js"
+    },
+    {
+      "label": "mongoose",
+      "file_type": "code",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_check_student_registrations_mongoose",
+      "community": 121,
+      "norm_label": "mongoose"
+    },
+    {
+      "label": "Registration",
+      "file_type": "code",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "server_check_student_registrations_registration",
+      "community": 121,
+      "norm_label": "registration"
+    },
+    {
+      "label": "Student",
+      "file_type": "code",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "server_check_student_registrations_student",
+      "community": 121,
+      "norm_label": "student"
+    },
+    {
+      "label": "AcademicProfile",
+      "file_type": "code",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "server_check_student_registrations_academicprofile",
+      "community": 121,
+      "norm_label": "academicprofile"
+    },
+    {
+      "label": "check()",
+      "file_type": "code",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "server_check_student_registrations_check",
+      "community": 121,
+      "norm_label": "check()"
+    },
+    {
+      "label": "check_students_data.js",
+      "file_type": "code",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_check_students_data",
+      "community": 86,
+      "norm_label": "check_students_data.js"
+    },
+    {
+      "label": "mongoose",
+      "file_type": "code",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_check_students_data_mongoose",
+      "community": 86,
+      "norm_label": "mongoose"
+    },
+    {
+      "label": "User",
+      "file_type": "code",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "server_check_students_data_user",
+      "community": 86,
+      "norm_label": "user"
+    },
+    {
+      "label": "check()",
+      "file_type": "code",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "server_check_students_data_check",
+      "community": 86,
+      "norm_label": "check()"
+    },
+    {
       "label": "db.js",
       "file_type": "code",
       "source_file": "server/config/db.js",
@@ -3890,7 +3990,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_computegradepoint",
-      "community": 138,
+      "community": 72,
       "norm_label": "computegradepoint()"
     },
     {
@@ -3900,7 +4000,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_calculatestudentcgpa",
-      "community": 138,
+      "community": 72,
       "norm_label": "calculatestudentcgpa()"
     },
     {
@@ -3910,7 +4010,7 @@
       "source_location": "L278",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getstudentacademicprofile",
-      "community": 138,
+      "community": 72,
       "norm_label": "getstudentacademicprofile()"
     },
     {
@@ -3920,7 +4020,7 @@
       "source_location": "L360",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getstudenttranscript",
-      "community": 138,
+      "community": 72,
       "norm_label": "getstudenttranscript()"
     },
     {
@@ -3990,7 +4090,7 @@
       "source_location": "L748",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getstudentdashboardstats",
-      "community": 138,
+      "community": 72,
       "norm_label": "getstudentdashboardstats()"
     },
     {
@@ -4597,7 +4697,7 @@
       "label": "markAttendance()",
       "file_type": "code",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L95",
+      "source_location": "L140",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_markattendance",
       "community": 7,
@@ -4607,7 +4707,7 @@
       "label": "getAttendance()",
       "file_type": "code",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L152",
+      "source_location": "L197",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_getattendance",
       "community": 7,
@@ -4617,7 +4717,7 @@
       "label": "getAttendanceStats()",
       "file_type": "code",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L224",
+      "source_location": "L269",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_getattendancestats",
       "community": 7,
@@ -4627,7 +4727,7 @@
       "label": "getStudentCourses()",
       "file_type": "code",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L323",
+      "source_location": "L368",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_getstudentcourses",
       "community": 7,
@@ -4637,7 +4737,7 @@
       "label": "updateCourseFormulas()",
       "file_type": "code",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L338",
+      "source_location": "L383",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_updatecourseformulas",
       "community": 7,
@@ -4647,7 +4747,7 @@
       "label": "evaluateExcelFormula()",
       "file_type": "code",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L368",
+      "source_location": "L413",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_evaluateexcelformula",
       "community": 7,
@@ -4657,21 +4757,11 @@
       "label": "evalArithmetic()",
       "file_type": "code",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L426",
+      "source_location": "L471",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_evalarithmetic",
       "community": 7,
       "norm_label": "evalarithmetic()"
-    },
-    {
-      "label": "IMPORTANT: Filter only students, not teachers",
-      "file_type": "rationale",
-      "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L57",
-      "_origin": "ast",
-      "id": "server_controllers_attendancecontroller_rationale_57",
-      "community": 7,
-      "norm_label": "important: filter only students, not teachers"
     },
     {
       "label": "authController.js",
@@ -5670,7 +5760,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_uploadlecture",
-      "community": 8,
+      "community": 73,
       "norm_label": "uploadlecture()"
     },
     {
@@ -5920,7 +6010,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller",
-      "community": 49,
+      "community": 36,
       "norm_label": "registrationcontroller.js"
     },
     {
@@ -5930,7 +6020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_user",
-      "community": 49,
+      "community": 36,
       "norm_label": "user"
     },
     {
@@ -5940,7 +6030,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_student",
-      "community": 49,
+      "community": 36,
       "norm_label": "student"
     },
     {
@@ -5950,7 +6040,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_teacher",
-      "community": 49,
+      "community": 36,
       "norm_label": "teacher"
     },
     {
@@ -5960,7 +6050,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_courseimport",
-      "community": 49,
+      "community": 36,
       "norm_label": "courseimport"
     },
     {
@@ -5970,7 +6060,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_adviser",
-      "community": 49,
+      "community": 36,
       "norm_label": "adviser"
     },
     {
@@ -5980,7 +6070,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_registration",
-      "community": 49,
+      "community": 36,
       "norm_label": "registration"
     },
     {
@@ -5990,7 +6080,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_enrollment",
-      "community": 49,
+      "community": 36,
       "norm_label": "enrollment"
     },
     {
@@ -6000,7 +6090,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_payment",
-      "community": 49,
+      "community": 36,
       "norm_label": "payment"
     },
     {
@@ -6010,7 +6100,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_registrationcalendar",
-      "community": 49,
+      "community": 36,
       "norm_label": "registrationcalendar"
     },
     {
@@ -6020,7 +6110,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_createnotification",
-      "community": 49,
+      "community": 36,
       "norm_label": "createnotification()"
     },
     {
@@ -6070,7 +6160,7 @@
       "source_location": "L389",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_linkorcreatelmscourse",
-      "community": 49,
+      "community": 36,
       "norm_label": "linkorcreatelmscourse()"
     },
     {
@@ -6080,7 +6170,7 @@
       "source_location": "L443",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_getmyregistrations",
-      "community": 49,
+      "community": 36,
       "norm_label": "getmyregistrations()"
     },
     {
@@ -6090,7 +6180,7 @@
       "source_location": "L463",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_getpendingregistrationsforadviser",
-      "community": 49,
+      "community": 36,
       "norm_label": "getpendingregistrationsforadviser()"
     },
     {
@@ -6100,7 +6190,7 @@
       "source_location": "L654",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_approveregistration",
-      "community": 91,
+      "community": 36,
       "norm_label": "approveregistration()"
     },
     {
@@ -6110,7 +6200,7 @@
       "source_location": "L712",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_rejectregistration",
-      "community": 49,
+      "community": 36,
       "norm_label": "rejectregistration()"
     },
     {
@@ -6120,7 +6210,7 @@
       "source_location": "L738",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_approveallpendingregistrations",
-      "community": 49,
+      "community": 36,
       "norm_label": "approveallpendingregistrations()"
     },
     {
@@ -6480,7 +6570,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_resultcorrectionrequest",
-      "community": 37,
+      "community": 78,
       "norm_label": "resultcorrectionrequest"
     },
     {
@@ -6510,7 +6600,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_parseoptionalnumber",
-      "community": 125,
+      "community": 88,
       "norm_label": "parseoptionalnumber()"
     },
     {
@@ -6520,7 +6610,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_validateresultrows",
-      "community": 125,
+      "community": 88,
       "norm_label": "validateresultrows()"
     },
     {
@@ -6530,7 +6620,7 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_uploadresultexcel",
-      "community": 125,
+      "community": 88,
       "norm_label": "uploadresultexcel()"
     },
     {
@@ -6660,7 +6750,7 @@
       "source_location": "L1276",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_schedulepublicationbysession",
-      "community": 73,
+      "community": 37,
       "norm_label": "schedulepublicationbysession()"
     },
     {
@@ -6690,7 +6780,7 @@
       "source_location": "L1515",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_createcorrectionrequest",
-      "community": 37,
+      "community": 78,
       "norm_label": "createcorrectionrequest()"
     },
     {
@@ -6700,7 +6790,7 @@
       "source_location": "L1614",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getstudentcorrectionrequests",
-      "community": 37,
+      "community": 78,
       "norm_label": "getstudentcorrectionrequests()"
     },
     {
@@ -6710,7 +6800,7 @@
       "source_location": "L1627",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getteachercorrectionrequests",
-      "community": 37,
+      "community": 78,
       "norm_label": "getteachercorrectionrequests()"
     },
     {
@@ -6720,7 +6810,7 @@
       "source_location": "L1667",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_replytocorrectionrequest",
-      "community": 37,
+      "community": 78,
       "norm_label": "replytocorrectionrequest()"
     },
     {
@@ -6730,7 +6820,7 @@
       "source_location": "L1703",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_batchupdatemarks",
-      "community": 125,
+      "community": 88,
       "norm_label": "batchupdatemarks()"
     },
     {
@@ -6750,7 +6840,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller",
-      "community": 88,
+      "community": 6,
       "norm_label": "searchcontroller.js"
     },
     {
@@ -6760,7 +6850,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_user",
-      "community": 88,
+      "community": 6,
       "norm_label": "user"
     },
     {
@@ -6770,7 +6860,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_student",
-      "community": 88,
+      "community": 6,
       "norm_label": "student"
     },
     {
@@ -6780,7 +6870,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_teacher",
-      "community": 88,
+      "community": 6,
       "norm_label": "teacher"
     },
     {
@@ -6790,7 +6880,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_course",
-      "community": 88,
+      "community": 6,
       "norm_label": "course"
     },
     {
@@ -6800,7 +6890,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_courseimport",
-      "community": 88,
+      "community": 6,
       "norm_label": "courseimport"
     },
     {
@@ -6810,7 +6900,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_notice",
-      "community": 88,
+      "community": 6,
       "norm_label": "notice"
     },
     {
@@ -6820,7 +6910,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_assignment",
-      "community": 88,
+      "community": 6,
       "norm_label": "assignment"
     },
     {
@@ -6830,7 +6920,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_result",
-      "community": 88,
+      "community": 6,
       "norm_label": "result"
     },
     {
@@ -6840,7 +6930,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_globalsearch",
-      "community": 88,
+      "community": 6,
       "norm_label": "globalsearch()"
     },
     {
@@ -6960,7 +7050,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_syncteachercourseassignments",
-      "community": 15,
+      "community": 68,
       "norm_label": "syncteachercourseassignments()"
     },
     {
@@ -7050,7 +7140,7 @@
       "source_location": "L700",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_updateteacher",
-      "community": 15,
+      "community": 68,
       "norm_label": "updateteacher()"
     },
     {
@@ -7202,6 +7292,66 @@
       "id": "server_controllers_umsadmincontroller_getteacherworkload",
       "community": 15,
       "norm_label": "getteacherworkload()"
+    },
+    {
+      "label": "debug_attendance_students.js",
+      "file_type": "code",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_debug_attendance_students",
+      "community": 47,
+      "norm_label": "debug_attendance_students.js"
+    },
+    {
+      "label": "mongoose",
+      "file_type": "code",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_debug_attendance_students_mongoose",
+      "community": 47,
+      "norm_label": "mongoose"
+    },
+    {
+      "label": "Course",
+      "file_type": "code",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "server_debug_attendance_students_course",
+      "community": 47,
+      "norm_label": "course"
+    },
+    {
+      "label": "User",
+      "file_type": "code",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "server_debug_attendance_students_user",
+      "community": 47,
+      "norm_label": "user"
+    },
+    {
+      "label": "Student",
+      "file_type": "code",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "server_debug_attendance_students_student",
+      "community": 47,
+      "norm_label": "student"
+    },
+    {
+      "label": "check()",
+      "file_type": "code",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "server_debug_attendance_students_check",
+      "community": 47,
+      "norm_label": "check()"
     },
     {
       "label": "delete_user.js",
@@ -7390,7 +7540,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware",
-      "community": 80,
+      "community": 4,
       "norm_label": "authmiddleware.js"
     },
     {
@@ -7400,7 +7550,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_jwt",
-      "community": 80,
+      "community": 4,
       "norm_label": "jwt"
     },
     {
@@ -7410,7 +7560,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_user",
-      "community": 80,
+      "community": 4,
       "norm_label": "user"
     },
     {
@@ -7420,7 +7570,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_verifytoken",
-      "community": 97,
+      "community": 95,
       "norm_label": "verifytoken()"
     },
     {
@@ -7430,7 +7580,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_checkrole",
-      "community": 4,
+      "community": 97,
       "norm_label": "checkrole()"
     },
     {
@@ -7530,7 +7680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_academicprofile",
-      "community": 122,
+      "community": 121,
       "norm_label": "academicprofile.js"
     },
     {
@@ -7540,7 +7690,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_academicprofile_mongoose",
-      "community": 122,
+      "community": 121,
       "norm_label": "mongoose"
     },
     {
@@ -7550,7 +7700,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_academicprofile_academicprofileschema",
-      "community": 122,
+      "community": 121,
       "norm_label": "academicprofileschema"
     },
     {
@@ -7660,7 +7810,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment",
-      "community": 88,
+      "community": 5,
       "norm_label": "assignment.js"
     },
     {
@@ -7670,7 +7820,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment_mongoose",
-      "community": 88,
+      "community": 5,
       "norm_label": "mongoose"
     },
     {
@@ -7680,7 +7830,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_assignment_assignmentschema",
-      "community": 88,
+      "community": 5,
       "norm_label": "assignmentschema"
     },
     {
@@ -7780,7 +7930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment",
-      "community": 128,
+      "community": 3,
       "norm_label": "communitycomment.js"
     },
     {
@@ -7790,7 +7940,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment_mongoose",
-      "community": 128,
+      "community": 3,
       "norm_label": "mongoose"
     },
     {
@@ -7800,7 +7950,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_communitycomment_communitycommentschema",
-      "community": 128,
+      "community": 3,
       "norm_label": "communitycommentschema"
     },
     {
@@ -7810,7 +7960,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitypost",
-      "community": 139,
+      "community": 3,
       "norm_label": "communitypost.js"
     },
     {
@@ -7820,7 +7970,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitypost_mongoose",
-      "community": 139,
+      "community": 3,
       "norm_label": "mongoose"
     },
     {
@@ -7830,7 +7980,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_communitypost_communitypostschema",
-      "community": 139,
+      "community": 3,
       "norm_label": "communitypostschema"
     },
     {
@@ -7870,7 +8020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_course",
-      "community": 127,
+      "community": 47,
       "norm_label": "course.js"
     },
     {
@@ -7880,7 +8030,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_course_mongoose",
-      "community": 127,
+      "community": 47,
       "norm_label": "mongoose"
     },
     {
@@ -7890,7 +8040,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_course_courseschema",
-      "community": 127,
+      "community": 47,
       "norm_label": "courseschema"
     },
     {
@@ -7960,7 +8110,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_enrollment",
-      "community": 106,
+      "community": 22,
       "norm_label": "enrollment.js"
     },
     {
@@ -7970,7 +8120,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_enrollment_mongoose",
-      "community": 106,
+      "community": 22,
       "norm_label": "mongoose"
     },
     {
@@ -7980,7 +8130,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_enrollment_enrollmentschema",
-      "community": 106,
+      "community": 22,
       "norm_label": "enrollmentschema"
     },
     {
@@ -7990,7 +8140,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_exam",
-      "community": 75,
+      "community": 56,
       "norm_label": "exam.js"
     },
     {
@@ -8000,7 +8150,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_exam_mongoose",
-      "community": 75,
+      "community": 56,
       "norm_label": "mongoose"
     },
     {
@@ -8010,7 +8160,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_exam_questionschema",
-      "community": 75,
+      "community": 56,
       "norm_label": "questionschema"
     },
     {
@@ -8020,7 +8170,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_models_exam_examschema",
-      "community": 75,
+      "community": 56,
       "norm_label": "examschema"
     },
     {
@@ -8130,7 +8280,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notice",
-      "community": 108,
+      "community": 6,
       "norm_label": "notice.js"
     },
     {
@@ -8140,7 +8290,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notice_mongoose",
-      "community": 108,
+      "community": 6,
       "norm_label": "mongoose"
     },
     {
@@ -8150,7 +8300,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notice_noticeschema",
-      "community": 108,
+      "community": 6,
       "norm_label": "noticeschema"
     },
     {
@@ -8160,7 +8310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification",
-      "community": 105,
+      "community": 13,
       "norm_label": "notification.js"
     },
     {
@@ -8170,7 +8320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification_mongoose",
-      "community": 105,
+      "community": 13,
       "norm_label": "mongoose"
     },
     {
@@ -8180,7 +8330,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notification_notificationschema",
-      "community": 105,
+      "community": 13,
       "norm_label": "notificationschema"
     },
     {
@@ -8220,7 +8370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_privatemessage",
-      "community": 3,
+      "community": 125,
       "norm_label": "privatemessage.js"
     },
     {
@@ -8230,7 +8380,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_models_privatemessage_mongoose",
-      "community": 3,
+      "community": 125,
       "norm_label": "mongoose"
     },
     {
@@ -8240,7 +8390,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_models_privatemessage_privatemessageschema",
-      "community": 3,
+      "community": 125,
       "norm_label": "privatemessageschema"
     },
     {
@@ -8280,7 +8430,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registration",
-      "community": 121,
+      "community": 77,
       "norm_label": "registration.js"
     },
     {
@@ -8290,7 +8440,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registration_mongoose",
-      "community": 121,
+      "community": 77,
       "norm_label": "mongoose"
     },
     {
@@ -8300,7 +8450,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_registration_registrationschema",
-      "community": 121,
+      "community": 77,
       "norm_label": "registrationschema"
     },
     {
@@ -8310,7 +8460,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar",
-      "community": 53,
+      "community": 127,
       "norm_label": "registrationcalendar.js"
     },
     {
@@ -8320,7 +8470,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_mongoose",
-      "community": 53,
+      "community": 127,
       "norm_label": "mongoose"
     },
     {
@@ -8330,7 +8480,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_registrationcalendarschema",
-      "community": 53,
+      "community": 127,
       "norm_label": "registrationcalendarschema"
     },
     {
@@ -8460,7 +8610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_resultupload",
-      "community": 78,
+      "community": 6,
       "norm_label": "resultupload.js"
     },
     {
@@ -8470,7 +8620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_resultupload_mongoose",
-      "community": 78,
+      "community": 6,
       "norm_label": "mongoose"
     },
     {
@@ -8480,7 +8630,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_resultupload_resultuploadschema",
-      "community": 78,
+      "community": 6,
       "norm_label": "resultuploadschema"
     },
     {
@@ -8550,7 +8700,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission",
-      "community": 56,
+      "community": 64,
       "norm_label": "submission.js"
     },
     {
@@ -8560,7 +8710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission_mongoose",
-      "community": 56,
+      "community": 64,
       "norm_label": "mongoose"
     },
     {
@@ -8570,7 +8720,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_submission_submissionschema",
-      "community": 56,
+      "community": 64,
       "norm_label": "submissionschema"
     },
     {
@@ -9180,7 +9330,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes",
-      "community": 80,
+      "community": 4,
       "norm_label": "academicroutes.js"
     },
     {
@@ -9190,7 +9340,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes_router",
-      "community": 80,
+      "community": 4,
       "norm_label": "router"
     },
     {
@@ -9200,7 +9350,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_academicroutes_verifytoken_checkrole",
-      "community": 80,
+      "community": 4,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9210,7 +9360,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_academicroutes_ctrl",
-      "community": 80,
+      "community": 4,
       "norm_label": "ctrl"
     },
     {
@@ -9220,7 +9370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes",
-      "community": 89,
+      "community": 80,
       "norm_label": "adminroutes.js"
     },
     {
@@ -9230,7 +9380,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes_router",
-      "community": 89,
+      "community": 80,
       "norm_label": "router"
     },
     {
@@ -9240,7 +9390,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_adminroutes_verifytoken_checkrole",
-      "community": 89,
+      "community": 80,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9250,7 +9400,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_adminroutes_ctrl",
-      "community": 89,
+      "community": 80,
       "norm_label": "ctrl"
     },
     {
@@ -9400,7 +9550,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes",
-      "community": 95,
+      "community": 105,
       "norm_label": "attendanceroutes.js"
     },
     {
@@ -9410,7 +9560,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_router",
-      "community": 95,
+      "community": 105,
       "norm_label": "router"
     },
     {
@@ -9420,7 +9570,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_verifytoken_checkrole",
-      "community": 95,
+      "community": 105,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9430,7 +9580,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_ctrl",
-      "community": 95,
+      "community": 105,
       "norm_label": "ctrl"
     },
     {
@@ -9570,7 +9720,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes",
-      "community": 4,
+      "community": 95,
       "norm_label": "examroutes.js"
     },
     {
@@ -9580,7 +9730,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes_router",
-      "community": 4,
+      "community": 95,
       "norm_label": "router"
     },
     {
@@ -9590,7 +9740,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_examroutes_verifytoken_checkrole",
-      "community": 4,
+      "community": 95,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9600,7 +9750,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_examroutes_ctrl",
-      "community": 4,
+      "community": 95,
       "norm_label": "ctrl"
     },
     {
@@ -9700,7 +9850,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes",
-      "community": 72,
+      "community": 122,
       "norm_label": "registrationpaymentroutes.js"
     },
     {
@@ -9710,7 +9860,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_router",
-      "community": 72,
+      "community": 122,
       "norm_label": "router"
     },
     {
@@ -9720,7 +9870,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_verifytoken_checkrole",
-      "community": 72,
+      "community": 122,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9730,7 +9880,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_payctrl",
-      "community": 72,
+      "community": 122,
       "norm_label": "payctrl"
     },
     {
@@ -9790,7 +9940,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_resultroutes",
-      "community": 4,
+      "community": 97,
       "norm_label": "resultroutes.js"
     },
     {
@@ -9800,7 +9950,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_resultroutes_router",
-      "community": 4,
+      "community": 97,
       "norm_label": "router"
     },
     {
@@ -9810,7 +9960,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_resultroutes_verifytoken_checkrole",
-      "community": 4,
+      "community": 97,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9820,7 +9970,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_resultroutes_ctrl",
-      "community": 4,
+      "community": 97,
       "norm_label": "ctrl"
     },
     {
@@ -9900,7 +10050,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes",
-      "community": 97,
+      "community": 95,
       "norm_label": "umsadminroutes.js"
     },
     {
@@ -9910,7 +10060,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_router",
-      "community": 97,
+      "community": 95,
       "norm_label": "router"
     },
     {
@@ -9920,7 +10070,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_verifytoken_checkrole",
-      "community": 97,
+      "community": 95,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9930,7 +10080,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_ctrl",
-      "community": 97,
+      "community": 95,
       "norm_label": "ctrl"
     },
     {
@@ -9940,7 +10090,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder",
-      "community": 105,
+      "community": 48,
       "norm_label": "deadlinereminder.js"
     },
     {
@@ -9950,7 +10100,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_cron",
-      "community": 105,
+      "community": 48,
       "norm_label": "cron"
     },
     {
@@ -9960,7 +10110,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_assignment",
-      "community": 105,
+      "community": 48,
       "norm_label": "assignment"
     },
     {
@@ -9970,7 +10120,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_exam",
-      "community": 105,
+      "community": 48,
       "norm_label": "exam"
     },
     {
@@ -9980,7 +10130,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_notification",
-      "community": 105,
+      "community": 48,
       "norm_label": "notification"
     },
     {
@@ -9990,7 +10140,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_user",
-      "community": 105,
+      "community": 48,
       "norm_label": "user"
     },
     {
@@ -10000,7 +10150,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_examsubmission",
-      "community": 105,
+      "community": 48,
       "norm_label": "examsubmission"
     },
     {
@@ -10010,7 +10160,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_sendemail_emailtemplates_queueemail",
-      "community": 105,
+      "community": 48,
       "norm_label": "{ sendemail, emailtemplates, queueemail }"
     },
     {
@@ -10020,7 +10170,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scheduler_deadlinereminder_getio",
-      "community": 105,
+      "community": 48,
       "norm_label": "{ getio }"
     },
     {
@@ -10960,7 +11110,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism",
-      "community": 56,
+      "community": 64,
       "norm_label": "recalculate_all_plagiarism.js"
     },
     {
@@ -10970,7 +11120,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_mongoose",
-      "community": 56,
+      "community": 64,
       "norm_label": "mongoose"
     },
     {
@@ -10980,7 +11130,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_path",
-      "community": 56,
+      "community": 64,
       "norm_label": "path"
     },
     {
@@ -10990,7 +11140,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_similarityservice",
-      "community": 56,
+      "community": 64,
       "norm_label": "similarityservice"
     },
     {
@@ -11000,7 +11150,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_submission",
-      "community": 56,
+      "community": 64,
       "norm_label": "submission"
     },
     {
@@ -11010,7 +11160,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_user",
-      "community": 56,
+      "community": 64,
       "norm_label": "user"
     },
     {
@@ -11020,7 +11170,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_fs",
-      "community": 56,
+      "community": 64,
       "norm_label": "fs"
     },
     {
@@ -11030,7 +11180,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_recalculateassignmentsimilarity",
-      "community": 56,
+      "community": 64,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -11040,7 +11190,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_main",
-      "community": 56,
+      "community": 64,
       "norm_label": "main()"
     },
     {
@@ -11110,7 +11260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status",
-      "community": 121,
+      "community": 77,
       "norm_label": "reset_reg_status.js"
     },
     {
@@ -11120,7 +11270,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_mongoose",
-      "community": 121,
+      "community": 77,
       "norm_label": "mongoose"
     },
     {
@@ -11130,7 +11280,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_registration",
-      "community": 121,
+      "community": 77,
       "norm_label": "registration"
     },
     {
@@ -11140,7 +11290,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_run",
-      "community": 121,
+      "community": 77,
       "norm_label": "run()"
     },
     {
@@ -11200,7 +11350,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate",
-      "community": 57,
+      "community": 64,
       "norm_label": "run_recalculate.js"
     },
     {
@@ -11210,7 +11360,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_mongoose",
-      "community": 57,
+      "community": 64,
       "norm_label": "mongoose"
     },
     {
@@ -11220,7 +11370,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_path",
-      "community": 57,
+      "community": 64,
       "norm_label": "path"
     },
     {
@@ -11230,7 +11380,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_similarityservice",
-      "community": 57,
+      "community": 64,
       "norm_label": "similarityservice"
     },
     {
@@ -11240,7 +11390,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_submission",
-      "community": 57,
+      "community": 64,
       "norm_label": "submission"
     },
     {
@@ -11250,7 +11400,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_user",
-      "community": 57,
+      "community": 64,
       "norm_label": "user"
     },
     {
@@ -11260,7 +11410,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_fs",
-      "community": 57,
+      "community": 64,
       "norm_label": "fs"
     },
     {
@@ -11270,7 +11420,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_recalculateassignmentsimilarity",
-      "community": 57,
+      "community": 64,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -11280,7 +11430,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_main",
-      "community": 57,
+      "community": 64,
       "norm_label": "main()"
     },
     {
@@ -11350,7 +11500,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses",
-      "community": 91,
+      "community": 36,
       "norm_label": "setup_asim_courses.js"
     },
     {
@@ -11360,7 +11510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_mongoose",
-      "community": 91,
+      "community": 36,
       "norm_label": "mongoose"
     },
     {
@@ -11370,7 +11520,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_user",
-      "community": 91,
+      "community": 36,
       "norm_label": "user"
     },
     {
@@ -11380,7 +11530,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_student",
-      "community": 91,
+      "community": 36,
       "norm_label": "student"
     },
     {
@@ -11390,7 +11540,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_registration",
-      "community": 91,
+      "community": 36,
       "norm_label": "registration"
     },
     {
@@ -11400,7 +11550,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_courseimport",
-      "community": 91,
+      "community": 36,
       "norm_label": "courseimport"
     },
     {
@@ -11410,7 +11560,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_approveregistration",
-      "community": 91,
+      "community": 36,
       "norm_label": "{ approveregistration }"
     },
     {
@@ -11420,7 +11570,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_run",
-      "community": 91,
+      "community": 36,
       "norm_label": "run()"
     },
     {
@@ -11430,7 +11580,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status",
-      "community": 123,
+      "community": 49,
       "norm_label": "sync_active_status.js"
     },
     {
@@ -11440,7 +11590,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_mongoose",
-      "community": 123,
+      "community": 49,
       "norm_label": "mongoose"
     },
     {
@@ -11450,7 +11600,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_user",
-      "community": 123,
+      "community": 49,
       "norm_label": "user"
     },
     {
@@ -11460,7 +11610,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_teacher",
-      "community": 123,
+      "community": 49,
       "norm_label": "teacher"
     },
     {
@@ -11470,7 +11620,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_student",
-      "community": 123,
+      "community": 49,
       "norm_label": "student"
     },
     {
@@ -11480,7 +11630,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_run",
-      "community": 123,
+      "community": 49,
       "norm_label": "run()"
     },
     {
@@ -11660,7 +11810,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller",
-      "community": 47,
+      "community": 5,
       "norm_label": "test_assignment_controller.js"
     },
     {
@@ -11670,7 +11820,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_assert",
-      "community": 47,
+      "community": 5,
       "norm_label": "assert"
     },
     {
@@ -11680,7 +11830,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_mongoose",
-      "community": 47,
+      "community": 5,
       "norm_label": "mongoose"
     },
     {
@@ -11690,7 +11840,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_fs",
-      "community": 47,
+      "community": 5,
       "norm_label": "fs"
     },
     {
@@ -11700,7 +11850,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_path",
-      "community": 47,
+      "community": 5,
       "norm_label": "path"
     },
     {
@@ -11710,7 +11860,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_assignment",
-      "community": 47,
+      "community": 5,
       "norm_label": "assignment"
     },
     {
@@ -11720,7 +11870,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_submission",
-      "community": 47,
+      "community": 5,
       "norm_label": "submission"
     },
     {
@@ -11730,7 +11880,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_assignmentcontroller",
-      "community": 47,
+      "community": 5,
       "norm_label": "assignmentcontroller"
     },
     {
@@ -11740,7 +11890,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_testviewassignmentbase64",
-      "community": 47,
+      "community": 5,
       "norm_label": "testviewassignmentbase64()"
     },
     {
@@ -11750,7 +11900,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_testviewsubmissionbase64",
-      "community": 47,
+      "community": 5,
       "norm_label": "testviewsubmissionbase64()"
     },
     {
@@ -11760,7 +11910,7 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_runall",
-      "community": 47,
+      "community": 5,
       "norm_label": "runall()"
     },
     {
@@ -12130,7 +12280,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model",
-      "community": 75,
+      "community": 56,
       "norm_label": "test_exam_model.js"
     },
     {
@@ -12140,7 +12290,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_mongoose",
-      "community": 75,
+      "community": 56,
       "norm_label": "mongoose"
     },
     {
@@ -12150,7 +12300,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_exam",
-      "community": 75,
+      "community": 56,
       "norm_label": "exam"
     },
     {
@@ -12160,7 +12310,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_testmodel",
-      "community": 75,
+      "community": 56,
       "norm_label": "testmodel()"
     },
     {
@@ -12470,7 +12620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_id_collision_import",
-      "community": 68,
+      "community": 89,
       "norm_label": "test_id_collision_import.js"
     },
     {
@@ -12480,7 +12630,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_id_collision_import_dns",
-      "community": 68,
+      "community": 89,
       "norm_label": "dns"
     },
     {
@@ -12490,7 +12640,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_id_collision_import_path",
-      "community": 68,
+      "community": 89,
       "norm_label": "path"
     },
     {
@@ -12500,7 +12650,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_id_collision_import_mongoose",
-      "community": 68,
+      "community": 89,
       "norm_label": "mongoose"
     },
     {
@@ -12510,7 +12660,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_id_collision_import_teacher",
-      "community": 68,
+      "community": 89,
       "norm_label": "teacher"
     },
     {
@@ -12520,7 +12670,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_id_collision_import_importteachers",
-      "community": 68,
+      "community": 89,
       "norm_label": "{ importteachers }"
     },
     {
@@ -12680,7 +12830,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query",
-      "community": 84,
+      "community": 57,
       "norm_label": "test_pending_query.js"
     },
     {
@@ -12690,7 +12840,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query_mongoose",
-      "community": 84,
+      "community": 57,
       "norm_label": "mongoose"
     },
     {
@@ -12700,7 +12850,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query_user",
-      "community": 84,
+      "community": 57,
       "norm_label": "user"
     },
     {
@@ -12710,7 +12860,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query_teacher",
-      "community": 84,
+      "community": 57,
       "norm_label": "teacher"
     },
     {
@@ -12720,7 +12870,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query_adviser",
-      "community": 84,
+      "community": 57,
       "norm_label": "adviser"
     },
     {
@@ -12730,7 +12880,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query_student",
-      "community": 84,
+      "community": 57,
       "norm_label": "student"
     },
     {
@@ -12740,7 +12890,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query_registration",
-      "community": 84,
+      "community": 57,
       "norm_label": "registration"
     },
     {
@@ -12750,7 +12900,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_pending_query_run",
-      "community": 84,
+      "community": 57,
       "norm_label": "run()"
     },
     {
@@ -13220,7 +13370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query",
-      "community": 108,
+      "community": 6,
       "norm_label": "test_teacher_query.js"
     },
     {
@@ -13230,7 +13380,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_dns",
-      "community": 108,
+      "community": 6,
       "norm_label": "dns"
     },
     {
@@ -13240,7 +13390,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_path",
-      "community": 108,
+      "community": 6,
       "norm_label": "path"
     },
     {
@@ -13250,7 +13400,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_mongoose",
-      "community": 108,
+      "community": 6,
       "norm_label": "mongoose"
     },
     {
@@ -13260,7 +13410,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_user",
-      "community": 108,
+      "community": 6,
       "norm_label": "user"
     },
     {
@@ -13270,7 +13420,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_notice",
-      "community": 108,
+      "community": 6,
       "norm_label": "notice"
     },
     {
@@ -13280,7 +13430,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_resultupload",
-      "community": 108,
+      "community": 6,
       "norm_label": "resultupload"
     },
     {
@@ -13290,7 +13440,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_teacher",
-      "community": 108,
+      "community": 6,
       "norm_label": "teacher"
     },
     {
@@ -13300,7 +13450,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_test",
-      "community": 108,
+      "community": 6,
       "norm_label": "test()"
     },
     {
@@ -13520,7 +13670,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_upsert_issue",
-      "community": 111,
+      "community": 91,
       "norm_label": "test_upsert_issue.js"
     },
     {
@@ -13530,7 +13680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_upsert_issue_dns",
-      "community": 111,
+      "community": 91,
       "norm_label": "dns"
     },
     {
@@ -13540,7 +13690,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_upsert_issue_path",
-      "community": 111,
+      "community": 91,
       "norm_label": "path"
     },
     {
@@ -13550,7 +13700,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_upsert_issue_mongoose",
-      "community": 111,
+      "community": 91,
       "norm_label": "mongoose"
     },
     {
@@ -13560,7 +13710,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_upsert_issue_teacher",
-      "community": 111,
+      "community": 91,
       "norm_label": "teacher"
     },
     {
@@ -13570,7 +13720,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_upsert_issue_testupsertissue",
-      "community": 111,
+      "community": 91,
       "norm_label": "testupsertissue()"
     },
     {
@@ -14320,7 +14470,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_services_previewservice",
-      "community": 8,
+      "community": 5,
       "norm_label": "previewservice.js"
     },
     {
@@ -14330,7 +14480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_services_previewservice_fs",
-      "community": 8,
+      "community": 5,
       "norm_label": "fs"
     },
     {
@@ -14340,7 +14490,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_services_previewservice_path",
-      "community": 8,
+      "community": 5,
       "norm_label": "path"
     },
     {
@@ -14350,7 +14500,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_services_previewservice_mammoth",
-      "community": 8,
+      "community": 5,
       "norm_label": "mammoth"
     },
     {
@@ -14360,7 +14510,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_services_previewservice_xlsx",
-      "community": 8,
+      "community": 5,
       "norm_label": "xlsx"
     },
     {
@@ -14370,7 +14520,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_services_previewservice_jszip",
-      "community": 8,
+      "community": 5,
       "norm_label": "jszip"
     },
     {
@@ -14380,7 +14530,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_services_previewservice_extractslideelements",
-      "community": 8,
+      "community": 5,
       "norm_label": "extractslideelements()"
     },
     {
@@ -14390,7 +14540,7 @@
       "source_location": "L214",
       "_origin": "ast",
       "id": "server_services_previewservice_formattablehtml",
-      "community": 8,
+      "community": 5,
       "norm_label": "formattablehtml()"
     },
     {
@@ -14400,7 +14550,7 @@
       "source_location": "L242",
       "_origin": "ast",
       "id": "server_services_previewservice_formattextelementhtml",
-      "community": 8,
+      "community": 5,
       "norm_label": "formattextelementhtml()"
     },
     {
@@ -14410,7 +14560,7 @@
       "source_location": "L304",
       "_origin": "ast",
       "id": "server_services_previewservice_buildslidebodyhtml",
-      "community": 8,
+      "community": 5,
       "norm_label": "buildslidebodyhtml()"
     },
     {
@@ -14420,7 +14570,7 @@
       "source_location": "L445",
       "_origin": "ast",
       "id": "server_services_previewservice_extractpptxslideshtml",
-      "community": 8,
+      "community": 5,
       "norm_label": "extractpptxslideshtml()"
     },
     {
@@ -14430,7 +14580,7 @@
       "source_location": "L539",
       "_origin": "ast",
       "id": "server_services_previewservice_extractpptxslidesarray",
-      "community": 8,
+      "community": 5,
       "norm_label": "extractpptxslidesarray()"
     },
     {
@@ -14440,7 +14590,7 @@
       "source_location": "L666",
       "_origin": "ast",
       "id": "server_services_previewservice_generatepreviewdata",
-      "community": 8,
+      "community": 5,
       "norm_label": "generatepreviewdata()"
     },
     {
@@ -14650,7 +14800,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_test_admin_results",
-      "community": 78,
+      "community": 6,
       "norm_label": "test_admin_results.js"
     },
     {
@@ -14660,7 +14810,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_test_admin_results_mongoose",
-      "community": 78,
+      "community": 6,
       "norm_label": "mongoose"
     },
     {
@@ -14670,7 +14820,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_test_admin_results_resultupload",
-      "community": 78,
+      "community": 6,
       "norm_label": "resultupload"
     },
     {
@@ -14680,7 +14830,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_test_admin_results_user",
-      "community": 78,
+      "community": 6,
       "norm_label": "user"
     },
     {
@@ -14690,7 +14840,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_test_admin_results_course",
-      "community": 78,
+      "community": 6,
       "norm_label": "course"
     },
     {
@@ -14700,7 +14850,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_test_admin_results_courseimport",
-      "community": 78,
+      "community": 6,
       "norm_label": "courseimport"
     },
     {
@@ -14710,7 +14860,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_test_admin_results_test",
-      "community": 78,
+      "community": 6,
       "norm_label": "test()"
     },
     {
@@ -15153,17 +15303,6 @@
       "source": "client_package_dependencies_jspdf",
       "target": "jspdf",
       "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/src/pages/TeacherAttendancePage.jsx",
-      "source_location": "L713",
-      "weight": 1.0,
-      "source": "client_src_pages_teacherattendancepage_teacherattendancepage",
-      "target": "client_package_dependencies_jspdf"
     },
     {
       "relation": "imports",
@@ -22552,6 +22691,130 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_check_student_registrations_academicprofile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_check_student_registrations_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_check_student_registrations_mongoose",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_check_student_registrations_registration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_check_student_registrations_student",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_models_academicprofile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_models_registration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_student_registrations.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_check_student_registrations",
+      "target": "server_models_student",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "server_check_students_data",
+      "target": "server_check_students_data_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "server_check_students_data",
+      "target": "server_check_students_data_mongoose",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_check_students_data",
+      "target": "server_check_students_data_user",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/check_students_data.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_check_students_data",
+      "target": "server_models_user",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "server/config/db.js",
       "source_location": "L3",
       "weight": 1.0,
@@ -24778,7 +25041,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L426",
+      "source_location": "L471",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller",
       "target": "server_controllers_attendancecontroller_evalarithmetic",
@@ -24788,7 +25051,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L368",
+      "source_location": "L413",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller",
       "target": "server_controllers_attendancecontroller_evaluateexcelformula",
@@ -24798,7 +25061,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L152",
+      "source_location": "L197",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller",
       "target": "server_controllers_attendancecontroller_getattendance",
@@ -24808,7 +25071,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L224",
+      "source_location": "L269",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller",
       "target": "server_controllers_attendancecontroller_getattendancestats",
@@ -24818,7 +25081,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L323",
+      "source_location": "L368",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller",
       "target": "server_controllers_attendancecontroller_getstudentcourses",
@@ -24848,7 +25111,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L95",
+      "source_location": "L140",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller",
       "target": "server_controllers_attendancecontroller_markattendance",
@@ -24858,7 +25121,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L338",
+      "source_location": "L383",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller",
       "target": "server_controllers_attendancecontroller_updatecourseformulas",
@@ -24908,16 +25171,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L57",
-      "weight": 1.0,
-      "source": "server_controllers_attendancecontroller_rationale_57",
-      "target": "server_controllers_attendancecontroller",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -24934,7 +25187,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L169",
+      "source_location": "L214",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller_getattendance",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -24945,7 +25198,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L241",
+      "source_location": "L286",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller_getattendancestats",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -24956,7 +25209,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L119",
+      "source_location": "L164",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller_markattendance",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -24999,7 +25252,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L297",
+      "source_location": "L342",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller_getattendancestats",
       "target": "server_controllers_attendancecontroller_evaluateexcelformula",
@@ -25010,7 +25263,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/attendanceController.js",
-      "source_location": "L391",
+      "source_location": "L436",
       "weight": 1.0,
       "source": "server_controllers_attendancecontroller_evaluateexcelformula",
       "target": "server_controllers_attendancecontroller_evalarithmetic",
@@ -30339,6 +30592,89 @@
       "weight": 1.0,
       "source": "server_controllers_umsadmincontroller_updateteacher",
       "target": "server_controllers_umsadmincontroller_syncteachercourseassignments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_debug_attendance_students_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_debug_attendance_students_course",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_debug_attendance_students_mongoose",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_debug_attendance_students_student",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_debug_attendance_students_user",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_models_course",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_models_student",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/debug_attendance_students.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_debug_attendance_students",
+      "target": "server_models_user",
       "confidence_score": 1.0
     },
     {
@@ -39112,5 +39448,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c6f4c4403706db510076675145b05b4f6da69dc4"
+  "built_at_commit": "a93ebdbe85a461600ad45ea9c4d9ae7a1b51097a"
 }

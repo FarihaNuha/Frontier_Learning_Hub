@@ -34,7 +34,7 @@ exports.getTeacherCourses = async (req, res) => {
   }
 };
 
-// Get students by course - ONLY STUDENTS (not teacher)
+// Get students by course - ONLY STUDENTS (not teacher) with Academic Profile Metadata (Dept, Session, Level, Term)
 exports.getStudentsByCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
@@ -54,13 +54,64 @@ exports.getStudentsByCourse = async (req, res) => {
       });
     }
 
-    // IMPORTANT: Filter only students, not teachers
-    const students = await User.find({
-      _id: { $in: course.students },
-      role: "student", // ← এই লাইনটি যোগ করুন - শুধু student দেখাবে
-    }).select("name email studentId");
+    const User = require("../models/User");
+    const Student = require("../models/Student");
+    const Registration = require("../models/Registration");
 
-    // Sort students by studentId in ascending order (small to large)
+    const rawStudents = await User.find({
+      _id: { $in: course.students },
+      role: "student",
+    }).select("name email studentId department session level term program batch").lean();
+
+    const students = await Promise.all(
+      rawStudents.map(async (s) => {
+        const sidStr = s.studentId ? String(s.studentId).trim() : "";
+        let dept = s.department || course.department || "EDTE";
+        let sess = s.session || "";
+        let lvl = s.level || "";
+        let trm = s.term || "";
+
+        if (sidStr && (!sess || !dept)) {
+          const stDoc = await Student.findOne({ studentId: sidStr }).lean();
+          if (stDoc) {
+            if (!dept && stDoc.department) dept = stDoc.department;
+            if (!sess && stDoc.session) sess = stDoc.session;
+            if (!lvl && stDoc.level) lvl = stDoc.level;
+            if (!trm && stDoc.term) trm = stDoc.term;
+          }
+        }
+
+        if (sidStr && (!sess || !lvl || !trm)) {
+          const regDoc = await Registration.findOne({ studentId: sidStr }).sort({ createdAt: -1 }).lean();
+          if (regDoc) {
+            if (!dept && regDoc.department) dept = regDoc.department;
+            if (!sess && regDoc.session) sess = regDoc.session;
+            if (!lvl && regDoc.level) lvl = regDoc.level;
+            if (!trm && regDoc.term) trm = regDoc.term;
+          }
+        }
+
+        if (!sess && sidStr.length >= 2) {
+          const prefix = sidStr.substring(0, 2);
+          if (prefix === "22") sess = "2022-23";
+          else if (prefix === "23") sess = "2023-24";
+          else if (prefix === "24") sess = "2024-25";
+          else if (prefix === "25") sess = "2025-26";
+        }
+
+        if (!lvl) lvl = course.level || "Level-3";
+        if (!trm) trm = course.term || "Term-2";
+
+        return {
+          ...s,
+          department: dept || "EDTE",
+          session: sess || "2022-23",
+          level: lvl || "Level-3",
+          term: trm || "Term-2",
+        };
+      })
+    );
+
     students.sort((a, b) => {
       const idA = a.studentId ? String(a.studentId).trim() : "";
       const idB = b.studentId ? String(b.studentId).trim() : "";
@@ -73,12 +124,6 @@ exports.getStudentsByCourse = async (req, res) => {
       }
       return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: "base" });
     });
-
-    console.log("Total students in course:", students.length);
-    console.log(
-      "Students:",
-      students.map((s) => `${s.studentId}: ${s.name}`),
-    );
 
     res.json({
       students,

@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
-    "mtime": 1784994848.903669,
-    "ast_hash": "85214bb3ace8992fcd778db1092e0ead",
+    "mtime": 1785527054.4889455,
+    "ast_hash": "96ab526ef47d45d7436fcd5d1fe5ea50",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "server/controllers/attendanceController.js": {
-    "mtime": 1784663960.1794133,
-    "ast_hash": "c3f49eb86f429228442cf28ea36ff36a",
+    "mtime": 1785524555.7137487,
+    "ast_hash": "af8c4064037e2919a512402069a75e34",
     "semantic_hash": ""
   },
   "server/controllers/authController.js": {
@@ -1187,6 +1187,21 @@
   "server/test_admin_results.js": {
     "mtime": 1785522167.014233,
     "ast_hash": "b26f3039ef3136382ad92ea6f5e7b260",
+    "semantic_hash": ""
+  },
+  "server/check_student_registrations.js": {
+    "mtime": 1785524516.011794,
+    "ast_hash": "8f688d8251b1b2d0dc1931c8e77eb5df",
+    "semantic_hash": ""
+  },
+  "server/check_students_data.js": {
+    "mtime": 1785524505.6498048,
+    "ast_hash": "017f45aecb4f0877cc2fd88b76042d7e",
+    "semantic_hash": ""
+  },
+  "server/debug_attendance_students.js": {
+    "mtime": 1785525408.4519892,
+    "ast_hash": "c4aed8df576814a28114e1c87f9eb97a",
     "semantic_hash": ""
   }
 }

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
 import toast from "react-hot-toast";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import {
@@ -52,6 +52,71 @@ export default function TeacherAttendancePage({
   const [classType, setClassType] = useState("theory");
   const [saved, setSaved] = useState(false);
   const [studentStats, setStudentStats] = useState({});
+
+  // Academic Profile Filter States for Attendance (Department, Session, Level, Term)
+  const [deptFilter, setDeptFilter] = useState("all");
+  const [sessionFilter, setSessionFilter] = useState("all");
+  const [levelFilter, setLevelFilter] = useState("all");
+  const [termFilter, setTermFilter] = useState("all");
+
+  const extractDigit = (val) => {
+    if (!val) return "";
+    const match = String(val).match(/\d+/);
+    return match ? match[0] : "";
+  };
+
+  const isAcademicMatch = (student, dept, sess, lvl, trm) => {
+    // 1. Department match
+    if (dept !== "all") {
+      const sDept = student.department || (student.studentIdNumber?.startsWith("22") || student.studentIdNumber?.startsWith("23") ? "EDTE" : "");
+      if (sDept && sDept.toUpperCase() !== dept.toUpperCase()) return false;
+    }
+
+    // 2. Session match
+    if (sess !== "all") {
+      let sSess = student.session || "";
+      if (!sSess && student.studentIdNumber) {
+        const idStr = String(student.studentIdNumber).trim();
+        if (idStr.startsWith("22")) sSess = "2022-23";
+        else if (idStr.startsWith("23")) sSess = "2023-24";
+        else if (idStr.startsWith("24")) sSess = "2024-25";
+        else if (idStr.startsWith("25")) sSess = "2025-26";
+      }
+      if (sSess && sSess !== sess) return false;
+    }
+
+    // 3. Level match
+    if (lvl !== "all") {
+      let sLvl = student.level || "";
+      if (!sLvl && student.studentIdNumber) {
+        const idStr = String(student.studentIdNumber).trim();
+        if (idStr.startsWith("22")) sLvl = "Level-3";
+        else if (idStr.startsWith("23")) sLvl = "Level-2";
+        else if (idStr.startsWith("24")) sLvl = "Level-1";
+      }
+      const recL = extractDigit(sLvl);
+      const selL = extractDigit(lvl);
+      if (recL && selL && recL !== selL) return false;
+    }
+
+    // 4. Term match
+    if (trm !== "all") {
+      let sTrm = student.term || "";
+      if (!sTrm && student.studentIdNumber) {
+        sTrm = "Term-2";
+      }
+      const recT = extractDigit(sTrm);
+      const selT = extractDigit(trm);
+      if (recT && selT && recT !== selT) return false;
+    }
+
+    return true;
+  };
+
+  const filteredRecords = records.filter((r) =>
+    isAcademicMatch(r, deptFilter, sessionFilter, levelFilter, termFilter)
+  );
+
   const [theoryFormula, setTheoryFormula] = useState("=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
   const [labFormula, setLabFormula] = useState("=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)");
   const [theoryTotalClasses, setTheoryTotalClasses] = useState(28);
@@ -323,13 +388,23 @@ export default function TeacherAttendancePage({
           const sId = (s._id || s.studentId).toString();
           const existingRec = existingRecordsMap.get(sId);
           if (existingRec) {
-            return existingRec;
+            return {
+              ...existingRec,
+              department: s.department || existingRec.department,
+              session: s.session || existingRec.session,
+              level: s.level || existingRec.level,
+              term: s.term || existingRec.term,
+            };
           } else {
             return {
               studentId: s._id || s.studentId,
               studentName: s.name || s.studentName,
               studentEmail: s.email || s.studentEmail || "",
               studentIdNumber: s.studentIdNumber || s.studentId || "",
+              department: s.department,
+              session: s.session,
+              level: s.level,
+              term: s.term,
               status: "absent",
             };
           }
@@ -344,6 +419,10 @@ export default function TeacherAttendancePage({
           studentName: s.name || s.studentName,
           studentEmail: s.email || s.studentEmail || "",
           studentIdNumber: s.studentIdNumber || s.studentId || "",
+          department: s.department,
+          session: s.session,
+          level: s.level,
+          term: s.term,
           status: "present",
         }));
         setRecords(initialRecords);
@@ -440,6 +519,10 @@ export default function TeacherAttendancePage({
         name: s.name || s.studentName,
         email: s.email || s.studentEmail || "",
         studentIdNumber: s.studentIdNumber || s.studentId || "",
+        department: s.department,
+        session: s.session,
+        level: s.level,
+        term: s.term,
       }));
 
       const matrix = students.map((student) => {
@@ -703,39 +786,74 @@ export default function TeacherAttendancePage({
 
   const generatePDFDoc = () => {
     try {
-      const doc = new jsPDF("landscape", "mm", "a4");
+      if (!gridData || !gridData.students || !gridData.dates) {
+        toast.error("No grid data available to generate PDF");
+        return null;
+      }
+
       const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
       ];
-      const gridMonthName = monthNames[gridMonth];
+      const gridMonthName = monthNames[gridMonth] || "";
+
+      let DocConstructor = jsPDF;
+      if (typeof DocConstructor !== "function" && typeof window !== "undefined" && window.jspdf && typeof window.jspdf.jsPDF === "function") {
+        DocConstructor = window.jspdf.jsPDF;
+      }
+      const doc = new DocConstructor("landscape", "mm", "a4");
+
+      let filterSubtitle = "";
+      const activeFilters = [];
+      if (deptFilter !== "all") activeFilters.push(`Dept: ${deptFilter}`);
+      if (sessionFilter !== "all") activeFilters.push(`Session: ${sessionFilter}`);
+      if (levelFilter !== "all") activeFilters.push(`Level: ${levelFilter}`);
+      if (termFilter !== "all") activeFilters.push(`Term: ${termFilter}`);
+      if (activeFilters.length > 0) filterSubtitle = ` (${activeFilters.join(" | ")})`;
 
       doc.setFontSize(14);
       doc.text(
-        `Attendance Report - ${courseName} (${gridMonthName} ${gridYear})`,
+        `Attendance Report - ${courseName || courseCode} (${gridMonthName} ${gridYear})${filterSubtitle}`,
         14,
         15
       );
 
-      const tableData = gridData.students.map((student, si) => {
-        const stats = studentStats[student.id] || {
+      const filteredIndices = (gridData.students || [])
+        .map((student, index) => (isAcademicMatch(student, deptFilter, sessionFilter, levelFilter, termFilter) ? index : -1))
+        .filter((index) => index !== -1);
+
+      if (filteredIndices.length === 0) {
+        toast.error("No students match the current filter");
+        return null;
+      }
+
+      const tableData = filteredIndices.map((si, displayIdx) => {
+        const student = gridData.students[si] || {};
+        const stats = (studentStats && studentStats[student.id]) || {
           present: 0,
           percentage: 0,
           attendanceMarks: 0,
         };
+
+        const sidStr = student.studentIdNumber 
+          ? String(student.studentIdNumber)
+          : student.id 
+            ? String(student.id).slice(-8)
+            : "";
+
         const row = [
-          si + 1,
-          student.studentIdNumber || student.id?.substring(student.id.length - 8),
-          student.name,
-          ...gridData.dates.map((_, di) => {
-            const cell = gridData.matrix[si]?.[di];
+          displayIdx + 1,
+          sidStr,
+          student.name || "N/A",
+          ...(gridData.dates || []).map((_, di) => {
+            const cell = gridData.matrix && gridData.matrix[si] ? gridData.matrix[si][di] : null;
             return cell?.status === "present"
               ? "P"
               : cell?.status === "absent"
                 ? "A"
                 : "-";
           }),
-          stats.present,
+          stats.present || 0,
         ];
         return row;
       });
@@ -744,26 +862,47 @@ export default function TeacherAttendancePage({
         "#",
         "ID",
         "Name",
-        ...gridData.dates.map((date) => {
+        ...(gridData.dates || []).map((date) => {
           const d = new Date(date);
-          return `${d.getDate()}/${d.getMonth() + 1}`;
+          return isNaN(d.getTime()) ? "" : `${d.getDate()}/${d.getMonth() + 1}`;
         }),
         "Present",
       ];
 
-      autoTable(doc, {
-        head: [headers],
-        body: tableData,
-        startY: 20,
-        theme: "striped",
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [59, 141, 179], textColor: 255 },
-      });
+      // Safe autoTable invocation (supports autoTable(doc, config) or doc.autoTable(config) or autoTable.default(doc, config))
+      if (typeof autoTable === "function") {
+        autoTable(doc, {
+          head: [headers],
+          body: tableData,
+          startY: 20,
+          theme: "striped",
+          styles: { fontSize: 8, cellPadding: 2 },
+          headStyles: { fillColor: [59, 141, 179], textColor: 255 },
+        });
+      } else if (typeof doc.autoTable === "function") {
+        doc.autoTable({
+          head: [headers],
+          body: tableData,
+          startY: 20,
+          theme: "striped",
+          styles: { fontSize: 8, cellPadding: 2 },
+          headStyles: { fillColor: [59, 141, 179], textColor: 255 },
+        });
+      } else if (autoTable && typeof autoTable.default === "function") {
+        autoTable.default(doc, {
+          head: [headers],
+          body: tableData,
+          startY: 20,
+          theme: "striped",
+          styles: { fontSize: 8, cellPadding: 2 },
+          headStyles: { fillColor: [59, 141, 179], textColor: 255 },
+        });
+      }
 
       return doc;
     } catch (err) {
       console.error("PDF generation error:", err);
-      toast.error("Failed to generate PDF document");
+      toast.error(`PDF Error: ${err.message || "Failed to generate PDF"}`);
       return null;
     }
   };
@@ -797,44 +936,66 @@ export default function TeacherAttendancePage({
 
   const downloadGridExcel = () => {
     try {
+      if (!gridData || !gridData.students || !gridData.dates) {
+        toast.error("No grid data available to export Excel");
+        return;
+      }
+
       const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
       ];
-      const gridMonthName = monthNames[gridMonth];
+      const gridMonthName = monthNames[gridMonth] || "";
 
       // Prepare headers
       const headers = [
         "Index",
         "Student ID",
         "Student Name",
-        ...gridData.dates.map((date) => {
+        ...(gridData.dates || []).map((date) => {
           const d = new Date(date);
-          return `${d.getDate()}/${d.getMonth() + 1}`;
+          return isNaN(d.getTime()) ? "" : `${d.getDate()}/${d.getMonth() + 1}`;
         }),
         "Present Classes",
       ];
 
       // Prepare rows
-      const rows = gridData.students.map((student, si) => {
-        const stats = studentStats[student.id] || {
+      const filteredIndices = (gridData.students || [])
+        .map((student, index) => (isAcademicMatch(student, deptFilter, sessionFilter, levelFilter, termFilter) ? index : -1))
+        .filter((index) => index !== -1);
+
+      if (filteredIndices.length === 0) {
+        toast.error("No students match the current filter");
+        return;
+      }
+
+      const rows = filteredIndices.map((si, displayIdx) => {
+        const student = gridData.students[si] || {};
+        const stats = (studentStats && studentStats[student.id]) || {
           present: 0,
           percentage: 0,
           attendanceMarks: 0,
         };
+
+        const sidStr = student.studentIdNumber 
+          ? String(student.studentIdNumber)
+          : student.id 
+            ? String(student.id).slice(-8)
+            : "";
+
         const rowData = [
-          si + 1,
-          student.studentIdNumber || student.id?.substring(student.id.length - 8),
-          student.name,
-          ...gridData.dates.map((_, di) => {
-            const cell = gridData.matrix[si]?.[di];
+          displayIdx + 1,
+          sidStr,
+          student.name || "N/A",
+          ...(gridData.dates || []).map((_, di) => {
+            const cell = gridData.matrix && gridData.matrix[si] ? gridData.matrix[si][di] : null;
             return cell?.status === "present"
               ? "Present"
               : cell?.status === "absent"
                 ? "Absent"
                 : "-";
           }),
-          stats.present,
+          stats.present || 0,
         ];
         return rowData;
       });
@@ -852,7 +1013,7 @@ export default function TeacherAttendancePage({
       toast.success("Excel Sheet Downloaded!");
     } catch (error) {
       console.error("Excel download error:", error);
-      toast.error("Failed to download Excel sheet");
+      toast.error(`Excel Error: ${error.message || "Failed to download Excel sheet"}`);
     }
   };
 
@@ -901,8 +1062,8 @@ export default function TeacherAttendancePage({
     setRecords([]);
   };
 
-  const presentCount = records.filter((r) => r.status === "present").length;
-  const absentCount = records.filter((r) => r.status === "absent").length;
+  const presentCount = filteredRecords.filter((r) => r.status === "present").length;
+  const absentCount = filteredRecords.filter((r) => r.status === "absent").length;
 
   if (loadingCourse) {
     return (
@@ -1147,6 +1308,72 @@ export default function TeacherAttendancePage({
                 </p>
               </div>
             </div>
+
+            {/* Academic Profile Filter Control Bar (Department, Session, Level, Term) */}
+            <div style={{ background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", border: "1px solid #cbd5e1", marginBottom: "20px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)", display: "flex", flexWrap: "wrap", gap: "16px", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "4px" }}>Department</label>
+                  <select
+                    value={deptFilter}
+                    onChange={(e) => setDeptFilter(e.target.value)}
+                    style={{ padding: "8px 14px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13px", background: "#ffffff", fontWeight: 600, color: "#0f172a", minWidth: "140px" }}
+                  >
+                    <option value="all">All Departments</option>
+                    {["EDTE", "CSE", "EEE", "IRE"].map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "4px" }}>Session</label>
+                  <select
+                    value={sessionFilter}
+                    onChange={(e) => setSessionFilter(e.target.value)}
+                    style={{ padding: "8px 14px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13px", background: "#ffffff", fontWeight: 600, color: "#0f172a", minWidth: "130px" }}
+                  >
+                    <option value="all">All Sessions</option>
+                    {["2022-23", "2023-24", "2024-25", "2025-26"].map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "4px" }}>Level</label>
+                  <select
+                    value={levelFilter}
+                    onChange={(e) => setLevelFilter(e.target.value)}
+                    style={{ padding: "8px 14px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13px", background: "#ffffff", fontWeight: 600, color: "#0f172a", minWidth: "120px" }}
+                  >
+                    <option value="all">All Levels</option>
+                    {["Level-1", "Level-2", "Level-3", "Level-4"].map((l) => (
+                      <option key={l} value={l}>{l}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "4px" }}>Term</label>
+                  <select
+                    value={termFilter}
+                    onChange={(e) => setTermFilter(e.target.value)}
+                    style={{ padding: "8px 14px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13px", background: "#ffffff", fontWeight: 600, color: "#0f172a", minWidth: "120px" }}
+                  >
+                    <option value="all">All Terms</option>
+                    {["Term-1", "Term-2"].map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#e0f2fe", border: "1px solid #bae6fd", borderRadius: "8px", padding: "6px 14px", fontSize: "13px", color: "#0369a1", fontWeight: 600 }}>
+                🎓 Enrolled Students Filtered: <strong>{filteredRecords.length}</strong> / {records.length}
+              </div>
+            </div>
+
             <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 20 }}>
               <div className="form-group">
                 <label style={{ fontWeight: 600, fontSize: 14, color: "#374151", marginBottom: 6, display: "block" }}>
@@ -1452,10 +1679,10 @@ export default function TeacherAttendancePage({
               <div className="loading-state">
                 <div className="spinner"></div>
               </div>
-            ) : records.length === 0 ? (
+            ) : filteredRecords.length === 0 ? (
               <div className="empty-state">
                 <FiUser size={48} />
-                <h3>No students enrolled in {courseCode}</h3>
+                <h3>No enrolled students match the selected Department / Session / Level / Term filter</h3>
               </div>
             ) : (
               <div className="table-container">
@@ -1473,7 +1700,7 @@ export default function TeacherAttendancePage({
                     </tr>
                   </thead>
                   <tbody>
-                    {records.map((r, i) => {
+                    {filteredRecords.map((r, i) => {
                       const stats = studentStats[r.studentId] || {
                         present: 0,
                         attendanceMarks: 0,
@@ -1684,13 +1911,19 @@ export default function TeacherAttendancePage({
                 gap: 16,
                 alignItems: "center",
                 flexWrap: "wrap",
+                background: "#ffffff",
+                padding: "16px 20px",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
               }}
             >
               <div className="filter-group">
-                <label>Month:</label>
+                <label style={{ fontWeight: 700, fontSize: 12, color: "#475569" }}>Month:</label>
                 <select
                   value={gridMonth}
                   onChange={(e) => setGridMonth(parseInt(e.target.value))}
+                  style={{ padding: "7px 12px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontWeight: 600, background: "white" }}
                 >
                   {Array.from({ length: 12 }, (_, i) => (
                     <option key={i} value={i}>
@@ -1701,11 +1934,13 @@ export default function TeacherAttendancePage({
                   ))}
                 </select>
               </div>
+
               <div className="filter-group">
-                <label>Year:</label>
+                <label style={{ fontWeight: 700, fontSize: 12, color: "#475569" }}>Year:</label>
                 <select
                   value={gridYear}
                   onChange={(e) => setGridYear(parseInt(e.target.value))}
+                  style={{ padding: "7px 12px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontWeight: 600, background: "white" }}
                 >
                   {[2024, 2025, 2026, 2027].map((y) => (
                     <option key={y} value={y}>
@@ -1714,8 +1949,66 @@ export default function TeacherAttendancePage({
                   ))}
                 </select>
               </div>
+
+              {/* Academic Profile Filters in Grid View */}
+              <div className="filter-group">
+                <label style={{ fontWeight: 700, fontSize: 12, color: "#475569" }}>Department:</label>
+                <select
+                  value={deptFilter}
+                  onChange={(e) => setDeptFilter(e.target.value)}
+                  style={{ padding: "7px 12px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontWeight: 600, background: "white" }}
+                >
+                  <option value="all">All Departments</option>
+                  {["EDTE", "CSE", "EEE", "IRE"].map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label style={{ fontWeight: 700, fontSize: 12, color: "#475569" }}>Session:</label>
+                <select
+                  value={sessionFilter}
+                  onChange={(e) => setSessionFilter(e.target.value)}
+                  style={{ padding: "7px 12px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontWeight: 600, background: "white" }}
+                >
+                  <option value="all">All Sessions</option>
+                  {["2022-23", "2023-24", "2024-25", "2025-26"].map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label style={{ fontWeight: 700, fontSize: 12, color: "#475569" }}>Level:</label>
+                <select
+                  value={levelFilter}
+                  onChange={(e) => setLevelFilter(e.target.value)}
+                  style={{ padding: "7px 12px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontWeight: 600, background: "white" }}
+                >
+                  <option value="all">All Levels</option>
+                  {["Level-1", "Level-2", "Level-3", "Level-4"].map((l) => (
+                    <option key={l} value={l}>{l}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label style={{ fontWeight: 700, fontSize: 12, color: "#475569" }}>Term:</label>
+                <select
+                  value={termFilter}
+                  onChange={(e) => setTermFilter(e.target.value)}
+                  style={{ padding: "7px 12px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontWeight: 600, background: "white" }}
+                >
+                  <option value="all">All Terms</option>
+                  {["Term-1", "Term-2"].map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
               {gridData.students.length > 0 && (
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", marginLeft: "auto" }}>
                   <button className="btn-primary" onClick={previewGridPDF} style={{ background: "#3b8db3", display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <FiEye size={16} /> Preview PDF
                   </button>
@@ -1813,117 +2106,134 @@ export default function TeacherAttendancePage({
                     </tr>
                   </thead>
                   <tbody>
-                    {gridData.students.map((student, si) => {
-                      const stats = studentStats[student.id] || {
-                        present: 0,
-                        percentage: 0,
-                        attendanceMarks: 0,
-                      };
-                      return (
-                        <tr key={student.id}>
-                          <td
-                            style={{
-                              position: "sticky",
-                              left: 0,
-                              background: "#fafafa",
-                              border: "1px solid #e0e0e0",
-                              padding: "6px 8px",
-                              textAlign: "center",
-                            }}
-                          >
-                            {si + 1}
-                          </td>
-                          <td
-                            style={{
-                              position: "sticky",
-                              left: 40,
-                              background: "#fafafa",
-                              border: "1px solid #e0e0e0",
-                              padding: "6px 8px",
-                              textAlign: "center",
-                              fontSize: 12,
-                              color: "#6B89A0",
-                            }}
-                          >
-                            {student.studentIdNumber ||
-                              student.id?.substring(student.id.length - 8)}
-                          </td>
-                          <td
-                            style={{
-                              position: "sticky",
-                              left: 140,
-                              background: "#fafafa",
-                              border: "1px solid #e0e0e0",
-                              padding: "6px 8px",
-                              fontWeight: 600,
-                            }}
-                          >
-                            {student.name}
-                          </td>
-                          {gridData.dates.map((date, di) => {
-                            const cell = gridData.matrix[si]?.[di];
-                            const status = cell?.status || "none";
-                            return (
-                              <td
-                                key={di}
-                                onClick={() =>
-                                  toggleGridCell(student.id, date, status)
-                                }
-                                style={{
-                                  border: "1px solid #e0e0e0",
-                                  padding: "4px",
-                                  textAlign: "center",
-                                  background:
-                                    status === "present"
-                                      ? "#dcfce7"
-                                      : status === "absent"
-                                        ? "#fee2e2"
-                                        : "#f9f9f9",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {status === "present" ? (
-                                  <span
-                                    style={{
-                                      color: "#10B981",
-                                      fontWeight: 700,
-                                      fontSize: 16,
-                                    }}
-                                  >
-                                    ✓
-                                  </span>
-                                ) : status === "absent" ? (
-                                  <span
-                                    style={{
-                                      color: "#EF4444",
-                                      fontWeight: 700,
-                                      fontSize: 16,
-                                    }}
-                                  >
-                                    ✗
-                                  </span>
-                                ) : (
-                                  <span style={{ color: "#ccc" }}>-</span>
-                                )}
-                              </td>
-                            );
-                          })}
-                          <td
-                            style={{
-                              background: "#f0fdf4",
-                              border: "1px solid #e0e0e0",
-                              padding: "6px 8px",
-                              textAlign: "center",
-                              fontWeight: 700,
-                              color: "#10B981",
-                            }}
-                          >
-                            {stats.present}
-                          </td>
+                    {(() => {
+                      const filteredIndices = gridData.students
+                        .map((student, index) => (isAcademicMatch(student, deptFilter, sessionFilter, levelFilter, termFilter) ? index : -1))
+                        .filter((index) => index !== -1);
 
-                        </tr>
-                      );
-                    })}
+                      if (filteredIndices.length === 0) {
+                        return (
+                          <tr>
+                            <td colSpan={gridData.dates.length + 4} style={{ textAlign: "center", padding: "24px", color: "#64748b", fontWeight: 600 }}>
+                              No enrolled students match the selected Department / Session / Level / Term filter.
+                            </td>
+                          </tr>
+                        );
+                      }
+
+                      return filteredIndices.map((si, displayIdx) => {
+                        const student = gridData.students[si];
+                        const stats = studentStats[student.id] || {
+                          present: 0,
+                          percentage: 0,
+                          attendanceMarks: 0,
+                        };
+                        return (
+                          <tr key={student.id}>
+                            <td
+                              style={{
+                                position: "sticky",
+                                left: 0,
+                                background: "#fafafa",
+                                border: "1px solid #e0e0e0",
+                                padding: "6px 8px",
+                                textAlign: "center",
+                              }}
+                            >
+                              {displayIdx + 1}
+                            </td>
+                            <td
+                              style={{
+                                position: "sticky",
+                                left: 40,
+                                background: "#fafafa",
+                                border: "1px solid #e0e0e0",
+                                padding: "6px 8px",
+                                textAlign: "center",
+                                fontSize: 12,
+                                color: "#6B89A0",
+                              }}
+                            >
+                              {student.studentIdNumber ||
+                                student.id?.substring(student.id.length - 8)}
+                            </td>
+                            <td
+                              style={{
+                                position: "sticky",
+                                left: 140,
+                                background: "#fafafa",
+                                border: "1px solid #e0e0e0",
+                                padding: "6px 8px",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {student.name}
+                            </td>
+                            {gridData.dates.map((date, di) => {
+                              const cell = gridData.matrix[si]?.[di];
+                              const status = cell?.status || "none";
+                              return (
+                                <td
+                                  key={di}
+                                  onClick={() =>
+                                    toggleGridCell(student.id, date, status)
+                                  }
+                                  style={{
+                                    border: "1px solid #e0e0e0",
+                                    padding: "4px",
+                                    textAlign: "center",
+                                    background:
+                                      status === "present"
+                                        ? "#dcfce7"
+                                        : status === "absent"
+                                          ? "#fee2e2"
+                                          : "#f9f9f9",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  {status === "present" ? (
+                                    <span
+                                      style={{
+                                        color: "#10B981",
+                                        fontWeight: 700,
+                                        fontSize: 16,
+                                      }}
+                                    >
+                                      ✓
+                                    </span>
+                                  ) : status === "absent" ? (
+                                    <span
+                                      style={{
+                                        color: "#EF4444",
+                                        fontWeight: 700,
+                                        fontSize: 16,
+                                      }}
+                                    >
+                                      ✗
+                                    </span>
+                                  ) : (
+                                    <span style={{ color: "#ccc" }}>-</span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                            <td
+                              style={{
+                                background: "#f0fdf4",
+                                border: "1px solid #e0e0e0",
+                                padding: "6px 8px",
+                                textAlign: "center",
+                                fontWeight: 700,
+                                color: "#10B981",
+                              }}
+                            >
+                              {stats.present}
+                            </td>
+
+                          </tr>
+                        );
+                      });
+                    })()}
                   </tbody>
                 </table>
               </div>

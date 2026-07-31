@@ -592,9 +592,9 @@ exports.getAdminResults = async (req, res) => {
   try {
     const { status, session, level, term, department, resultType } = req.query;
 
-    // Default to Final; Admin can also view Midterm submitted batches in read-only mode
-    const query = { resultType: resultType === "Midterm" ? "Midterm" : "Final" };
-    if (status && status !== "all") query.status = status;
+    const activeResultType = resultType === "Midterm" ? "Midterm" : "Final";
+    const query = { resultType: activeResultType };
+    if (status && status !== "all" && status.toLowerCase() !== "pending") query.status = status;
     if (session && session !== "all") query.session = session;
     if (level && level !== "all") query.level = level;
     if (term && term !== "all") query.term = term;
@@ -607,15 +607,200 @@ exports.getAdminResults = async (req, res) => {
         const results = await Result.find({ uploadId: up._id }).sort({ studentId: 1 }).lean();
         const logs = await ResultLog.find({ uploadId: up._id }).populate("performedBy", "name email").sort({ createdAt: -1 }).lean();
 
+        let teacherUser = null;
+        if (up.teacher) {
+          teacherUser = await User.findById(up.teacher).lean();
+        } else if (up.teacherEmail) {
+          teacherUser = await User.findOne({ email: up.teacherEmail.toLowerCase() }).lean();
+        }
+
+        const isPendingStatus = !up.status || up.status === "Draft" || up.status === "Pending Upload" || up.status === "Pending";
+
         return {
           ...up,
+          status: isPendingStatus ? "Pending" : up.status,
+          teacherName: teacherUser?.name || up.teacherName || "Assigned Teacher",
+          teacherEmail: teacherUser?.email || up.teacherEmail || "",
           results,
           logs,
         };
       })
     );
 
-    res.json({ uploads: uploadsWithResults });
+    // If status filter is "all" or "Pending", discover pending assigned courses that haven't been uploaded yet
+    if (!status || status === "all" || status.toLowerCase() === "pending") {
+      const existingUploadKeys = new Set();
+      uploadsWithResults.forEach((u) => {
+        const code = (u.courseCode || "").trim().toUpperCase();
+        const sess = (u.session || "").trim();
+        const ldig = (String(u.level || "").match(/\d+/) || [])[0] || "1";
+        const tdig = (String(u.term || "").match(/\d+/) || [])[0] || "1";
+        if (code) {
+          existingUploadKeys.add(`${code}_${sess}_${ldig}_${tdig}`);
+        }
+      });
+
+      const allTeachers = await User.find({ role: "teacher" }).lean();
+      const Course = require("../models/Course");
+      const CourseImport = require("../models/CourseImport");
+      const allLmsCourses = await Course.find({}).populate("teacher", "name email department").lean();
+      const allCourseImports = await CourseImport.find({}).lean();
+
+      const pendingAutoCards = [];
+
+      // 1. From CourseImport (Department Syllabus Curriculum)
+      allCourseImports.forEach((ci) => {
+        const code = (ci.courseCode || "").trim().toUpperCase();
+        if (!code) return;
+        const sess = "2022-23";
+        const ldig = (String(ci.level || "").match(/\d+/) || [])[0] || "3";
+        const tdig = (String(ci.term || "").match(/\d+/) || [])[0] || "2";
+        const key = `${code}_${sess}_${ldig}_${tdig}`;
+
+        if (!existingUploadKeys.has(key)) {
+          existingUploadKeys.add(key);
+
+          const matchedTeacher = allTeachers.find((t) =>
+            t.department === ci.department ||
+            (t.assignedCourses || []).some((ac) => (ac.courseCode || ac.courseName || "").toUpperCase().includes(code))
+          ) || allTeachers[0];
+
+          pendingAutoCards.push({
+            _id: `pending_${code}_${sess}_${ldig}_${tdig}`,
+            isPendingAutoCard: true,
+            courseCode: ci.courseCode,
+            courseTitle: ci.courseTitle,
+            department: ci.department || "EDTE",
+            session: sess,
+            level: ci.level ? (ci.level.startsWith("Level") ? ci.level : `Level-${ci.level}`) : `Level-${ldig}`,
+            term: ci.term ? (ci.term.startsWith("Term") ? ci.term : `Term-${ci.term}`) : `Term-${tdig}`,
+            totalRecords: 0,
+            resultType: activeResultType,
+            status: "Pending",
+            teacherEmail: matchedTeacher?.email || "farihatasnim0903@gmail.com",
+            teacherName: matchedTeacher?.name || "Rabbi Khan",
+            results: [],
+          });
+        }
+      });
+
+      // 2. From LMS Course models
+      allLmsCourses.forEach((c) => {
+        const code = (c.displayCode || c.courseCode || "").trim().toUpperCase();
+        const sess = (c.session || "2022-23").trim();
+        const ldig = (String(c.level || "").match(/\d+/) || [])[0] || "3";
+        const tdig = (String(c.term || "").match(/\d+/) || [])[0] || "2";
+        const key = `${code}_${sess}_${ldig}_${tdig}`;
+
+        if (code && !existingUploadKeys.has(key)) {
+          existingUploadKeys.add(key);
+          pendingAutoCards.push({
+            _id: `pending_${code}_${sess}_${ldig}_${tdig}`,
+            isPendingAutoCard: true,
+            courseCode: c.displayCode || c.courseCode || code,
+            courseTitle: c.courseTitle || c.title || c.name || "Course",
+            department: c.department || c.teacher?.department || "EDTE",
+            session: sess,
+            level: c.level || `Level-${ldig}`,
+            term: c.term || `Term-${tdig}`,
+            totalRecords: 0,
+            resultType: activeResultType,
+            status: "Pending",
+            teacherEmail: c.teacher?.email || "",
+            teacherName: c.teacher?.name || "Assigned Teacher",
+            results: [],
+          });
+        }
+      });
+
+      // 3. From User assignedCourses
+      allTeachers.forEach((t) => {
+        (t.assignedCourses || []).forEach((ac) => {
+          const code = (ac.courseCode || ac.courseName || "").trim().toUpperCase();
+          if (!code) return;
+          const sess = (ac.session || "2022-23").trim();
+          const ldig = (String(ac.level || ac.levelTerm || "").match(/\d+/) || [])[0] || "3";
+          const tdig = (String(ac.term || ac.levelTerm || "").match(/\d+/) || [])[0] || "2";
+          const key = `${code}_${sess}_${ldig}_${tdig}`;
+
+          if (!existingUploadKeys.has(key)) {
+            existingUploadKeys.add(key);
+            pendingAutoCards.push({
+              _id: `pending_${code}_${sess}_${ldig}_${tdig}`,
+              isPendingAutoCard: true,
+              courseCode: ac.displayCode || ac.courseCode || code,
+              courseTitle: ac.name || ac.courseTitle || ac.displayCode || code,
+              department: ac.department || t.department || "EDTE",
+              session: sess,
+              level: ac.level || `Level-${ldig}`,
+              term: ac.term || `Term-${tdig}`,
+              totalRecords: 0,
+              resultType: activeResultType,
+              status: "Pending",
+              teacherEmail: t.email || "",
+              teacherName: t.name || "Assigned Teacher",
+              results: [],
+            });
+          }
+        });
+      });
+
+      if (status && status.toLowerCase() === "pending") {
+        return res.json({ uploads: pendingAutoCards });
+      }
+
+      res.json({ uploads: [...uploadsWithResults, ...pendingAutoCards] });
+    } else {
+      res.json({ uploads: uploadsWithResults });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Send direct personal reminder to teacher for pending marksheet upload
+exports.sendTeacherReminder = async (req, res) => {
+  try {
+    const { teacherEmail, courseCode, courseTitle, session, level, term, resultType, message } = req.body;
+    if (!teacherEmail) {
+      return res.status(400).json({ error: "Teacher email is required" });
+    }
+
+    const teacherUser = await User.findOne({ email: teacherEmail.toLowerCase().trim() });
+    if (!teacherUser) {
+      return res.status(404).json({ error: `Teacher with email ${teacherEmail} not found.` });
+    }
+
+    const examType = resultType || "Result";
+    const title = `URGENT REMINDER: ${examType} Marksheet Pending for ${courseCode}`;
+    const noticeMsg = message || `Dear ${teacherUser.name},\n\nThis is an urgent reminder to upload and submit the ${examType} result marksheet for course ${courseCode} (${courseTitle || ""}) for ${level || "Level-3"} ${term || "Term-2"} (Session: ${session || "2022-23"}).\n\nPlease upload the marksheet as soon as possible.`;
+
+    const notif = await Notification.create({
+      userId: teacherUser._id,
+      title,
+      message: noticeMsg,
+      type: "general",
+    });
+
+    const io = getIO();
+    if (io) io.emit("new_notification", { userId: teacherUser._id.toString(), notif });
+
+    try {
+      await sendEmail({
+        to: teacherUser.email,
+        subject: title,
+        html: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #1e293b; background: #f8fafc; border-radius: 8px;">
+          <h2 style="color: #dc2626;">⚠️ ${title}</h2>
+          <p style="font-size: 14px; line-height: 1.6;">${noticeMsg.replace(/\n/g, "<br/>")}</p>
+          <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 20px 0;"/>
+          <p style="font-size: 12px; color: #64748b;">Frontier Learning Academy - Result Publication Portal</p>
+        </div>`,
+      });
+    } catch (e) {
+      console.error("Email reminder error:", e.message);
+    }
+
+    res.json({ success: true, message: `Reminder notification & email sent to ${teacherUser.name} (${teacherUser.email})!` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

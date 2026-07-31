@@ -187,20 +187,22 @@ export default function TeacherResultManagementPage() {
   // Download Fixed Excel Template matching exact user image layout
   const handleDownloadTemplate = () => {
     const isFinal = resultTypeTab === "Final";
-    const wsData = isFinal ? [
-      ["", "Session: 2022 23", "", "", "Level: 3 - Term 2", "", "", "Course Code: NEM 481", "Course Title: Computer Networking", "", "", "Course Type: Theory Credit Hours: 3"],
-      ["ID", "MT Part A", "MT Part B", "FT Part A", "FT Part B", "Attendance", "Continuous", "Total", "CGPA"],
-      ["2202001", 30, 21, 40, 40, 30, 50, 211, 3.25],
-      ["2202002", 27, 25, 40, 40, 30, 50, 212, 3.25],
-      ["2202003", 25, 26, 40, 40, 30, 50, 211, 3.25],
-      ["2202022", 22, 18, 40, 40, 30, 50, 200, 4.00],
-    ] : [
-      ["", "Session: 2022-23", "Level: 3 - Term 2", "", "", "Course Code: ET 315", "", "Course Title: STEAM Education Design and Development", "", "Course Type: Theory", "", "Credit Hours: 3"],
-      ["ID", "MT Part A", "MT Part B", "Attendance", "Continuous", "Total", "CGPA"],
-      ["2202001", 29, 21, 10, 10, 70, ""],
-      ["2202002", 27, 25, 10, 10, 72, ""],
-      ["2202003", 25, 26, 10, 10, 71, ""],
-      ["2202022", 22, 25, 10, 10, 67, ""],
+    const wsData = [
+      ["", "Session: 2022 23", "", "", "Level: 3 • Term 2", "", "", "Course Code: CC 483", "", "Course Title: Cloud Computing", "", "Course Type: Theory", "", "Credit Hours: 3"],
+      ["ID", "MT Part A", "MT Part B", "FT Part A", "FT Part B", "Attendance", "Continuous Assessment", "Total", "GPA"],
+      ...(isFinal
+        ? [
+            ["2202001", 30, 21, 40, 40, 30, 50, 211, 3.75],
+            ["2202002", 27, 25, 40, 40, 30, 50, 212, 3.75],
+            ["2202003", 25, 26, 40, 40, 30, 50, 211, 3.75],
+            ["2202022", 22, 18, 40, 40, 30, 50, 200, 4.00],
+          ]
+        : [
+            ["2202001", 30, 21, "", "", "", "", 51, ""],
+            ["2202002", 27, 25, "", "", "", "", 52, ""],
+            ["2202003", 25, 26, "", "", "", "", 51, ""],
+            ["2202022", 22, 18, "", "", "", "", 40, ""],
+          ]),
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -562,14 +564,22 @@ export default function TeacherResultManagementPage() {
 
   const formatLevel = (lvl) => {
     if (!lvl) return "Level 1";
-    const str = String(lvl).trim();
-    return /^level/i.test(str) ? str : `Level ${str}`;
+    const dig = (String(lvl).match(/\d+/) || [])[0] || "1";
+    return `Level ${dig}`;
   };
 
   const formatTerm = (t) => {
     if (!t) return "Term 1";
-    const str = String(t).trim();
-    return /^term/i.test(str) ? str : `Term ${str}`;
+    const dig = (String(t).match(/\d+/) || [])[0] || "1";
+    return `Term ${dig}`;
+  };
+
+  const formatSession = (sess) => {
+    if (!sess) return "2022-23";
+    const str = String(sess).trim();
+    const match = str.match(/\d{4}[-\s]\d{2,4}/);
+    if (match) return match[0].replace(/\s+/, "-");
+    return str;
   };
 
   const getSectionDeadline = (session, level, term) => {
@@ -624,7 +634,11 @@ export default function TeacherResultManagementPage() {
   // Group uploads into sections by Department, Session, and Level-Term (like Assessment Marksheet)
   const groupedSections = {};
   filteredUploads.forEach((up) => {
-    const key = `${up.department || "EDTE"} • Session ${up.session} • ${formatLevel(up.level)} ${formatTerm(up.term)}`;
+    const dept = (up.department || "EDTE").toUpperCase();
+    const sess = formatSession(up.session);
+    const lvl = formatLevel(up.level);
+    const trm = formatTerm(up.term);
+    const key = `${dept} • Session ${sess} • ${lvl} ${trm}`;
     if (!groupedSections[key]) {
       groupedSections[key] = [];
     }

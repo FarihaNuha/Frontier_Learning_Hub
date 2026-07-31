@@ -650,8 +650,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminResultManagementPage.jsx": {
-    "mtime": 1785522196.5451975,
-    "ast_hash": "26ddb4554273c4a2656227dffd9c261a",
+    "mtime": 1785521955.370007,
+    "ast_hash": "3df9a862b242d9ef20f33e3438bb267f",
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
-    "mtime": 1785522189.1665492,
-    "ast_hash": "68e85bad1e66c657507239a0db18b847",
+    "mtime": 1785521915.5286138,
+    "ast_hash": "cbc4087932557a8c6373d7a4a7270322",
     "semantic_hash": ""
   },
   "server/models/Announcement.js": {
@@ -1177,16 +1177,6 @@
   "server/scratch/test_dept_program_filtering.js": {
     "mtime": 1785509872.961945,
     "ast_hash": "6c9a1f88377510a3b431e5e06474de9e",
-    "semantic_hash": ""
-  },
-  "scratch/test_admin_results.js": {
-    "mtime": 1785522152.0555449,
-    "ast_hash": "01ba10f7427a6fff1538f6c60a156f2a",
-    "semantic_hash": ""
-  },
-  "server/test_admin_results.js": {
-    "mtime": 1785522167.014233,
-    "ast_hash": "b26f3039ef3136382ad92ea6f5e7b260",
     "semantic_hash": ""
   }
 }

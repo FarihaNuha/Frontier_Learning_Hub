@@ -19,6 +19,7 @@ router.post("/admin/request-correction/:uploadId", verifyToken, checkRole("admin
 router.post("/admin/publish/:uploadId", verifyToken, checkRole("admin"), ctrl.publishResultBatch);
 router.post("/admin/calculate-gpa", verifyToken, checkRole("admin"), ctrl.calculateSemesterGPA);
 router.post("/admin/notice", verifyToken, checkRole("admin"), ctrl.setDeadlineAndNotice);
+router.post("/admin/send-teacher-reminder", verifyToken, checkRole("admin"), ctrl.sendTeacherReminder);
 router.post("/admin/schedule-publication", verifyToken, checkRole("admin"), ctrl.schedulePublicationBySession);
 
 // Student Result endpoints

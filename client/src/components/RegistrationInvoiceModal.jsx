@@ -45,59 +45,23 @@ export default function RegistrationInvoiceModal({
         @media print {
           @page {
             size: A4 portrait;
-            margin: 6mm 10mm 6mm 10mm;
+            margin: 4mm 6mm 4mm 6mm;
           }
           html, body {
+            visibility: hidden !important;
             background: #ffffff !important;
             margin: 0 !important;
             padding: 0 !important;
             height: auto !important;
-            min-height: 0 !important;
-            max-height: none !important;
             overflow: visible !important;
           }
-          /* Completely collapse all background dashboard elements so PDF height is strictly 1 page */
-          body * {
-            display: none !important;
-          }
-          .invoice-modal-overlay,
-          .invoice-modal-overlay * {
-            display: block !important;
-          }
-          /* Maintain inline flex for headers/badges */
-          .invoice-modal-overlay [style*="display: flex"],
-          .invoice-modal-overlay [style*="display:flex"] {
-            display: flex !important;
-          }
-          .invoice-modal-overlay [style*="display: grid"],
-          .invoice-modal-overlay [style*="display:grid"] {
-            display: grid !important;
-          }
-          .invoice-modal-overlay [style*="display: inline-block"],
-          .invoice-modal-overlay [style*="display:inline-block"] {
-            display: inline-block !important;
-          }
-          .invoice-modal-overlay table,
-          .invoice-modal-overlay tbody,
-          .invoice-modal-overlay tr,
-          .invoice-modal-overlay td,
-          .invoice-modal-overlay th {
-            display: table-cell !important;
-          }
-          .invoice-modal-overlay table {
-            display: table !important;
-          }
-          .invoice-modal-overlay tr {
-            display: table-row !important;
-          }
           .invoice-modal-overlay {
+            visibility: visible !important;
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
             height: auto !important;
-            min-height: 0 !important;
-            max-height: none !important;
             background: #ffffff !important;
             padding: 0 !important;
             margin: 0 !important;
@@ -106,21 +70,27 @@ export default function RegistrationInvoiceModal({
             overflow: visible !important;
           }
           .invoice-printable-container {
-            position: static !important;
-            max-height: none !important;
+            visibility: visible !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
             height: auto !important;
-            min-height: 0 !important;
+            max-height: none !important;
             overflow: visible !important;
             border: none !important;
             box-shadow: none !important;
-            width: 100% !important;
-            max-width: 100% !important;
             padding: 0 !important;
             margin: 0 !important;
             border-radius: 0 !important;
           }
+          .invoice-printable-container * {
+            visibility: visible !important;
+          }
           .no-print, .no-print * {
             display: none !important;
+            visibility: hidden !important;
           }
           table {
             page-break-inside: avoid !important;

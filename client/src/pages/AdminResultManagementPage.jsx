@@ -52,6 +52,46 @@ export default function AdminResultManagementPage() {
   const [noticeTitle, setNoticeTitle] = useState("");
   const [noticeContent, setNoticeContent] = useState("");
 
+  // Teacher Reminder Modal State
+  const [reminderModalBatch, setReminderModalBatch] = useState(null);
+  const [reminderMessage, setReminderMessage] = useState("");
+  const [sendingReminder, setSendingReminder] = useState(false);
+
+  const handleOpenReminderModal = (batch) => {
+    setReminderModalBatch(batch);
+    setReminderMessage(
+      `Dear ${batch.teacherName || "Course Teacher"},\n\nThis is an urgent reminder that your ${resultTypeTab} result marksheet for ${batch.courseCode} (${batch.courseTitle}) for ${batch.level} ${batch.term} (Session: ${batch.session}) has not been uploaded/submitted yet.\n\nPlease upload the marksheet as soon as possible.`
+    );
+  };
+
+  const handleSendReminderSubmit = async (e) => {
+    e.preventDefault();
+    if (!reminderModalBatch) return;
+    if (!reminderModalBatch.teacherEmail) {
+      toast.error("No teacher email associated with this course.");
+      return;
+    }
+    setSendingReminder(true);
+    try {
+      await api.post("/results/admin/send-teacher-reminder", {
+        teacherEmail: reminderModalBatch.teacherEmail,
+        courseCode: reminderModalBatch.courseCode,
+        courseTitle: reminderModalBatch.courseTitle,
+        session: reminderModalBatch.session,
+        level: reminderModalBatch.level,
+        term: reminderModalBatch.term,
+        resultType: resultTypeTab,
+        message: reminderMessage,
+      });
+      toast.success(`Reminder notice & email sent to ${reminderModalBatch.teacherName || reminderModalBatch.teacherEmail}!`);
+      setReminderModalBatch(null);
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to send reminder notice.");
+    } finally {
+      setSendingReminder(false);
+    }
+  };
+
   // CGPA Calculation State
   const [calcSession, setCalcSession] = useState("2023-24");
   const [calcLevel, setCalcLevel] = useState("Level-1");
@@ -247,8 +287,18 @@ export default function AdminResultManagementPage() {
     toast.success("Result report exported to Excel!");
   };
 
+  const isStatusMatch = (statusVal, tabVal, uploadObj) => {
+    if (tabVal === "all") return true;
+    const s = String(statusVal || "").toLowerCase();
+    const t = String(tabVal || "").toLowerCase();
+    if (t === "pending") {
+      return s.includes("pending") || s === "draft" || uploadObj?.totalRecords === 0 || uploadObj?.isPendingAutoCard === true;
+    }
+    return s === t;
+  };
+
   const filteredUploads = uploads.filter((u) => {
-    if (activeTab !== "all" && u.status.toLowerCase() !== activeTab.toLowerCase()) return false;
+    if (!isStatusMatch(u.status, activeTab, u)) return false;
     if (sessionFilter !== "all" && u.session !== sessionFilter) return false;
     if (levelFilter !== "all" && u.level !== levelFilter) return false;
     if (termFilter !== "all" && u.term !== termFilter) return false;
@@ -561,12 +611,9 @@ export default function AdminResultManagementPage() {
 
         {/* Filter Controls Bar */}
         <div style={{ background: "#ffffff", padding: "20px", borderRadius: "14px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", marginBottom: "24px", display: "flex", flexWrap: "wrap", gap: "16px", alignItems: "center", justifyContent: "space-between" }}>
-          {/* Status Tabs — different sets per result type */}
+          {/* Status Tabs — available for both Midterm and Final */}
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {(resultTypeTab === "Final"
-              ? ["all", "Pending", "Submitted", "Correction Requested", "Published"]
-              : ["all", "Submitted"]
-            ).map((tab) => (
+            {["all", "Pending", "Submitted", "Correction Requested", "Published"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -629,22 +676,46 @@ export default function AdminResultManagementPage() {
                       Dept: <strong>{batch.department || "EDTE"}</strong> • {/^level/i.test(String(batch.level || "").trim()) ? batch.level : `Level ${batch.level || ""}`} • {/^term/i.test(String(batch.term || "").trim()) ? batch.term : `Term ${batch.term || ""}`} • Session: <strong>{batch.session}</strong> • Students: <strong>{batch.totalRecords}</strong>
                     </div>
                     {/* Teacher attribution — always visible */}
-                    <div style={{ marginTop: "6px", display: "inline-flex", alignItems: "center", gap: "6px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: "6px", padding: "3px 10px", fontSize: "12.5px", color: "#0369a1", fontWeight: 600 }}>
-                      📋 Submitted by: {batch.teacherEmail || "Unknown Teacher"}
+                    <div style={{ marginTop: "6px", display: "inline-flex", alignItems: "center", gap: "6px", background: batch.status === "Pending" ? "#fef3c7" : "#f0f9ff", border: `1px solid ${batch.status === "Pending" ? "#fcd34d" : "#bae6fd"}`, borderRadius: "6px", padding: "3px 10px", fontSize: "12.5px", color: batch.status === "Pending" ? "#b45309" : "#0369a1", fontWeight: 600 }}>
+                      {batch.status === "Pending" ? `⚠️ Assigned Teacher: ${batch.teacherName ? `${batch.teacherName} (${batch.teacherEmail || "No Email"})` : (batch.teacherEmail || "Pending Assignment")}` : `📋 Submitted by: ${batch.teacherEmail || "Unknown Teacher"}`}
                     </div>
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                     <span style={{ padding: "4px 12px", borderRadius: "12px", fontWeight: 700, fontSize: "12px",
-                      background: batch.status === "Published" ? "#dcfce7" : batch.status === "Submitted" ? "#fef3c7" : batch.status === "Correction Requested" ? "#fee2e2" : batch.status === "Pending" ? "#f1f5f9" : "#e0f2fe",
-                      color: batch.status === "Published" ? "#166534" : batch.status === "Submitted" ? "#b45309" : batch.status === "Correction Requested" ? "#991b1b" : batch.status === "Pending" ? "#475569" : "#0369a1"
+                      background: batch.status === "Published" ? "#dcfce7" : batch.status === "Submitted" ? "#fef3c7" : batch.status === "Correction Requested" ? "#fee2e2" : batch.status === "Pending" ? "#fef3c7" : "#e0f2fe",
+                      color: batch.status === "Published" ? "#166534" : batch.status === "Submitted" ? "#b45309" : batch.status === "Correction Requested" ? "#991b1b" : batch.status === "Pending" ? "#b45309" : "#0369a1"
                     }}>
-                      {batch.status}
+                      {batch.status === "Pending" ? "⚠️ Pending Upload" : batch.status}
                     </span>
 
-                    <button onClick={() => exportAdminResultsCSV(batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
-                      <FiDownload size={14} /> Export CSV
-                    </button>
+                    {batch.status === "Pending" && (
+                      <button
+                        onClick={() => handleOpenReminderModal(batch)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          padding: "6px 14px",
+                          background: "linear-gradient(135deg, #d97706, #b45309)",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "8px",
+                          fontWeight: 700,
+                          fontSize: "12.5px",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 6px rgba(217, 119, 6, 0.2)"
+                        }}
+                      >
+                        <FiBell size={14} /> Send Teacher Reminder
+                      </button>
+                    )}
+
+                    {!batch.isPendingAutoCard && (
+                      <button onClick={() => exportAdminResultsCSV(batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
+                        <FiDownload size={14} /> Export CSV
+                      </button>
+                    )}
 
                     {/* Final result action buttons */}
                     {resultTypeTab === "Final" && (
@@ -663,9 +734,11 @@ export default function AdminResultManagementPage() {
                       </>
                     )}
 
-                    <button onClick={() => setViewBatch(viewBatch?._id === batch._id ? null : batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
-                      <FiEye size={14} /> {viewBatch?._id === batch._id ? "Hide Read-Only Roster" : "View Roster (Read-Only)"}
-                    </button>
+                    {!batch.isPendingAutoCard && (
+                      <button onClick={() => setViewBatch(viewBatch?._id === batch._id ? null : batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
+                        <FiEye size={14} /> {viewBatch?._id === batch._id ? "Hide Read-Only Roster" : "View Roster (Read-Only)"}
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -795,6 +868,47 @@ export default function AdminResultManagementPage() {
                   {processing ? "Sending..." : "Send Correction Request"}
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Send Personal Reminder Modal */}
+        {reminderModalBatch && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", maxWidth: "560px", width: "100%", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <h3 style={{ margin: 0, color: "#0f172a", fontSize: "18px", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <FiBell color="#d97706" size={20} /> Send Personal Teacher Reminder Notice
+                </h3>
+                <FiX size={20} color="#64748b" cursor="pointer" onClick={() => setReminderModalBatch(null)} />
+              </div>
+
+              <div style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: "10px", padding: "12px 16px", marginBottom: "16px", color: "#92400e", fontSize: "13px" }}>
+                <div><strong>Course:</strong> {reminderModalBatch.courseCode} — {reminderModalBatch.courseTitle}</div>
+                <div style={{ marginTop: "4px" }}><strong>Recipient Teacher:</strong> {reminderModalBatch.teacherName || "Course Teacher"} ({reminderModalBatch.teacherEmail || "No Email"})</div>
+              </div>
+
+              <form onSubmit={handleSendReminderSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Reminder Notice Message *</label>
+                  <textarea
+                    rows={5}
+                    value={reminderMessage}
+                    onChange={(e) => setReminderMessage(e.target.value)}
+                    required
+                    style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13.5px", fontFamily: "inherit", boxSizing: "border-box" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "8px" }}>
+                  <button type="button" onClick={() => setReminderModalBatch(null)} style={{ padding: "10px 18px", background: "#ffffff", color: "#475569", border: "1px solid #cbd5e1", borderRadius: "8px", fontWeight: 600, fontSize: "13.5px", cursor: "pointer" }}>
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={sendingReminder} style={{ padding: "10px 20px", background: "#d97706", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13.5px", cursor: sendingReminder ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <FiSend size={15} /> {sendingReminder ? "Sending..." : "Send Notice & Email"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

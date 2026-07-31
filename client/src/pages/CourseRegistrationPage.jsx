@@ -64,6 +64,25 @@ export default function CourseRegistrationPage() {
     }
   };
 
+  const allCourseIds = (data?.courses || []).map((c) => c._id);
+  const isAllSelected = allCourseIds.length > 0 && allCourseIds.every((id) => selectedIds.includes(id));
+
+  // Auto pre-select all available courses when data initially loads
+  useEffect(() => {
+    if (data?.courses?.length > 0 && selectedIds.length === 0) {
+      setSelectedIds(data.courses.map((c) => c._id));
+    }
+  }, [data]);
+
+  const handleToggleSelectAll = () => {
+    if (data?.calendar?.isOpen === false) return;
+    if (isAllSelected) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(allCourseIds);
+    }
+  };
+
   const selectedCourses = (data?.courses || []).filter((c) => selectedIds.includes(c._id));
   const totalSelectedCredits = selectedCourses.reduce((acc, c) => acc + c.creditHours, 0);
 
@@ -136,11 +155,55 @@ export default function CourseRegistrationPage() {
             Select courses for your level & term. Total selected credits must be between {minCred} and {maxCred}.
           </p>
 
+          {data?.calendar && !data.calendar.isOpen && (
+            <div
+              style={{
+                background: "#fff1f2",
+                border: "1.5px solid #fecdd3",
+                borderRadius: "12px",
+                padding: "16px 20px",
+                marginBottom: "20px",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "14px",
+              }}
+            >
+              <FiAlertCircle size={24} color="#e11d48" style={{ marginTop: "2px", flexShrink: 0 }} />
+              <div>
+                <h4 style={{ margin: "0 0 4px 0", color: "#be123c", fontSize: "15px", fontWeight: 700 }}>
+                  Registration Period Closed
+                </h4>
+                <p style={{ margin: 0, color: "#9f1239", fontSize: "13.5px", lineHeight: "1.5" }}>
+                  {data.calendar.message || `Registration for Session ${data.student?.session} (${level} ${term}) is currently CLOSED by UMS Admin.`}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div style={{ overflowX: "auto", marginBottom: "24px" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
               <thead>
                 <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b" }}>
-                  <th style={{ padding: "12px 10px" }}>Select</th>
+                  <th style={{ padding: "12px 10px" }}>
+                    <div
+                      onClick={handleToggleSelectAll}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
+                        userSelect: "none",
+                      }}
+                      title={isAllSelected ? "Deselect All Courses" : "Select All Courses"}
+                    >
+                      {isAllSelected ? (
+                        <FiCheckSquare size={18} color="#3b8db3" />
+                      ) : (
+                        <FiSquare size={18} color="#94a3b8" />
+                      )}
+                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>Select All</span>
+                    </div>
+                  </th>
                   <th style={{ padding: "12px 10px" }}>Code</th>
                   <th style={{ padding: "12px 10px" }}>Title</th>
                   <th style={{ padding: "12px 10px" }}>Credits</th>
@@ -153,11 +216,12 @@ export default function CourseRegistrationPage() {
                   return (
                     <tr
                       key={c._id}
-                      onClick={() => toggleCourse(c._id)}
+                      onClick={() => data?.calendar?.isOpen !== false && toggleCourse(c._id)}
                       style={{
                         borderBottom: "1px solid #f1f5f9",
-                        cursor: "pointer",
+                        cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
                         background: isSelected ? "#f0f9ff" : "transparent",
+                        opacity: data?.calendar?.isOpen === false ? 0.7 : 1,
                       }}
                     >
                       <td style={{ padding: "12px 10px" }}>
@@ -186,19 +250,20 @@ export default function CourseRegistrationPage() {
 
           <button
             onClick={handleProceedSummary}
+            disabled={data?.calendar?.isOpen === false}
             style={{
               width: "100%",
-              background: "#3b8db3",
+              background: data?.calendar?.isOpen === false ? "#94a3b8" : "#3b8db3",
               color: "#ffffff",
               border: "none",
               padding: "14px",
               borderRadius: "8px",
               fontWeight: "600",
               fontSize: "16px",
-              cursor: "pointer",
+              cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
             }}
           >
-            Proceed to Registration Summary
+            {data?.calendar?.isOpen === false ? "Registration Closed by Admin" : "Proceed to Registration Summary"}
           </button>
         </div>
       ) : (

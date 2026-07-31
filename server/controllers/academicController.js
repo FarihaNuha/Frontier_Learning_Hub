@@ -57,194 +57,220 @@ const computeGradePoint = (letterGrade, existingGp) => {
 
 // 1. Core CGPA Calculation Engine with Retake Replacement Rule
 const calculateStudentCGPA = async (studentUserObj) => {
-  const studentUser = studentUserObj || {};
-  const userId = studentUser._id || studentUser.id || studentUser.uid;
-  const studentProfile = await Student.findOne({
-    $or: [
-      { universityEmail: studentUser.email },
-      ...(studentUser.studentId ? [{ studentId: studentUser.studentId }] : []),
-    ],
-  }).lean();
-  const studentIdStr = studentProfile?.studentId || studentUser.studentId || "";
+  try {
+    const studentUser = studentUserObj || {};
+    const userId = studentUser._id || studentUser.id || studentUser.uid;
+    
+    const studentOrConditions = [];
+    if (studentUser.email) studentOrConditions.push({ universityEmail: studentUser.email });
+    if (studentUser.studentId) studentOrConditions.push({ studentId: studentUser.studentId });
 
-  // Query all Published results for student
-  const queryConditions = [];
-  if (userId) queryConditions.push({ student: userId });
-  if (studentIdStr) queryConditions.push({ studentId: studentIdStr });
+    const studentProfile = studentOrConditions.length > 0
+      ? await Student.findOne({ $or: studentOrConditions }).lean()
+      : null;
 
-  const publishedResults = queryConditions.length > 0
-    ? await Result.find({
-        status: "Published",
-        $or: queryConditions,
-      })
-        .sort({ createdAt: -1 })
-        .lean()
-    : [];
+    const studentIdStr = studentProfile?.studentId || studentUser.studentId || "";
 
-  // Group results by Course Code to apply Retake Replacement Rule
-  const courseAttemptsMap = new Map();
-  publishedResults.forEach((r) => {
-    const code = (r.courseCode || "").toUpperCase();
-    if (code) {
-      if (!courseAttemptsMap.has(code)) {
-        courseAttemptsMap.set(code, []);
+    // Query all Published results for student
+    const queryConditions = [];
+    if (userId) queryConditions.push({ student: userId });
+    if (studentIdStr) queryConditions.push({ studentId: studentIdStr });
+
+    const publishedResults = queryConditions.length > 0
+      ? await Result.find({
+          status: "Published",
+          $or: queryConditions,
+        })
+          .sort({ createdAt: -1 })
+          .lean()
+      : [];
+
+    // Group results by Course Code to apply Retake Replacement Rule
+    const courseAttemptsMap = new Map();
+    publishedResults.forEach((r) => {
+      const code = (r.courseCode || "").toUpperCase();
+      if (code) {
+        if (!courseAttemptsMap.has(code)) {
+          courseAttemptsMap.set(code, []);
+        }
+        courseAttemptsMap.get(code).push(r);
       }
-      courseAttemptsMap.get(code).push(r);
-    }
-  });
-
-  const latestCourseResults = [];
-  const completedCoursesList = [];
-  let totalCreditsEarned = 0;
-  let totalPointsEarned = 0;
-  let totalCreditsAttemptedForCGPA = 0;
-
-  courseAttemptsMap.forEach((attempts) => {
-    attempts.sort((a, b) => {
-      const gpA = computeGradePoint(a.letterGrade, a.gradePoint);
-      const gpB = computeGradePoint(b.letterGrade, b.gradePoint);
-      if (gpB !== gpA) return gpB - gpA;
-      return new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0);
     });
-    const latest = attempts[0];
-    latestCourseResults.push(latest);
 
-    const cr = Number(latest.creditHours) || 3;
-    const gp = computeGradePoint(latest.letterGrade, latest.gradePoint);
+    const latestCourseResults = [];
+    const completedCoursesList = [];
+    let totalCreditsEarned = 0;
+    let totalPointsEarned = 0;
+    let totalCreditsAttemptedForCGPA = 0;
 
-    if (latest.letterGrade !== "F" && gp > 0) {
-      totalCreditsEarned += cr;
-      completedCoursesList.push({
-        courseCode: latest.courseCode,
-        courseTitle: latest.courseTitle,
-        creditHours: cr,
-        letterGrade: latest.letterGrade || (gp >= 4.0 ? "A+" : gp >= 3.75 ? "A" : gp >= 3.5 ? "A-" : gp >= 3.25 ? "B+" : gp >= 3.0 ? "B" : "P"),
-        gradePoint: gp,
-        completedSession: latest.session,
+    courseAttemptsMap.forEach((attempts) => {
+      attempts.sort((a, b) => {
+        const gpA = computeGradePoint(a.letterGrade, a.gradePoint);
+        const gpB = computeGradePoint(b.letterGrade, b.gradePoint);
+        if (gpB !== gpA) return gpB - gpA;
+        return new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0);
+      });
+      const latest = attempts[0];
+      latestCourseResults.push(latest);
+
+      const cr = Number(latest.creditHours) || 3;
+      const gp = computeGradePoint(latest.letterGrade, latest.gradePoint);
+
+      if (latest.letterGrade !== "F" && gp > 0) {
+        totalCreditsEarned += cr;
+        completedCoursesList.push({
+          courseCode: latest.courseCode,
+          courseTitle: latest.courseTitle,
+          creditHours: cr,
+          letterGrade: latest.letterGrade || (gp >= 4.0 ? "A+" : gp >= 3.75 ? "A" : gp >= 3.5 ? "A-" : gp >= 3.25 ? "B+" : gp >= 3.0 ? "B" : "P"),
+          gradePoint: gp,
+          completedSession: latest.session,
+        });
+
+        totalPointsEarned += gp * cr;
+        totalCreditsAttemptedForCGPA += cr;
+      }
+    });
+
+    const overallCGPA = totalCreditsAttemptedForCGPA > 0
+      ? Number((totalPointsEarned / totalCreditsAttemptedForCGPA).toFixed(2))
+      : 0.0;
+
+    // Calculate Semester GPAs
+    const semesterGroups = {};
+    publishedResults.forEach((r) => {
+      const semKey = `${r.level || "Level-1"} - ${r.term || "Term-1"}`;
+      if (!semesterGroups[semKey]) semesterGroups[semKey] = [];
+      semesterGroups[semKey].push(r);
+    });
+
+    let lastSemGPA = 0.0;
+    const totalReqCredits = 140;
+
+    for (const [semKey, rawResList] of Object.entries(semesterGroups)) {
+      const semCourseMap = new Map();
+      rawResList.forEach((r) => {
+        const code = (r.courseCode || "").toUpperCase().trim();
+        if (!code) return;
+        const gp = computeGradePoint(r.letterGrade, r.gradePoint);
+        if (!semCourseMap.has(code) || gp > semCourseMap.get(code).gp) {
+          semCourseMap.set(code, { r, cr: Number(r.creditHours) || 3, gp });
+        }
       });
 
-      totalPointsEarned += gp * cr;
-      totalCreditsAttemptedForCGPA += cr;
+      let semPoints = 0;
+      let semCredits = 0;
+      semCourseMap.forEach(({ cr, gp, r }) => {
+        if (r.letterGrade !== "F" && gp > 0) {
+          semPoints += gp * cr;
+          semCredits += cr;
+        }
+      });
+
+      const semGPA = semCredits > 0 ? Number((semPoints / semCredits).toFixed(2)) : 0.0;
+      lastSemGPA = semGPA;
+
+      const parts = semKey.split("-").map((s) => s.trim());
+      if (studentIdStr && studentIdStr.trim()) {
+        try {
+          await CGPARecord.findOneAndUpdate(
+            { studentId: studentIdStr, level: parts[0] || "Level-1", term: parts[1] || "Term-1" },
+            {
+              student: userId,
+              studentId: studentIdStr,
+              session: rawResList[0]?.session || "2025-26",
+              level: parts[0] || "Level-1",
+              term: parts[1] || "Term-1",
+              semesterGPA: semGPA,
+              semesterCredits: semCredits,
+              cumulativeCGPA: overallCGPA,
+              totalCumulativeCredits: totalCreditsEarned,
+              calculatedAt: new Date(),
+            },
+            { upsert: true, new: true }
+          );
+        } catch (err) {
+          console.error("CGPARecord upsert error:", err.message);
+        }
+      }
     }
-  });
 
-  const overallCGPA = totalCreditsAttemptedForCGPA > 0
-    ? Number((totalPointsEarned / totalCreditsAttemptedForCGPA).toFixed(2))
-    : 0.0;
-
-  // Calculate Semester GPAs
-  const semesterGroups = {};
-  publishedResults.forEach((r) => {
-    const semKey = `${r.level || "Level-1"} - ${r.term || "Term-1"}`;
-    if (!semesterGroups[semKey]) semesterGroups[semKey] = [];
-    semesterGroups[semKey].push(r);
-  });
-
-  let lastSemGPA = 0.0;
-  const totalReqCredits = 140;
-
-  for (const [semKey, rawResList] of Object.entries(semesterGroups)) {
-    const semCourseMap = new Map();
-    rawResList.forEach((r) => {
-      const code = (r.courseCode || "").toUpperCase().trim();
-      if (!code) return;
-      const gp = computeGradePoint(r.letterGrade, r.gradePoint);
-      if (!semCourseMap.has(code) || gp > semCourseMap.get(code).gp) {
-        semCourseMap.set(code, { r, cr: Number(r.creditHours) || 3, gp });
+    // Update or Create AcademicProfile safely
+    let academicProfile = null;
+    if (userId || studentIdStr) {
+      try {
+        academicProfile = await AcademicProfile.findOne({
+          $or: [
+            ...(userId ? [{ student: userId }] : []),
+            ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+          ],
+        });
+      } catch (err) {
+        console.error("AcademicProfile query error:", err.message);
       }
-    });
+    }
 
-    let semPoints = 0;
-    let semCredits = 0;
-    semCourseMap.forEach(({ cr, gp, r }) => {
-      if (r.letterGrade !== "F" && gp > 0) {
-        semPoints += gp * cr;
-        semCredits += cr;
-      }
-    });
+    let academicStatus = "Regular";
+    if (overallCGPA > 0 && overallCGPA < 2.0) academicStatus = "Probation";
+    if (completedCoursesList.some((c) => c.letterGrade === "F")) academicStatus = "Retake";
+    if (totalCreditsEarned >= totalReqCredits) academicStatus = "Graduated";
 
-    const semGPA = semCredits > 0 ? Number((semPoints / semCredits).toFixed(2)) : 0.0;
-    lastSemGPA = semGPA;
+    const levelStr = studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1";
+    const termStr = studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1";
 
-    const parts = semKey.split("-").map((s) => s.trim());
-    if (studentIdStr) {
-      await CGPARecord.findOneAndUpdate(
-        { studentId: studentIdStr, level: parts[0], term: parts[1] },
-        {
+    try {
+      if (!academicProfile && (userId || studentIdStr)) {
+        academicProfile = await AcademicProfile.create({
           student: userId,
-          studentId: studentIdStr,
-          session: rawResList[0]?.session || "2023-24",
-          level: parts[0],
-          term: parts[1],
-          semesterGPA: semGPA,
-          semesterCredits: semCredits,
-          cumulativeCGPA: overallCGPA,
-          totalCumulativeCredits: totalCreditsEarned,
-          calculatedAt: new Date(),
-        },
-        { upsert: true, new: true }
-      );
+          studentId: studentIdStr || "STD_001",
+          department: studentProfile?.department || studentUser.department || "EDTE",
+          program: studentProfile?.program || "B.Sc. in EDTE",
+          batch: studentProfile?.batch || "2023",
+          session: studentProfile?.session || "2025-26",
+          currentLevel: levelStr,
+          currentTerm: termStr,
+          totalCreditsRequired: totalReqCredits,
+          totalCreditsEarned,
+          creditsRemaining: Math.max(0, totalReqCredits - totalCreditsEarned),
+          currentCGPA: overallCGPA,
+          lastSemesterGPA: lastSemGPA,
+          academicStatus,
+          completedCourses: completedCoursesList,
+          isGraduated: totalCreditsEarned >= totalReqCredits,
+        });
+      } else if (academicProfile) {
+        academicProfile.currentLevel = levelStr;
+        academicProfile.currentTerm = termStr;
+        academicProfile.totalCreditsEarned = totalCreditsEarned;
+        academicProfile.creditsRemaining = Math.max(0, totalReqCredits - totalCreditsEarned);
+        academicProfile.currentCGPA = overallCGPA;
+        academicProfile.lastSemesterGPA = lastSemGPA;
+        academicProfile.academicStatus = academicProfile.isGraduated ? "Graduated" : academicStatus;
+        academicProfile.completedCourses = completedCoursesList;
+        academicProfile.updatedAt = new Date();
+        await academicProfile.save();
+      }
+    } catch (err) {
+      console.error("AcademicProfile update error:", err.message);
     }
-  }
 
-  // Update or Create AcademicProfile
-  let academicProfile = null;
-  if (userId || studentIdStr) {
-    academicProfile = await AcademicProfile.findOne({
-      $or: [
-        ...(userId ? [{ student: userId }] : []),
-        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
-      ],
-    });
-  }
-
-  let academicStatus = "Regular";
-  if (overallCGPA > 0 && overallCGPA < 2.0) academicStatus = "Probation";
-  if (completedCoursesList.some((c) => c.letterGrade === "F")) academicStatus = "Retake";
-  if (totalCreditsEarned >= totalReqCredits) academicStatus = "Graduated";
-
-  const levelStr = studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1";
-  const termStr = studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1";
-
-  if (!academicProfile && (userId || studentIdStr)) {
-    academicProfile = await AcademicProfile.create({
-      student: userId,
-      studentId: studentIdStr || "STD_001",
-      department: studentProfile?.department || studentUser.department || "EDTE",
-      program: studentProfile?.program || "B.Sc. in EDTE",
-      batch: studentProfile?.batch || "2023-24",
-      session: studentProfile?.session || "2023-24",
-      currentLevel: levelStr,
-      currentTerm: termStr,
-      totalCreditsRequired: totalReqCredits,
+    return {
+      overallCGPA,
+      lastSemGPA,
       totalCreditsEarned,
       creditsRemaining: Math.max(0, totalReqCredits - totalCreditsEarned),
-      currentCGPA: overallCGPA,
-      lastSemesterGPA: lastSemGPA,
-      academicStatus,
-      completedCourses: completedCoursesList,
-      isGraduated: totalCreditsEarned >= totalReqCredits,
-    });
-  } else if (academicProfile) {
-    academicProfile.currentLevel = levelStr;
-    academicProfile.currentTerm = termStr;
-    academicProfile.totalCreditsEarned = totalCreditsEarned;
-    academicProfile.creditsRemaining = Math.max(0, totalReqCredits - totalCreditsEarned);
-    academicProfile.currentCGPA = overallCGPA;
-    academicProfile.lastSemesterGPA = lastSemGPA;
-    academicProfile.academicStatus = academicProfile.isGraduated ? "Graduated" : academicStatus;
-    academicProfile.completedCourses = completedCoursesList;
-    academicProfile.updatedAt = new Date();
-    await academicProfile.save();
+      academicStatus: academicProfile?.academicStatus || "Regular",
+    };
+  } catch (error) {
+    console.error("calculateStudentCGPA error:", error);
+    return {
+      overallCGPA: 0.0,
+      lastSemGPA: 0.0,
+      totalCreditsEarned: 0,
+      creditsRemaining: 140,
+      academicStatus: "Regular",
+    };
   }
-
-  return {
-    overallCGPA,
-    lastSemGPA,
-    totalCreditsEarned,
-    creditsRemaining: Math.max(0, totalReqCredits - totalCreditsEarned),
-    academicStatus: academicProfile?.academicStatus || "Regular",
-  };
 };
 exports.calculateStudentCGPA = calculateStudentCGPA;
 
@@ -254,32 +280,61 @@ exports.getStudentAcademicProfile = async (req, res) => {
     const userId = req.user._id || req.user.id || req.user.uid;
     const cgpaSummary = await calculateStudentCGPA(req.user);
 
-    const studentProfile = await Student.findOne({ universityEmail: req.user.email }).lean();
+    const studentOrConditions = [];
+    if (req.user.email) studentOrConditions.push({ universityEmail: req.user.email });
+    if (req.user.studentId) studentOrConditions.push({ studentId: req.user.studentId });
+
+    const studentProfile = studentOrConditions.length > 0
+      ? await Student.findOne({ $or: studentOrConditions }).lean()
+      : null;
+
     const studentIdStr = studentProfile?.studentId || req.user.studentId || "";
 
-    const profile = await AcademicProfile.findOne({
+    const activeReg = await Registration.findOne({
       $or: [
         ...(userId ? [{ student: userId }] : []),
         ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+        ...(req.user.email ? [{ studentEmail: req.user.email }] : []),
       ],
+    }).sort({ createdAt: -1 }).lean();
+
+    const profileOrConditions = [];
+    if (userId) profileOrConditions.push({ student: userId });
+    if (studentIdStr) profileOrConditions.push({ studentId: studentIdStr });
+
+    const profile = profileOrConditions.length > 0
+      ? await AcademicProfile.findOne({ $or: profileOrConditions }).lean()
+      : null;
+
+    const retakes = profileOrConditions.length > 0
+      ? await RetakeRequest.find({ $or: profileOrConditions }).lean()
+      : [];
+
+    const studentDept = studentProfile?.department || req.user.department || activeReg?.department || "EDTE";
+    const deptImports = await CourseImport.find({
+      department: { $regex: new RegExp(`^${studentDept.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
     }).lean();
 
-    const retakes = await RetakeRequest.find({
-      $or: [
-        ...(userId ? [{ student: userId }] : []),
-        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
-      ],
-    }).lean();
+    const completedCodes = new Set((profile?.completedCourses || []).map((c) => (c.courseCode || "").toUpperCase()));
+    const incompleteCourses = deptImports.filter((ci) => !completedCodes.has((ci.courseCode || "").toUpperCase()));
 
-    const allImports = await CourseImport.find().lean();
-    const completedCodes = new Set((profile?.completedCourses || []).map((c) => c.courseCode.toUpperCase()));
-    const incompleteCourses = allImports.filter((ci) => !completedCodes.has(ci.courseCode.toUpperCase()));
-
-    const currentLevelStr = profile?.currentLevel || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
-    const currentTermStr = profile?.currentTerm || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
+    const currentLevelStr = activeReg?.level || profile?.currentLevel || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
+    const currentTermStr = activeReg?.term || profile?.currentTerm || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
+    const activeSessionStr = activeReg?.session || studentProfile?.session || req.user.session || "2025-26";
+    const activeBatchStr = studentProfile?.batch || req.user.batch || "2023";
+    const activeProgramStr = studentProfile?.program || req.user.program || `B.Sc. in ${studentDept}`;
 
     res.json({
       profile: {
+        studentName: studentProfile?.name || req.user.name || activeReg?.studentName || "Student",
+        studentId: studentIdStr || req.user.studentId || activeReg?.studentId || "N/A",
+        department: studentDept,
+        program: activeProgramStr,
+        session: activeSessionStr,
+        batch: activeBatchStr,
+        hallName: studentProfile?.hallName || req.user.hallName || "N/A",
+        phone: studentProfile?.phone || req.user.phone || "N/A",
+        universityEmail: studentProfile?.universityEmail || req.user.email,
         ...(profile || {}),
         currentLevel: currentLevelStr,
         currentTerm: currentTermStr,
@@ -287,6 +342,7 @@ exports.getStudentAcademicProfile = async (req, res) => {
         totalCreditsEarned: cgpaSummary.totalCreditsEarned || profile?.totalCreditsEarned || 0,
         creditsRemaining: cgpaSummary.creditsRemaining || profile?.creditsRemaining || 140,
         currentCGPA: cgpaSummary.overallCGPA || profile?.currentCGPA || 0.0,
+        lastSemesterGPA: cgpaSummary.lastSemGPA || profile?.lastSemesterGPA || 0.0,
         academicStatus: profile?.academicStatus || "Regular",
         cgpaSummary,
       },
@@ -517,9 +573,10 @@ exports.submitRetakeRequest = async (req, res) => {
 // 6. Get Adviser Retake Requests
 exports.getTeacherRetakeRequests = async (req, res) => {
   try {
-    const teacherEmail = req.user.email;
+    const teacherEmailClean = (req.user.email || "").toLowerCase().trim();
     const requests = await RetakeRequest.find({
-      $or: [{ adviserEmail: teacherEmail }, { status: "Pending Adviser Approval" }],
+      status: "Pending Adviser Approval",
+      adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") },
     })
       .sort({ createdAt: -1 })
       .lean();

@@ -44,56 +44,127 @@ exports.getMyCourses = async (req, res) => {
       const Enrollment = require("../models/Enrollment");
       const Student = require("../models/Student");
       const User = require("../models/User");
+      const Registration = require("../models/Registration");
 
-      // 1. Direct LMS courses where student is in students array
-      let lmsCourses = await Course.find({ students: userId })
+      const studentProfile = await Student.findOne({
+        $or: [
+          { universityEmail: req.user.email },
+          { universityEmail: { $regex: new RegExp(`^${(req.user.email || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+        ]
+      }).lean();
+
+      const studentIdStr = studentProfile?.studentId || req.user.studentId;
+
+      // Auto-sync courses ONLY from student's APPROVED registrations
+      const approvedRegs = await Registration.find({
+        $or: [
+          { user: userId },
+          ...(studentIdStr ? [{ studentId: studentIdStr }] : [])
+        ],
+        status: "Approved"
+      }).lean();
+
+      for (const reg of approvedRegs) {
+        for (const courseItem of reg.selectedCourses || []) {
+          const codeStr = (courseItem.courseCode || courseItem.code || "").toUpperCase().trim();
+          if (!codeStr) continue;
+
+          let lmsCourse = await Course.findOne({ displayCode: codeStr });
+          if (!lmsCourse) {
+            let teacherId = null;
+            if (reg.adviserEmail) {
+              const advTeacher = await User.findOne({
+                email: { $regex: new RegExp(`^${reg.adviserEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
+              });
+              if (advTeacher) teacherId = advTeacher._id;
+            }
+            if (!teacherId) {
+              const anyTeacher = await User.findOne({ role: "teacher" });
+              teacherId = anyTeacher ? anyTeacher._id : userId;
+            }
+            const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+            // Normalize department enum for Course model
+            let normalizedDept = "EDTE";
+            const rawDept = String(studentProfile?.department || reg.department || "").toUpperCase();
+            if (rawDept.includes("IRE")) normalizedDept = "IRE";
+            else if (rawDept.includes("SOFTWARE")) normalizedDept = "Software";
+            else if (rawDept.includes("CYBER")) normalizedDept = "Cyber";
+            else if (rawDept.includes("DATA")) normalizedDept = "DataScience";
+            else if (rawDept.includes("GENERAL")) normalizedDept = "General";
+
+            lmsCourse = await Course.create({
+              name: courseItem.courseTitle || codeStr,
+              displayCode: codeStr,
+              session: reg.session || studentProfile?.session || "2023-24",
+              department: normalizedDept,
+              teacher: teacherId,
+              joinCode,
+              students: [userId]
+            });
+          } else {
+            await Course.updateOne(
+              { _id: lmsCourse._id },
+              { $addToSet: { students: userId } }
+            );
+          }
+
+          await Enrollment.findOneAndUpdate(
+            {
+              $or: [
+                { student: userId, courseCode: codeStr },
+                ...(studentIdStr ? [{ studentId: studentIdStr, courseCode: codeStr }] : [])
+              ]
+            },
+            {
+              student: userId,
+              studentId: studentIdStr || reg.studentId,
+              course: lmsCourse._id,
+              courseTitle: courseItem.courseTitle,
+              session: reg.session,
+              level: reg.level,
+              term: reg.term,
+            },
+            { upsert: true, returnDocument: "after" }
+          );
+        }
+      }
+
+      // Collect all course codes strictly from APPROVED registrations
+      const approvedCourseCodes = new Set();
+      approvedRegs.forEach((r) => {
+        (r.selectedCourses || []).forEach((c) => {
+          const code = (c.courseCode || c.code || "").toUpperCase().trim();
+          if (code) approvedCourseCodes.add(code);
+        });
+      });
+
+      const enrollments = await Enrollment.find({
+        $or: [
+          { student: userId },
+          ...(studentIdStr ? [{ studentId: studentIdStr }] : [])
+        ]
+      }).lean();
+
+      enrollments.forEach((e) => {
+        const code = (e.courseCode || "").toUpperCase().trim();
+        if (code && approvedCourseCodes.has(code)) {
+          approvedCourseCodes.add(code);
+        }
+      });
+
+      // If student has no approved course registrations, return empty array immediately (block pending registrations from displaying)
+      if (approvedCourseCodes.size === 0) {
+        return res.json([]);
+      }
+
+      // Fetch ONLY LMS courses matching approved course codes
+      let lmsCourses = await Course.find({
+        displayCode: { $in: Array.from(approvedCourseCodes) }
+      })
         .populate("teacher", "name email profilePicture department")
         .sort({ createdAt: -1 })
         .lean();
-
-      // 2. Approved Enrollments for this student
-      const enrollments = await Enrollment.find({ student: userId }).lean();
-      const studentProfile = await Student.findOne({ universityEmail: req.user.email }).lean();
-
-      // For every enrollment, make sure a real Course exists in LMS Course collection & student is added
-      for (const e of enrollments) {
-        let matchingCourse = lmsCourses.find(c => (c.displayCode || "").toUpperCase() === (e.courseCode || "").toUpperCase());
-        if (!matchingCourse) {
-          // Check DB for LMS Course with displayCode
-          let dbCourse = await Course.findOne({ displayCode: (e.courseCode || "").toUpperCase() })
-            .populate("teacher", "name email profilePicture department");
-          
-          if (!dbCourse) {
-            // Find teacher user to assign
-            let teacherId = null;
-            const anyTeacher = await User.findOne({ role: "teacher" });
-            teacherId = anyTeacher ? anyTeacher._id : userId;
-
-            const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
-            dbCourse = await Course.create({
-              name: e.courseTitle,
-              displayCode: (e.courseCode || "").toUpperCase(),
-              session: e.session || studentProfile?.session || "",
-              department: studentProfile?.department || "EDTE",
-              teacher: teacherId,
-              joinCode: joinCode,
-              students: [userId]
-            });
-            dbCourse = await Course.findById(dbCourse._id).populate("teacher", "name email profilePicture department");
-          } else {
-            // Add student if not in students array
-            if (!dbCourse.students.some(s => s.toString() === userId.toString())) {
-              dbCourse.students.push(userId);
-              await dbCourse.save();
-            }
-          }
-
-          if (dbCourse && !lmsCourses.some(c => c._id.toString() === dbCourse._id.toString())) {
-            const courseObj = dbCourse.toObject ? dbCourse.toObject() : dbCourse;
-            lmsCourses.push(courseObj);
-          }
-        }
-      }
 
       // Fetch all Teacher master records and User teacher accounts to ensure fresh teacher assignment mapping
       const Teacher = require("../models/Teacher");
@@ -108,7 +179,7 @@ exports.getMyCourses = async (req, res) => {
           );
 
           // Find teacher assigned to this course in Teacher model master data
-          let assignedTeacherObj = c.teacher;
+          let assignedTeacherObj = null;
           const matchedTeacherDoc = teachersList.find((t) =>
             (t.assignedCourses || []).some(
               (ac) =>
@@ -135,14 +206,46 @@ exports.getMyCourses = async (req, res) => {
                 await Course.findByIdAndUpdate(c._id, { teacher: teacherUserDoc._id }).catch(() => {});
               }
             }
+          } else if (c.teacher) {
+            const teacherUserDoc = teacherUsers.find(
+              (u) => u._id.toString() === (c.teacher._id || c.teacher).toString()
+            );
+            if (teacherUserDoc) {
+              const tDoc = teachersList.find((t) => t.email.toLowerCase() === teacherUserDoc.email.toLowerCase());
+              if (
+                tDoc &&
+                (tDoc.assignedCourses || []).some(
+                  (ac) =>
+                    (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
+                    (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
+                )
+              ) {
+                assignedTeacherObj = {
+                  _id: teacherUserDoc._id,
+                  name: teacherUserDoc.name,
+                  email: teacherUserDoc.email,
+                  profilePicture: teacherUserDoc.profilePicture || "",
+                  department: teacherUserDoc.department,
+                };
+              }
+            }
           }
+
+          const CourseImport = require("../models/CourseImport");
+          const importDoc = await CourseImport.findOne({
+            courseCode: { $regex: new RegExp(`^${(c.displayCode || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
+          }).lean();
+
+          const resolvedLevel = c.level || matchingEnrollment?.level || importDoc?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
+          const resolvedTerm = c.term || matchingEnrollment?.term || importDoc?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
+          const resolvedSession = c.session || matchingEnrollment?.session || importDoc?.session || studentProfile?.session || "2023-24";
 
           return {
             ...c,
             teacher: assignedTeacherObj,
-            session: c.session || matchingEnrollment?.session || studentProfile?.session || "",
-            level: c.level || matchingEnrollment?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : ""),
-            term: c.term || matchingEnrollment?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : ""),
+            session: resolvedSession,
+            level: resolvedLevel,
+            term: resolvedTerm,
           };
         })
       );
@@ -246,28 +349,39 @@ exports.getTeacherDashboardSummary = async (req, res) => {
 
     const TeacherProfile = await Teacher.findOne({ email: teacherEmail }).lean();
 
-    // 1. Teacher's Courses (directly assigned or matched by TeacherProfile.assignedCourses)
+    // 1. Teacher's Courses (strictly matched by Admin assigned courses in TeacherProfile)
     let courses = await Course.find({ teacher: userId }).lean();
 
-    if (TeacherProfile && TeacherProfile.assignedCourses && TeacherProfile.assignedCourses.length > 0) {
-      const assignedCodes = TeacherProfile.assignedCourses.map(ac => (ac.courseCode || "").toUpperCase()).filter(Boolean);
-      const assignedNames = TeacherProfile.assignedCourses.map(ac => (ac.courseName || "").trim()).filter(Boolean);
+    if (TeacherProfile && Array.isArray(TeacherProfile.assignedCourses) && TeacherProfile.assignedCourses.length > 0) {
+      const assignedCodes = new Set(
+        TeacherProfile.assignedCourses.map((ac) => (ac.courseCode || "").trim().toUpperCase()).filter(Boolean)
+      );
+      const assignedNames = TeacherProfile.assignedCourses
+        .map((ac) => (ac.courseName || "").trim().toLowerCase())
+        .filter(Boolean);
 
+      // Find any missing courses from LMS collection matching assigned codes/names
       const matchedConditions = [];
-      if (assignedCodes.length > 0) matchedConditions.push({ displayCode: { $in: assignedCodes } });
-      assignedNames.forEach(n => {
-        matchedConditions.push({ name: { $regex: new RegExp(`^${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
+      if (assignedCodes.size > 0) matchedConditions.push({ displayCode: { $in: Array.from(assignedCodes) } });
+      assignedNames.forEach((n) => {
+        matchedConditions.push({ name: { $regex: new RegExp(`^${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") } });
       });
 
       if (matchedConditions.length > 0) {
-        const extraCourses = await Course.find({ $or: matchedConditions }).lean();
-        for (const ec of extraCourses) {
-          if (!courses.some(c => c._id.toString() === ec._id.toString())) {
-            courses.push(ec);
-            await Course.findByIdAndUpdate(ec._id, { teacher: userId }).catch(() => {});
+        const matchingLmsCourses = await Course.find({ $or: matchedConditions }).lean();
+        for (const mc of matchingLmsCourses) {
+          if (!courses.some((c) => c._id.toString() === mc._id.toString())) {
+            courses.push(mc);
           }
         }
       }
+
+      // Strictly retain ONLY courses assigned to this teacher by Admin
+      courses = courses.filter((c) => {
+        const code = (c.displayCode || "").trim().toUpperCase();
+        const name = (c.name || "").trim().toLowerCase();
+        return assignedCodes.has(code) || assignedNames.some((n) => n && name === n);
+      });
     }
 
     const courseIds = courses.map(c => c._id);

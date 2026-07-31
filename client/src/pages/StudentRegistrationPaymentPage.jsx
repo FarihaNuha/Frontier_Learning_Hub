@@ -5,11 +5,9 @@ import toast from "react-hot-toast";
 import {
   FiCreditCard,
   FiPrinter,
-  FiClock,
   FiCheckCircle,
   FiAlertCircle,
   FiRefreshCw,
-  FiX,
   FiFileText,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
@@ -36,9 +34,8 @@ const FIXED_FEES_TOTAL = 3100;
 export default function StudentRegistrationPaymentPage() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
-  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [selectedPaymentForModal, setSelectedPaymentForModal] = useState(null);
+  const [selectedRegIdForInvoice, setSelectedRegIdForInvoice] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
@@ -58,10 +55,22 @@ export default function StudentRegistrationPaymentPage() {
     fetchPayments();
   }, []);
 
-  const activePayment = payments.length > 0 ? payments[0] : null;
+  const totalRegisteredSemesters = payments.length;
+  const totalPaidAmount = payments
+    .filter((p) => p.paymentStatus === "Paid")
+    .reduce((sum, p) => sum + (p.totalAmount || 0), 0);
+  const totalDueAmount = payments
+    .filter((p) => p.paymentStatus !== "Paid")
+    .reduce((sum, p) => sum + (p.totalAmount || 0), 0);
 
-  const handlePayNow = async (paymentId) => {
+  const handlePayForSemester = (paymentItem) => {
+    setSelectedPaymentForModal(paymentItem);
     setShowPaymentModal(true);
+  };
+
+  const handleViewInvoiceForSemester = (regId) => {
+    setSelectedRegIdForInvoice(regId);
+    setShowInvoiceModal(true);
   };
 
   const handleRetryPayment = async (paymentId) => {
@@ -74,329 +83,378 @@ export default function StudentRegistrationPaymentPage() {
     }
   };
 
-  const handleViewReceipt = async (paymentId) => {
-    try {
-      const res = await api.get(`/registration-payments/receipt/${paymentId}`);
-      setSelectedReceipt(res.data.receipt);
-      setShowReceiptModal(true);
-    } catch (err) {
-      toast.error("Failed to load payment receipt.");
-    }
-  };
-
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
       <StudentSidebar currentPage="payments" />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "36px 32px", overflowY: "auto" }}>
         {/* Header */}
-        <div style={{ marginBottom: "28px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
-            <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
-              <FiCreditCard size={22} />
-            </div>
-            <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Semester Registration Payment</h1>
-          </div>
-          <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
-            Pay your semester registration fees online anytime or view payment history and official money receipts.
-          </p>
-        </div>
-
-        {/* Optional Info Banner */}
-        <div style={{ background: "#e0f2fe", padding: "14px 20px", borderRadius: "12px", color: "#0369a1", fontSize: "13.5px", marginBottom: "24px", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
-          <FiAlertCircle size={22} />
+        <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <strong>Optional Payment Policy:</strong> Payment status does NOT block course registration approval or LMS class access. You can pay online whenever convenient.
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
+              <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+                <FiCreditCard size={22} />
+              </div>
+              <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px", fontWeight: 800 }}>
+                Semester Registration Payments
+              </h1>
+            </div>
+            <p style={{ margin: 0, color: "#64748b", fontSize: "14.5px" }}>
+              Comprehensive payment portal for all registered level-term semesters, course fee breakdowns, and payment statuses.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <div style={{ background: "#ffffff", padding: "10px 18px", borderRadius: "12px", border: "1px solid #cbd5e1", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+              <div style={{ fontSize: "11px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>Registered Semesters</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>{totalRegisteredSemesters} Semesters</div>
+            </div>
+            <div style={{ background: "#ffffff", padding: "10px 18px", borderRadius: "12px", border: "1px solid #cbd5e1", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+              <div style={{ fontSize: "11px", color: "#166534", fontWeight: 700, textTransform: "uppercase" }}>Total Fees Paid</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: "#16a34a" }}>৳{totalPaidAmount.toLocaleString()} BDT</div>
+            </div>
+            <div style={{ background: "#ffffff", padding: "10px 18px", borderRadius: "12px", border: "1px solid #cbd5e1", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+              <div style={{ fontSize: "11px", color: totalDueAmount > 0 ? "#c2410c" : "#166534", fontWeight: 700, textTransform: "uppercase" }}>Total Outstanding Due</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: totalDueAmount > 0 ? "#ea580c" : "#16a34a" }}>৳{totalDueAmount.toLocaleString()} BDT</div>
+            </div>
           </div>
         </div>
 
-        {/* Active Payment Card */}
-        {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading payment details...</div>
-        ) : activePayment ? (
-          <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", marginBottom: "32px", border: "1px solid #e2e8f0" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
-              <div>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "#3b8db3", textTransform: "uppercase", letterSpacing: "0.5px" }}>Current Registration Fee</span>
-                <h2 style={{ margin: "4px 0 0 0", color: "#0f172a", fontSize: "22px" }}>
-                  {activePayment.level} {activePayment.term} ({activePayment.session})
-                </h2>
-                <div style={{ fontSize: "13px", color: "#64748b", marginTop: "4px" }}>
-                  Student ID: <strong>{activePayment.studentId}</strong> • Dept: <strong>{activePayment.department}</strong>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-                <span style={{ padding: "6px 14px", borderRadius: "20px", fontWeight: 700, fontSize: "13px", background: activePayment.paymentStatus === "Paid" ? "#dcfce7" : activePayment.paymentStatus === "Failed" || activePayment.paymentStatus === "Cancelled" ? "#fee2e2" : "#fff7ed", color: activePayment.paymentStatus === "Paid" ? "#166534" : activePayment.paymentStatus === "Failed" || activePayment.paymentStatus === "Cancelled" ? "#991b1b" : "#c2410c", border: activePayment.paymentStatus === "Paid" ? "1px solid #bbf7d0" : "1px solid #fed7aa" }}>
-                  Status: {activePayment.paymentStatus === "Paid" ? "Paid" : `Pending (Due: ৳${(activePayment.totalAmount || 0).toLocaleString()} BDT)`}
-                </span>
-
-                <button
-                  onClick={() => setShowInvoiceModal(true)}
-                  style={{
-                    padding: "10px 18px",
-                    background: "#0284c7",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
-                  <FiFileText size={16} /> View Registration Invoice
-                </button>
-
-                {(activePayment.paymentStatus === "Pending" || activePayment.paymentStatus === "Unpaid") && (
-                  <button onClick={() => setShowPaymentModal(true)} disabled={processing} style={{ padding: "10px 20px", background: "linear-gradient(135deg, #16a34a, #15803d)", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "14px", cursor: processing ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 8px rgba(22,163,74,0.3)" }}>
-                    <FiCreditCard size={16} /> Pay ৳{activePayment.totalAmount?.toLocaleString()} Online Now (bKash/Nagad/Card)
-                  </button>
-                )}
-
-                {(activePayment.paymentStatus === "Failed" || activePayment.paymentStatus === "Cancelled") && (
-                  <button onClick={() => handleRetryPayment(activePayment._id)} style={{ padding: "10px 20px", background: "#f59e0b", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <FiRefreshCw size={15} /> Retry Payment
-                  </button>
-                )}
-
-                {activePayment.paymentStatus === "Paid" && (
-                  <button onClick={() => handleViewReceipt(activePayment._id)} style={{ padding: "10px 20px", background: "#3b8db3", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <FiPrinter size={15} /> Download Receipt / Slip
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Courses Breakdown Table */}
-            <h4 style={{ margin: "0 0 10px 0", color: "#0f172a", fontSize: "15px" }}>1. Selected Academic Courses</h4>
-            <div style={{ overflowX: "auto", marginBottom: "20px" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
-                    <th style={{ padding: "10px 12px" }}>Course Code</th>
-                    <th style={{ padding: "10px 12px" }}>Course Title</th>
-                    <th style={{ padding: "10px 12px" }}>Type</th>
-                    <th style={{ padding: "10px 12px" }}>Credit</th>
-                    <th style={{ padding: "10px 12px", textAlign: "right" }}>Course Fee (BDT)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(activePayment.selectedCourses || []).map((c, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "#0f172a" }}>{c.courseCode}</td>
-                      <td style={{ padding: "10px 12px" }}>{c.courseTitle}</td>
-                      <td style={{ padding: "10px 12px" }}>
-                        <span style={{ padding: "2px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, background: c.courseType === "Sessional" ? "#fef3c7" : "#e0f2fe", color: c.courseType === "Sessional" ? "#b45309" : "#0369a1" }}>
-                          {c.courseType}
-                        </span>
-                      </td>
-                      <td style={{ padding: "10px 12px" }}>{c.creditHours}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontWeight: 600, color: "#3b8db3" }}>৳{(c.fee || (c.creditHours === 1 ? 100 : 300)).toLocaleString()} BDT</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Fixed Fees Serial List */}
-            <h4 style={{ margin: "0 0 10px 0", color: "#0f172a", fontSize: "15px" }}>2. Fixed Institutional Fees</h4>
-            <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", marginBottom: "20px" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left" }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1px solid #e2e8f0" }}>
-                    <th style={{ padding: "8px 12px", width: "40px" }}>#</th>
-                    <th style={{ padding: "8px 12px" }}>Fee Item</th>
-                    <th style={{ padding: "8px 12px", textAlign: "right" }}>Amount (BDT)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {FIXED_REGISTRATION_FEES.map((item, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9", background: idx % 2 === 0 ? "#ffffff" : "#f8fafc" }}>
-                      <td style={{ padding: "7px 12px", color: "#64748b", fontWeight: 600 }}>{idx + 1}</td>
-                      <td style={{ padding: "7px 12px", color: "#1e293b" }}>{item.name}</td>
-                      <td style={{ padding: "7px 12px", textAlign: "right", fontWeight: 600, color: "#0f172a" }}>৳{item.amount.toLocaleString()} BDT</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Total Fee Box */}
-            <div style={{ background: "#f0fdf4", padding: "18px 20px", borderRadius: "12px", border: "1.5px solid #86efac", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: "13.5px", color: "#166534" }}>
-                Courses Subtotal: <strong>৳{((activePayment.selectedCourses || []).reduce((sum, c) => sum + (c.fee || (c.creditHours === 1 ? 100 : 300)), 0)).toLocaleString()}</strong> • Fixed Fees: <strong>৳{FIXED_FEES_TOTAL.toLocaleString()}</strong>
-              </div>
-              <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>
-                Grand Total: <span style={{ color: "#16a34a" }}>৳{activePayment.totalAmount?.toLocaleString()} BDT</span>
-              </div>
-            </div>
+        {/* Formal Academic Payment Policy Banner */}
+        <div style={{ background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", color: "#334155", fontSize: "14px", marginBottom: "28px", border: "1px solid #cbd5e1", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+          <FiAlertCircle size={22} style={{ color: "#0284c7" }} />
+          <div>
+            <strong style={{ color: "#0f172a" }}>Semester Registration Fee Notice:</strong>{" "}
+            Course registration approval and LMS class materials remain fully accessible regardless of payment status. You may complete your semester registration fee payments online whenever convenient.
           </div>
-        ) : (
-          <div style={{ padding: "60px", background: "#ffffff", borderRadius: "16px", textAlign: "center", color: "#94a3b8", marginBottom: "32px" }}>
-            <FiCreditCard size={48} style={{ opacity: 0.3, marginBottom: "12px" }} />
-            <h3>No active registration payment required at this time</h3>
+        </div>
+
+        {/* Semester Payment Status Summary Table */}
+        {!loading && payments.length > 0 && (
+          <div style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
+            <h3 style={{ margin: "0 0 16px 0", color: "#0f172a", fontSize: "17px", fontWeight: 800, display: "flex", alignItems: "center", gap: "8px" }}>
+              <FiCreditCard style={{ color: "#3b8db3" }} /> Registered Semesters Payment Overview
+            </h3>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, borderBottom: "1.5px solid #cbd5e1" }}>
+                    <th style={{ padding: "12px 16px" }}>Semester (Level & Term)</th>
+                    <th style={{ padding: "12px 16px" }}>Session</th>
+                    <th style={{ padding: "12px 16px" }}>Total Fee (BDT)</th>
+                    <th style={{ padding: "12px 16px", textAlign: "right" }}>Payment Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((p, idx) => {
+                    const isP = p.paymentStatus === "Paid";
+                    return (
+                      <tr key={p._id || idx} style={{ borderBottom: "1px solid #f1f5f9", background: idx % 2 === 0 ? "#ffffff" : "#f8fafc" }}>
+                        <td style={{ padding: "12px 16px", fontWeight: 700, color: "#0f172a" }}>
+                          {p.level} {p.term}
+                        </td>
+                        <td style={{ padding: "12px 16px", color: "#64748b", fontWeight: 600 }}>
+                          {p.session || "N/A"}
+                        </td>
+                        <td style={{ padding: "12px 16px", fontWeight: 800, color: "#0284c7" }}>
+                          ৳{(p.totalAmount || 0).toLocaleString()} BDT
+                        </td>
+                        <td style={{ padding: "12px 16px", textAlign: "right" }}>
+                          <span
+                            style={{
+                              padding: "4px 12px",
+                              borderRadius: "16px",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              background: isP ? "#dcfce7" : "#fff7ed",
+                              color: isP ? "#15803d" : "#c2410c",
+                              border: `1px solid ${isP ? "#86efac" : "#fed7aa"}`,
+                            }}
+                          >
+                            {isP ? "Paid in Full" : `Pending (Due: ৳${(p.totalAmount || 0).toLocaleString()} BDT)`}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
-        {/* Payment History Table */}
-        <div style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
-          <h3 style={{ margin: "0 0 16px 0", color: "#0f172a", fontSize: "18px" }}>Payment History</h3>
-          {payments.length === 0 ? (
-            <div style={{ padding: "30px", textAlign: "center", color: "#94a3b8", fontSize: "13px" }}>No previous payment records found.</div>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
-                    <th style={{ padding: "10px 12px" }}>Semester</th>
-                    <th style={{ padding: "10px 12px" }}>Amount</th>
-                    <th style={{ padding: "10px 12px" }}>Txn ID</th>
-                    <th style={{ padding: "10px 12px" }}>Payment Date</th>
-                    <th style={{ padding: "10px 12px" }}>Status</th>
-                    <th style={{ padding: "10px 12px" }}>Receipt</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map((p) => (
-                    <tr key={p._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "10px 12px", fontWeight: 600 }}>{p.level} {p.term} ({p.session})</td>
-                      <td style={{ padding: "10px 12px", fontWeight: 700, color: "#3b8db3" }}>৳{p.totalAmount?.toLocaleString()} BDT</td>
-                      <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: "12px", color: "#64748b" }}>{p.transactionId || "N/A"}</td>
-                      <td style={{ padding: "10px 12px", color: "#64748b" }}>{p.paymentDate ? new Date(p.paymentDate).toLocaleDateString() : "N/A"}</td>
-                      <td style={{ padding: "10px 12px" }}>
-                        <span style={{ padding: "2px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, background: p.paymentStatus === "Paid" ? "#dcfce7" : "#fef3c7", color: p.paymentStatus === "Paid" ? "#166534" : "#b45309" }}>
-                          {p.paymentStatus}
+        {loading ? (
+          <div style={{ padding: "60px", textAlign: "center", color: "#64748b", fontSize: "15px" }}>Loading registration payment history...</div>
+        ) : payments.length === 0 ? (
+          <div style={{ padding: "60px", background: "#ffffff", borderRadius: "16px", textAlign: "center", color: "#94a3b8", border: "1px solid #cbd5e1" }}>
+            <FiCreditCard size={48} style={{ opacity: 0.4, marginBottom: "12px" }} />
+            <h3 style={{ margin: "0 0 6px 0", color: "#1e293b" }}>No Registered Semesters Found</h3>
+            <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>You have not submitted course registration for any semester yet.</p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            {payments.map((payment, index) => {
+              const isPaid = payment.paymentStatus === "Paid";
+              const isFailed = payment.paymentStatus === "Failed" || payment.paymentStatus === "Cancelled";
+              const coursesSubtotal = (payment.selectedCourses || []).reduce(
+                (sum, c) => sum + (c.fee || (c.creditHours === 1 ? 100 : 300)),
+                0
+              );
+
+              return (
+                <div
+                  key={payment._id || index}
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: "16px",
+                    padding: "28px",
+                    boxShadow: isPaid ? "0 4px 16px rgba(22, 163, 74, 0.06)" : "0 4px 16px rgba(234, 88, 12, 0.08)",
+                    border: `1.5px solid ${isPaid ? "#bbf7d0" : isFailed ? "#fca5a5" : "#fed7aa"}`,
+                  }}
+                >
+                  {/* Card Top Header */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                        <span style={{ fontSize: "12px", fontWeight: 800, color: "#0284c7", textTransform: "uppercase", letterSpacing: "0.5px", background: "#e0f2fe", padding: "3px 10px", borderRadius: "12px" }}>
+                          Semester #{payments.length - index}
                         </span>
-                      </td>
-                      <td style={{ padding: "10px 12px" }}>
-                        {p.paymentStatus === "Paid" && (
-                          <button onClick={() => handleViewReceipt(p._id)} style={{ padding: "4px 10px", background: "#e0f2fe", color: "#0369a1", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
-                            Receipt
-                          </button>
+                        {payment.session && (
+                          <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569", background: "#f1f5f9", padding: "3px 10px", borderRadius: "12px" }}>
+                            Session {payment.session}
+                          </span>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                      </div>
+                      <h2 style={{ margin: "8px 0 0 0", color: "#0f172a", fontSize: "22px", fontWeight: 800 }}>
+                        {payment.level} {payment.term}
+                      </h2>
+                      <div style={{ fontSize: "13px", color: "#64748b", marginTop: "4px" }}>
+                        Student ID: <strong>{payment.studentId}</strong> • Department: <strong>{payment.department || "EDTE"}</strong>
+                      </div>
+                    </div>
 
-        {/* Printable Money Receipt / Academic Registration Slip Modal */}
-        {showReceiptModal && selectedReceipt && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "32px", maxWidth: "750px", width: "100%", boxShadow: "0 20px 40px rgba(0,0,0,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", borderBottom: "2px solid #3b8db3", paddingBottom: "16px" }}>
-                <div>
-                  <h2 style={{ margin: 0, color: "#1e293b", fontSize: "22px" }}>{selectedReceipt.universityName}</h2>
-                  <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#3b8db3", marginTop: "2px" }}>Official Academic Registration Slip & Fee Receipt</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                      <span
+                        style={{
+                          padding: "6px 16px",
+                          borderRadius: "20px",
+                          fontWeight: 700,
+                          fontSize: "13.5px",
+                          background: isPaid ? "#dcfce7" : isFailed ? "#fee2e2" : "#fff7ed",
+                          color: isPaid ? "#15803d" : isFailed ? "#991b1b" : "#c2410c",
+                          border: `1px solid ${isPaid ? "#86efac" : isFailed ? "#fca5a5" : "#fed7aa"}`,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        {isPaid ? (
+                          <>
+                            <FiCheckCircle size={16} /> Paid in Full (Txn: {payment.transactionId || "N/A"})
+                          </>
+                        ) : (
+                          <>
+                            <FiAlertCircle size={16} /> Due Amount: ৳{(payment.totalAmount || 0).toLocaleString()} BDT
+                          </>
+                        )}
+                      </span>
+
+                      {/* Official Registration Document (Invoice & Slip) */}
+                      <button
+                        onClick={() => handleViewInvoiceForSemester(payment.registration || payment._id)}
+                        style={{
+                          padding: "10px 18px",
+                          background: "#0284c7",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "8px",
+                          fontWeight: 700,
+                          fontSize: "13.5px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        {isPaid ? <FiPrinter size={16} /> : <FiFileText size={16} />}
+                        {isPaid ? "Official Money Receipt & Slip" : "Official Registration Invoice"}
+                      </button>
+
+                      {!isPaid && (
+                        <button
+                          onClick={() => handlePayForSemester(payment)}
+                          style={{
+                            padding: "10px 20px",
+                            background: "linear-gradient(135deg, #16a34a, #15803d)",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontWeight: 700,
+                            fontSize: "13.5px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            boxShadow: "0 4px 12px rgba(22,163,74,0.25)",
+                          }}
+                        >
+                          <FiCreditCard size={16} /> Pay Online (৳{payment.totalAmount?.toLocaleString()} BDT)
+                        </button>
+                      )}
+
+                      {isFailed && (
+                        <button
+                          onClick={() => handleRetryPayment(payment._id)}
+                          style={{
+                            padding: "10px 16px",
+                            background: "#f59e0b",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontWeight: 700,
+                            fontSize: "13.5px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}
+                        >
+                          <FiRefreshCw size={15} /> Retry Session
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Registered Courses Table */}
+                  <h4 style={{ margin: "0 0 10px 0", color: "#0f172a", fontSize: "15px", fontWeight: 700 }}>
+                    1. Registered Academic Courses Roster
+                  </h4>
+                  <div style={{ overflowX: "auto", marginBottom: "20px", border: "1px solid #e2e8f0", borderRadius: "10px" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, borderBottom: "1px solid #e2e8f0" }}>
+                          <th style={{ padding: "10px 14px" }}>Code</th>
+                          <th style={{ padding: "10px 14px" }}>Course Title</th>
+                          <th style={{ padding: "10px 14px" }}>Type</th>
+                          <th style={{ padding: "10px 14px" }}>Credit</th>
+                          <th style={{ padding: "10px 14px", textAlign: "right" }}>Course Fee (BDT)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(payment.selectedCourses || []).length === 0 ? (
+                          <tr>
+                            <td colSpan={5} style={{ padding: "16px", textAlign: "center", color: "#94a3b8" }}>No registered courses listed for this semester.</td>
+                          </tr>
+                        ) : (
+                          (payment.selectedCourses || []).map((c, idx) => (
+                            <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0f172a" }}>{c.courseCode}</td>
+                              <td style={{ padding: "10px 14px", color: "#334155" }}>{c.courseTitle}</td>
+                              <td style={{ padding: "10px 14px" }}>
+                                <span
+                                  style={{
+                                    padding: "2px 8px",
+                                    borderRadius: "6px",
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    background: c.courseType === "Sessional" ? "#fef3c7" : "#e0f2fe",
+                                    color: c.courseType === "Sessional" ? "#b45309" : "#0369a1",
+                                  }}
+                                >
+                                  {c.courseType}
+                                </span>
+                              </td>
+                              <td style={{ padding: "10px 14px" }}>{c.creditHours}</td>
+                              <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: 700, color: "#0284c7" }}>
+                                ৳{(c.fee || (c.creditHours === 1 ? 100 : 300)).toLocaleString()} BDT
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Fixed Fees Serial List */}
+                  <h4 style={{ margin: "0 0 10px 0", color: "#0f172a", fontSize: "15px", fontWeight: 700 }}>
+                    2. Fixed Institutional Fees Schedule
+                  </h4>
+                  <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", marginBottom: "20px" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1px solid #e2e8f0" }}>
+                          <th style={{ padding: "8px 12px", width: "40px" }}>#</th>
+                          <th style={{ padding: "8px 12px" }}>Fee Item Description</th>
+                          <th style={{ padding: "8px 12px", textAlign: "right" }}>Amount (BDT)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {FIXED_REGISTRATION_FEES.map((item, idx) => (
+                          <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9", background: idx % 2 === 0 ? "#ffffff" : "#f8fafc" }}>
+                            <td style={{ padding: "7px 12px", color: "#64748b", fontWeight: 600 }}>{idx + 1}</td>
+                            <td style={{ padding: "7px 12px", color: "#1e293b" }}>{item.name}</td>
+                            <td style={{ padding: "7px 12px", textAlign: "right", fontWeight: 600, color: "#0f172a" }}>৳{item.amount.toLocaleString()} BDT</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Grand Total Summary Box */}
+                  <div
+                    style={{
+                      background: isPaid ? "#f0fdf4" : "#fff7ed",
+                      padding: "18px 24px",
+                      borderRadius: "12px",
+                      border: `1.5px solid ${isPaid ? "#86efac" : "#fed7aa"}`,
+                      display: "flex",
+                      justify: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "12px",
+                    }}
+                  >
+                    <div style={{ fontSize: "14px", color: isPaid ? "#166534" : "#c2410c" }}>
+                      Courses Subtotal: <strong>৳{coursesSubtotal.toLocaleString()} BDT</strong> • Fixed Fees: <strong>৳{FIXED_FEES_TOTAL.toLocaleString()} BDT</strong>
+                    </div>
+                    <div style={{ fontSize: "19px", fontWeight: 800, color: "#0f172a" }}>
+                      Grand Total Fee: <span style={{ color: isPaid ? "#16a34a" : "#ea580c" }}>৳{payment.totalAmount?.toLocaleString()} BDT</span>
+                      <span style={{ fontSize: "13px", fontWeight: 600, marginLeft: "10px", color: isPaid ? "#15803d" : "#c2410c" }}>
+                        ({isPaid ? "Paid in Full" : `Outstanding Due: ৳${payment.totalAmount?.toLocaleString()} BDT`})
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <button onClick={() => window.print()} style={{ padding: "6px 14px", background: "#3b8db3", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12.5px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
-                  <FiPrinter size={14} /> Print Academic Slip
-                </button>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "13px", marginBottom: "20px", background: "#f8fafc", padding: "14px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-                <div>Student Name: <strong>{selectedReceipt.studentName}</strong></div>
-                <div>Student ID: <strong>{selectedReceipt.studentId}</strong></div>
-                <div>Department: <strong>{selectedReceipt.department}</strong></div>
-                <div>Level-Term: <strong>{selectedReceipt.levelTerm} ({selectedReceipt.session})</strong></div>
-                <div>Transaction ID: <strong style={{ fontFamily: "monospace" }}>{selectedReceipt.transactionId}</strong></div>
-                <div>Payment Status: <strong style={{ color: "#16a34a" }}>{selectedReceipt.paymentStatus}</strong></div>
-              </div>
-
-              {/* Courses Table with Individual Fees */}
-              <h4 style={{ margin: "0 0 8px 0", color: "#0f172a", fontSize: "14.5px" }}>1. Registered Academic Courses</h4>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left", marginBottom: "20px" }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1.5px solid #cbd5e1" }}>
-                    <th style={{ padding: "8px" }}>Course Code</th>
-                    <th style={{ padding: "8px" }}>Course Title</th>
-                    <th style={{ padding: "8px" }}>Type</th>
-                    <th style={{ padding: "8px" }}>Credit</th>
-                    <th style={{ padding: "8px", textAlign: "right" }}>Course Fee (BDT)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(selectedReceipt.selectedCourses || []).map((c, i) => (
-                    <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "8px", fontWeight: 600, color: "#0f172a" }}>{c.courseCode}</td>
-                      <td style={{ padding: "8px" }}>{c.courseTitle}</td>
-                      <td style={{ padding: "8px" }}>{c.courseType}</td>
-                      <td style={{ padding: "8px" }}>{c.creditHours}</td>
-                      <td style={{ padding: "8px", textAlign: "right", fontWeight: 600, color: "#3b8db3" }}>৳{(c.fee || (c.creditHours === 1 ? 100 : 300)).toLocaleString()} BDT</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Fixed Fees Serial List Table */}
-              <h4 style={{ margin: "0 0 8px 0", color: "#0f172a", fontSize: "14.5px" }}>2. Fixed Institutional Fees Schedule</h4>
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflow: "hidden", marginBottom: "20px" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
-                  <thead>
-                    <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1px solid #e2e8f0" }}>
-                      <th style={{ padding: "7px 10px", width: "40px" }}>#</th>
-                      <th style={{ padding: "7px 10px" }}>Fee Item Description</th>
-                      <th style={{ padding: "7px 10px", textAlign: "right" }}>Amount (BDT)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(selectedReceipt.fixedFees || FIXED_REGISTRATION_FEES).map((item, idx) => (
-                      <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9", background: idx % 2 === 0 ? "#ffffff" : "#f8fafc" }}>
-                        <td style={{ padding: "6px 10px", color: "#64748b", fontWeight: 600 }}>{idx + 1}</td>
-                        <td style={{ padding: "6px 10px", color: "#1e293b" }}>{item.name}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 600, color: "#0f172a" }}>৳{item.amount.toLocaleString()} BDT</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Total Calculation Banner */}
-              <div style={{ background: "#f0fdf4", padding: "16px", borderRadius: "10px", border: "1.5px solid #86efac", fontSize: "14px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px", color: "#334155" }}>
-                  <span>Academic Courses Fee Subtotal:</span>
-                  <strong>৳{(selectedReceipt.courseSubtotal || ((selectedReceipt.selectedCourses || []).reduce((sum, c) => sum + (c.fee || (c.creditHours === 1 ? 100 : 300)), 0))).toLocaleString()} BDT</strong>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px", color: "#334155" }}>
-                  <span>Fixed Institutional Fees Subtotal (13 Items):</span>
-                  <strong>৳{(selectedReceipt.fixedFeesTotal || FIXED_FEES_TOTAL).toLocaleString()} BDT</strong>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px dashed #86efac", paddingTop: "10px", marginTop: "8px", fontWeight: 800, fontSize: "16px", color: "#0f172a" }}>
-                  <span>Grand Total Paid Amount:</span>
-                  <span style={{ color: "#16a34a" }}>৳{selectedReceipt.totalAmount?.toLocaleString()} BDT</span>
-                </div>
-              </div>
-
-              <div style={{ marginTop: "24px", textAlign: "right" }}>
-                <button onClick={() => setShowReceiptModal(false)} style={{ padding: "8px 18px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: "6px", fontWeight: 600, fontSize: "13px", cursor: "pointer" }}>Close</button>
-              </div>
-            </div>
+              );
+            })}
           </div>
         )}
 
         {/* Online Payment Gateway Checkout Modal */}
         <PaymentCheckoutModal
           isOpen={showPaymentModal}
-          onClose={() => setShowPaymentModal(false)}
-          paymentRecord={activePayment}
-          totalAmount={activePayment?.totalAmount || 0}
+          onClose={() => {
+            setShowPaymentModal(false);
+            setSelectedPaymentForModal(null);
+          }}
+          paymentRecord={selectedPaymentForModal || payments[0]}
+          selectedCourses={selectedPaymentForModal?.selectedCourses || payments[0]?.selectedCourses || []}
+          totalAmount={selectedPaymentForModal?.totalAmount || payments[0]?.totalAmount || 0}
           onPaymentSuccess={() => {
             fetchPayments();
             setShowPaymentModal(false);
+            setSelectedPaymentForModal(null);
           }}
         />
 
-        {/* Official Registration Invoice Modal */}
+        {/* Official Registration Document (Invoice & Money Receipt Slip) Modal */}
         <RegistrationInvoiceModal
           isOpen={showInvoiceModal}
-          onClose={() => setShowInvoiceModal(false)}
-          registrationId={activePayment?.registration || activePayment?._id}
+          onClose={() => {
+            setShowInvoiceModal(false);
+            setSelectedRegIdForInvoice(null);
+          }}
+          registrationId={selectedRegIdForInvoice || payments[0]?.registration || payments[0]?._id}
           onPaymentSuccess={() => {
             fetchPayments();
           }}

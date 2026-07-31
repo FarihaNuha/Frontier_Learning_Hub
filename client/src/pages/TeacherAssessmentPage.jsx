@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
 import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
 import {
   FiUpload,
   FiFileText,
@@ -17,6 +18,12 @@ import {
   FiAlertCircle,
   FiBookOpen,
   FiInfo,
+  FiDownload,
+  FiMessageSquare,
+  FiSend,
+  FiX,
+  FiClock,
+  FiCheck,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -36,6 +43,116 @@ export default function TeacherAssessmentPage() {
   
   // Upload results summary state
   const [summary, setSummary] = useState(null);
+
+  // Correction Requests state
+  const [teacherRequests, setTeacherRequests] = useState([]);
+  const [viewRequestsModalGroup, setViewRequestsModalGroup] = useState(null);
+  const [replyTextMap, setReplyTextMap] = useState({});
+  const [submittingReplyId, setSubmittingReplyId] = useState(null);
+  const [timerValues, setTimerValues] = useState({});
+
+  const handleSetAssessmentDeadline = async (group, deadlineVal = null, isCloseNow = false) => {
+    try {
+      await api.post("/assessments/set-deadline", {
+        courseCode: group.courseCode,
+        level: group.level,
+        term: group.term,
+        department: group.department,
+        correctionWindowEnd: deadlineVal,
+        isCorrectionClosed: isCloseNow,
+      });
+      if (isCloseNow) {
+        toast.success(`Correction window locked for ${getCleanCourseCode(group.courseCode)}.`);
+      } else if (deadlineVal) {
+        toast.success(`Correction deadline updated for ${getCleanCourseCode(group.courseCode)}.`);
+      } else {
+        toast.success(`Correction deadline cleared for ${getCleanCourseCode(group.courseCode)}.`);
+      }
+      fetchAssessments();
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to update deadline.");
+    }
+  };
+  
+  // Helper to sanitize Course Code (e.g. "ET 317")
+  const getCleanCourseCode = (rawCode) => {
+    if (!rawCode) return "";
+    return String(rawCode).split(/course title|course type|credit|level|term|dept/i)[0].trim();
+  };
+
+  // Helper to sanitize Course Title (e.g. "Blended Education Design and Development")
+  const getCleanCourseTitle = (rawCode, rawTitle) => {
+    if (rawTitle && !rawTitle.toLowerCase().includes("course type") && !rawTitle.toLowerCase().includes("credit hour")) {
+      return rawTitle.trim();
+    }
+    if (!rawCode) return "";
+    if (/course title/i.test(rawCode)) {
+      let titlePart = rawCode.split(/course title\s*:?\s*/i)[1];
+      if (titlePart) {
+        return titlePart.split(/course type|credit|level|term|dept/i)[0].trim();
+      }
+    }
+    return "";
+  };
+
+  const getCleanSession = (group) => {
+    const raw = group?.session || group?.items?.[0]?.session || "";
+    const match = raw.match(/\d{4}[-\s]\d{2,4}/);
+    if (match) return match[0];
+    return "2022-23";
+  };
+
+  const getCleanLevel = (group) => {
+    const raw = group?.level || group?.items?.[0]?.level || "";
+    const match = raw.match(/level\s*(\d+)/i) || raw.match(/(\d+)/);
+    if (match) return match[1] || match[0];
+    return "3";
+  };
+
+  const getCleanTerm = (group) => {
+    const raw = group?.term || group?.items?.[0]?.term || "";
+    const match = raw.match(/term\s*(\d+)/i) || raw.match(/(\d+)/);
+    if (match) return match[1] || match[0];
+    return "2";
+  };
+
+  const getCleanDepartment = (group) => {
+    const raw = group?.department || group?.items?.[0]?.department || "";
+    const match = raw.match(/EDTE|IRE|CySE|DSE|SWE/i);
+    if (match) return match[0].toUpperCase();
+    return "EDTE";
+  };
+  
+  // Download Assessment Template matching user image layout exactly
+  const handleDownloadTemplate = () => {
+    const wsData = [
+      ["", "", "Dept: EDTE", "Session: 2022-23", "Level 3", "Term 2"],
+      ["", "Course Code: ET 317", "Course Title: Blended Education Design and Development", "", "Course Type: Theory", "Credit Hour: 3"],
+      [
+        "SL",
+        "ID of the Student",
+        "Attendance and Class Performance Marks (30)",
+        "Class Test/Quiz (Out of 30)",
+        "Assignment (Out of 30)",
+        "Presentation (Out of 30)",
+        "Total CA Marks (90)",
+      ],
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws["!cols"] = [
+      { wch: 6 },
+      { wch: 20 },
+      { wch: 44 },
+      { wch: 28 },
+      { wch: 25 },
+      { wch: 25 },
+      { wch: 22 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Assessment_Template");
+    XLSX.writeFile(wb, "Assessment_Marksheet_Template.xlsx");
+  };
   
   // Deletion UI states
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -72,8 +189,33 @@ export default function TeacherAssessmentPage() {
     }
   };
 
+  const fetchTeacherRequests = async () => {
+    try {
+      const res = await api.get("/results/teacher/correction-requests");
+      setTeacherRequests(res.data.requests || []);
+    } catch (err) {}
+  };
+
+  const handleReplyStudentRequest = async (requestId, newStatus = "Replied") => {
+    const text = replyTextMap[requestId] || "";
+    setSubmittingReplyId(requestId);
+    try {
+      await api.post(`/results/teacher/reply-correction-request/${requestId}`, {
+        teacherReply: text,
+        status: newStatus,
+      });
+      toast.success("Response sent to student successfully!");
+      fetchTeacherRequests();
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to send reply.");
+    } finally {
+      setSubmittingReplyId(null);
+    }
+  };
+
   useEffect(() => {
     fetchAssessments();
+    fetchTeacherRequests();
   }, [courseId]);
 
   const fetchAssessments = async () => {
@@ -225,97 +367,37 @@ export default function TeacherAssessmentPage() {
 
         {/* UPLOAD MARKSHEET BOX */}
         <div className="table-container" style={{ padding: 20, marginBottom: 24 }}>
-          <h2 style={{ fontSize: 18, color: "#2c4b66", marginBottom: 12 }}>
-            Upload Assessment Sheet
-          </h2>
-          <p style={{ fontSize: 13, color: "#6b89a0", marginBottom: 16 }}>
-            Upload an Excel (`.xlsx` or `.csv`) sheet. The system will automatically detect the Course Code (e.g. `Course Code: ENG 205`) and extract student marks for Quiz, Assignment, Presentation, and Attendance. Duplicates are automatically skipped.
-          </p>
-
-          {/* EXCEL FORMAT RULES & GUIDELINES CARD */}
-          <div style={{
-            background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
-            border: "1px solid #bae6fd",
-            borderRadius: 12,
-            padding: "16px 20px",
-            marginBottom: 20,
-          }}>
-            <div 
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }} 
-              onClick={() => setShowRules(!showRules)}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <FiInfo size={20} color="#0284c7" />
-                <strong style={{ color: "#0369a1", fontSize: 15 }}>Excel Marksheet Upload Format & Rules Guide</strong>
-              </div>
-              <span style={{ fontSize: 13, color: "#0284c7", fontWeight: 600 }}>
-                {showRules ? "Hide Guidelines ▲" : "View Rules & Format Guide ▼"}
-              </span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+            <div>
+              <h2 style={{ fontSize: 18, color: "#2c4b66", margin: 0 }}>
+                Upload Assessment Sheet
+              </h2>
+              <p style={{ fontSize: 13, color: "#6b89a0", marginTop: 4, marginBottom: 0 }}>
+                Upload an Excel (`.xlsx` or `.csv`) sheet. Course Code, Level, Term, Dept & student marks will be parsed automatically.
+              </p>
             </div>
-            {showRules && (
-              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #bae6fd", fontSize: 13, color: "#334155" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 14 }}>
-                  <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>1. Header Tags (Course Code, Level, Term, Dept)</strong>
-                    Include cells in top rows containing: <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Course Code: CC 483</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Level: Level 2</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Term: Term 1</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Dept: EDTE</code>
-                  </div>
-                  <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>2. Required Student ID & Session Columns</strong>
-                    Headers must include <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Student ID</code> and a per-student <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Session</code> column (e.g. 2021-22).
-                  </div>
-                  <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                    <strong style={{ color: "#0369a1", display: "block", marginBottom: 4 }}>3. Score Component Columns</strong>
-                    Headers for <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Attendance</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Quiz</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Assignment</code>, <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Presentation</code>, and <code style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 6px", borderRadius: 4 }}>Total</code>.
-                  </div>
-                </div>
-                <strong style={{ color: "#0369a1", fontSize: 13, display: "block", marginBottom: 6 }}>Sample Excel Layout:</strong>
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", background: "#ffffff", fontSize: 12, border: "1px solid #cbd5e1" }}>
-                    <thead>
-                      <tr style={{ background: "#f1f5f9" }}>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Row</th>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col A</th>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col B</th>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col C</th>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col D</th>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col E</th>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col F</th>
-                        <th style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>Col G</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>1</td>
-                        <td colSpan="2" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Course Code: CC 483</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Level: Level 2</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Term: Term 1</td>
-                        <td colSpan="3" style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#0284c7", fontWeight: "bold" }}>Dept: EDTE</td>
-                      </tr>
-                      <tr>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>2</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Student ID</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Session</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Attendance</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Quiz</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Assignment</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Presentation</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>Total</td>
-                      </tr>
-                      <tr>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", fontWeight: "bold" }}>3</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>2202022</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#475569", fontWeight: "bold" }}>2021-22</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>30</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>26</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>25</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px" }}>25</td>
-                        <td style={{ border: "1px solid #cbd5e1", padding: "6px 10px", color: "#16a34a", fontWeight: "bold" }}>106</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={handleDownloadTemplate}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "10px 18px",
+                borderRadius: 10,
+                background: "#ffffff",
+                color: "#0369a1",
+                border: "1.5px solid #bae6fd",
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: "pointer",
+                boxShadow: "0 2px 6px rgba(2, 132, 199, 0.08)",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <FiDownload size={18} color="#0369a1" />
+              <span>Download Template</span>
+            </button>
           </div>
 
           <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -392,7 +474,10 @@ export default function TeacherAssessmentPage() {
                 <FiCheckCircle /> Marksheet Processing Summary
               </h4>
               <div style={{ display: "flex", gap: 24, flexWrap: "wrap", fontSize: 14 }}>
-                <p><strong>Detected Course Code:</strong> <span className="status-badge ontime">{summary.courseCode}</span></p>
+                <p><strong>Detected Course Code:</strong> <span className="status-badge ontime">{getCleanCourseCode(summary.courseCode)}</span></p>
+                {getCleanCourseTitle(summary.courseCode, summary.courseTitle) && (
+                  <p><strong>Course Title:</strong> <span style={{ fontWeight: 600, color: "#2c4b66" }}>{getCleanCourseTitle(summary.courseCode, summary.courseTitle)}</span></p>
+                )}
                 {summary.level && <p><strong>Level:</strong> <span style={{ background: "#f1f5f9", color: "#475569", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.level}</span></p>}
                 {summary.term && <p><strong>Term:</strong> <span style={{ background: "#f1f5f9", color: "#475569", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.term}</span></p>}
                 {summary.department && <p><strong>Dept:</strong> <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>{summary.department}</span></p>}
@@ -493,8 +578,11 @@ export default function TeacherAssessmentPage() {
                           .map(([levelTermName, groupsList]) => (
                           <div key={levelTermName}>
                             {/* Level & Term Sub-header */}
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
-                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569", background: "#f1f5f9", padding: "4px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", flexWrap: "wrap" }}>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0369a1", background: "#e0f2fe", padding: "4px 12px", borderRadius: "6px", border: "1px solid #bae6fd" }}>
+                                📅 Session: {getCleanSession(groupsList[0])}
+                              </span>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569", background: "#f1f5f9", padding: "4px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
                                 🎓 {levelTermName}
                               </span>
                               <span style={{ fontSize: "12px", color: "#64748b" }}>
@@ -511,7 +599,16 @@ export default function TeacherAssessmentPage() {
                                     key={group.key}
                                     onClick={() => setSelectedCourseGroup(group)}
                                     className="assessment-course-card"
-                                    style={{ position: "relative", cursor: "pointer" }}
+                                    style={{
+                                      position: "relative",
+                                      cursor: "pointer",
+                                      background: "#ffffff",
+                                      borderRadius: "12px",
+                                      padding: "20px",
+                                      border: "1px solid #e2e8f0",
+                                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                                      transition: "all 0.2s ease"
+                                    }}
                                   >
                                     {/* Card Accent Line */}
                                     <div style={{
@@ -520,10 +617,11 @@ export default function TeacherAssessmentPage() {
                                       left: 0,
                                       width: "6px",
                                       height: "100%",
-                                      background: "#3B8DB3"
-                                    }}></div>
+                                      background: "#3B8DB3",
+                                      borderRadius: "12px 0 0 12px"
+                                    }} />
 
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
                                       <span style={{
                                         background: "#E8F4FD",
                                         color: "#3B8DB3",
@@ -533,9 +631,42 @@ export default function TeacherAssessmentPage() {
                                         fontWeight: 700,
                                         letterSpacing: "0.5px"
                                       }}>
-                                        {group.courseCode}
+                                        {getCleanCourseCode(group.courseCode)}
                                       </span>
                                       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setViewRequestsModalGroup(group);
+                                          }}
+                                          style={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "5px",
+                                            padding: "4px 10px",
+                                            borderRadius: "16px",
+                                            background: "#e0f2fe",
+                                            color: "#0369a1",
+                                            border: "1px solid #bae6fd",
+                                            fontSize: "12px",
+                                            fontWeight: 600,
+                                            cursor: "pointer"
+                                          }}
+                                          title="View Student Correction Requests"
+                                        >
+                                          <FiMessageSquare size={13} />
+                                          <span>
+                                            Correction Requests (
+                                            {
+                                              teacherRequests.filter((r) =>
+                                                r.courseCode &&
+                                                r.courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() ===
+                                                getCleanCourseCode(group.courseCode).replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
+                                              ).length
+                                            }
+                                            )
+                                          </span>
+                                        </button>
                                         <button
                                           onClick={(e) => {
                                             e.stopPropagation();
@@ -561,12 +692,83 @@ export default function TeacherAssessmentPage() {
                                       </div>
                                     </div>
 
-                                    <h3 style={{ fontSize: "16px", color: "#2c4b66", margin: "0 0 6px 0", fontWeight: 600 }}>
-                                      Assessment Marksheet
+                                    <h3 style={{ fontSize: "15px", color: "#2c4b66", margin: "0 0 8px 0", fontWeight: 600, lineHeight: 1.4 }}>
+                                      {getCleanCourseTitle(group.courseCode) || "Assessment Marksheet"}
                                     </h3>
+
                                     <p style={{ color: "#6b89a0", fontSize: "14px", margin: 0 }}>
                                       Students Uploaded: <strong style={{ color: "#2c4b66" }}>{studentCount}</strong>
                                     </p>
+
+                                    {/* Assessment Correction Window Deadline Box */}
+                                    {(() => {
+                                      const firstItem = group.items[0] || {};
+                                      const isClosed = Boolean(firstItem.isCorrectionClosed || (firstItem.correctionWindowEnd && new Date() > new Date(firstItem.correctionWindowEnd)));
+                                      const hasDeadline = Boolean(firstItem.correctionWindowEnd);
+                                      const formattedVal = timerValues[group.key] ?? (firstItem.correctionWindowEnd ? new Date(firstItem.correctionWindowEnd).toISOString().slice(0, 16) : "");
+
+                                      return (
+                                        <div
+                                          onClick={(e) => e.stopPropagation()}
+                                          style={{
+                                            marginTop: "12px",
+                                            padding: "10px 12px",
+                                            borderRadius: "10px",
+                                            background: isClosed ? "#fff1f2" : hasDeadline ? "#f0fdf4" : "#f8fafc",
+                                            border: `1px solid ${isClosed ? "#fecdd3" : hasDeadline ? "#bbf7d0" : "#cbd5e1"}`,
+                                            fontSize: "12px"
+                                          }}
+                                        >
+                                          <div style={{ fontWeight: 700, marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", color: isClosed ? "#be123c" : hasDeadline ? "#15803d" : "#475569" }}>
+                                            <FiClock size={14} />
+                                            {isClosed
+                                              ? `🔒 Marksheet Correction Locked (${firstItem.correctionWindowEnd ? new Date(firstItem.correctionWindowEnd).toLocaleString([], { dateStyle: "short", timeStyle: "short" }) : "Closed"})`
+                                              : hasDeadline
+                                              ? `🔓 Open for Student Correction until: ${new Date(firstItem.correctionWindowEnd).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}`
+                                              : "⏱️ No Correction Deadline Set"}
+                                          </div>
+
+                                          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center", marginTop: "6px" }}>
+                                            <input
+                                              type="datetime-local"
+                                              value={formattedVal}
+                                              onChange={(e) => setTimerValues({ ...timerValues, [group.key]: e.target.value })}
+                                              style={{ padding: "3px 6px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", outline: "none" }}
+                                            />
+                                            <button
+                                              onClick={() => handleSetAssessmentDeadline(group, timerValues[group.key])}
+                                              style={{ padding: "3px 8px", background: "#0284c7", color: "#fff", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}
+                                            >
+                                              Save
+                                            </button>
+                                            <button
+                                              onClick={() => {
+                                                const d = new Date(Date.now() + 48 * 3600 * 1000).toISOString().slice(0, 16);
+                                                handleSetAssessmentDeadline(group, d);
+                                              }}
+                                              style={{ padding: "3px 6px", background: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "10.5px" }}
+                                            >
+                                              +48h
+                                            </button>
+                                            <button
+                                              onClick={() => {
+                                                const d = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 16);
+                                                handleSetAssessmentDeadline(group, d);
+                                              }}
+                                              style={{ padding: "3px 6px", background: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "10.5px" }}
+                                            >
+                                              +7d
+                                            </button>
+                                            <button
+                                              onClick={() => handleSetAssessmentDeadline(group, null, true)}
+                                              style={{ padding: "3px 6px", background: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "10.5px" }}
+                                            >
+                                              🔒 Lock
+                                            </button>
+                                          </div>
+                                        </div>
+                                      );
+                                    })()}
 
                                     <div style={{
                                       marginTop: "16px",
@@ -594,98 +796,119 @@ export default function TeacherAssessmentPage() {
             </div>
           ) : (
             // SELECTED COURSE DETAILED TABLE VIEW
-            <div>
+            <div style={{ padding: 20 }}>
+              {/* TOP COURSE HEADER BANNER */}
               <div
                 style={{
-                  padding: "16px 20px",
-                  borderBottom: "1px solid #E2EEF6",
+                  padding: "20px 24px",
+                  background: "linear-gradient(135deg, #2c4b66 0%, #3B8DB3 100%)",
+                  borderRadius: "12px",
+                  color: "#fff",
+                  marginBottom: "20px",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   flexWrap: "wrap",
-                  gap: 16,
+                  gap: "16px",
+                  boxShadow: "0 4px 12px rgba(59, 141, 179, 0.15)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 6 }}>
+                    <span
+                      style={{
+                        background: "#ffffff",
+                        color: "#2c4b66",
+                        fontWeight: 800,
+                        fontSize: 16,
+                        padding: "4px 14px",
+                        borderRadius: 8,
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      {getCleanCourseCode(selectedCourseGroup?.courseCode)}
+                    </span>
+                    {getCleanCourseTitle(selectedCourseGroup?.courseCode) && (
+                      <h2 style={{ margin: 0, fontSize: 18, color: "#ffffff", fontWeight: 700 }}>
+                        {getCleanCourseTitle(selectedCourseGroup?.courseCode)}
+                      </h2>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, opacity: 0.95, marginTop: 6 }}>
+                    <span>📅 Session: <strong>{getCleanSession(selectedCourseGroup)}</strong></span>
+                    <span>🎓 Level: <strong>{getCleanLevel(selectedCourseGroup)}</strong></span>
+                    <span>📘 Term: <strong>{getCleanTerm(selectedCourseGroup)}</strong></span>
+                    <span>📖 Course Type: <strong>Theory</strong></span>
+                    <span>⏱️ Credit Hour: <strong>3</strong></span>
+                    <span>🏛️ Dept: <strong>{getCleanDepartment(selectedCourseGroup)}</strong></span>
+                    <span>👥 Total Students: <strong>{filteredAssessments.length}</strong></span>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                   <button
                     onClick={() => setSelectedCourseGroup(null)}
-                    className="btn-secondary"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 6,
-                      padding: "8px 14px",
+                      padding: "8px 16px",
                       borderRadius: 8,
                       fontSize: 13,
                       height: "auto",
-                      border: "1px solid #d4e7f5",
-                      background: "#fff"
+                      border: "1px solid rgba(255,255,255,0.4)",
+                      background: "rgba(255,255,255,0.15)",
+                      color: "#ffffff",
+                      fontWeight: 600,
+                      cursor: "pointer"
                     }}
                   >
                     <FiArrowLeft size={14} /> Back to Courses
                   </button>
-                  <h2 style={{ margin: 0, fontSize: 18, color: "#2c4b66", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    Marksheet for <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", fontWeight: 700 }}>{selectedCourseGroup?.courseCode}</span>
-                    {selectedCourseGroup?.level && (
-                      <span style={{ background: "#f1f5f9", color: "#475569", padding: "3px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 }}>
-                        Level: {selectedCourseGroup.level.replace(/^level\s*:?\s*/i, '')}
-                      </span>
-                    )}
-                    {selectedCourseGroup?.term && (
-                      <span style={{ background: "#f1f5f9", color: "#475569", padding: "3px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 }}>
-                        Term: {selectedCourseGroup.term.replace(/^term\s*:?\s*/i, '')}
-                      </span>
-                    )}
-                    {selectedCourseGroup?.department && (
-                      <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "3px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600 }}>
-                        Dept: {selectedCourseGroup.department}
-                      </span>
-                    )}
-                  </h2>
-                </div>
-
-                {/* SEARCH & ACTIONS */}
-                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                   <button
                     onClick={() => setDeleteTarget({ type: "course", value: selectedCourseGroup })}
-                    className="btn-secondary"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 6,
-                      padding: "8px 14px",
+                      padding: "8px 16px",
                       borderRadius: 8,
                       fontSize: 13,
                       height: "auto",
-                      border: "1px solid #fecaca",
-                      background: "#fef2f2",
-                      color: "#ef4444",
+                      border: "none",
+                      background: "rgba(239, 68, 68, 0.9)",
+                      color: "#ffffff",
                       fontWeight: 600,
                       cursor: "pointer"
                     }}
                   >
                     <FiTrash2 size={14} /> Delete Marksheet
                   </button>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      type="text"
-                      placeholder="Search student ID, Name, or Session..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      style={{
-                        padding: "8px 12px 8px 36px",
-                        border: "1px solid #E2EEF6",
-                        borderRadius: 8,
-                        fontSize: 14,
-                        width: 240,
-                      }}
-                    />
-                    <FiSearch
-                      size={16}
-                      color="#6B89A0"
-                      style={{ position: "absolute", left: 12, top: 11 }}
-                    />
-                  </div>
+                </div>
+              </div>
+
+              {/* SEARCH BAR */}
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+                <div style={{ position: "relative", width: "100%", maxWidth: 300 }}>
+                  <input
+                    type="text"
+                    placeholder="Search student ID, Name, or Session..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                      padding: "8px 12px 8px 36px",
+                      border: "1px solid #E2EEF6",
+                      borderRadius: 8,
+                      fontSize: 14,
+                      width: "100%",
+                      outline: "none",
+                    }}
+                  />
+                  <FiSearch
+                    size={16}
+                    color="#6B89A0"
+                    style={{ position: "absolute", left: 12, top: 11 }}
+                  />
                 </div>
               </div>
 
@@ -706,8 +929,6 @@ export default function TeacherAssessmentPage() {
                       <tr>
                         <th style={{ textAlign: "center" }}>Student ID</th>
                         <th style={{ textAlign: "center" }}>Name</th>
-                        <th style={{ textAlign: "center" }}>Session</th>
-                        <th style={{ textAlign: "center" }}>Course Code</th>
                         <th style={{ textAlign: "center" }}>Attendance Score</th>
                         <th style={{ textAlign: "center" }}>Quiz Score</th>
                         <th style={{ textAlign: "center" }}>Assignment Score</th>
@@ -721,16 +942,6 @@ export default function TeacherAssessmentPage() {
                         <tr key={record._id}>
                           <td style={{ fontWeight: 700, textAlign: "center" }}>{record.studentIdNumber}</td>
                           <td style={{ fontWeight: 600, textAlign: "center" }}>{record.studentId?.name || "N/A"}</td>
-                          <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                            <span style={{ background: "#f1f5f9", color: "#475569", padding: "4px 10px", borderRadius: 4, fontWeight: 600, fontSize: 12, whiteSpace: "nowrap", display: "inline-block" }}>
-                              {record.session || "N/A"}
-                            </span>
-                          </td>
-                          <td style={{ textAlign: "center" }}>
-                            <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", whiteSpace: "nowrap" }}>
-                              {record.courseCode}
-                            </span>
-                          </td>
                           <td style={{ textAlign: "center" }}>{record.attendance}</td>
                           <td style={{ textAlign: "center" }}>{record.quiz}</td>
                           <td style={{ textAlign: "center" }}>{record.assignment}</td>
@@ -822,6 +1033,165 @@ export default function TeacherAssessmentPage() {
                 {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Student Correction Requests Modal for Teacher */}
+      {viewRequestsModalGroup && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", zIndex: 1200, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+          <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", maxWidth: "750px", width: "100%", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: "20px", color: "#0f172a", fontWeight: 700 }}>
+                  📩 Student Correction Requests: <strong>{getCleanCourseCode(viewRequestsModalGroup.courseCode)}</strong>
+                </h3>
+                <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#64748b" }}>
+                  Review and reply to private assessment score issue messages sent by students
+                </p>
+              </div>
+              <button onClick={() => setViewRequestsModalGroup(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#64748b", padding: 4 }}>
+                <FiX size={22} />
+              </button>
+            </div>
+
+            {(() => {
+              const targetCodeClean = getCleanCourseCode(viewRequestsModalGroup.courseCode).replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+              const groupRequests = teacherRequests.filter(
+                (r) => r.courseCode && r.courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() === targetCodeClean
+              );
+
+              if (groupRequests.length === 0) {
+                return (
+                  <div style={{ padding: "40px 20px", textAlign: "center", color: "#94a3b8" }}>
+                    <FiMessageSquare size={42} style={{ opacity: 0.4, marginBottom: "12px" }} />
+                    <h4 style={{ margin: "0 0 4px 0", color: "#475569" }}>No Correction Requests</h4>
+                    <p style={{ margin: 0, fontSize: "13px" }}>No student correction requests have been submitted for this course yet.</p>
+                  </div>
+                );
+              }
+
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  {groupRequests.map((req) => {
+                    const isPending = req.status === "Pending";
+                    const isReplied = req.status === "Replied";
+                    const isResolved = req.status === "Resolved";
+
+                    return (
+                      <div
+                        key={req._id}
+                        style={{
+                          background: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "12px",
+                          padding: "18px",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px", flexWrap: "wrap", gap: 8 }}>
+                          <div>
+                            <strong style={{ fontSize: "15px", color: "#0f172a" }}>{req.studentName}</strong>
+                            <span style={{ fontSize: "13px", color: "#64748b", marginLeft: "8px" }}>
+                              (ID: {req.studentId})
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span
+                              style={{
+                                padding: "4px 10px",
+                                borderRadius: "20px",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                background: isPending ? "#fef3c7" : isReplied ? "#dbeafe" : "#dcfce7",
+                                color: isPending ? "#d97706" : isReplied ? "#1d4ed8" : "#15803d",
+                              }}
+                            >
+                              {req.status}
+                            </span>
+                            <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                              {new Date(req.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div style={{ background: "#ffffff", padding: "12px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", marginBottom: "14px", fontSize: "13.5px", color: "#334155", lineHeight: 1.5 }}>
+                          <strong style={{ color: "#0369a1", display: "block", marginBottom: 2 }}>Student Issue Message:</strong>
+                          {req.studentMessage ? req.studentMessage.replace(/^\[Assessment Marksheet Issue\]\s*/i, "") : ""}
+                        </div>
+
+                        {req.teacherReply && (
+                          <div style={{ background: "#f0fdf4", padding: "10px 14px", borderRadius: "8px", border: "1px solid #bbf7d0", marginBottom: "14px", fontSize: "13px", color: "#166534" }}>
+                            <strong>Your Sent Reply:</strong> {req.teacherReply}
+                          </div>
+                        )}
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <textarea
+                            placeholder="Type your response to the student..."
+                            rows={2}
+                            value={replyTextMap[req._id] ?? req.teacherReply ?? ""}
+                            onChange={(e) => setReplyTextMap({ ...replyTextMap, [req._id]: e.target.value })}
+                            style={{
+                              width: "100%",
+                              padding: "10px",
+                              borderRadius: "8px",
+                              border: "1px solid #cbd5e1",
+                              fontSize: "13px",
+                              fontFamily: "inherit"
+                            }}
+                          />
+                          <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                            <button
+                              type="button"
+                              onClick={() => handleReplyStudentRequest(req._id, "Replied")}
+                              disabled={submittingReplyId === req._id}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                padding: "6px 14px",
+                                background: "#0284c7",
+                                color: "#ffffff",
+                                border: "none",
+                                borderRadius: "6px",
+                                fontWeight: 600,
+                                fontSize: "12.5px",
+                                cursor: "pointer"
+                              }}
+                            >
+                              <FiSend size={13} /> Send Reply
+                            </button>
+                            {!isResolved && (
+                              <button
+                                type="button"
+                                onClick={() => handleReplyStudentRequest(req._id, "Resolved")}
+                                disabled={submittingReplyId === req._id}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "6px",
+                                  padding: "6px 14px",
+                                  background: "#16a34a",
+                                  color: "#ffffff",
+                                  border: "none",
+                                  borderRadius: "6px",
+                                  fontWeight: 600,
+                                  fontSize: "12.5px",
+                                  cursor: "pointer"
+                                }}
+                              >
+                                <FiCheck size={13} /> Mark Resolved
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

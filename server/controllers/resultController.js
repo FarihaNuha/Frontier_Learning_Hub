@@ -1341,10 +1341,21 @@ exports.createCorrectionRequest = async (req, res) => {
       uploadBatch = await ResultUpload.findOne({ courseCode: { $regex: new RegExp(cleanC, "i") } });
     }
 
-    if (uploadBatch && uploadBatch.correctionWindowEnd && new Date() > new Date(uploadBatch.correctionWindowEnd)) {
+    if (uploadBatch && (uploadBatch.isCorrectionClosed || (uploadBatch.correctionWindowEnd && new Date() > new Date(uploadBatch.correctionWindowEnd)))) {
       return res.status(400).json({
-        error: `Correction deadline passed on ${new Date(uploadBatch.correctionWindowEnd).toLocaleString()}. Further requests are locked.`,
+        error: `Correction deadline passed for this marksheet. Further correction requests are locked.`,
       });
+    }
+
+    if (courseCode) {
+      const Assessment = require("../models/Assessment");
+      const cleanC = courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const assCheck = await Assessment.findOne({ courseCode: { $regex: new RegExp(cleanC, "i") } }).lean();
+      if (assCheck && (assCheck.isCorrectionClosed || (assCheck.correctionWindowEnd && new Date() > new Date(assCheck.correctionWindowEnd)))) {
+        return res.status(400).json({
+          error: `Correction request deadline passed for this assessment. Submissions are locked.`,
+        });
+      }
     }
 
     let actualStudentId = req.user.studentId;
@@ -1359,28 +1370,47 @@ exports.createCorrectionRequest = async (req, res) => {
       if (sProf && sProf.studentId) actualStudentId = sProf.studentId;
     }
 
+    let finalTeacherEmail = (teacherEmail || uploadBatch?.teacherEmail || "").toLowerCase().trim();
+
+    if (!finalTeacherEmail && courseCode) {
+      const Assessment = require("../models/Assessment");
+      const cleanCode = courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const assDoc = await Assessment.findOne({ courseCode: { $regex: new RegExp(cleanCode, "i") } }).populate("uploadedBy", "email");
+      if (assDoc && assDoc.uploadedBy && assDoc.uploadedBy.email) {
+        finalTeacherEmail = assDoc.uploadedBy.email.toLowerCase().trim();
+      }
+    }
+
+    if (!finalTeacherEmail && courseCode) {
+      const Course = require("../models/Course");
+      const cleanCode = courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const courseDoc = await Course.findOne({ displayCode: { $regex: new RegExp(cleanCode, "i") } }).populate("teacher", "email");
+      if (courseDoc && courseDoc.teacher && courseDoc.teacher.email) {
+        finalTeacherEmail = courseDoc.teacher.email.toLowerCase().trim();
+      }
+    }
+
     const reqDoc = await ResultCorrectionRequest.create({
       uploadId: uploadBatch ? uploadBatch._id : null,
       resultId: resultId || null,
       student: req.user._id || req.user.id,
       studentId: actualStudentId || "Student",
       studentName: req.user.name || "Student",
-      teacherEmail: teacherEmail || uploadBatch?.teacherEmail || "",
+      teacherEmail: finalTeacherEmail,
       courseCode: courseCode || uploadBatch?.courseCode || "",
       courseTitle: courseTitle || uploadBatch?.courseTitle || "",
       studentMessage: studentMessage.trim(),
     });
 
     // Notify Course Teacher
-    const targetTeacherEmail = teacherEmail || uploadBatch?.teacherEmail;
-    if (targetTeacherEmail) {
-      const teacherUser = await User.findOne({ email: targetTeacherEmail.toLowerCase() });
+    if (finalTeacherEmail) {
+      const teacherUser = await User.findOne({ email: finalTeacherEmail });
       if (teacherUser) {
         try {
           const notif = await Notification.create({
             userId: teacherUser._id,
-            title: `Result Issue Reported: ${courseCode || uploadBatch?.courseCode || ""}`,
-            message: `Student ${req.user.name} (${req.user.studentId || ""}) submitted a result correction request for ${courseCode || uploadBatch?.courseCode || ""}.`,
+            title: `Correction Request: ${courseCode || uploadBatch?.courseCode || ""}`,
+            message: `Student ${req.user.name} (${actualStudentId}) submitted a correction request for ${courseCode || uploadBatch?.courseCode || ""}.`,
             type: "general",
           });
           const io = getIO();
@@ -1411,10 +1441,36 @@ exports.getStudentCorrectionRequests = async (req, res) => {
 // Fetch teacher's correction requests
 exports.getTeacherCorrectionRequests = async (req, res) => {
   try {
-    const teacherEmail = req.user.email.toLowerCase();
-    const requests = await ResultCorrectionRequest.find({
-      $or: [{ teacherEmail }, { teacher: req.user._id || req.user.id }],
-    }).sort({ createdAt: -1 }).lean();
+    const teacherEmail = (req.user.email || "").toLowerCase().trim();
+
+    const Course = require("../models/Course");
+    const Teacher = require("../models/Teacher");
+    const teacherLmsCourses = await Course.find({ teacher: req.user.uid || req.user._id || req.user.id }).lean();
+    const teacherProfile = await Teacher.findOne({ email: { $regex: new RegExp(`^${teacherEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }).lean();
+
+    const assignedCodesList = [];
+    (teacherLmsCourses || []).forEach(c => {
+      const code = String(c.displayCode || c.name || "").trim();
+      if (code) assignedCodesList.push(code);
+    });
+    (teacherProfile?.assignedCourses || []).forEach(c => {
+      const code = String(c.courseCode || c.courseName || "").trim();
+      if (code) assignedCodesList.push(code);
+    });
+
+    const conditions = [
+      { teacherEmail: { $regex: new RegExp(`^${teacherEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+      { teacher: req.user.uid || req.user._id || req.user.id }
+    ];
+
+    if (assignedCodesList.length > 0) {
+      const codeRegexes = assignedCodesList.map(c => new RegExp(c.replace(/[^a-zA-Z0-9]/g, ""), "i"));
+      conditions.push({ courseCode: { $in: codeRegexes } });
+    }
+
+    const requests = await ResultCorrectionRequest.find({ $or: conditions })
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ requests });
   } catch (error) {

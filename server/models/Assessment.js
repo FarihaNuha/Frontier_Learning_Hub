@@ -55,6 +55,14 @@ const assessmentSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  correctionWindowEnd: {
+    type: Date,
+    default: null,
+  },
+  isCorrectionClosed: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -62,7 +62,11 @@ export default function StudentLevelTermPage() {
   const isPending = reg?.status === "Pending Adviser Approval";
   const isRejected = reg?.status === "Rejected";
 
-  const coursesToDisplay = reg?.selectedCourses?.length > 0 ? reg.selectedCourses : data?.courses || [];
+  const coursesToDisplay = isApproved
+    ? (reg?.selectedCourses?.length > 0 ? reg.selectedCourses : data?.courses || [])
+    : isPending
+    ? []
+    : (data?.courses || []);
 
   return (
     <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto", fontFamily: "sans-serif" }}>
@@ -92,15 +96,16 @@ export default function StudentLevelTermPage() {
 
           <span
             style={{
-              padding: "6px 14px",
+              padding: "6px 16px",
               borderRadius: "20px",
-              fontWeight: "700",
               fontSize: "13px",
-              background: isCompletedSemester || isApproved ? "#dcfce7" : isPending ? "#fef3c7" : isRejected ? "#fee2e2" : "#e0f2fe",
-              color: isCompletedSemester || isApproved ? "#15803d" : isPending ? "#b45309" : isRejected ? "#b91c1c" : "#0369a1",
+              fontWeight: "700",
+              background: isApproved ? "#dcfce7" : isPending ? "#fff7ed" : isRejected ? "#fee2e2" : "#f1f5f9",
+              color: isApproved ? "#15803d" : isPending ? "#c2410c" : isRejected ? "#991b1b" : "#475569",
+              border: `1px solid ${isApproved ? "#86efac" : isPending ? "#fed7aa" : isRejected ? "#fca5a5" : "#cbd5e1"}`,
             }}
           >
-            {isCompletedSemester ? "Semester Complete" : reg ? reg.status : "Registration Open"}
+            {isApproved ? "Registration Approved" : isPending ? "Pending Adviser Approval" : isRejected ? "Registration Rejected" : "Not Registered"}
           </span>
         </div>
 
@@ -261,7 +266,15 @@ export default function StudentLevelTermPage() {
         <div>
           <h3 style={{ color: "#1e293b", marginBottom: "12px" }}>Academic Course Roster & Study Materials</h3>
           {coursesToDisplay.length === 0 ? (
-            <div style={{ padding: "30px", textAlign: "center", color: "#94a3b8" }}>No courses found for Level {level} Term {term}.</div>
+            <div style={{ padding: "30px", textAlign: "center", color: "#64748b", background: isPending ? "#fff7ed" : "#f8fafc", borderRadius: "10px", border: isPending ? "1px solid #fed7aa" : "1px solid #e2e8f0" }}>
+              {isPending ? (
+                <div style={{ color: "#c2410c", fontWeight: "600" }}>
+                  ⚠️ Your course registration for Level {level} Term {term} is currently pending Adviser approval. Course roster and LMS study materials will unlock as soon as your Adviser approves your registration.
+                </div>
+              ) : (
+                `No courses found for ${data?.student?.department ? `Department of ${data.student.department}` : "your department"} Level ${level} Term ${term}.`
+              )}
+            </div>
           ) : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>

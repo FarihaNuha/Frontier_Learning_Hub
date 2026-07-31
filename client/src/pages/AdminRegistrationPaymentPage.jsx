@@ -189,6 +189,86 @@ export default function AdminRegistrationPaymentPage() {
                 <div>Transaction ID: <strong style={{ fontFamily: "monospace" }}>{selectedPayment.transactionId || "N/A"}</strong></div>
               </div>
 
+              {/* Previous Dues & Student Academic Payment History Section */}
+              {selectedPayment.previousDuesInfo && (
+                <div style={{ marginBottom: "20px" }}>
+                  {selectedPayment.previousDuesInfo.hasUnpaidPreviousSemesters ? (
+                    <div
+                      style={{
+                        background: "#fff1f2",
+                        border: "1.5px solid #fecdd3",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        marginBottom: "14px",
+                      }}
+                    >
+                      <div style={{ color: "#be123c", fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>
+                        Previous Dues: ৳{selectedPayment.previousDuesInfo.totalUnpaidAmount.toLocaleString()} BDT Unpaid
+                      </div>
+                      <p style={{ margin: 0, color: "#9f1239", fontSize: "13px" }}>
+                        This student has unpaid registration balances from previous semester(s) prior to {selectedPayment.level} {selectedPayment.term}.
+                      </p>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        background: "#f0fdf4",
+                        border: "1.5px solid #bbf7d0",
+                        borderRadius: "12px",
+                        padding: "12px 16px",
+                        marginBottom: "14px",
+                        color: "#166534",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      All Previous Semester Dues Cleared (৳0 BDT Pending)
+                    </div>
+                  )}
+
+                  {selectedPayment.previousDuesInfo.historyList?.length > 0 && (
+                    <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px", marginBottom: "16px" }}>
+                      <h4 style={{ margin: "0 0 10px 0", color: "#334155", fontSize: "13.5px" }}>
+                        Student Academic Payment History (Prior Semesters):
+                      </h4>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px" }}>
+                        <thead>
+                          <tr style={{ background: "#e2e8f0", color: "#334155" }}>
+                            <th style={{ padding: "6px 10px", textAlign: "left" }}>Semester</th>
+                            <th style={{ padding: "6px 10px", textAlign: "center" }}>Payment Status</th>
+                            <th style={{ padding: "6px 10px", textAlign: "right" }}>Previous Dues (BDT)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedPayment.previousDuesInfo.historyList.map((h, i) => (
+                            <tr key={i} style={{ borderBottom: "1px solid #e2e8f0" }}>
+                              <td style={{ padding: "6px 10px", fontWeight: 600 }}>{h.levelTerm}</td>
+                              <td style={{ padding: "6px 10px", textAlign: "center" }}>
+                                <span
+                                  style={{
+                                    padding: "2px 8px",
+                                    borderRadius: "8px",
+                                    fontWeight: 700,
+                                    fontSize: "11px",
+                                    background: h.status === "Paid" ? "#dcfce7" : "#fee2e2",
+                                    color: h.status === "Paid" ? "#15803d" : "#b91c1c",
+                                  }}
+                                >
+                                  {h.status}
+                                </span>
+                              </td>
+                              <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 700, color: h.status === "Paid" ? "#15803d" : "#be123c" }}>
+                                {h.status === "Paid" ? "৳0 BDT" : `৳${h.dueAmount.toLocaleString()} BDT`}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <h4 style={{ margin: "16px 0 8px 0", color: "#334155" }}>1. Courses Included in Registration Fee:</h4>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left", marginBottom: "16px" }}>
                 <thead>
@@ -200,14 +280,19 @@ export default function AdminRegistrationPaymentPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(selectedPayment.selectedCourses || []).map((c, i) => (
-                    <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "8px", fontWeight: 600 }}>{c.courseCode}</td>
-                      <td style={{ padding: "8px" }}>{c.courseTitle}</td>
-                      <td style={{ padding: "8px" }}>{c.courseType}</td>
-                      <td style={{ padding: "8px", textAlign: "right", fontWeight: 600, color: "#3b8db3" }}>৳{(c.fee || (c.creditHours === 1 ? 100 : 300)).toLocaleString()} BDT</td>
-                    </tr>
-                  ))}
+                  {(selectedPayment.selectedCourses || []).map((c, i) => {
+                    const credits = Number(c.creditHours) || 3;
+                    const isLab = credits <= 1.5 || (c.courseType || "").toLowerCase().includes("sessional") || (c.courseType || "").toLowerCase().includes("lab");
+                    const calculatedFee = c.fee || (isLab ? (credits === 1.5 ? 150 : 100) : 300);
+                    return (
+                      <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                        <td style={{ padding: "8px", fontWeight: 600 }}>{c.courseCode}</td>
+                        <td style={{ padding: "8px" }}>{c.courseTitle}</td>
+                        <td style={{ padding: "8px" }}>{c.courseType} ({credits} Cr)</td>
+                        <td style={{ padding: "8px", textAlign: "right", fontWeight: 600, color: "#3b8db3" }}>৳{calculatedFee.toLocaleString()} BDT</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 

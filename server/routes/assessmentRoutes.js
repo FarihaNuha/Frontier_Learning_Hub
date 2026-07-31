@@ -41,4 +41,11 @@ router.delete(
   ctrl.deleteSingleAssessment
 );
 
+router.post(
+  "/set-deadline",
+  verifyToken,
+  checkRole("teacher", "admin"),
+  ctrl.setAssessmentCorrectionDeadline
+);
+
 module.exports = router;

@@ -496,20 +496,20 @@ export default function AdminAdvisers() {
                       <td style={{ padding: "12px" }}>
                         {isEditing ? (
                           <select
-                            value={editFormData.program || "B.Sc. in Educational Technology and Engineering"}
+                            value={editFormData.program || "B.Sc. in EDTE"}
                             onChange={(e) => setEditFormData({ ...editFormData, program: e.target.value })}
                             style={{ padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "12px", width: "170px" }}
                           >
-                            <option value="B.Sc. in Educational Technology and Engineering">B.Sc. in Educational Technology and Engineering</option>
-                            <option value="M.Sc. in Educational Technology and Engineering">M.Sc. in Educational Technology and Engineering</option>
-                            <option value="B.Sc. in Internet of Things and Robotics Engineering">B.Sc. in Internet of Things and Robotics Engineering</option>
-                            <option value="M.Sc. in Internet of Things and Robotics Engineering">M.Sc. in Internet of Things and Robotics Engineering</option>
-                            <option value="B.Sc. in Software Engineering">B.Sc. in Software Engineering</option>
-                            <option value="M.Sc. in Software Engineering">M.Sc. in Software Engineering</option>
-                            <option value="B.Sc. in Cyber Security Engineering">B.Sc. in Cyber Security Engineering</option>
-                            <option value="M.Sc. in Cyber Security Engineering">M.Sc. in Cyber Security Engineering</option>
-                            <option value="B.Sc. in Data Science Engineering">B.Sc. in Data Science Engineering</option>
-                            <option value="M.Sc. in Data Science Engineering">M.Sc. in Data Science Engineering</option>
+                            <option value="B.Sc. in EDTE">B.Sc. in EDTE</option>
+                            <option value="M.Sc. in EDTE">M.Sc. in EDTE</option>
+                            <option value="B.Sc. in IRE">B.Sc. in IRE</option>
+                            <option value="M.Sc. in IRE">M.Sc. in IRE</option>
+                            <option value="B.Sc. in CySE">B.Sc. in CySE</option>
+                            <option value="M.Sc. in CySE">M.Sc. in CySE</option>
+                            <option value="B.Sc. in DSE">B.Sc. in DSE</option>
+                            <option value="M.Sc. in DSE">M.Sc. in DSE</option>
+                            <option value="B.Sc. in SWE">B.Sc. in SWE</option>
+                            <option value="M.Sc. in SWE">M.Sc. in SWE</option>
                           </select>
                         ) : (
                           adv.program

@@ -412,7 +412,7 @@ export default function StudentAcademicResultsPage() {
                                   }}
                                 >
                                   <FiMessageSquare size={13} />
-                                  {existingReq ? "View / Update Request" : isExpired ? "🔒 Correction Closed" : "Request Correction"}
+                                  {existingReq ? "View / Update Request" : isExpired ? "🔒 Correction Closed" : "Correction Request"}
                                 </button>
                               </td>
                             </tr>

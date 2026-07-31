@@ -106,6 +106,8 @@ exports.importStudents = async (req, res) => {
       return res.status(400).json({ error: "Invalid data format. Expected an array of students." });
     }
 
+    const savedStudents = [];
+
     for (const record of students) {
       const {
         studentId,
@@ -128,26 +130,42 @@ exports.importStudents = async (req, res) => {
       const sId = String(studentId).trim();
       const sEmail = String(universityEmail).trim().toLowerCase();
 
-      await Student.findOneAndUpdate(
-        { $or: [{ studentId: sId }, { universityEmail: sEmail }] },
-        {
-          studentId: sId,
-          name: String(name).trim(),
-          universityEmail: sEmail,
-          department: String(department !== undefined && department !== null ? department : "").trim(),
-          program: String(program !== undefined && program !== null ? program : "").trim(),
-          batch: String(batch !== undefined && batch !== null ? batch : "").trim(),
-          session: String(session !== undefined && session !== null ? session : "").trim(),
-          admissionSemester: String(admissionSemester !== undefined && admissionSemester !== null ? admissionSemester : "").trim(),
-          currentLevel: currentLevel !== undefined && currentLevel !== null ? Number(currentLevel) : 1,
-          currentTerm: currentTerm !== undefined && currentTerm !== null ? Number(currentTerm) : 1,
-          accountStatus: String(accountStatus !== undefined && accountStatus !== null ? accountStatus : "inactive").trim(),
-        },
-        { upsert: true, new: true }
-      );
+      let existingStudent = null;
+      if (sEmail) {
+        existingStudent = await Student.findOne({ universityEmail: sEmail });
+      }
+      if (!existingStudent && sId) {
+        existingStudent = await Student.findOne({ studentId: sId });
+      }
+
+      const finalSession = String(session !== undefined && session !== null && session !== "" ? session : "2023-24").trim();
+      const defaultSemester = `${finalSession.split("-")[0] || "2023"} 2022`;
+      const finalAdmissionSemester = admissionSemester && String(admissionSemester).trim() ? String(admissionSemester).trim() : defaultSemester;
+
+      const studentUpdateData = {
+        studentId: sId,
+        name: String(name).trim(),
+        universityEmail: sEmail,
+        department: String(department !== undefined && department !== null ? department : "EDTE").trim(),
+        program: String(program !== undefined && program !== null ? program : "BSc. Eng in EDTE").trim(),
+        batch: String(batch !== undefined && batch !== null ? batch : "6th").trim(),
+        session: finalSession,
+        admissionSemester: finalAdmissionSemester,
+        currentLevel: currentLevel !== undefined && currentLevel !== null ? Number(currentLevel) : 1,
+        currentTerm: currentTerm !== undefined && currentTerm !== null ? Number(currentTerm) : 1,
+        accountStatus: String(accountStatus !== undefined && accountStatus !== null ? accountStatus : "inactive").trim(),
+      };
+
+      let savedDoc;
+      if (existingStudent) {
+        savedDoc = await Student.findByIdAndUpdate(existingStudent._id, { $set: studentUpdateData }, { returnDocument: "after" });
+      } else {
+        savedDoc = await Student.create(studentUpdateData);
+      }
+      if (savedDoc) savedStudents.push(savedDoc);
     }
 
-    res.json({ message: "Students imported successfully." });
+    res.json({ message: "Students imported successfully.", students: savedStudents });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -172,19 +190,45 @@ exports.importTeachers = async (req, res) => {
       const rawTeacherId = record.teacherId !== undefined && record.teacherId !== null ? String(record.teacherId).trim() : "";
       const rawName = record.name !== undefined && record.name !== null ? String(record.name).trim() : "";
       const rawEmail = record.email !== undefined && record.email !== null ? String(record.email).trim().toLowerCase() : "";
+      const rawDept = record.department !== undefined && record.department !== null ? String(record.department).trim() : "";
 
-      if (rawTeacherId) currentTeacherId = rawTeacherId;
-      if (rawName) currentName = rawName;
-      if (rawEmail) currentEmail = rawEmail;
-      if (record.department) currentDept = String(record.department).trim();
+      if (rawEmail) {
+        if (rawEmail !== currentEmail) {
+          currentEmail = rawEmail;
+          currentTeacherId = rawTeacherId;
+          currentName = rawName;
+          currentDept = rawDept;
+        } else {
+          if (rawTeacherId) currentTeacherId = rawTeacherId;
+          if (rawName) currentName = rawName;
+          if (rawDept) currentDept = rawDept;
+        }
+      } else if (rawTeacherId) {
+        if (rawTeacherId !== currentTeacherId) {
+          currentTeacherId = rawTeacherId;
+          currentEmail = rawEmail;
+          currentName = rawName;
+          currentDept = rawDept;
+        } else {
+          if (rawName) currentName = rawName;
+          if (rawDept) currentDept = rawDept;
+        }
+      } else if (rawName) {
+        if (rawName !== currentName) {
+          currentName = rawName;
+          currentEmail = rawEmail;
+          currentTeacherId = rawTeacherId;
+          currentDept = rawDept;
+        }
+      }
 
-      const key = currentTeacherId || currentEmail;
+      const key = currentEmail || currentTeacherId;
       if (!key) continue;
 
       if (!groupedTeachers[key]) {
         const rawAdvSess = record.adviserSession !== undefined && record.adviserSession !== null ? String(record.adviserSession).trim() : "";
         groupedTeachers[key] = {
-          teacherId: currentTeacherId,
+          teacherId: currentTeacherId || currentEmail,
           name: currentName,
           email: currentEmail,
           department: currentDept,
@@ -196,6 +240,15 @@ exports.importTeachers = async (req, res) => {
       } else {
         if (record.adviserSession) {
           groupedTeachers[key].adviserSession = String(record.adviserSession).trim();
+        }
+        if (currentTeacherId && groupedTeachers[key].teacherId !== currentTeacherId) {
+          groupedTeachers[key].teacherId = currentTeacherId;
+        }
+        if (currentName && !groupedTeachers[key].name) {
+          groupedTeachers[key].name = currentName;
+        }
+        if (currentDept && !groupedTeachers[key].department) {
+          groupedTeachers[key].department = currentDept;
         }
       }
 
@@ -219,30 +272,80 @@ exports.importTeachers = async (req, res) => {
       }
     }
 
+    // Ensure all existing teacher & admin users do not have erroneous studentId set
+    const User = require("../models/User");
+    await User.updateMany(
+      { role: { $in: ["teacher", "admin"] }, studentId: { $exists: true } },
+      { $unset: { studentId: 1 } }
+    );
+
     for (const key of Object.keys(groupedTeachers)) {
       const t = groupedTeachers[key];
+      const targetEmail = t.email ? t.email.toLowerCase().trim() : "";
+      const targetTeacherId = t.teacherId || key;
 
-      const searchOr = [];
-      if (t.teacherId) searchOr.push({ teacherId: t.teacherId });
-      if (t.email) searchOr.push({ email: t.email.toLowerCase().trim() });
+      let existingTeacher = null;
+      if (targetEmail) {
+        existingTeacher = await Teacher.findOne({ email: targetEmail });
+      }
+      if (!existingTeacher && targetTeacherId) {
+        existingTeacher = await Teacher.findOne({ teacherId: targetTeacherId });
+      }
 
-      const filter = searchOr.length > 0 ? { $or: searchOr } : { teacherId: key };
+      // If targetTeacherId is provided and conflicts with a DIFFERENT teacher document in DB,
+      // resolve conflict so unique index teacherId_1 does NOT crash findAndModify or create
+      if (targetTeacherId) {
+        const conflictDoc = await Teacher.findOne({ teacherId: targetTeacherId });
+        if (conflictDoc && (!existingTeacher || conflictDoc._id.toString() !== existingTeacher._id.toString())) {
+          const conflictEmailInBatch = Object.values(groupedTeachers).find(
+            (gt) => gt.email && gt.email.toLowerCase().trim() === conflictDoc.email.toLowerCase()
+          );
+          if (conflictEmailInBatch && conflictEmailInBatch.teacherId && conflictEmailInBatch.teacherId !== targetTeacherId) {
+            await Teacher.findByIdAndUpdate(conflictDoc._id, { teacherId: conflictEmailInBatch.teacherId });
+          } else {
+            const tempId = `${conflictDoc.teacherId}_old_${Date.now().toString().slice(-4)}`;
+            await Teacher.findByIdAndUpdate(conflictDoc._id, { teacherId: tempId });
+          }
+        }
+      }
 
-      const savedTeacher = await Teacher.findOneAndUpdate(
-        filter,
-        {
-          teacherId: t.teacherId || key,
-          name: t.name,
-          email: t.email ? t.email.toLowerCase().trim() : "",
-          department: t.department,
-          program: t.program || "BSc. Eng in EDTE",
-          assignedLevelTerm: t.assignedLevelTerm,
-          assignedSession: t.assignedSession,
-          assignedCourses: t.assignedCourses,
-          adviserSession: t.adviserSession,
-        },
-        { upsert: true, new: true }
-      );
+      const updateFields = {
+        teacherId: targetTeacherId,
+        name: t.name,
+        email: targetEmail,
+        department: t.department,
+        program: t.program || "BSc. Eng in EDTE",
+        assignedLevelTerm: t.assignedLevelTerm,
+        assignedSession: t.assignedSession,
+        assignedCourses: t.assignedCourses,
+        adviserSession: t.adviserSession,
+      };
+
+      let savedTeacher = null;
+      if (existingTeacher) {
+        savedTeacher = await Teacher.findByIdAndUpdate(
+          existingTeacher._id,
+          { $set: updateFields },
+          { returnDocument: "after" }
+        );
+      } else {
+        savedTeacher = await Teacher.create(updateFields);
+      }
+
+      // Also sync/update corresponding User document for login authentication
+      if (targetEmail) {
+        let userDoc = await User.findOne({ email: targetEmail });
+        if (userDoc) {
+          if (t.name) userDoc.name = t.name;
+          if (t.department) userDoc.department = t.department;
+          if (userDoc.role === "student") {
+            userDoc.studentId = targetTeacherId;
+          } else {
+            userDoc.studentId = undefined;
+          }
+          await userDoc.save();
+        }
+      }
 
       // Sync teacher assignment to real LMS Course documents in MongoDB
       if (savedTeacher) {
@@ -485,8 +588,8 @@ exports.getStudents = async (req, res) => {
 exports.getTeachers = async (req, res) => {
   try {
     const User = require("../models/User");
-    const registeredUsers = await User.find({ isRegistered: true }, "email").lean();
-    const registeredEmails = new Set(
+    const registeredUsers = await User.find({ isBlocked: { $ne: true } }, "email isRegistered").lean();
+    const activeEmails = new Set(
       registeredUsers.map((u) => (u.email || "").toLowerCase().trim()).filter(Boolean)
     );
 
@@ -499,8 +602,8 @@ exports.getTeachers = async (req, res) => {
 
     const enriched = teachers.map((t) => {
       const email = (t.email || "").toLowerCase().trim();
-      const isSignedUp = registeredEmails.has(email);
-      const isActive = isSignedUp || (t.accountStatus || "").toLowerCase() === "active";
+      const hasUser = activeEmails.has(email);
+      const isActive = hasUser || t.isActive !== false || (t.accountStatus || "").toLowerCase() === "active";
       return {
         ...t,
         accountStatus: isActive ? "active" : "inactive",
@@ -551,16 +654,16 @@ exports.getAdvisers = async (req, res) => {
       if (t.email) teacherMap[t.email.toLowerCase().trim()] = t;
     });
 
-    const registeredUsers = await User.find({ isRegistered: true }, "email").lean();
-    const registeredEmailSet = new Set(
+    const registeredUsers = await User.find({ isBlocked: { $ne: true } }, "email isRegistered").lean();
+    const activeEmailSet = new Set(
       registeredUsers.map((u) => (u.email || "").toLowerCase().trim()).filter(Boolean)
     );
 
     const enriched = advisers.map((a) => {
       const email = (a.teacherEmail || "").toLowerCase().trim();
       const teacherInfo = teacherMap[email] || {};
-      const isSignedUp = registeredEmailSet.has(email);
-      const isActive = isSignedUp || (teacherInfo.accountStatus || "").toLowerCase() === "active";
+      const hasUser = activeEmailSet.has(email);
+      const isActive = hasUser || teacherInfo.isActive !== false || (teacherInfo.accountStatus || "").toLowerCase() === "active";
       return {
         ...a,
         teacherId: a.teacherId || teacherInfo.teacherId || "",

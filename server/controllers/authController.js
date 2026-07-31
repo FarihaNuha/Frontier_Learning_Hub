@@ -197,15 +197,17 @@ exports.login = async (req, res) => {
     const Teacher = require("../models/Teacher");
 
     if (user.role === "student") {
-      await Student.updateOne(
-        { $or: [{ universityEmail: user.email }, { studentId: user.studentId }] },
-        { accountStatus: "active" }
-      );
+      const studentProfile = await Student.findOne({
+        $or: [{ universityEmail: user.email }, { studentId: user.studentId }]
+      }).lean();
+      if (studentProfile && studentProfile.department) {
+        user.department = studentProfile.department;
+      }
     } else if (user.role === "teacher") {
-      await Teacher.updateOne(
-        { email: user.email },
-        { accountStatus: "active" }
-      );
+      const teacherProfile = await Teacher.findOne({ email: user.email }).lean();
+      if (teacherProfile && teacherProfile.department) {
+        user.department = teacherProfile.department;
+      }
     }
 
     const token = generateToken(user);
@@ -230,15 +232,38 @@ exports.login = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   try {
-    console.log("getMe called - User ID:", req.user?.uid);
-    const user = await User.findById(req.user.uid).select("-password");
-    if (!user) {
+    const userDoc = await User.findById(req.user.uid).select("-password").lean();
+    if (!userDoc) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (user.isBlocked) {
+    if (userDoc.isBlocked) {
       return res.status(401).json({ error: "Your account has been suspended." });
     }
-    res.json({ user });
+
+    if (userDoc.role === "student") {
+      const Student = require("../models/Student");
+      const studentProfile = await Student.findOne({
+        $or: [
+          { universityEmail: userDoc.email },
+          ...(userDoc.studentId ? [{ studentId: userDoc.studentId }] : []),
+        ],
+      }).lean();
+
+      if (studentProfile) {
+        userDoc.department = studentProfile.department || userDoc.department;
+        userDoc.program = studentProfile.program || userDoc.program;
+        userDoc.session = studentProfile.session || userDoc.session;
+      }
+    } else if (userDoc.role === "teacher") {
+      const Teacher = require("../models/Teacher");
+      const teacherProfile = await Teacher.findOne({ email: userDoc.email }).lean();
+      if (teacherProfile) {
+        userDoc.department = teacherProfile.department || userDoc.department;
+        userDoc.program = teacherProfile.program || userDoc.program;
+      }
+    }
+
+    res.json({ user: userDoc });
   } catch (error) {
     console.error("GetMe error:", error);
     res.status(500).json({ error: error.message });

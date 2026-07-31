@@ -5,7 +5,7 @@ const User = require("../models/User");
 const Notification = require("../models/Notification");
 const AuditLog = require("../models/AuditLog");
 const paymentGatewayService = require("../services/paymentGatewayService");
-const { sendEmail } = require("../services/emailService");
+const { queueEmail } = require("../services/emailService");
 const { getIO } = require("../socket");
 const mongoose = require("mongoose");
 
@@ -50,10 +50,13 @@ const calculateRegistrationFee = (courses = []) => {
   let labCount = 0;
 
   const coursesWithFee = courses.map((c) => {
+    const credits = Number(c.creditHours) || 3;
+    const typeStr = (c.courseType || c.type || "").toLowerCase();
+
     const isLab =
-      Number(c.creditHours) === 1 ||
-      (c.courseType || "").toLowerCase().includes("sessional") ||
-      (c.courseType || "").toLowerCase().includes("lab");
+      credits <= 1.5 ||
+      typeStr.includes("sessional") ||
+      typeStr.includes("lab");
 
     if (isLab) {
       labCount++;
@@ -65,7 +68,7 @@ const calculateRegistrationFee = (courses = []) => {
     return {
       courseCode: c.courseCode || c.code || "",
       courseTitle: c.courseTitle || c.title || c.name || "",
-      creditHours: c.creditHours || 3,
+      creditHours: credits,
       courseType: isLab ? "Sessional" : "Theory",
       fee,
     };
@@ -109,25 +112,38 @@ exports.initiateOrGetPaymentRecord = async (req, res) => {
     let regDoc = null;
     if (registrationId) {
       regDoc = await Registration.findById(registrationId);
-    } else {
+    }
+    if (!regDoc && studentIdStr) {
+      const levelFilter = level ? { level: { $regex: new RegExp(level.replace(/[^0-9]/g, ""), "i") } } : {};
+      const termFilter = term ? { term: { $regex: new RegExp(term.replace(/[^0-9]/g, ""), "i") } } : {};
       regDoc = await Registration.findOne({
         studentId: studentIdStr,
-        session: session || "2023-24",
-        level: level || `Level-${studentProfile?.currentLevel || 1}`,
-        term: term || `Term-${studentProfile?.currentTerm || 1}`,
-      });
+        ...(session ? { session } : {}),
+        ...levelFilter,
+        ...termFilter,
+      }).sort({ createdAt: -1 });
     }
+    if (!regDoc && studentIdStr) {
+      regDoc = await Registration.findOne({ studentId: studentIdStr }).sort({ createdAt: -1 });
+    }
+
+    const resolvedSession = session || regDoc?.session || studentProfile?.session || "2023-24";
+    const resolvedLevel = level || regDoc?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
+    const resolvedTerm = term || regDoc?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
 
     const coursesToCalculate = selectedCourses || regDoc?.selectedCourses || [];
     const feeCalculation = calculateRegistrationFee(coursesToCalculate);
 
     const paymentIdStr = `REG_PAY_${studentIdStr}_${Date.now().toString(36).toUpperCase()}`;
 
+    const levelRegexp = new RegExp((resolvedLevel || "").replace(/[^0-9]/g, ""), "i");
+    const termRegexp = new RegExp((resolvedTerm || "").replace(/[^0-9]/g, ""), "i");
+
     let paymentDoc = await RegistrationPayment.findOne({
       studentId: studentIdStr,
-      session: session || regDoc?.session || "2023-24",
-      level: level || regDoc?.level || "Level-1",
-      term: term || regDoc?.term || "Term-1",
+      session: resolvedSession,
+      level: { $regex: levelRegexp },
+      term: { $regex: termRegexp },
     });
 
     if (!paymentDoc) {
@@ -138,9 +154,9 @@ exports.initiateOrGetPaymentRecord = async (req, res) => {
         studentName: studentUser.name || studentProfile?.name || "Student",
         registration: regDoc ? regDoc._id : null,
         department: studentProfile?.department || studentUser.department || "EDTE",
-        session: session || regDoc?.session || "2023-24",
-        level: level || regDoc?.level || "Level-1",
-        term: term || regDoc?.term || "Term-1",
+        session: resolvedSession,
+        level: resolvedLevel,
+        term: resolvedTerm,
         selectedCourses: feeCalculation.coursesWithFee,
         theoryCount: feeCalculation.theoryCount,
         labCount: feeCalculation.labCount,
@@ -153,6 +169,8 @@ exports.initiateOrGetPaymentRecord = async (req, res) => {
       paymentDoc.theoryCount = feeCalculation.theoryCount;
       paymentDoc.labCount = feeCalculation.labCount;
       paymentDoc.totalAmount = feeCalculation.totalAmount;
+      paymentDoc.level = resolvedLevel;
+      paymentDoc.term = resolvedTerm;
       if (regDoc) paymentDoc.registration = regDoc._id;
       paymentDoc.updatedAt = new Date();
       await paymentDoc.save();
@@ -185,17 +203,78 @@ exports.initiateOrGetPaymentRecord = async (req, res) => {
 // 3. Process Online Payment Completion (Simulated Gateway Callback)
 exports.processOnlinePayment = async (req, res) => {
   try {
-    const { paymentId, status } = req.body;
+    const { paymentId, registrationId, session, level, term, status } = req.body;
     let paymentDoc = null;
-    if (mongoose.Types.ObjectId.isValid(paymentId)) {
+
+    if (paymentId && mongoose.Types.ObjectId.isValid(paymentId)) {
       paymentDoc = await RegistrationPayment.findById(paymentId);
     }
-    if (!paymentDoc) {
+    if (!paymentDoc && paymentId) {
       paymentDoc = await RegistrationPayment.findOne({ paymentId });
+    }
+    if (!paymentDoc && registrationId) {
+      paymentDoc = await RegistrationPayment.findOne({ registration: registrationId });
+    }
+
+    const studentUserId = req.user._id || req.user.id || req.user.uid;
+    const studentUser = await User.findById(studentUserId).lean();
+    const studentProfile = await Student.findOne({
+      $or: [
+        { universityEmail: req.user.email },
+        { universityEmail: { $regex: new RegExp(`^${(req.user.email || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+      ]
+    }).lean();
+    const studentIdStr = studentProfile?.studentId || studentUser?.studentId || req.user?.studentId;
+
+    if (!paymentDoc && studentIdStr) {
+      const levelDigit = (level || "").replace(/[^0-9]/g, "");
+      const termDigit = (term || "").replace(/[^0-9]/g, "");
+
+      const levelFilter = levelDigit ? { level: { $regex: new RegExp(levelDigit, "i") } } : {};
+      const termFilter = termDigit ? { term: { $regex: new RegExp(termDigit, "i") } } : {};
+
+      paymentDoc = await RegistrationPayment.findOne({
+        $or: [{ student: studentUserId }, { studentId: studentIdStr }],
+        ...levelFilter,
+        ...termFilter,
+      }).sort({ createdAt: -1 });
     }
 
     if (!paymentDoc) {
-      return res.status(404).json({ error: "Payment record not found." });
+      let regDoc = null;
+      if (registrationId) regDoc = await Registration.findById(registrationId);
+      if (!regDoc && studentIdStr) {
+        const levelFilter = level ? { level: { $regex: new RegExp((level).replace(/[^0-9]/g, ""), "i") } } : {};
+        regDoc = await Registration.findOne({
+          $or: [{ user: studentUserId }, { studentId: studentIdStr }],
+          ...levelFilter,
+        }).sort({ createdAt: -1 });
+      }
+
+      const resolvedSession = session || regDoc?.session || studentProfile?.session || "2023-24";
+      const resolvedLevel = level || regDoc?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
+      const resolvedTerm = term || regDoc?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
+      const feeCalculation = calculateRegistrationFee(regDoc?.selectedCourses || []);
+
+      const generatedPaymentId = `REG_PAY_${studentIdStr || "STD"}_${Date.now().toString(36).toUpperCase()}`;
+
+      paymentDoc = await RegistrationPayment.create({
+        paymentId: generatedPaymentId,
+        student: studentUserId,
+        studentId: studentIdStr || "STD",
+        studentName: studentUser?.name || studentProfile?.name || "Student",
+        registration: regDoc ? regDoc._id : null,
+        department: studentProfile?.department || "EDTE",
+        session: resolvedSession,
+        level: resolvedLevel,
+        term: resolvedTerm,
+        selectedCourses: feeCalculation.coursesWithFee,
+        theoryCount: feeCalculation.theoryCount,
+        labCount: feeCalculation.labCount,
+        totalAmount: feeCalculation.totalAmount,
+        gatewayName: paymentGatewayService.activeGateway,
+        paymentStatus: "Pending",
+      });
     }
 
     const verification = await paymentGatewayService.verifyPaymentCallback(
@@ -217,12 +296,20 @@ exports.processOnlinePayment = async (req, res) => {
           totalPayable: paymentDoc.totalAmount,
         });
       }
+
+      const levelDigit = (paymentDoc.level || "").replace(/[^0-9]/g, "");
+      const termDigit = (paymentDoc.term || "").replace(/[^0-9]/g, "");
+      const levelRegex = levelDigit ? new RegExp(`level[\\s-]*${levelDigit}`, "i") : /.*/;
+      const termRegex = termDigit ? new RegExp(`term[\\s-]*${termDigit}`, "i") : /.*/;
+
       await Registration.updateMany(
         {
-          studentId: paymentDoc.studentId,
-          session: paymentDoc.session,
-          level: paymentDoc.level,
-          term: paymentDoc.term,
+          $or: [
+            { studentId: paymentDoc.studentId },
+            { user: paymentDoc.student }
+          ],
+          level: { $regex: levelRegex },
+          term: { $regex: termRegex },
         },
         { paymentStatus: "Paid", totalPayable: paymentDoc.totalAmount }
       );
@@ -262,7 +349,7 @@ exports.processOnlinePayment = async (req, res) => {
         } catch (err) {}
       }
 
-      sendEmail(
+      queueEmail(
         req.user.email,
         `💳 Registration Payment Receipt: ${paymentDoc.transactionId}`,
         `
@@ -282,7 +369,7 @@ exports.processOnlinePayment = async (req, res) => {
           </div>
         </div>
         `
-      ).catch(() => {});
+      );
     } else {
       paymentDoc.paymentStatus = verification.paymentStatus || "Failed";
       paymentDoc.updatedAt = new Date();
@@ -396,7 +483,85 @@ exports.getStudentPaymentHistory = async (req, res) => {
       }
     }
 
-    const payments = Array.from(paymentMap.values()).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    const synthesizedList = Array.from(paymentMap.values());
+
+    const CourseImport = require("../models/CourseImport");
+    const allImports = await CourseImport.find().lean();
+    const allStudentRegistrations = await Registration.find({
+      $or: [
+        { user: studentUserId },
+        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+      ],
+    }).lean();
+
+    // Attach previous dues history to each synthesized payment item
+    for (const item of synthesizedList) {
+      const sId = String(item.studentId || studentIdStr).trim();
+      const currentLevelNum = parseInt((item.level || "").replace(/[^0-9]/g, ""), 10) || 1;
+      const currentTermNum = parseInt((item.term || "").replace(/[^0-9]/g, ""), 10) || 1;
+
+      const historyList = [];
+      let totalUnpaidAmount = 0;
+
+      for (let l = 1; l <= 4; l++) {
+        for (let t = 1; t <= 2; t++) {
+          if (l > currentLevelNum || (l === currentLevelNum && t >= currentTermNum)) {
+            continue;
+          }
+
+          const levelStr = `Level-${l}`;
+          const termStr = `Term-${t}`;
+
+          const levelRegexp = new RegExp(`level[\\s-]*${l}`, "i");
+          const termRegexp = new RegExp(`term[\\s-]*${t}`, "i");
+
+          const matchingReg = allStudentRegistrations.find(
+            (r) => levelRegexp.test(r.level || "") && termRegexp.test(r.term || "")
+          );
+
+          let pStatus = "Unpaid";
+          let dueAmount = 0;
+
+          if (matchingReg && matchingReg.paymentStatus === "Paid") {
+            pStatus = "Paid";
+            dueAmount = 0;
+          } else if (matchingReg) {
+            pStatus = "Unpaid";
+            dueAmount = calculateRegistrationFee(matchingReg.selectedCourses || []).totalAmount;
+          } else {
+            pStatus = "Unpaid";
+            const levelCourses = allImports.filter(
+              (c) => levelRegexp.test(c.level || "") && termRegexp.test(c.term || "")
+            );
+            if (levelCourses.length > 0) {
+              dueAmount = calculateRegistrationFee(levelCourses).totalAmount;
+            } else {
+              dueAmount = 4900;
+            }
+          }
+
+          if (pStatus === "Unpaid") {
+            totalUnpaidAmount += dueAmount;
+          }
+
+          historyList.push({
+            levelTerm: `${levelStr} ${termStr}`,
+            level: levelStr,
+            term: termStr,
+            status: pStatus,
+            dueAmount,
+          });
+        }
+      }
+
+      item.previousDuesInfo = {
+        hasUnpaidPreviousSemesters: totalUnpaidAmount > 0,
+        totalUnpaidAmount,
+        historyList,
+      };
+    }
+
+    const payments = synthesizedList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
     res.json({ payments });
   } catch (error) {
@@ -466,6 +631,79 @@ exports.getAdminRegistrationPayments = async (req, res) => {
 
     const synthesizedList = Array.from(paymentMap.values());
 
+    const CourseImport = require("../models/CourseImport");
+    const allImports = await CourseImport.find().lean();
+
+    // Attach previous dues history to each synthesized payment item
+    for (const item of synthesizedList) {
+      const sId = String(item.studentId || "").trim();
+      const currentLevelNum = parseInt((item.level || "").replace(/[^0-9]/g, ""), 10) || 1;
+      const currentTermNum = parseInt((item.term || "").replace(/[^0-9]/g, ""), 10) || 1;
+
+      // Find all registrations for this student
+      const studentRegs = allRegistrations.filter(r => String(r.studentId || "").trim() === sId);
+
+      const historyList = [];
+      let totalUnpaidAmount = 0;
+
+      for (let l = 1; l <= 4; l++) {
+        for (let t = 1; t <= 2; t++) {
+          if (l > currentLevelNum || (l === currentLevelNum && t >= currentTermNum)) {
+            continue;
+          }
+
+          const levelStr = `Level-${l}`;
+          const termStr = `Term-${t}`;
+
+          const levelRegexp = new RegExp(`level[\\s-]*${l}`, "i");
+          const termRegexp = new RegExp(`term[\\s-]*${t}`, "i");
+
+          const matchingReg = studentRegs.find(
+            (r) => levelRegexp.test(r.level || "") && termRegexp.test(r.term || "")
+          );
+
+          let pStatus = "Unpaid";
+          let dueAmount = 0;
+
+          if (matchingReg && matchingReg.paymentStatus === "Paid") {
+            pStatus = "Paid";
+            dueAmount = 0;
+          } else if (matchingReg) {
+            pStatus = "Unpaid";
+            dueAmount = calculateRegistrationFee(matchingReg.selectedCourses || []).totalAmount;
+          } else {
+            pStatus = "Unpaid";
+            const levelCourses = allImports.filter(
+              (c) => levelRegexp.test(c.level || "") && termRegexp.test(c.term || "")
+            );
+            if (levelCourses.length > 0) {
+              dueAmount = calculateRegistrationFee(levelCourses).totalAmount;
+            } else {
+              dueAmount = 4900;
+            }
+          }
+
+          if (pStatus === "Unpaid") {
+            totalUnpaidAmount += dueAmount;
+          }
+
+          historyList.push({
+            levelTerm: `${levelStr} ${termStr}`,
+            level: levelStr,
+            term: termStr,
+            status: pStatus,
+            dueAmount,
+          });
+        }
+      }
+
+      item.previousDuesInfo = {
+        hasUnpaidPreviousSemesters: totalUnpaidAmount > 0,
+        totalUnpaidAmount,
+        historyList,
+      };
+    }
+
     // Filter by status (Paid vs Unpaid)
     let filtered = synthesizedList;
     if (status && status !== "all") {
@@ -516,7 +754,12 @@ exports.getMoneyReceipt = async (req, res) => {
     }
 
     const courseSubtotal = (paymentDoc.selectedCourses || []).reduce(
-      (sum, c) => sum + (c.fee || (c.creditHours === 1 ? 100 : 300)),
+      (sum, c) => {
+        const credits = Number(c.creditHours) || 3;
+        const typeStr = (c.courseType || c.type || "").toLowerCase();
+        const isLab = credits <= 1.5 || typeStr.includes("sessional") || typeStr.includes("lab");
+        return sum + (c.fee || (isLab ? 100 : 300));
+      },
       0
     );
 
@@ -628,6 +871,76 @@ exports.getRegistrationInvoiceData = async (req, res) => {
     const paidAmount = isPaid ? grandTotal : 0;
     const dueAmount = isPaid ? 0 : grandTotal;
 
+    // Calculate previous unpaid semester dues
+    const currentLevelNum = parseInt((regDoc.level || "").replace(/[^0-9]/g, ""), 10) || 1;
+    const currentTermNum = parseInt((regDoc.term || "").replace(/[^0-9]/g, ""), 10) || 1;
+
+    const CourseImport = require("../models/CourseImport");
+    const allImports = await CourseImport.find().lean();
+    const allStudentRegistrations = await Registration.find({ studentId: regDoc.studentId }).lean();
+    const allStudentPayments = await RegistrationPayment.find({ studentId: regDoc.studentId }).lean();
+
+    const historyList = [];
+    let totalUnpaidAmount = 0;
+
+    for (let l = 1; l <= 4; l++) {
+      for (let t = 1; t <= 2; t++) {
+        if (l > currentLevelNum || (l === currentLevelNum && t >= currentTermNum)) {
+          continue;
+        }
+
+        const levelStr = `Level-${l}`;
+        const termStr = `Term-${t}`;
+
+        const levelRegexp = new RegExp(`level[\\s-]*${l}`, "i");
+        const termRegexp = new RegExp(`term[\\s-]*${t}`, "i");
+
+        const matchingPay = allStudentPayments.find(
+          (p) => levelRegexp.test(p.level || "") && termRegexp.test(p.term || "") && p.paymentStatus === "Paid"
+        );
+        const matchingReg = allStudentRegistrations.find(
+          (r) => levelRegexp.test(r.level || "") && termRegexp.test(r.term || "") && r.paymentStatus === "Paid"
+        );
+
+        let pStatus = "Unpaid";
+        let dueAmt = 0;
+
+        if (matchingPay || matchingReg) {
+          pStatus = "Paid";
+          dueAmt = 0;
+        } else {
+          pStatus = "Unpaid";
+          const matchingUnpaidReg = allStudentRegistrations.find(
+            (r) => levelRegexp.test(r.level || "") && termRegexp.test(r.term || "")
+          );
+          if (matchingUnpaidReg) {
+            dueAmt = calculateRegistrationFee(matchingUnpaidReg.selectedCourses || []).totalAmount;
+          } else {
+            const levelCourses = allImports.filter(
+              (c) => levelRegexp.test(c.level || "") && termRegexp.test(c.term || "")
+            );
+            dueAmt = levelCourses.length > 0 ? calculateRegistrationFee(levelCourses).totalAmount : 4900;
+          }
+        }
+
+        if (pStatus === "Unpaid") {
+          totalUnpaidAmount += dueAmt;
+        }
+
+        historyList.push({
+          levelTerm: `${levelStr} ${termStr}`,
+          status: pStatus,
+          dueAmount: dueAmt,
+        });
+      }
+    }
+
+    const previousDuesInfo = {
+      hasUnpaidPreviousSemesters: totalUnpaidAmount > 0,
+      totalUnpaidAmount,
+      historyList,
+    };
+
     const invoice = {
       invoiceNo: `INV-${regDoc.studentId}-${(regDoc.session || "2023-24").replace(/[^0-9]/g, "")}-${(regDoc.level || "L1").replace(/[^0-9L]/g, "")}${(regDoc.term || "T1").replace(/[^0-9T]/g, "")}`,
       registrationId: regDoc._id,
@@ -659,6 +972,7 @@ exports.getRegistrationInvoiceData = async (req, res) => {
       labCount: feeCalc.labCount,
       fixedFees: fixedFeesList,
       fixedFeesTotal,
+      previousDuesInfo,
     };
 
     res.json({ invoice });

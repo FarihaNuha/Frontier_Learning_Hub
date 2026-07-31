@@ -5,7 +5,6 @@ const resultCorrectionRequestSchema = new mongoose.Schema(
     uploadId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ResultUpload",
-      required: true,
     },
     resultId: {
       type: mongoose.Schema.Types.ObjectId,

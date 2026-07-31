@@ -195,12 +195,11 @@ export default function CourseListPage() {
     if (levelFilter !== "all") {
       const levelNum = levelFilter.replace(/[^0-9]/g, "");
       const courseLvlClean = (course.level || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-      const courseCodeClean = (course.displayCode || "").toLowerCase();
-
       const levelMatches =
+        !levelNum ||
         courseLvlClean.includes(`level${levelNum}`) ||
         courseLvlClean.includes(`l${levelNum}`) ||
-        (levelNum && Boolean(courseCodeClean.match(new RegExp(`^[a-z]*\\s*${levelNum}`))));
+        courseLvlClean.includes(levelNum);
 
       if (!levelMatches) return false;
     }
@@ -208,14 +207,11 @@ export default function CourseListPage() {
     if (termFilter !== "all") {
       const termNum = termFilter.replace(/[^0-9]/g, "");
       const courseTermClean = (course.term || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-      const courseLvlClean = (course.level || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-      const courseCodeClean = (course.displayCode || "").toLowerCase();
-
       const termMatches =
+        !termNum ||
         courseTermClean.includes(`term${termNum}`) ||
         courseTermClean.includes(`t${termNum}`) ||
-        courseLvlClean.includes(`term${termNum}`) ||
-        (termNum && Boolean(courseCodeClean.match(new RegExp(`^[a-z]*\\s*\\d${termNum}`))));
+        courseTermClean.includes(termNum);
 
       if (!termMatches) return false;
     }
@@ -264,8 +260,8 @@ export default function CourseListPage() {
 
   const fetchCourses = async (forceRefresh = false) => {
     try {
-      const data = await fetchWithCache("/courses/my", { forceRefresh });
-      const list = Array.isArray(data) ? data : (data?.courses || []);
+      const res = await api.get("/courses/my");
+      const list = Array.isArray(res.data) ? res.data : (res.data?.courses || []);
       setCourses(list);
     } catch (error) {
       console.error(error);
@@ -926,13 +922,13 @@ export default function CourseListPage() {
         )}
 
         {courses.length === 0 ? (
-          <div className="empty-state">
+          <div className="empty-state" style={{ padding: "50px 20px" }}>
             <FiBook size={48} color="#6B89A0" />
-            <h3>No courses yet</h3>
-            <p>
+            <h3 style={{ marginTop: 12 }}>No Approved Courses Found</h3>
+            <p style={{ maxWidth: 480, margin: "8px auto 0 auto", color: "#64748b", lineHeight: "1.5" }}>
               {user?.role === "teacher"
                 ? "Create your first course!"
-                : "Join a course with join code from your teacher"}
+                : "Your course registration is currently pending Adviser approval. As soon as your Adviser approves your registration, your approved courses will automatically appear here!"}
             </p>
           </div>
         ) : filteredCourses.length === 0 ? (
@@ -1022,7 +1018,7 @@ export default function CourseListPage() {
                             className="classroom-avatar-img"
                           />
                         ) : (
-                          course.teacher?.name ? course.teacher.name.charAt(0).toUpperCase() : "T"
+                          course.teacher?.name ? course.teacher.name.charAt(0).toUpperCase() : "?"
                         )}
                       </div>
                     </div>
@@ -1032,13 +1028,21 @@ export default function CourseListPage() {
                         <FiUsers size={12} style={{ marginRight: 6 }} />
                         {course.students?.length || 0} students
                       </span>
-                      {course.teacher?.name && (
+                      {course.teacher?.name ? (
                         <span
                           className="classroom-teacher-name"
                           title={course.teacher.name}
                           style={{ fontSize: 13, color: "var(--text-gray)" }}
                         >
                           {course.teacher.name}
+                        </span>
+                      ) : (
+                        <span
+                          className="classroom-teacher-name"
+                          title="Teacher Not Assigned Yet"
+                          style={{ fontSize: 12, color: "#94a3b8", fontStyle: "italic", fontWeight: 500 }}
+                        >
+                          Teacher Not Assigned Yet
                         </span>
                       )}
                     </div>

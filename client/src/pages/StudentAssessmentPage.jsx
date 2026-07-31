@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
@@ -32,9 +32,18 @@ export default function StudentAssessmentPage() {
   const [selectedRecordForIssue, setSelectedRecordForIssue] = useState(null);
   const [issueMessage, setIssueMessage] = useState("");
   const [submittingIssue, setSubmittingIssue] = useState(false);
+  const [myRequests, setMyRequests] = useState([]);
+
+  const fetchMyRequests = async () => {
+    try {
+      const res = await api.get("/results/student/correction-requests");
+      setMyRequests(res.data.requests || []);
+    } catch (err) {}
+  };
 
   useEffect(() => {
     fetchAssessments();
+    fetchMyRequests();
     if (courseId) {
       setCourseLoading(true);
       api.get(`/courses/${courseId}`)
@@ -76,15 +85,16 @@ export default function StudentAssessmentPage() {
     }
     setSubmittingIssue(true);
     try {
-      await api.post("/results/request-correction", {
+      await api.post("/results/correction-request", {
         courseCode: selectedRecordForIssue.courseCode,
         courseTitle: selectedRecordForIssue.courseCode,
-        teacherEmail: selectedRecordForIssue.teacherEmail || "",
-        studentMessage: `[Assessment Marksheet Issue] ${issueMessage.trim()}`,
+        teacherEmail: selectedRecordForIssue.uploadedBy?.email || selectedRecordForIssue.teacherEmail || "",
+        studentMessage: issueMessage.trim(),
       });
       toast.success("Correction request submitted to course teacher!");
       setSelectedRecordForIssue(null);
       setIssueMessage("");
+      fetchMyRequests();
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to submit correction request.");
     } finally {
@@ -213,42 +223,135 @@ export default function StudentAssessmentPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {displayedAssessments.map((record) => (
-                    <tr key={record._id}>
-                      <td>
-                        <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", fontWeight: 700 }}>
-                          {record.courseCode}
-                        </span>
-                      </td>
-                      <td>{record.attendance}</td>
-                      <td>{record.quiz}</td>
-                      <td>{record.assignment}</td>
-                      <td>{record.presentation}</td>
-                      <td style={{ fontWeight: 700, color: "#10b981", fontSize: 15 }}>
-                        {record.totalMarks}
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => handleOpenIssueModal(record)}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            padding: "6px 12px",
-                            borderRadius: "8px",
-                            background: "#e0f2fe",
-                            color: "#0369a1",
-                            border: "1px solid #bae6fd",
-                            fontWeight: 600,
-                            fontSize: "12.5px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <FiEdit3 size={14} /> Request Correction
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {displayedAssessments.map((record) => {
+                    const recordCodeClean = (record.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+                    const existingReq = myRequests.find(
+                      (req) => req.courseCode && req.courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() === recordCodeClean
+                    );
+
+                    return (
+                      <React.Fragment key={record._id}>
+                        <tr>
+                          <td>
+                            <span className="status-badge ontime" style={{ background: "#E8F4FD", color: "#3B8DB3", fontWeight: 700 }}>
+                              {record.courseCode}
+                            </span>
+                          </td>
+                          <td>{record.attendance}</td>
+                          <td>{record.quiz}</td>
+                          <td>{record.assignment}</td>
+                          <td>{record.presentation}</td>
+                          <td style={{ fontWeight: 700, color: "#10b981", fontSize: 15 }}>
+                            {record.totalMarks}
+                          </td>
+                          <td>
+                            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                              {existingReq && (
+                                <span style={{
+                                  padding: "4px 10px",
+                                  borderRadius: "16px",
+                                  fontSize: "12px",
+                                  fontWeight: 700,
+                                  background: existingReq.status === "Resolved" ? "#dcfce7" : existingReq.status === "Replied" ? "#dbeafe" : "#fef3c7",
+                                  color: existingReq.status === "Resolved" ? "#15803d" : existingReq.status === "Replied" ? "#1d4ed8" : "#d97706",
+                                  border: existingReq.status === "Resolved" ? "1px solid #86efac" : existingReq.status === "Replied" ? "1px solid #93c5fd" : "1px solid #fcd34d",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "4px"
+                                }}>
+                                  {existingReq.status === "Resolved" ? "✓ Resolved" : existingReq.status === "Replied" ? "💬 Replied" : "⏳ Pending"}
+                                </span>
+                              )}
+                              {(() => {
+                                const isExpired = Boolean(
+                                  record.isCorrectionClosed ||
+                                  (record.correctionWindowEnd && new Date() > new Date(record.correctionWindowEnd))
+                                );
+                                return (
+                                  <button
+                                    onClick={() => handleOpenIssueModal(record)}
+                                    disabled={isExpired}
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "6px",
+                                      padding: "6px 12px",
+                                      borderRadius: "8px",
+                                      background: isExpired ? "#f1f5f9" : existingReq ? "#0284c7" : "#e0f2fe",
+                                      color: isExpired ? "#94a3b8" : existingReq ? "#ffffff" : "#0369a1",
+                                      border: isExpired ? "1px solid #cbd5e1" : existingReq ? "none" : "1px solid #bae6fd",
+                                      fontWeight: 600,
+                                      fontSize: "12.5px",
+                                      cursor: isExpired ? "not-allowed" : "pointer",
+                                    }}
+                                    title={isExpired ? "Correction request window has expired." : "Submit correction request to teacher"}
+                                  >
+                                    {isExpired ? (
+                                      <>🔒 Window Closed</>
+                                    ) : (
+                                      <>
+                                        <FiEdit3 size={14} /> {existingReq ? "View / Update Request" : "Correction Request"}
+                                      </>
+                                    )}
+                                  </button>
+                                );
+                              })()}
+                            </div>
+                          </td>
+                        </tr>
+                        {existingReq && (
+                          <tr style={{ background: "#f8fafc" }}>
+                            <td colSpan={7} style={{ padding: "12px 18px", fontSize: "13px" }}>
+                              <div style={{
+                                background: "#ffffff",
+                                border: "1px solid #cbd5e1",
+                                borderRadius: "10px",
+                                padding: "14px 18px",
+                                boxShadow: "0 1px 3px rgba(0,0,0,0.04)"
+                              }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: 6 }}>
+                                  <span style={{ fontWeight: 700, color: "#2c4b66", display: "flex", alignItems: "center", gap: 6 }}>
+                                    💬 Your Submitted Correction Request:
+                                  </span>
+                                  <span style={{
+                                    fontWeight: 800,
+                                    fontSize: "12px",
+                                    padding: "4px 12px",
+                                    borderRadius: "20px",
+                                    background: existingReq.status === "Resolved" ? "#dcfce7" : existingReq.status === "Replied" ? "#dbeafe" : "#fef3c7",
+                                    color: existingReq.status === "Resolved" ? "#15803d" : existingReq.status === "Replied" ? "#1d4ed8" : "#d97706"
+                                  }}>
+                                    Status: {existingReq.status}
+                                  </span>
+                                </div>
+
+                                <div style={{ color: "#334155", background: "#f1f5f9", padding: "10px 14px", borderRadius: "6px", marginBottom: "8px" }}>
+                                  "{existingReq.studentMessage ? existingReq.studentMessage.replace(/^\[Assessment Marksheet Issue\]\s*/i, "") : ""}"
+                                </div>
+
+                                {existingReq.teacherReply ? (
+                                  <div style={{
+                                    background: "#f0fdf4",
+                                    borderLeft: "4px solid #16a34a",
+                                    padding: "10px 14px",
+                                    borderRadius: "6px",
+                                    color: "#166534",
+                                    fontWeight: 500
+                                  }}>
+                                    <strong style={{ color: "#15803d" }}>Teacher's Reply:</strong> {existingReq.teacherReply}
+                                  </div>
+                                ) : (
+                                  <div style={{ fontSize: "12px", color: "#64748b", fontStyle: "italic" }}>
+                                    ⏳ Awaiting response from course teacher...
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -267,6 +370,12 @@ export default function StudentAssessmentPage() {
               <FiX size={20} color="#64748b" cursor="pointer" onClick={() => setSelectedRecordForIssue(null)} />
             </div>
 
+            {Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd))) && (
+              <div style={{ background: "#fff1f2", border: "1.5px solid #fecdd3", borderRadius: "10px", padding: "12px 16px", color: "#be123c", fontSize: "13px", fontWeight: 700, marginBottom: "16px" }}>
+                🔒 Marksheet Correction Locked: The deadline for submitting correction requests for this assessment closed on {selectedRecordForIssue.correctionWindowEnd ? new Date(selectedRecordForIssue.correctionWindowEnd).toLocaleString() : "Deadline Expiry"}. No further requests can be submitted.
+              </div>
+            )}
+
             <div style={{ background: "#f8fafc", padding: "12px 16px", borderRadius: "10px", marginBottom: "16px", border: "1px solid #e2e8f0" }}>
               <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#1e293b" }}>Course Code: {selectedRecordForIssue.courseCode}</div>
               <div style={{ fontSize: "12.5px", color: "#64748b", marginTop: "4px" }}>
@@ -281,17 +390,41 @@ export default function StudentAssessmentPage() {
               <textarea
                 rows={4}
                 value={issueMessage}
+                disabled={Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd)))}
                 onChange={(e) => setIssueMessage(e.target.value)}
                 placeholder="e.g. My Quiz 2 marks were miscalculated or my presentation score was not updated..."
-                style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13.5px", outline: "none", boxSizing: "border-box", marginBottom: "20px" }}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "13.5px",
+                  outline: "none",
+                  boxSizing: "border-box",
+                  marginBottom: "20px",
+                  background: Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd))) ? "#f1f5f9" : "#ffffff"
+                }}
               />
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
                 <button type="button" onClick={() => setSelectedRecordForIssue(null)} style={{ padding: "10px 18px", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#ffffff", color: "#475569", fontWeight: 600, fontSize: "13px", cursor: "pointer" }}>
                   Cancel
                 </button>
-                <button type="submit" disabled={submittingIssue} style={{ padding: "10px 20px", borderRadius: "8px", border: "none", background: "#3b8db3", color: "#ffffff", fontWeight: 700, fontSize: "13px", cursor: submittingIssue ? "not-allowed" : "pointer" }}>
-                  {submittingIssue ? "Sending..." : "Submit Correction Request"}
+                <button
+                  type="submit"
+                  disabled={submittingIssue || Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd)))}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    border: "none",
+                    background: Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd))) ? "#cbd5e1" : "#3b8db3",
+                    color: "#ffffff",
+                    fontWeight: 700,
+                    fontSize: "13px",
+                    cursor: Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd))) ? "not-allowed" : "pointer"
+                  }}
+                >
+                  {Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd))) ? "Window Closed" : submittingIssue ? "Sending..." : "Submit Correction Request"}
                 </button>
               </div>
             </form>

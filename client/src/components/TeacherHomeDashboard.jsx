@@ -1,97 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import {
   FiBookOpen,
   FiUsers,
-  FiClock,
-  FiFileText,
-  FiCalendar,
-  FiArrowRight,
   FiCheckCircle,
-  FiFilter,
-  FiCopy,
+  FiAward,
+  FiRefreshCw,
+  FiCalendar,
+  FiClipboard,
+  FiArrowRight,
+  FiUserCheck,
+  FiLayers,
 } from "react-icons/fi";
 import TeacherSidebar from "./TeacherSidebar";
 import "../styles/dashboard.css";
 
-// 3D Gradient Banner Helper matching Student Dashboard
-const getCourseBanner = (course) => {
-  const name = (course.name || course.courseTitle || "").toLowerCase();
-  
-  if (name.includes("math") || name.includes("calculus") || name.includes("algebra") || name.includes("linear") || name.includes("geometry") || name.includes("statistic")) {
-    return {
-      gradient: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1d4ed8 100%)", // Royal Sapphire
-      accent: "#3b82f6"
-    };
-  }
-  if (name.includes("program") || name.includes("code") || name.includes("computer") || name.includes("software") || name.includes("java") || name.includes("python") || name.includes("c++") || name.includes("web") || name.includes("android") || name.includes("data") || name.includes("algorithm")) {
-    return {
-      gradient: "linear-gradient(135deg, #065f46 0%, #10b981 50%, #047857 100%)", // Emerald Code
-      accent: "#10b981"
-    };
-  }
-  if (name.includes("physics") || name.includes("chemistry") || name.includes("biology") || name.includes("science") || name.includes("circuit") || name.includes("electronics") || name.includes("electrical")) {
-    return {
-      gradient: "linear-gradient(135deg, #be185d 0%, #db2777 50%, #831843 100%)", // Hot Pink
-      accent: "#ec4899"
-    };
-  }
-  if (name.includes("art") || name.includes("design") || name.includes("drawing") || name.includes("paint") || name.includes("creative")) {
-    return {
-      gradient: "linear-gradient(135deg, #b45309 0%, #d97706 50%, #78350f 100%)", // Amber Glow
-      accent: "#f59e0b"
-    };
-  }
-  if (name.includes("business") || name.includes("finance") || name.includes("accounting") || name.includes("management") || name.includes("economy") || name.includes("marketing")) {
-    return {
-      gradient: "linear-gradient(135deg, #0369a1 0%, #0ea5e9 50%, #075985 100%)", // Sky Blue
-      accent: "#0ea5e9"
-    };
-  }
-  if (name.includes("game") || name.includes("graphics") || name.includes("media") || name.includes("animation")) {
-    return {
-      gradient: "linear-gradient(135deg, #db2777 0%, #f43f5e 50%, #9d174d 100%)", // Rose Red
-      accent: "#f43f5e"
-    };
-  }
-  if (name.includes("network") || name.includes("security") || name.includes("cloud") || name.includes("database") || name.includes("dbms")) {
-    return {
-      gradient: "linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e3a8a 100%)", // Neon Sapphire
-      accent: "#3b82f6"
-    };
-  }
-  if (name.includes("project") || name.includes("thesis") || name.includes("seminar") || name.includes("presentation")) {
-    return {
-      gradient: "linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #7c2d12 100%)", // Sunset Orange
-      accent: "#f97316"
-    };
-  }
-
-  const fallbackBanners = [
-    { gradient: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c084fc 100%)", accent: "#7c3aed" },
-    { gradient: "linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #fda4af 100%)", accent: "#fb7185" },
-    { gradient: "linear-gradient(135deg, #059669 0%, #10b981 50%, #6ee7b7 100%)", accent: "#10b981" },
-    { gradient: "linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1d4ed8 100%)", accent: "#2563eb" },
-    { gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fde047 100%)", accent: "#f97316" },
-    { gradient: "linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #67e8f9 100%)", accent: "#06b6d4" },
-    { gradient: "linear-gradient(135deg, #6d28d9 0%, #db2777 50%, #9d174d 100%)", accent: "#db2777" },
-    { gradient: "linear-gradient(135deg, #15803d 0%, #84cc16 50%, #a3e635 100%)", accent: "#84cc16" }
-  ];
-  
-  const index = course._id ? parseInt(course._id.slice(-4), 16) % fallbackBanners.length : 0;
-  return fallbackBanners[index];
-};
-
 export default function TeacherHomeDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Independent Level and Term filter state
-  const [selectedLevel, setSelectedLevel] = useState("all");
-  const [selectedTerm, setSelectedTerm] = useState("all");
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -111,464 +42,423 @@ export default function TeacherHomeDashboard() {
     totalAssignedCourses: 0,
     totalStudents: 0,
     pendingRegistrationRequests: 0,
-    upcomingClasses: 0,
-    pendingAssignments: 0,
-    pendingAttendance: 0,
     isAdviser: false,
   };
 
-  const activeLevels = data?.activeLevels || [];
-  const activeTerms = data?.activeTerms || [];
-  const allCourses = data?.courses || [];
-
-  // Filter courses based on independently selected Level and Term
-  const displayedCourses = allCourses.filter((c) => {
-    if (selectedLevel !== "all") {
-      const matchL = (c.level || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-      const targetL = selectedLevel.toLowerCase().replace(/[^a-z0-9]/g, "");
-      if (!matchL.includes(targetL)) return false;
-    }
-    if (selectedTerm !== "all") {
-      const matchT = (c.term || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-      const targetT = selectedTerm.toLowerCase().replace(/[^a-z0-9]/g, "");
-      if (!matchT.includes(targetT)) return false;
-    }
-    return true;
-  });
-
-  const copyJoinCode = (code, e) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(code);
-    toast.success("Join code copied!");
-  };
-
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
       <TeacherSidebar currentPage="dashboard" />
 
       <div
         style={{
           flex: 1,
-          padding: "32px 28px",
+          padding: "36px 32px",
           marginLeft: 0,
           overflowY: "auto",
         }}
       >
         {/* Header */}
-        <div style={{ marginBottom: "28px" }}>
-          <h1 style={{ color: "#1e293b", margin: 0, fontSize: "26px", fontWeight: 700 }}>
-            Teacher Overview Dashboard
-          </h1>
-          <p style={{ color: "#64748b", margin: "4px 0 0 0", fontSize: "14px" }}>
-            Welcome back! Here are your assigned courses, level/term filters, and academic metrics.
-          </p>
+        <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+          <div>
+            <h1 style={{ color: "#1e293b", margin: 0, fontSize: "28px", fontWeight: 800 }}>
+              Teacher Overview Dashboard
+            </h1>
+            <p style={{ color: "#64748b", margin: "4px 0 0 0", fontSize: "14.5px" }}>
+              Welcome back, <strong>{user?.name || "Faculty Member"}</strong>! Here is your academic overview, adviser portal, and quick management hub.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span
+              style={{
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontSize: "13px",
+                fontWeight: "700",
+                background: summary.isAdviser ? "#dcfce7" : "#e2e8f0",
+                color: summary.isAdviser ? "#15803d" : "#475569",
+                border: `1px solid ${summary.isAdviser ? "#86efac" : "#cbd5e1"}`,
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <FiUserCheck size={16} /> {summary.isAdviser ? `Assigned Adviser (${user?.department || "EDTE"})` : `Faculty Member (${user?.department || "EDTE"})`}
+            </span>
+          </div>
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>
-            Loading dashboard data...
+          <div style={{ padding: "60px", textAlign: "center", color: "#64748b", fontSize: "15px" }}>
+            Loading dashboard metrics...
           </div>
         ) : (
           <>
-            {/* 1. Summary Cards Grid */}
+            {/* 1. Interactive 3 Primary Counter Cards */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                gap: "16px",
-                marginBottom: "32px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gap: "20px",
+                marginBottom: "36px",
               }}
             >
-              {/* Total Assigned Courses */}
+              {/* Card 1: Assigned Courses */}
               <div
+                onClick={() => navigate("/courses")}
                 style={{
                   background: "#ffffff",
-                  padding: "20px",
-                  borderRadius: "14px",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-                  border: "1px solid #e2e8f0",
+                  padding: "24px",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 16px rgba(59, 141, 179, 0.08)",
+                  border: "1px solid #cbd5e1",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>Assigned Courses</span>
-                  <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#e0f2fe", color: "#0369a1", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <FiBookOpen size={18} />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
+                  <div>
+                    <span style={{ fontSize: "13.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      Assigned Courses
+                    </span>
+                    <div style={{ fontSize: "32px", fontWeight: 800, color: "#0f172a", marginTop: "4px" }}>
+                      {summary.totalAssignedCourses}
+                    </div>
+                  </div>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "linear-gradient(135deg, #e0f2fe, #bae6fd)", color: "#0284c7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <FiBookOpen size={24} />
                   </div>
                 </div>
-                <div style={{ fontSize: "26px", fontWeight: 800, color: "#0f172a" }}>{summary.totalAssignedCourses}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#0284c7", fontWeight: 600 }}>
+                  View All Assigned Courses <FiArrowRight size={14} />
+                </div>
               </div>
 
-              {/* Total Students */}
+              {/* Card 2: Total Students */}
               <div
+                onClick={() => navigate("/teacher/enrolled-students")}
                 style={{
                   background: "#ffffff",
-                  padding: "20px",
-                  borderRadius: "14px",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-                  border: "1px solid #e2e8f0",
+                  padding: "24px",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 16px rgba(59, 141, 179, 0.08)",
+                  border: "1px solid #cbd5e1",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>Total Students</span>
-                  <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#dcfce7", color: "#15803d", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <FiUsers size={18} />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
+                  <div>
+                    <span style={{ fontSize: "13.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      Total Enrolled Students
+                    </span>
+                    <div style={{ fontSize: "32px", fontWeight: 800, color: "#0f172a", marginTop: "4px" }}>
+                      {summary.totalStudents}
+                    </div>
+                  </div>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "linear-gradient(135deg, #dcfce7, #bbf7d0)", color: "#15803d", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <FiUsers size={24} />
                   </div>
                 </div>
-                <div style={{ fontSize: "26px", fontWeight: 800, color: "#0f172a" }}>{summary.totalStudents}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#15803d", fontWeight: 600 }}>
+                  View Student Directory <FiArrowRight size={14} />
+                </div>
               </div>
 
-              {/* Pending Registrations (Adviser) */}
-              {summary.isAdviser && (
+              {/* Card 3: Pending Registrations (Adviser) */}
+              <div
+                onClick={() => navigate("/teacher/registration-approval")}
+                style={{
+                  background: summary.pendingRegistrationRequests > 0 ? "#fff1f2" : "#ffffff",
+                  padding: "24px",
+                  borderRadius: "16px",
+                  boxShadow: summary.pendingRegistrationRequests > 0 ? "0 4px 20px rgba(225,29,72,0.1)" : "0 4px 16px rgba(59, 141, 179, 0.08)",
+                  border: summary.pendingRegistrationRequests > 0 ? "1.5px solid #fecdd3" : "1px solid #cbd5e1",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
+                  <div>
+                    <span style={{ fontSize: "13.5px", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      Pending Registrations
+                    </span>
+                    <div style={{ fontSize: "32px", fontWeight: 800, color: summary.pendingRegistrationRequests > 0 ? "#e11d48" : "#0f172a", marginTop: "4px" }}>
+                      {summary.pendingRegistrationRequests}
+                    </div>
+                  </div>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: summary.pendingRegistrationRequests > 0 ? "linear-gradient(135deg, #fee2e2, #fca5a5)" : "linear-gradient(135deg, #f1f5f9, #e2e8f0)", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <FiCheckCircle size={24} />
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#475569", fontWeight: 600 }}>
+                  {summary.isAdviser ? (summary.pendingRegistrationRequests > 0 ? "Action Required: Review Applications" : "All Registrations Approved") : "Adviser Alignment Portal"} <FiArrowRight size={14} />
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Interactive Academic Management Hub Grid */}
+            <div style={{ marginBottom: "36px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+                <FiLayers size={22} color="#0284c7" />
+                <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a", fontWeight: 700 }}>
+                  Academic Management Hub & Shortcuts
+                </h2>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
+                {/* Hub Item 1: Registration Approval */}
                 <div
                   onClick={() => navigate("/teacher/registration-approval")}
                   style={{
-                    background: summary.pendingRegistrationRequests > 0 ? "#fef2f2" : "#ffffff",
-                    padding: "20px",
+                    background: "#ffffff",
                     borderRadius: "14px",
-                    boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-                    border: summary.pendingRegistrationRequests > 0 ? "1.5px solid #fca5a5" : "1px solid #e2e8f0",
+                    padding: "22px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
                     cursor: "pointer",
+                    transition: "all 0.2s",
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                    <span style={{ fontSize: "13px", color: summary.pendingRegistrationRequests > 0 ? "#991b1b" : "#64748b", fontWeight: 600 }}>
-                      Pending Registrations
-                    </span>
-                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: summary.pendingRegistrationRequests > 0 ? "#fee2e2" : "#f1f5f9", color: summary.pendingRegistrationRequests > 0 ? "#dc2626" : "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FiCheckCircle size={18} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#fff7ed", color: "#c2410c", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiCheckCircle size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Registration Approval</h3>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Batch Adviser Panel</span>
                     </div>
                   </div>
-                  <div style={{ fontSize: "26px", fontWeight: 800, color: summary.pendingRegistrationRequests > 0 ? "#dc2626" : "#0f172a" }}>
-                    {summary.pendingRegistrationRequests}
+                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
+                    Review, approve, or reject student level-term course registration applications for your assigned batch.
+                  </p>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#c2410c", display: "flex", alignItems: "center", gap: "4px" }}>
+                    Open Approval Portal <FiArrowRight size={13} />
                   </div>
                 </div>
-              )}
 
-              {/* Upcoming Classes */}
-              <div
-                style={{
-                  background: "#ffffff",
-                  padding: "20px",
-                  borderRadius: "14px",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-                  border: "1px solid #e2e8f0",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>Active Classes</span>
-                  <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#fef3c7", color: "#b45309", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <FiClock size={18} />
+                {/* Hub Item 2: Result Publication */}
+                <div
+                  onClick={() => navigate("/teacher/results")}
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: "14px",
+                    padding: "22px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#f0fdf4", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiAward size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Result Publication</h3>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Marks & Grade Processing</span>
+                    </div>
+                  </div>
+                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
+                    Upload assessment Excel sheets, calculate semester GPA/CGPA, and publish official student result sheets.
+                  </p>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#166534", display: "flex", alignItems: "center", gap: "4px" }}>
+                    Manage Results <FiArrowRight size={13} />
                   </div>
                 </div>
-                <div style={{ fontSize: "26px", fontWeight: 800, color: "#0f172a" }}>{summary.upcomingClasses}</div>
-              </div>
 
-              {/* Pending Assignments */}
-              <div
-                style={{
-                  background: "#ffffff",
-                  padding: "20px",
-                  borderRadius: "14px",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-                  border: "1px solid #e2e8f0",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>Pending Grading</span>
-                  <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#f3e8ff", color: "#6b21a8", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <FiFileText size={18} />
+                {/* Hub Item 3: Retake Approval */}
+                <div
+                  onClick={() => navigate("/teacher/retake-approval")}
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: "14px",
+                    padding: "22px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#eff6ff", color: "#1d4ed8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiRefreshCw size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Retake Approval</h3>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Improvement & Retake Panel</span>
+                    </div>
+                  </div>
+                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
+                    Manage student course retake applications, verify eligibility criteria, and process retake approvals.
+                  </p>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#1d4ed8", display: "flex", alignItems: "center", gap: "4px" }}>
+                    View Retake Requests <FiArrowRight size={13} />
                   </div>
                 </div>
-                <div style={{ fontSize: "26px", fontWeight: 800, color: "#0f172a" }}>{summary.pendingAssignments}</div>
-              </div>
 
-              {/* Pending Attendance */}
-              <div
-                style={{
-                  background: "#ffffff",
-                  padding: "20px",
-                  borderRadius: "14px",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-                  border: "1px solid #e2e8f0",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>Pending Attendance</span>
-                  <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#ccfbf1", color: "#0f766e", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <FiCalendar size={18} />
+                {/* Hub Item 4: Enrolled Students */}
+                <div
+                  onClick={() => navigate("/teacher/enrolled-students")}
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: "14px",
+                    padding: "22px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#fbfbfe", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiUsers size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Enrolled Students</h3>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Student Roster Directory</span>
+                    </div>
+                  </div>
+                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
+                    Inspect full student roster, filter by academic session or level-term, and review academic profiles.
+                  </p>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#7c3aed", display: "flex", alignItems: "center", gap: "4px" }}>
+                    Browse Roster <FiArrowRight size={13} />
                   </div>
                 </div>
-                <div style={{ fontSize: "26px", fontWeight: 800, color: "#0f172a" }}>{summary.pendingAttendance}</div>
+
+                {/* Hub Item 5: Notice Board */}
+                <div
+                  onClick={() => navigate("/teacher/notices")}
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: "14px",
+                    padding: "22px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#f0fdfa", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiClipboard size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Notice Board</h3>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Announcements & Emails</span>
+                    </div>
+                  </div>
+                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
+                    Publish class announcements, exam notifications, and dispatch instant email alerts to enrolled students.
+                  </p>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "4px" }}>
+                    Publish Notices <FiArrowRight size={13} />
+                  </div>
+                </div>
+
+                {/* Hub Item 6: Academic Calendar */}
+                <div
+                  onClick={() => navigate("/academic-calendar")}
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: "14px",
+                    padding: "22px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#fef3c7", color: "#b45309", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiCalendar size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Academic Calendar</h3>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Semester Schedule</span>
+                    </div>
+                  </div>
+                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
+                    Check university registration schedules, examination windows, and official academic term dates.
+                  </p>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#b45309", display: "flex", alignItems: "center", gap: "4px" }}>
+                    View Calendar <FiArrowRight size={13} />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* 2. Independent Level and Term Selection Filters */}
-            <div style={{ background: "#ffffff", padding: "24px", borderRadius: "14px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", marginBottom: "32px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
-                <FiFilter size={20} color="#3b8db3" />
-                <h2 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>Filter Assigned Courses by Level & Term</h2>
+            {/* 3. Bottom Direct Banner to My Courses */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, #0284c7, #0369a1)",
+                borderRadius: "16px",
+                padding: "24px 28px",
+                color: "#ffffff",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "16px",
+                boxShadow: "0 8px 24px rgba(2,132,199,0.2)",
+              }}
+            >
+              <div>
+                <h3 style={{ margin: "0 0 4px 0", fontSize: "18px", fontWeight: 700 }}>
+                  Need to manage your assigned course study materials & LMS classrooms?
+                </h3>
+                <p style={{ margin: 0, fontSize: "14px", color: "#e0f2fe" }}>
+                  All your assigned courses, lecture materials, and LMS classroom access are available under <strong>My Courses</strong>.
+                </p>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-                {/* Level Selection Section */}
-                <div>
-                  <label style={{ fontSize: "13.5px", fontWeight: 700, color: "#475569", display: "block", marginBottom: "10px" }}>
-                    Select Level:
-                  </label>
-                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                    <button
-                      onClick={() => setSelectedLevel("all")}
-                      style={{
-                        padding: "8px 16px",
-                        borderRadius: "8px",
-                        border: selectedLevel === "all" ? "none" : "1px solid #cbd5e1",
-                        background: selectedLevel === "all" ? "#3b8db3" : "#f8fafc",
-                        color: selectedLevel === "all" ? "#ffffff" : "#334155",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      All Levels
-                    </button>
-                    {(activeLevels.length > 0 ? activeLevels : ["Level 1", "Level 2", "Level 3", "Level 4"]).map((lvl) => {
-                      const isSel = selectedLevel.toLowerCase().replace(/[^a-z0-9]/g, "") === lvl.toLowerCase().replace(/[^a-z0-9]/g, "");
-                      return (
-                        <button
-                          key={lvl}
-                          onClick={() => setSelectedLevel(lvl)}
-                          style={{
-                            padding: "8px 16px",
-                            borderRadius: "8px",
-                            border: isSel ? "none" : "1px solid #cbd5e1",
-                            background: isSel ? "#3b8db3" : "#ffffff",
-                            color: isSel ? "#ffffff" : "#1e293b",
-                            fontWeight: 600,
-                            fontSize: "13px",
-                            cursor: "pointer",
-                            boxShadow: isSel ? "0 4px 12px rgba(59,141,179,0.25)" : "none",
-                          }}
-                        >
-                          {lvl}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Term Selection Section */}
-                <div>
-                  <label style={{ fontSize: "13.5px", fontWeight: 700, color: "#475569", display: "block", marginBottom: "10px" }}>
-                    Select Term:
-                  </label>
-                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                    <button
-                      onClick={() => setSelectedTerm("all")}
-                      style={{
-                        padding: "8px 16px",
-                        borderRadius: "8px",
-                        border: selectedTerm === "all" ? "none" : "1px solid #cbd5e1",
-                        background: selectedTerm === "all" ? "#3b8db3" : "#f8fafc",
-                        color: selectedTerm === "all" ? "#ffffff" : "#334155",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      All Terms
-                    </button>
-                    {(activeTerms.length > 0 ? activeTerms : ["Term 1", "Term 2"]).map((trm) => {
-                      const isSel = selectedTerm.toLowerCase().replace(/[^a-z0-9]/g, "") === trm.toLowerCase().replace(/[^a-z0-9]/g, "");
-                      return (
-                        <button
-                          key={trm}
-                          onClick={() => setSelectedTerm(trm)}
-                          style={{
-                            padding: "8px 16px",
-                            borderRadius: "8px",
-                            border: isSel ? "none" : "1px solid #cbd5e1",
-                            background: isSel ? "#3b8db3" : "#ffffff",
-                            color: isSel ? "#ffffff" : "#1e293b",
-                            fontWeight: 600,
-                            fontSize: "13px",
-                            cursor: "pointer",
-                            boxShadow: isSel ? "0 4px 12px rgba(59,141,179,0.25)" : "none",
-                          }}
-                        >
-                          {trm}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 3. Assigned Course List Grid using 3D Animated Classroom Cards */}
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                <h2 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>
-                  Assigned Courses ({displayedCourses.length})
-                </h2>
-                <div style={{ fontSize: "13px", color: "#64748b" }}>
-                  Active Filter: <strong>{selectedLevel === "all" ? "All Levels" : selectedLevel}</strong> • <strong>{selectedTerm === "all" ? "All Terms" : selectedTerm}</strong>
-                </div>
-              </div>
-
-              {displayedCourses.length === 0 ? (
-                <div style={{ padding: "40px", background: "#ffffff", borderRadius: "12px", textAlign: "center", color: "#94a3b8" }}>
-                  No courses found matching selected Level ({selectedLevel}) and Term ({selectedTerm}).
-                </div>
-              ) : (
-                <div className="lectures-grid">
-                  {displayedCourses.map((c) => {
-                    const banner = getCourseBanner(c);
-
-                    return (
-                      <div
-                        key={c._id}
-                        className="classroom-course-card"
-                        onClick={() => navigate(`/course/${c._id}`)}
-                      >
-                        {/* 3D Gradient Banner Top Portion */}
-                        <div
-                          className="classroom-banner"
-                          style={{ background: banner.gradient }}
-                        >
-                          {/* Decorative shapes */}
-                          <div className="classroom-banner-shapes">
-                            <div className="classroom-banner-shape-1"></div>
-                            <div className="classroom-banner-shape-2"></div>
-                            <div className="classroom-banner-shape-3"></div>
-                            <div className="classroom-banner-shape-4"></div>
-                            <div className="classroom-banner-shape-5"></div>
-                            <div className="classroom-banner-shape-6"></div>
-                          </div>
-
-                          <div className="classroom-banner-content">
-                            <h3 className="classroom-course-name" title={c.name || c.courseTitle}>
-                              {c.name || c.courseTitle}
-                            </h3>
-                            <p className="classroom-course-code">
-                              {c.displayCode || c.courseCode}
-                            </p>
-                            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "4px" }}>
-                              {c.session && (
-                                <span style={{ background: "rgba(255,255,255,0.25)", color: "#ffffff", padding: "2px 8px", borderRadius: "10px", fontSize: "11px", fontWeight: "600" }}>
-                                  {c.session}
-                                </span>
-                              )}
-                              {c.level && (
-                                <span style={{ background: "rgba(255,255,255,0.25)", color: "#ffffff", padding: "2px 8px", borderRadius: "10px", fontSize: "11px", fontWeight: "600" }}>
-                                  {c.level}
-                                </span>
-                              )}
-                              {c.term && (
-                                <span style={{ background: "rgba(255,255,255,0.25)", color: "#ffffff", padding: "2px 8px", borderRadius: "10px", fontSize: "11px", fontWeight: "600" }}>
-                                  {c.term}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card Body */}
-                        <div className="classroom-card-body">
-                          {/* Floating Avatar of Instructor */}
-                          <div className="classroom-avatar-wrapper">
-                            <div
-                              className="classroom-avatar"
-                              style={{ background: banner.accent }}
-                            >
-                              {c.teacher?.profilePicture ? (
-                                <img
-                                  src={c.teacher.profilePicture}
-                                  alt={c.teacher.name || "Teacher"}
-                                  className="classroom-avatar-img"
-                                />
-                              ) : (
-                                c.teacher?.name ? c.teacher.name.charAt(0).toUpperCase() : "T"
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="classroom-meta-info">
-                            <span className="classroom-student-count">
-                              <FiUsers size={12} style={{ marginRight: 6 }} />
-                              {c.totalEnrolled || c.students?.length || 0} students
-                            </span>
-                            {c.teacher?.name && (
-                              <span
-                                className="classroom-teacher-name"
-                                title={c.teacher.name}
-                                style={{ fontSize: 13, color: "var(--text-gray)" }}
-                              >
-                                {c.teacher.name}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Actions Area */}
-                          <div className="classroom-actions" style={{ gap: 8, display: "flex", flexWrap: "wrap", alignItems: "center" }}>
-                            {c.joinCode && (
-                              <div
-                                className="join-code-container"
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 4,
-                                  background: "rgba(59, 141, 179, 0.08)",
-                                  padding: "4px 8px",
-                                  borderRadius: 6,
-                                  marginRight: "auto"
-                                }}
-                              >
-                                <span style={{ fontSize: 10, color: "var(--text-gray)", fontWeight: 600 }}>
-                                  Code:
-                                </span>
-                                <span
-                                  style={{
-                                    fontWeight: 700,
-                                    letterSpacing: 1,
-                                    fontSize: 12,
-                                    color: "var(--primary)",
-                                  }}
-                                >
-                                  {c.joinCode}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={(e) => copyJoinCode(c.joinCode, e)}
-                                  title="Copy join code"
-                                  style={{
-                                    background: "none",
-                                    border: "none",
-                                    cursor: "pointer",
-                                    padding: 2,
-                                    color: "var(--primary)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <FiCopy size={11} />
-                                </button>
-                              </div>
-                            )}
-
-                            <button
-                              className="btn-primary btn-sm"
-                              onClick={() => navigate(`/course/${c._id}`)}
-                              style={{ marginLeft: c.joinCode ? "0" : "auto", display: "flex", alignItems: "center", gap: "4px" }}
-                            >
-                              Open Course <FiArrowRight size={13} />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <button
+                onClick={() => navigate("/courses")}
+                style={{
+                  padding: "12px 24px",
+                  background: "#ffffff",
+                  color: "#0284c7",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontWeight: 700,
+                  fontSize: "14.5px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              >
+                Go to My Courses <FiArrowRight size={16} />
+              </button>
             </div>
           </>
         )}

@@ -31,6 +31,7 @@ exports.uploadMarksheet = async (req, res) => {
     let level = "";
     let term = "";
     let department = "";
+    let headerSession = "";
 
     for (let r = 0; r < Math.min(rows.length, 10); r++) {
       const row = rows[r];
@@ -45,50 +46,62 @@ exports.uploadMarksheet = async (req, res) => {
         // 1. Course Code Detection
         if (!courseCode && cellLower.includes("course code")) {
           if (cellLower.includes("course code:")) {
-            const extracted = cellStr.split(/course code:\s*/i)[1]?.split(/[\n,;]/)[0]?.trim();
-            if (extracted) courseCode = extracted;
+            const afterCodeTag = cellStr.split(/course code:\s*/i)[1] || "";
+            const cleanCodePart = afterCodeTag.split(/course title|course type|credit|level|term|dept|[\n,;]/i)[0]?.trim();
+            if (cleanCodePart) courseCode = cleanCodePart;
           }
           if (!courseCode && row[c + 1] !== undefined && row[c + 1] !== null) {
             const nextVal = String(row[c + 1]).trim();
-            if (nextVal && !nextVal.toLowerCase().includes("level") && !nextVal.toLowerCase().includes("term") && !nextVal.toLowerCase().includes("dept")) {
-              courseCode = nextVal;
+            const cleanNextVal = nextVal.split(/course title|course type|credit|level|term|dept|[\n,;]/i)[0]?.trim();
+            if (cleanNextVal && !cleanNextVal.toLowerCase().includes("level") && !cleanNextVal.toLowerCase().includes("term") && !cleanNextVal.toLowerCase().includes("dept")) {
+              courseCode = cleanNextVal;
             }
           }
         }
 
         // 2. Level Detection
         if (!level && cellLower.includes("level")) {
-          const cleaned = cellStr.replace(/^level\s*:?\s*/i, "").trim();
-          if (cleaned) {
-            level = cleaned;
+          const match = cellStr.match(/level\s*:?\s*(\d+)/i);
+          if (match) {
+            level = match[1];
           } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
-            const nextVal = String(row[c + 1]).replace(/^level\s*:?\s*/i, "").trim();
-            if (nextVal) level = nextVal;
+            const nextMatch = String(row[c + 1]).match(/level\s*:?\s*(\d+)/i) || String(row[c + 1]).match(/(\d+)/);
+            if (nextMatch) level = nextMatch[1] || nextMatch[0];
           }
         }
 
         // 3. Term Detection
         if (!term && cellLower.includes("term")) {
-          const cleaned = cellStr.replace(/^term\s*:?\s*/i, "").trim();
-          if (cleaned) {
-            term = cleaned;
+          const match = cellStr.match(/term\s*:?\s*(\d+)/i);
+          if (match) {
+            term = match[1];
           } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
-            const nextVal = String(row[c + 1]).replace(/^term\s*:?\s*/i, "").trim();
-            if (nextVal) term = nextVal;
+            const nextMatch = String(row[c + 1]).match(/term\s*:?\s*(\d+)/i) || String(row[c + 1]).match(/(\d+)/);
+            if (nextMatch) term = nextMatch[1] || nextMatch[0];
           }
         }
 
         // 4. Department Detection
         if (!department && (cellLower.includes("dept") || cellLower.includes("department"))) {
-          if (cellLower.includes("dept:") || cellLower.includes("department:") || cellLower.includes("dept :") || cellLower.includes("department :")) {
-            const extracted = cellStr.split(/(?:dept|department)\s*:\s*/i)[1]?.split(/[\n,;]/)[0]?.trim();
-            if (extracted) department = extracted;
-          }
-          if (!department && row[c + 1] !== undefined && row[c + 1] !== null) {
-            const nextVal = String(row[c + 1]).trim();
-            if (nextVal && !nextVal.toLowerCase().includes("course") && !nextVal.toLowerCase().includes("level")) {
+          const match = cellStr.match(/(?:dept|department)\s*:?\s*([a-zA-Z]+)/i);
+          if (match) {
+            department = match[1].toUpperCase();
+          } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+            const nextVal = String(row[c + 1]).trim().toUpperCase();
+            if (nextVal && ["EDTE", "IRE", "CYSE", "DSE", "SWE"].includes(nextVal)) {
               department = nextVal;
             }
+          }
+        }
+
+        // 5. Session Header Detection
+        if (!headerSession && cellLower.includes("session")) {
+          const match = cellStr.match(/session\s*:?\s*(\d{4}[-\s]\d{2,4})/i);
+          if (match) {
+            headerSession = match[1];
+          } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+            const nextMatch = String(row[c + 1]).match(/(\d{4}[-\s]\d{2,4})/);
+            if (nextMatch) headerSession = nextMatch[1];
           }
         }
       }
@@ -100,6 +113,80 @@ exports.uploadMarksheet = async (req, res) => {
       return res.status(400).json({
         error: "Course code not detected in the marksheet. Please ensure it contains a cell with 'Course Code: XXX'."
       });
+    }
+
+    // 1b. Teacher Course Assignment Verification
+    const teacherUser = await User.findById(req.user.uid);
+    const teacherEmail = (teacherUser?.email || "").toLowerCase().trim();
+
+    const Teacher = require("../models/Teacher");
+    const teacherDoc = await Teacher.findOne({
+      $or: [
+        { email: teacherEmail },
+        { email: { $regex: new RegExp(`^${teacherEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+      ]
+    }).lean();
+
+    const lmsCourses = await Course.find({ teacher: req.user.uid }).lean();
+
+    const assignedCoursesList = [];
+    const assignedCodesSet = new Set();
+
+    if (teacherDoc && Array.isArray(teacherDoc.assignedCourses)) {
+      teacherDoc.assignedCourses.forEach((c) => {
+        const code = String(c.courseCode || c.courseName || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        const sess = (c.session || teacherDoc.assignedSession || "").trim();
+        const lTerm = (c.levelTerm || teacherDoc.assignedLevelTerm || "").trim();
+        if (code) {
+          assignedCodesSet.add(code);
+          const desc = `${c.courseCode || code}${c.courseName ? ` (${c.courseName})` : ""}${sess ? ` — Session: ${sess}` : ""}${lTerm ? `, ${lTerm}` : ""}`;
+          if (!assignedCoursesList.includes(desc)) {
+            assignedCoursesList.push(desc);
+          }
+        }
+      });
+    }
+
+    if (Array.isArray(lmsCourses)) {
+      lmsCourses.forEach((c) => {
+        const code = String(c.displayCode || c.name || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        const sess = (c.session || "").trim();
+        if (code) {
+          assignedCodesSet.add(code);
+          const desc = `${c.displayCode || c.name || code}${sess ? ` — Session: ${sess}` : ""}`;
+          if (!assignedCoursesList.includes(desc)) {
+            assignedCoursesList.push(desc);
+          }
+        }
+      });
+    }
+
+    const cleanCourseCode = String(courseCode).replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+
+    if (req.user.role !== "admin" && assignedCoursesList.length > 0) {
+      const isAssigned = assignedCodesSet.has(cleanCourseCode) ||
+        Array.from(assignedCodesSet).some(k => k.includes(cleanCourseCode) || cleanCourseCode.includes(k));
+
+      if (!isAssigned) {
+        try { fs.unlinkSync(req.file.path); } catch (e) {}
+        
+        let warningLines = [];
+        warningLines.push(`Upload blocked — The uploaded Excel sheet does not match your assigned courses.`);
+        warningLines.push(``);
+        warningLines.push(`Your Excel file details:`);
+        warningLines.push(`  • Course Code : ${courseCode}`);
+        if (headerSession) warningLines.push(`  • Session     : ${headerSession}`);
+        if (level)         warningLines.push(`  • Level       : ${level}`);
+        if (term)          warningLines.push(`  • Term        : ${term}`);
+        if (department)    warningLines.push(`  • Department  : ${department}`);
+        warningLines.push(``);
+        warningLines.push(`Your assigned courses (one must match):`);
+        assignedCoursesList.forEach((ac) => warningLines.push(`  - ${ac}`));
+
+        return res.status(400).json({
+          error: warningLines.join("\n")
+        });
+      }
     }
 
     // Retrieve Course model doc for notification link and fallbacks
@@ -151,6 +238,17 @@ exports.uploadMarksheet = async (req, res) => {
     const savedRecords = [];
     const duplicateRecords = [];
 
+    // Overwrite behavior: Delete any previous assessment records for this courseCode
+    // so only the newly uploaded file's data remains in the database.
+    const targetCleanCourseCode = courseCode.trim();
+    const cleanRegex = new RegExp(targetCleanCourseCode.replace(/[^a-zA-Z0-9]/g, ""), "i");
+    await Assessment.deleteMany({
+      $or: [
+        { courseCode: targetCleanCourseCode },
+        { courseCode: { $regex: cleanRegex } }
+      ]
+    });
+
     // 4. Parse student rows
     for (let r = headerRowIndex + 1; r < rows.length; r++) {
       const row = rows[r];
@@ -166,10 +264,10 @@ exports.uploadMarksheet = async (req, res) => {
         continue; // skip headers or SL numbers misread as student ID
       }
 
-      // Per-student Session column extraction
-      const studentSession = sessionColIndex !== -1 && row[sessionColIndex] !== undefined && row[sessionColIndex] !== null
+      // Per-student Session column extraction or header fallback
+      const studentSession = (sessionColIndex !== -1 && row[sessionColIndex] !== undefined && row[sessionColIndex] !== null && String(row[sessionColIndex]).trim())
         ? String(row[sessionColIndex]).trim()
-        : "";
+        : (headerSession || "");
 
       // Helper to parse cell as number
       const getNum = (colIndex) => {
@@ -184,20 +282,6 @@ exports.uploadMarksheet = async (req, res) => {
       const assignment = getNum(assignmentColIndex);
       const presentation = getNum(presentationColIndex);
       const totalMarks = getNum(totalColIndex);
-
-      // 5. Duplicate Record Detection
-      const existingRecord = await Assessment.findOne({
-        studentIdNumber,
-        courseCode,
-        level,
-        term,
-        department,
-        session: studentSession
-      });
-      if (existingRecord) {
-        duplicateRecords.push({ studentIdNumber, courseCode, level, term, department, session: studentSession });
-        continue;
-      }
 
       // Find matching User model object
       const studentUser = await User.findOne({ studentId: studentIdNumber, role: "student" });
@@ -330,7 +414,9 @@ exports.getStudentAssessments = async (req, res) => {
         { studentIdNumber: student.studentId },
         { studentId: student._id }
       ]
-    }).sort({ courseCode: 1 });
+    })
+      .populate("uploadedBy", "name email")
+      .sort({ courseCode: 1 });
 
     res.json({ assessments });
   } catch (error) {
@@ -443,6 +529,43 @@ exports.deleteSingleAssessment = async (req, res) => {
     res.json({
       success: true,
       message: "Assessment record deleted successfully."
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Set or update correction deadline for assessment marksheet
+exports.setAssessmentCorrectionDeadline = async (req, res) => {
+  try {
+    const { courseCode, level, term, department, correctionWindowEnd, isCorrectionClosed } = req.body;
+    if (!courseCode) {
+      return res.status(400).json({ error: "Course code is required" });
+    }
+
+    const query = {
+      courseCode: { $regex: new RegExp(`^${courseCode.trim()}$`, "i") },
+    };
+
+    if (req.user.role !== "admin") {
+      query.uploadedBy = req.user.uid;
+    }
+
+    const updateData = {};
+    if (correctionWindowEnd !== undefined) {
+      updateData.correctionWindowEnd = correctionWindowEnd ? new Date(correctionWindowEnd) : null;
+    }
+    if (isCorrectionClosed !== undefined) {
+      updateData.isCorrectionClosed = Boolean(isCorrectionClosed);
+    }
+
+    await Assessment.updateMany(query, { $set: updateData });
+
+    res.json({
+      success: true,
+      message: "Assessment correction request deadline updated successfully.",
+      correctionWindowEnd: updateData.correctionWindowEnd,
+      isCorrectionClosed: updateData.isCorrectionClosed,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

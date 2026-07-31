@@ -28,6 +28,7 @@ import {
   FiCheck,
   FiAward,
   FiRefreshCw,
+  FiGrid,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -127,7 +128,14 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
         </div>
         <div className="sidebar-nav-scrollable">
           <button
-            className={`nav-item ${currentPage === "my-courses" || currentPage === "courses" ? "active" : ""}`}
+            className={`nav-item ${currentPage === "dashboard" || window.location.pathname === "/teacher/dashboard" ? "active" : ""}`}
+            onClick={() => navigate("/teacher/dashboard")}
+          >
+            <FiGrid size={18} />
+            <span>Dashboard</span>
+          </button>
+          <button
+            className={`nav-item ${currentPage === "my-courses" || currentPage === "courses" || (window.location.pathname === "/courses" && currentPage !== "dashboard") ? "active" : ""}`}
             onClick={() => navigate("/courses")}
           >
             <FiBookOpen size={18} />

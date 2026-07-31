@@ -68,19 +68,24 @@ export default function PaymentCheckoutModal({
 
     setProcessing(true);
     try {
-      // 1. Initiate or get payment ID if not provided
-      let targetPaymentId = paymentRecord?.paymentId || paymentRecord?._id;
+      // 1. Always initiate/get payment record with full context
+      const initRes = await api.post("/registration-payments/initiate", {
+        registrationId: paymentRecord?.registration || paymentRecord?.registrationId || paymentRecord?._id,
+        session: paymentRecord?.session,
+        level: paymentRecord?.level,
+        term: paymentRecord?.term,
+        selectedCourses: selectedCourses.length > 0 ? selectedCourses : paymentRecord?.selectedCourses || [],
+      });
 
-      if (!targetPaymentId) {
-        const initRes = await api.post("/registration-payments/initiate", {
-          selectedCourses,
-        });
-        targetPaymentId = initRes.data.payment.paymentId || initRes.data.payment._id;
-      }
+      const targetPaymentId = initRes.data?.payment?.paymentId || initRes.data?.payment?._id || paymentRecord?.paymentId || paymentRecord?._id;
 
       // 2. Process payment transaction online
       const res = await api.post("/registration-payments/process", {
         paymentId: targetPaymentId,
+        registrationId: paymentRecord?.registration || paymentRecord?.registrationId || paymentRecord?._id,
+        session: paymentRecord?.session,
+        level: paymentRecord?.level,
+        term: paymentRecord?.term,
         status: "SUCCESS",
       });
 
@@ -89,6 +94,7 @@ export default function PaymentCheckoutModal({
       toast.success("Payment completed successfully!");
       if (onPaymentSuccess) onPaymentSuccess(res.data.payment);
     } catch (err) {
+      console.error("Payment transaction error:", err);
       toast.error(err.response?.data?.error || "Online payment transaction failed.");
     } finally {
       setProcessing(false);

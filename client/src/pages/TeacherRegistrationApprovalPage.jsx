@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TeacherSidebar from "../components/TeacherSidebar";
 import api from "../services/api";
 import toast from "react-hot-toast";
-import { FiCheckCircle, FiXCircle, FiList, FiEye } from "react-icons/fi";
+import { FiCheckCircle, FiXCircle, FiList, FiEye, FiFileText } from "react-icons/fi";
 import RegistrationInvoiceModal from "../components/RegistrationInvoiceModal";
 
 export default function TeacherRegistrationApprovalPage() {
@@ -138,6 +138,25 @@ export default function TeacherRegistrationApprovalPage() {
                       >
                         {reg.paymentStatus === "Paid" ? `Paid (৳${(reg.totalAmount || 3100).toLocaleString()})` : `Pending (Due: ৳${(reg.dueAmount || reg.totalAmount || 3100).toLocaleString()})`}
                       </span>
+
+                      {reg.hasPreviousDues && (
+                        <div
+                          style={{
+                            marginTop: "6px",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            fontWeight: "800",
+                            background: "#ffe4e6",
+                            color: "#e11d48",
+                            border: "1px solid #fecdd3",
+                            display: "inline-block",
+                          }}
+                          title={`Previous Dues: ৳${reg.totalPreviousDues.toLocaleString()} BDT`}
+                        >
+                          Previous Dues: ৳{reg.totalPreviousDues.toLocaleString()}
+                        </div>
+                      )}
                     </td>
                     <td style={{ padding: "12px" }}>{new Date(reg.createdAt).toLocaleDateString()}</td>
                     <td style={{ padding: "12px", textAlign: "center" }}>
@@ -204,6 +223,34 @@ export default function TeacherRegistrationApprovalPage() {
                 </div>
               </div>
 
+              {/* Previous Semesters Dues Notice for Adviser */}
+              <div style={{ marginBottom: "20px" }}>
+                <h3 style={{ margin: "0 0 8px 0", color: "#334155", fontSize: "15px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  Student Dues & Academic Payment History
+                </h3>
+                {selectedReg.hasPreviousDues ? (
+                  <div style={{ background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: "10px", padding: "14px", color: "#9f1239" }}>
+                    <div style={{ fontWeight: 800, fontSize: "13.5px", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                      Attention Adviser: Student Has Outstanding Previous Dues (Total: ৳{selectedReg.totalPreviousDues.toLocaleString()} BDT)
+                    </div>
+                    <div style={{ fontSize: "12.5px", color: "#881337" }}>
+                      The student has pending fee balances for the following previous academic semester(s):
+                    </div>
+                    <ul style={{ margin: "8px 0 0 0", paddingLeft: "20px", fontSize: "13px" }}>
+                      {selectedReg.previousUnpaidSemesters.map((sem, idx) => (
+                        <li key={idx} style={{ marginBottom: "4px" }}>
+                          <strong>{sem.level} {sem.term}</strong> ({sem.session}) — <span style={{ fontWeight: 700, color: "#e11d48" }}>৳{sem.dueAmount.toLocaleString()} BDT</span> (Previous Dues Pending)
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "12px 14px", color: "#166534", fontSize: "13px", fontWeight: 700 }}>
+                    Academic Dues Cleared: No previous semester dues found for this student.
+                  </div>
+                )}
+              </div>
+
               <h3 style={{ margin: "0 0 10px 0", color: "#334155", fontSize: "15px" }}>Selected Courses</h3>
               <ul style={{ paddingLeft: "20px", margin: 0, fontSize: "13.5px", color: "#1e293b", display: "flex", flexDirection: "column", gap: "6px" }}>
                 {selectedReg.selectedCourses.map((c, i) => (
@@ -218,7 +265,7 @@ export default function TeacherRegistrationApprovalPage() {
                   onClick={() => setShowInvoiceModal(true)}
                   style={{ background: "#0284c7", color: "#ffffff", border: "none", padding: "10px 18px", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}
                 >
-                  📄 View Printable Invoice
+                  <FiFileText /> View Printable Invoice
                 </button>
                 <button onClick={() => setSelectedReg(null)} style={{ background: "#cbd5e1", border: "none", padding: "10px 20px", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "13px", color: "#334155" }}>
                   Close

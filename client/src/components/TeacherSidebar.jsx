@@ -14,13 +14,11 @@ import {
   FiBookOpen,
   FiMessageSquare,
   FiActivity,
-  FiCopy,
   FiChevronDown,
   FiChevronUp,
   FiMessageCircle,
   FiMail,
   FiClock,
-  FiBell,
   FiClipboard,
   FiSettings,
   FiMenu,
@@ -30,7 +28,6 @@ import {
   FiRefreshCw,
   FiGrid,
 } from "react-icons/fi";
-import toast from "react-hot-toast";
 
 export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
   const { user, logout } = useAuth();
@@ -39,6 +36,15 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
 
   const [course, setCourse] = useState(courseInfo || null);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isRegistrationPage =
+    currentPage === "registration-approval" ||
+    currentPage === "retake-approval" ||
+    window.location.pathname.includes("/teacher/registration-approval") ||
+    window.location.pathname.includes("/teacher/retake-approval");
+
+  const [registrationOpen, setRegistrationOpen] = useState(isRegistrationPage);
+
   const [communityOpen, setCommunityOpen] = useState(
     currentPage === "community-hub" ||
       currentPage === "community" ||
@@ -127,6 +133,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           </p>
         </div>
         <div className="sidebar-nav-scrollable">
+          {/* 1. Dashboard */}
           <button
             className={`nav-item ${currentPage === "dashboard" || window.location.pathname === "/teacher/dashboard" ? "active" : ""}`}
             onClick={() => navigate("/teacher/dashboard")}
@@ -134,6 +141,8 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             <FiGrid size={18} />
             <span>Dashboard</span>
           </button>
+
+          {/* 2. My Courses */}
           <button
             className={`nav-item ${currentPage === "my-courses" || currentPage === "courses" || (window.location.pathname === "/courses" && currentPage !== "dashboard") ? "active" : ""}`}
             onClick={() => navigate("/courses")}
@@ -141,6 +150,8 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             <FiBookOpen size={18} />
             <span>My Courses</span>
           </button>
+
+          {/* 3. Enrolled Students */}
           <button
             className={`nav-item ${currentPage === "enrolled-students" || window.location.pathname.includes("/enrolled-students") ? "active" : ""}`}
             onClick={() => navigate("/teacher/enrolled-students")}
@@ -148,13 +159,52 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             <FiUsers size={18} />
             <span>Enrolled Students</span>
           </button>
+
+          {/* 4. Registration Dropdown */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <button
+              className={`nav-item ${isRegistrationPage ? "active" : ""}`}
+              onClick={() => setRegistrationOpen(!registrationOpen)}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <FiCalendar size={18} />
+                <span>Registration</span>
+              </div>
+              {registrationOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+            </button>
+            {registrationOpen && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
+                <button
+                  className={`nav-item ${window.location.pathname.includes("/teacher/registration-approval") ? "active" : ""}`}
+                  onClick={() => navigate("/teacher/registration-approval")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
+                >
+                  <FiCheck size={15} />
+                  <span>Registration Approval</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === "retake-approval" || window.location.pathname.includes("/teacher/retake-approval") ? "active" : ""}`}
+                  onClick={() => navigate("/teacher/retake-approval")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
+                >
+                  <FiRefreshCw size={15} />
+                  <span>Retake Approval</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 5. Assessment Marksheet */}
           <button
-            className={`nav-item ${window.location.pathname.includes("/teacher/registration-approval") ? "active" : ""}`}
-            onClick={() => navigate("/teacher/registration-approval")}
+            className={`nav-item ${currentPage === "assessment" || window.location.pathname.includes("/teacher/assessment") ? "active" : ""}`}
+            onClick={() => navigate("/teacher/assessment")}
           >
-            <FiCheck size={18} />
-            <span>Registration Approval</span>
+            <FiFileText size={18} />
+            <span>Assessment Marksheet</span>
           </button>
+
+          {/* 6. Result Publication */}
           <button
             className={`nav-item ${currentPage === "results" || window.location.pathname.includes("/teacher/results") ? "active" : ""}`}
             onClick={() => navigate("/teacher/results")}
@@ -162,13 +212,8 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             <FiAward size={18} />
             <span>Result Publication</span>
           </button>
-          <button
-            className={`nav-item ${currentPage === "retake-approval" || window.location.pathname.includes("/teacher/retake-approval") ? "active" : ""}`}
-            onClick={() => navigate("/teacher/retake-approval")}
-          >
-            <FiRefreshCw size={18} />
-            <span>Retake Approval</span>
-          </button>
+
+          {/* 7. Academic Calendar */}
           <button
             className={`nav-item ${currentPage === "calendar" || window.location.pathname.includes("/academic-calendar") ? "active" : ""}`}
             onClick={() => navigate("/academic-calendar")}
@@ -176,13 +221,8 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             <FiCalendar size={18} />
             <span>Academic Calendar</span>
           </button>
-          <button
-            className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/teacher/notices") ? "active" : ""}`}
-            onClick={() => navigate("/teacher/notices")}
-          >
-            <FiClipboard size={18} />
-            <span>Notice Board</span>
-          </button>
+
+          {/* 8. Community Hub Dropdown */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <button
               className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
@@ -199,36 +239,24 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
                 <button
                   className={`nav-item ${window.location.pathname.includes("/community") ? "active" : ""}`}
-                  onClick={() => navigate(cid ? `/community/courses/${cid}` : "/community")}
-                  style={{
-                    paddingLeft: 32,
-                    fontSize: 13,
-                    fontWeight: 400,
-                  }}
+                  onClick={() => navigate("/community")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiMessageCircle size={15} />
                   <span>Discussion Feed</span>
                 </button>
                 <button
                   className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate(cid ? `/messages?courseId=${cid}` : "/messages")}
-                  style={{
-                    paddingLeft: 32,
-                    fontSize: 13,
-                    fontWeight: 400,
-                  }}
+                  onClick={() => navigate("/messages")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiMail size={15} />
                   <span>Messages</span>
                 </button>
                 <button
                   className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate(cid ? `/messages?tab=requests&courseId=${cid}` : "/messages?tab=requests")}
-                  style={{
-                    paddingLeft: 32,
-                    fontSize: 13,
-                    fontWeight: 400,
-                  }}
+                  onClick={() => navigate("/messages?tab=requests")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiClock size={15} />
                   <span>Contact Requests</span>
@@ -236,12 +264,14 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
               </div>
             )}
           </div>
+
+          {/* 9. Notice Board (After Community Hub) */}
           <button
-            className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
-            onClick={() => navigate("/teacher/assessment")}
+            className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/teacher/notices") ? "active" : ""}`}
+            onClick={() => navigate("/teacher/notices")}
           >
-            <FiFileText size={18} />
-            <span>Assessment Marksheet</span>
+            <FiClipboard size={18} />
+            <span>Notice Board</span>
           </button>
         </div>
         <div className="sidebar-footer-fixed">
@@ -264,6 +294,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
     );
   }
 
+  // Active Course Context Sidebar
   return (
     <>
       {/* Mobile Header Bar */}
@@ -420,8 +451,8 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           <span>Assessment Marksheet</span>
         </button>
         <button
-          className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/teacher/notices") ? "active" : ""}`}
-          onClick={() => navigate("/teacher/notices")}
+          className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/notice") ? "active" : ""}`}
+          onClick={() => navigate(`/teacher/course/${cid}/notice`)}
         >
           <FiClipboard size={18} />
           <span>Notice Board</span>

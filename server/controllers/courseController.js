@@ -83,10 +83,7 @@ exports.getMyCourses = async (req, res) => {
               });
               if (advTeacher) teacherId = advTeacher._id;
             }
-            if (!teacherId) {
-              const anyTeacher = await User.findOne({ role: "teacher" });
-              teacherId = anyTeacher ? anyTeacher._id : userId;
-            }
+
             const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
 
             // Normalize department enum for Course model
@@ -101,9 +98,9 @@ exports.getMyCourses = async (req, res) => {
             lmsCourse = await Course.create({
               name: courseItem.courseTitle || codeStr,
               displayCode: codeStr,
-              session: reg.session || studentProfile?.session || "2023-24",
+              session: regSession || "2024-25",
               department: normalizedDept,
-              teacher: teacherId,
+              teacher: teacherId || null,
               joinCode,
               students: [userId]
             });
@@ -187,14 +184,29 @@ exports.getMyCourses = async (req, res) => {
             (e) => (e.courseCode || "").toUpperCase() === (c.displayCode || "").toUpperCase()
           );
 
-          // Find teacher assigned to this course in Teacher model master data
+          const courseSession = (c.session || matchingEnrollment?.session || studentProfile?.session || "").trim().toLowerCase();
+          const courseCode = (c.displayCode || "").trim().toUpperCase();
+
+          // Find teacher assigned to THIS course AND THIS session in Teacher model master data
           let assignedTeacherObj = null;
           const matchedTeacherDoc = teachersList.find((t) =>
-            (t.assignedCourses || []).some(
-              (ac) =>
-                (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
-                (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
-            )
+            (t.assignedCourses || []).some((ac) => {
+              const acCode = (ac.courseCode || "").trim().toUpperCase();
+              const acName = (ac.courseName || "").trim().toLowerCase();
+              const acSess = (ac.session || t.assignedSession || "").trim().toLowerCase();
+
+              const codeOrNameMatch =
+                (acCode && acCode === courseCode) ||
+                (acName && (c.name || "").trim().toLowerCase() === acName);
+
+              if (!codeOrNameMatch) return false;
+
+              // STRICT SESSION MATCHING RULE:
+              if (acSess && courseSession && acSess !== courseSession) {
+                return false;
+              }
+              return true;
+            })
           );
 
           if (matchedTeacherDoc) {
@@ -215,28 +227,11 @@ exports.getMyCourses = async (req, res) => {
                 await Course.findByIdAndUpdate(c._id, { teacher: teacherUserDoc._id }).catch(() => {});
               }
             }
-          } else if (c.teacher) {
-            const teacherUserDoc = teacherUsers.find(
-              (u) => u._id.toString() === (c.teacher._id || c.teacher).toString()
-            );
-            if (teacherUserDoc) {
-              const tDoc = teachersList.find((t) => t.email.toLowerCase() === teacherUserDoc.email.toLowerCase());
-              if (
-                tDoc &&
-                (tDoc.assignedCourses || []).some(
-                  (ac) =>
-                    (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
-                    (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
-                )
-              ) {
-                assignedTeacherObj = {
-                  _id: teacherUserDoc._id,
-                  name: teacherUserDoc.name,
-                  email: teacherUserDoc.email,
-                  profilePicture: teacherUserDoc.profilePicture || "",
-                  department: teacherUserDoc.department,
-                };
-              }
+          } else {
+            // Unassign teacher if no master assignment exists for THIS session
+            assignedTeacherObj = null;
+            if (c.teacher) {
+              await Course.findByIdAndUpdate(c._id, { teacher: null }).catch(() => {});
             }
           }
 

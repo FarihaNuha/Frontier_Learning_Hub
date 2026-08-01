@@ -33,8 +33,10 @@ const formatTerm = (trm) => {
 
 export default function AdminResultManagementPage() {
   const [uploads, setUploads] = useState([]);
+  const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [resultTypeTab, setResultTypeTab] = useState("Final"); // "Midterm" or "Final"
+  const [viewTab, setViewTab] = useState("batches"); // "batches", "schedules", "cgpa"
   const [activeTab, setActiveTab] = useState("all");
 
   const [sessionFilter, setSessionFilter] = useState("all");
@@ -121,8 +123,8 @@ export default function AdminResultManagementPage() {
     const currentType = resultTypeTab === "Midterm" ? "Midterm" : "Final";
     try {
       await api.post("/results/admin/notice", {
-        noticeTitle: `${currentType} Result Submission Deadline — ${dlSession} ${dlLevel} ${dlTerm}`,
-        noticeContent: `All course teachers assigned to ${dlLevel} ${dlTerm} (Session: ${dlSession}) must upload and submit ${currentType} result marksheets by ${deadlineStr}. No uploads or modifications will be accepted after this deadline.`,
+        noticeTitle: `${currentType} Result Submission Cutoff — ${dlSession} ${dlLevel} ${dlTerm}`,
+        noticeContent: `All course teachers assigned to ${dlLevel} ${dlTerm} (Session: ${dlSession}) must upload and submit ${currentType} result marksheets by ${deadlineStr}.`,
         targetAudience: "Teachers",
         deadlineDate: cutoffInput,
         resultType: currentType,
@@ -130,7 +132,9 @@ export default function AdminResultManagementPage() {
         level: dlLevel,
         term: dlTerm,
       });
-      toast.success(`${currentType} Cutoff Deadline saved for ${dlLevel} ${dlTerm} (${dlSession})! Teachers notified successfully.`);
+      toast.success(`${currentType} Cutoff Deadline saved for ${dlLevel} ${dlTerm} (${dlSession})!`);
+      setCutoffInput("");
+      fetchAdminResults();
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to save deadline.");
     } finally {
@@ -138,6 +142,16 @@ export default function AdminResultManagementPage() {
     }
   };
 
+  const handleDeleteNotice = async (noticeId) => {
+    if (!window.confirm("Remove this deadline / schedule record from calendar?")) return;
+    try {
+      await api.delete(`/notices/${noticeId}`);
+      toast.success("Deadline / Schedule record removed!");
+      fetchAdminResults();
+    } catch (err) {
+      toast.error("Failed to remove deadline record.");
+    }
+  };
 
   const handleSchedulePublication = async () => {
     if (!scheduledDateTime) {
@@ -154,6 +168,7 @@ export default function AdminResultManagementPage() {
         scheduledPublishDate: scheduledDateTime,
       });
       toast.success(res.data.message);
+      setScheduledDateTime("");
       fetchAdminResults();
     } catch (err) {
       toast.error(err.response?.data?.error || "Scheduling failed.");
@@ -168,6 +183,7 @@ export default function AdminResultManagementPage() {
       const params = new URLSearchParams({ resultType: resultTypeTab });
       const res = await api.get(`/results/admin?${params.toString()}`);
       setUploads(res.data.uploads || []);
+      setNotices(res.data.notices || []);
     } catch (err) {
       toast.error("Failed to load admin result management data.");
     } finally {
@@ -176,7 +192,6 @@ export default function AdminResultManagementPage() {
   };
 
   useEffect(() => {
-    // Reset tab to 'all' when switching result type so nothing is hidden
     setActiveTab("all");
     fetchAdminResults();
   }, [resultTypeTab]);
@@ -307,172 +322,488 @@ export default function AdminResultManagementPage() {
 
   const uniqueSessions = Array.from(new Set(uploads.map((u) => u.session).filter(Boolean)));
   const uniqueLevels = Array.from(new Set(uploads.map((u) => u.level).filter(Boolean)));
-  const uniqueTerms = Array.from(new Set(uploads.map((u) => u.term).filter(Boolean)));
-
-  return (
+  const uniqueTerms = Array.from(new Set(uploads.map((u) => u.term).filter(Boolean)));  return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
       <AdminSidebar />
 
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
+        {/* Clean Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+              <FiAward size={22} />
+            </div>
+            <div>
+              <h1 style={{ margin: 0, color: "#0f172a", fontSize: "24px", fontWeight: 800 }}>Result Publication & Verification</h1>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              setNoticeTarget("Teachers");
+              setNoticeTitle("Result Submission Cutoff Notice");
+              setNoticeContent("All course teachers are requested to submit course result marksheets before the cutoff deadline.");
+              setShowNoticeModal(true);
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "9px 18px",
+              background: "#ffffff",
+              color: "#3b8db3",
+              border: "1.5px solid #3b8db3",
+              borderRadius: "10px",
+              fontWeight: 700,
+              fontSize: "13.5px",
+              cursor: "pointer",
+            }}
+          >
+            <FiBell size={16} /> Post Notice / Announcement
+          </button>
+        </div>
+
+        {/* Navigation Sub-Tabs */}
+        <div style={{ display: "flex", gap: "10px", background: "#ffffff", padding: "6px", borderRadius: "12px", border: "1px solid #cbd5e1", width: "fit-content", marginBottom: "24px" }}>
+          <button
+            onClick={() => setViewTab("batches")}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "8px",
+              border: "none",
+              background: viewTab === "batches" ? "linear-gradient(135deg, #3b8db3, #2C4B66)" : "transparent",
+              color: viewTab === "batches" ? "#ffffff" : "#64748b",
+              fontWeight: 700,
+              fontSize: "13.5px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <FiAward size={16} /> Result Batches & Verification
+          </button>
+
+          <button
+            onClick={() => setViewTab("schedules")}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "8px",
+              border: "none",
+              background: viewTab === "schedules" ? "linear-gradient(135deg, #3b8db3, #2C4B66)" : "transparent",
+              color: viewTab === "schedules" ? "#ffffff" : "#64748b",
+              fontWeight: 700,
+              fontSize: "13.5px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <FiClock size={16} /> Deadlines & Schedules Table
+          </button>
+
+          <button
+            onClick={() => setViewTab("cgpa")}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "8px",
+              border: "none",
+              background: viewTab === "cgpa" ? "linear-gradient(135deg, #3b8db3, #2C4B66)" : "transparent",
+              color: viewTab === "cgpa" ? "#ffffff" : "#64748b",
+              fontWeight: 700,
+              fontSize: "13.5px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <FiCpu size={16} /> GPA & CGPA Calculator
+          </button>
+        </div>
+
+        {/* TAB 1: RESULT BATCHES & VERIFICATION */}
+        {viewTab === "batches" && (
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
-              <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #3B8DB3, #2C4B66)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
-                <FiAward size={22} />
-              </div>
-              <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Result Publication & Verification</h1>
-            </div>
-            <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
-              Verify teacher uploaded marks, set submission deadlines, post announcements, calculate Semester CGPA, and publish results.
-            </p>
-          </div>
-
-          <div style={{ display: "flex", gap: "12px" }}>
-            <button
-              onClick={() => {
-                setNoticeTarget("Teachers");
-                setNoticeTitle("Result Submission Last Date Deadline");
-                setNoticeContent("All course teachers are requested to upload and submit final course results before the announced deadline.");
-                setShowNoticeModal(true);
-              }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "10px 16px",
-                background: "#ffffff",
-                color: "#3b8db3",
-                border: "1.5px solid #3b8db3",
-                borderRadius: "10px",
-                fontWeight: 600,
-                fontSize: "13.5px",
-                cursor: "pointer",
-              }}
-            >
-              <FiBell size={16} /> Post Teacher/Student Notice
-            </button>
-          </div>
-        </div>
-
-        {/* Primary Tabs: Mid Term vs Final Result */}
-        <div style={{ display: "flex", gap: "12px", background: "#ffffff", padding: "6px", borderRadius: "12px", border: "1px solid #cbd5e1", width: "fit-content", marginBottom: "24px" }}>
-          <button
-            onClick={() => setResultTypeTab("Midterm")}
-            style={{
-              padding: "10px 24px",
-              borderRadius: "8px",
-              border: "none",
-              background: resultTypeTab === "Midterm" ? "linear-gradient(135deg, #3b8db3, #2C4B66)" : "transparent",
-              color: resultTypeTab === "Midterm" ? "#ffffff" : "#64748b",
-              fontWeight: 700,
-              fontSize: "14px",
-              cursor: "pointer",
-            }}
-          >
-            Mid Term Result Batches
-          </button>
-          <button
-            onClick={() => setResultTypeTab("Final")}
-            style={{
-              padding: "10px 24px",
-              borderRadius: "8px",
-              border: "none",
-              background: resultTypeTab === "Final" ? "linear-gradient(135deg, #3b8db3, #2C4B66)" : "transparent",
-              color: resultTypeTab === "Final" ? "#ffffff" : "#64748b",
-              fontWeight: 700,
-              fontSize: "14px",
-              cursor: "pointer",
-            }}
-          >
-            Final Result Batches
-          </button>
-        </div>
-
-        {/* Result Submission Cutoff Deadline Card (Midterm & Final) */}
-        <div style={{ background: "linear-gradient(135deg, #ffffff, #f0fdf4)", padding: "24px", borderRadius: "14px", border: "1px solid #86efac", marginBottom: "28px", boxShadow: "0 4px 16px rgba(22,163,74,0.08)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-            <FiClock size={20} color="#166534" />
-            <h3 style={{ margin: 0, fontSize: "16.5px", color: "#166534" }}>{resultTypeTab} Result Submission Deadline</h3>
-          </div>
-          <p style={{ margin: "0 0 20px 0", fontSize: "13px", color: "#475569" }}>
-            Select the Session, Level, and Term, then set the deadline for {resultTypeTab} results. Teachers will be automatically notified via dashboard notification and email.
-          </p>
-
-          {/* Session / Level / Term selectors */}
-          <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", marginBottom: "16px", alignItems: "flex-end" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Session</label>
-              <select value={dlSession} onChange={(e) => setDlSession(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #bbf7d0", fontSize: "13px", background: "#f0fdf4" }}>
-                {["2025-26", "2024-25", "2023-24", "2022-23", "2021-22"].map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Level</label>
-              <select value={dlLevel} onChange={(e) => setDlLevel(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #bbf7d0", fontSize: "13px", background: "#f0fdf4" }}>
-                {["Level-1", "Level-2", "Level-3", "Level-4"].map(l => <option key={l} value={l}>{l}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Term</label>
-              <select value={dlTerm} onChange={(e) => setDlTerm(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #bbf7d0", fontSize: "13px", background: "#f0fdf4" }}>
-                {["Term-1", "Term-2"].map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {/* Deadline Date + Save */}
-          <div style={{ background: "#f0fdf4", borderRadius: "10px", padding: "16px", border: "1px solid #bbf7d0" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <FiClock size={15} color="#16a34a" />
-              <strong style={{ fontSize: "13.5px", color: "#166534" }}>{resultTypeTab} Submission Cutoff Date &amp; Time</strong>
-            </div>
-            <p style={{ margin: "0 0 12px 0", fontSize: "12.5px", color: "#475569" }}>
-              After this deadline, teachers must submit all {resultTypeTab} marksheets for the selected Level-Term.
-            </p>
-            <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-              <input
-                type="datetime-local"
-                value={cutoffInput}
-                onChange={(e) => setCutoffInput(e.target.value)}
-                style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #bbf7d0", fontSize: "13px", background: "#fff" }}
-              />
+            {/* Primary Switcher: Midterm vs Final */}
+            <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
               <button
-                onClick={handleSaveCutoffDeadline}
-                disabled={savingDeadline}
+                onClick={() => setResultTypeTab("Midterm")}
                 style={{
-                  padding: "9px 20px",
-                  background: savingDeadline ? "#86efac" : "#16a34a",
-                  color: "#ffffff",
-                  border: "none",
+                  padding: "8px 18px",
                   borderRadius: "8px",
+                  border: resultTypeTab === "Midterm" ? "none" : "1px solid #cbd5e1",
+                  background: resultTypeTab === "Midterm" ? "#0284c7" : "#ffffff",
+                  color: resultTypeTab === "Midterm" ? "#ffffff" : "#475569",
                   fontWeight: 700,
                   fontSize: "13px",
-                  cursor: savingDeadline ? "not-allowed" : "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "7px",
+                  cursor: "pointer",
                 }}
               >
-                <FiSend size={14} /> {savingDeadline ? "Saving & Notifying..." : "Save & Notify Teachers"}
+                Mid Term Result Batches
+              </button>
+              <button
+                onClick={() => setResultTypeTab("Final")}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: "8px",
+                  border: resultTypeTab === "Final" ? "none" : "1px solid #cbd5e1",
+                  background: resultTypeTab === "Final" ? "#0284c7" : "#ffffff",
+                  color: resultTypeTab === "Final" ? "#ffffff" : "#475569",
+                  fontWeight: 700,
+                  fontSize: "13px",
+                  cursor: "pointer",
+                }}
+              >
+                Final Result Batches
               </button>
             </div>
-          </div>
-        </div>
 
+            {/* Filter Bar */}
+            <div style={{ background: "#ffffff", padding: "16px 20px", borderRadius: "14px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", marginBottom: "24px", display: "flex", flexWrap: "wrap", gap: "14px", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {["all", "Pending", "Submitted", "Correction Requested", "Published"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: "8px",
+                      border: activeTab === tab ? "none" : "1px solid #cbd5e1",
+                      background: activeTab === tab ? "#3b8db3" : "#ffffff",
+                      color: activeTab === tab ? "#ffffff" : "#475569",
+                      fontWeight: 600,
+                      fontSize: "12.5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {tab === "all" ? "All Statuses" : tab}
+                  </button>
+                ))}
+              </div>
 
-        {/* CGPA Calculation Card (Final Result Only) */}
-        {resultTypeTab === "Final" && (
-          <div style={{ background: "linear-gradient(135deg, #ffffff, #f0f9ff)", padding: "20px", borderRadius: "14px", border: "1px solid #bae6fd", marginBottom: "28px", boxShadow: "0 4px 16px rgba(59,141,179,0.08)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <FiCpu size={20} color="#0369a1" />
-              <h3 style={{ margin: 0, fontSize: "16.5px", color: "#0369a1" }}>Automatic Semester GPA & CGPA Calculator</h3>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <select value={sessionFilter} onChange={(e) => setSessionFilter(e.target.value)} style={{ padding: "7px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                  <option value="all">All Sessions</option>
+                  {uniqueSessions.map((s) => (<option key={s} value={s}>{s}</option>))}
+                </select>
+
+                <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)} style={{ padding: "7px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                  <option value="all">All Levels</option>
+                  {uniqueLevels.map((l) => (<option key={l} value={l}>{l}</option>))}
+                </select>
+
+                <select value={termFilter} onChange={(e) => setTermFilter(e.target.value)} style={{ padding: "7px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                  <option value="all">All Terms</option>
+                  {uniqueTerms.map((t) => (<option key={t} value={t}>{t}</option>))}
+                </select>
+              </div>
             </div>
-            <p style={{ margin: "0 0 16px 0", fontSize: "13px", color: "#475569" }}>
-              Select a Level-Term and click <strong>Calculate Semester GPA</strong> to automatically compute credit-weighted GPAs for all students.
-            </p>
 
-            <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
+            {/* Upload Batches Roster */}
+            {loading ? (
+              <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading result batches...</div>
+            ) : filteredUploads.length === 0 ? (
+              <div style={{ padding: "60px", background: "#ffffff", borderRadius: "14px", textAlign: "center", color: "#94a3b8" }}>
+                <FiAward size={44} style={{ opacity: 0.3, marginBottom: "10px" }} />
+                <h3 style={{ margin: 0 }}>No {resultTypeTab} result batches found</h3>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {filteredUploads.map((batch) => (
+                  <div key={batch._id} style={{ background: "#ffffff", borderRadius: "14px", padding: "20px 24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
+                          <span style={{ background: "rgba(59,141,179,0.12)", color: "#3b8db3", fontWeight: 800, padding: "3px 10px", borderRadius: "6px", fontSize: "13px" }}>
+                            {batch.courseCode}
+                          </span>
+                          <h3 style={{ margin: 0, fontSize: "17px", color: "#0f172a", fontWeight: 700 }}>{batch.courseTitle}</h3>
+                        </div>
+
+                        <div style={{ fontSize: "12.5px", color: "#64748b", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginTop: "6px" }}>
+                          <span>Dept: <strong>{batch.department || "EDTE"}</strong></span>
+                          <span>•</span>
+                          <span>{formatLevel(batch.level)} {formatTerm(batch.term)}</span>
+                          <span>•</span>
+                          <span>Session: <strong>{batch.session}</strong></span>
+                          <span>•</span>
+                          <span>Students: <strong>{batch.totalRecords}</strong></span>
+                        </div>
+
+                        <div style={{ marginTop: "8px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: batch.status === "Pending" ? "#fef3c7" : "#f0f9ff", border: `1px solid ${batch.status === "Pending" ? "#fcd34d" : "#bae6fd"}`, borderRadius: "6px", padding: "3px 10px", fontSize: "12px", color: batch.status === "Pending" ? "#b45309" : "#0369a1", fontWeight: 600 }}>
+                            {batch.status === "Pending" ? `👤 Assigned: ${batch.teacherName || batch.teacherEmail || "Assigned Teacher"}` : `📋 Submitted by: ${batch.teacherEmail || "Teacher"}`}
+                          </span>
+
+                          {batch.status === "Pending" && (
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", background: batch.cutoffDeadline ? "#fff1f2" : "#f8fafc", border: `1px solid ${batch.cutoffDeadline ? "#fca5a5" : "#e2e8f0"}`, borderRadius: "6px", padding: "3px 10px", fontSize: "12px", color: batch.cutoffDeadline ? "#991b1b" : "#64748b", fontWeight: 700 }}>
+                              <FiClock size={13} /> {batch.cutoffDeadline ? `Target Deadline: ${new Date(batch.cutoffDeadline).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}` : "No Cutoff Set"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                        <span style={{ padding: "4px 12px", borderRadius: "12px", fontWeight: 700, fontSize: "12px",
+                          background: batch.status === "Published" ? "#dcfce7" : batch.status === "Submitted" ? "#fef3c7" : batch.status === "Correction Requested" ? "#fee2e2" : "#fef3c7",
+                          color: batch.status === "Published" ? "#166534" : batch.status === "Submitted" ? "#b45309" : batch.status === "Correction Requested" ? "#991b1b" : "#b45309"
+                        }}>
+                          {batch.status === "Pending" ? "⚠️ Pending Upload" : batch.status}
+                        </span>
+
+                        {batch.status === "Pending" && (
+                          <button
+                            onClick={() => handleOpenReminderModal(batch)}
+                            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "linear-gradient(135deg, #d97706, #b45309)", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "12px", cursor: "pointer" }}
+                          >
+                            <FiBell size={13} /> Send Reminder
+                          </button>
+                        )}
+
+                        {!batch.isPendingAutoCard && (
+                          <button onClick={() => exportAdminResultsCSV(batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}>
+                            <FiDownload size={13} /> Export CSV
+                          </button>
+                        )}
+
+                        {resultTypeTab === "Final" && batch.status === "Submitted" && (
+                          <>
+                            <button onClick={() => setCorrectionModalBatch(batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}>
+                              <FiAlertCircle size={13} /> Correction
+                            </button>
+                            <button onClick={() => handlePublish(batch._id)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 14px", background: "#16a34a", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "12px", cursor: "pointer" }}>
+                              <FiSend size={13} /> Publish
+                            </button>
+                          </>
+                        )}
+
+                        {!batch.isPendingAutoCard && (
+                          <button onClick={() => setViewBatch(viewBatch?._id === batch._id ? null : batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}>
+                            <FiEye size={13} /> {viewBatch?._id === batch._id ? "Hide Roster" : "View Roster"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Roster Table inside card */}
+                    {viewBatch?._id === batch._id && (
+                      <div style={{ marginTop: "16px", borderTop: "1px solid #f1f5f9", paddingTop: "14px" }}>
+                        <h4 style={{ margin: "0 0 10px 0", color: "#1e293b", fontSize: "13.5px" }}>Student Grade Roster ({batch.courseCode})</h4>
+                        <div style={{ overflowX: "auto" }}>
+                          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px" }}>
+                            <thead>
+                              <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, textAlign: "left" }}>
+                                <th style={{ padding: "8px 12px" }}>Student ID</th>
+                                <th style={{ padding: "8px 12px" }}>Student Name</th>
+                                <th style={{ padding: "8px 12px" }}>MT Part A</th>
+                                <th style={{ padding: "8px 12px" }}>MT Part B</th>
+                                <th style={{ padding: "8px 12px" }}>Att.</th>
+                                <th style={{ padding: "8px 12px" }}>Cont. Assmt</th>
+                                <th style={{ padding: "8px 12px" }}>Final Exam</th>
+                                <th style={{ padding: "8px 12px" }}>Total</th>
+                                <th style={{ padding: "8px 12px" }}>GPA</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(batch.results || []).map((r) => (
+                                <tr key={r._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                                  <td style={{ padding: "8px 12px", fontWeight: 700, color: "#3b8db3" }}>{r.studentId}</td>
+                                  <td style={{ padding: "8px 12px" }}>{r.studentName}</td>
+                                  <td style={{ padding: "8px 12px" }}>{r.midPartA ?? "-"}</td>
+                                  <td style={{ padding: "8px 12px" }}>{r.midPartB ?? "-"}</td>
+                                  <td style={{ padding: "8px 12px" }}>{r.attendance ?? "-"}</td>
+                                  <td style={{ padding: "8px 12px" }}>{r.continuousAssessment ?? "-"}</td>
+                                  <td style={{ padding: "8px 12px" }}>{r.finalExam ?? "-"}</td>
+                                  <td style={{ padding: "8px 12px", fontWeight: 700 }}>{r.totalMarks ?? "-"}</td>
+                                  <td style={{ padding: "8px 12px", fontWeight: 700, color: "#16a34a" }}>{r.gradePoint ?? r.letterGrade ?? "-"}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 2: DEADLINES & PUBLICATION SCHEDULES TABLE */}
+        {viewTab === "schedules" && (
+          <div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: "20px", marginBottom: "28px" }}>
+              {/* Set Cutoff Card */}
+              <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                  <FiClock size={20} color="#166534" />
+                  <h3 style={{ margin: 0, fontSize: "16px", color="#166534", fontWeight: 800 }}>Set Result Submission Cutoff Deadline</h3>
+                </div>
+
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Session</label>
+                    <select value={dlSession} onChange={(e) => setDlSession(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                      {["2025-26", "2024-25", "2023-24", "2022-23", "2021-22"].map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Level</label>
+                    <select value={dlLevel} onChange={(e) => setDlLevel(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                      {["Level-1", "Level-2", "Level-3", "Level-4"].map(l => <option key={l} value={l}>{l}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Term</label>
+                    <select value={dlTerm} onChange={(e) => setDlTerm(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                      {["Term-1", "Term-2"].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                  <input
+                    type="datetime-local"
+                    value={cutoffInput}
+                    onChange={(e) => setCutoffInput(e.target.value)}
+                    style={{ flex: 1, minWidth: "180px", padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}
+                  />
+                  <button
+                    onClick={handleSaveCutoffDeadline}
+                    disabled={savingDeadline}
+                    style={{ padding: "8.5px 16px", background: "#16a34a", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: savingDeadline ? "not-allowed" : "pointer" }}
+                  >
+                    {savingDeadline ? "Saving..." : "Save Deadline"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Schedule Auto-Release Card */}
+              <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                  <FiClock size={20} color="#0369a1" />
+                  <h3 style={{ margin: 0, fontSize: "16px", color="#0369a1", fontWeight: 800 }}>Schedule Automated Timed Release</h3>
+                </div>
+
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Session</label>
+                    <select value={schedSession} onChange={(e) => setSchedSession(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                      {["2025-26", "2024-25", "2023-24", "2022-23", "2021-22"].map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Level</label>
+                    <select value={schedLevel} onChange={(e) => setSchedLevel(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                      {["Level-1", "Level-2", "Level-3", "Level-4"].map(l => <option key={l} value={l}>{l}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Term</label>
+                    <select value={schedTerm} onChange={(e) => setSchedTerm(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                      {["Term-1", "Term-2"].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                  <input
+                    type="datetime-local"
+                    value={scheduledDateTime}
+                    onChange={(e) => setScheduledDateTime(e.target.value)}
+                    style={{ flex: 1, minWidth: "180px", padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}
+                  />
+                  <button
+                    onClick={handleSchedulePublication}
+                    disabled={scheduling}
+                    style={{ padding: "8.5px 16px", background: "#0284c7", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: scheduling ? "not-allowed" : "pointer" }}
+                  >
+                    {scheduling ? "Scheduling..." : "Schedule Release"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Active Deadlines & Schedules Table (Like Registration Calendar) */}
+            <div style={{ background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <h3 style={{ margin: 0, color: "#0f172a", fontSize: "17px", fontWeight: 800 }}>📅 Active Deadlines & Schedules Registry</h3>
+                <span style={{ fontSize: "12.5px", color: "#64748b", fontWeight: 600 }}>Total Records: {notices.length}</span>
+              </div>
+
+              {notices.length === 0 ? (
+                <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8", fontSize: "13.5px" }}>
+                  No active deadlines or scheduled releases recorded yet.
+                </div>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                    <thead>
+                      <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #e2e8f0" }}>
+                        <th style={{ padding: "10px 14px" }}>Session</th>
+                        <th style={{ padding: "10px 14px" }}>Level-Term</th>
+                        <th style={{ padding: "10px 14px" }}>Type / Audience</th>
+                        <th style={{ padding: "10px 14px" }}>Notice Title</th>
+                        <th style={{ padding: "10px 14px" }}>Cutoff / Release Date & Time</th>
+                        <th style={{ padding: "10px 14px" }}>Status</th>
+                        <th style={{ padding: "10px 14px", textAlign: "center" }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {notices.map((n) => {
+                        const targetDate = n.deadlineDate || n.scheduledPublishDate;
+                        const isExpired = targetDate ? new Date(targetDate) < new Date() : false;
+
+                        return (
+                          <tr key={n._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0f172a" }}>{n.session || "All Sessions"}</td>
+                            <td style={{ padding: "10px 14px" }}>{n.level && n.term ? `${formatLevel(n.level)} ${formatTerm(n.term)}` : "All Level-Terms"}</td>
+                            <td style={{ padding: "10px 14px" }}>
+                              <span style={{ background: "#e0f2fe", color: "#0369a1", fontWeight: 700, padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
+                                {n.resultDeadlineType || n.targetAudience || "Academic"}
+                              </span>
+                            </td>
+                            <td style={{ padding: "10px 14px", fontWeight: 600 }}>{n.title}</td>
+                            <td style={{ padding: "10px 14px", fontWeight: 700, color: isExpired ? "#991b1b" : "#166534" }}>
+                              {targetDate ? new Date(targetDate).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "No Date Set"}
+                            </td>
+                            <td style={{ padding: "10px 14px" }}>
+                              <span style={{ background: isExpired ? "#fee2e2" : "#dcfce7", color: isExpired ? "#991b1b" : "#166534", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
+                                {isExpired ? "Expired / Passed" : "Active 🟢"}
+                              </span>
+                            </td>
+                            <td style={{ padding: "10px 14px", textAlign: "center" }}>
+                              <button
+                                onClick={() => handleDeleteNotice(n._id)}
+                                style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}
+                                title="Remove schedule record"
+                              >
+                                Remove
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: GPA & CGPA CALCULATOR */}
+        {viewTab === "cgpa" && (
+          <div style={{ background: "#ffffff", padding: "24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+              <FiCpu size={22} color="#0369a1" />
+              <h3 style={{ margin: 0, fontSize: "18px", color: "#0369a1", fontWeight: 800 }}>Automatic Semester GPA & CGPA Calculator</h3>
+            </div>
+
+            <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "flex-end", marginBottom: "20px" }}>
               <div>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Session</label>
                 <select value={calcSession} onChange={(e) => setCalcSession(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
@@ -485,7 +816,7 @@ export default function AdminResultManagementPage() {
               <div>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Level</label>
                 <select value={calcLevel} onChange={(e) => setCalcLevel(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-                  {["Level-1", "Level-2", "Level-3", "Level-4", "Level 1", "Level 2", "Level 3", "Level 4"].map((l) => (
+                  {["Level-1", "Level-2", "Level-3", "Level-4"].map((l) => (
                     <option key={l} value={l}>{formatLevel(l)}</option>
                   ))}
                 </select>
@@ -494,7 +825,7 @@ export default function AdminResultManagementPage() {
               <div>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Term</label>
                 <select value={calcTerm} onChange={(e) => setCalcTerm(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-                  {["Term-1", "Term-2", "Term 1", "Term 2"].map((t) => (
+                  {["Term-1", "Term-2"].map((t) => (
                     <option key={t} value={t}>{formatTerm(t)}</option>
                   ))}
                 </select>
@@ -504,284 +835,37 @@ export default function AdminResultManagementPage() {
                 onClick={handleCalculateCGPA}
                 disabled={calculating}
                 style={{
-                  marginTop: "20px",
-                  padding: "10px 20px",
+                  padding: "9px 20px",
                   background: "#16a34a",
                   color: "#ffffff",
                   border: "none",
                   borderRadius: "8px",
                   fontWeight: 700,
-                  fontSize: "13.5px",
+                  fontSize: "13px",
                   cursor: calculating ? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
                 }}
               >
-                <FiCpu size={16} /> {calculating ? "Calculating..." : "Calculate Semester GPA / CGPA"}
+                <FiCpu size={16} /> {calculating ? "Computing..." : "Compute Semester GPA & CGPA"}
               </button>
             </div>
 
             {calcSummary && calcSummary.length > 0 && (
-              <div style={{ marginTop: "16px", background: "#ffffff", padding: "14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-                <h4 style={{ margin: "0 0 10px 0", color: "#166534" }}>✓ Calculated CGPA for {calcSummary.length} Students</h4>
+              <div style={{ marginTop: "20px", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "12px", padding: "20px" }}>
+                <h4 style={{ margin: "0 0 14px 0", color: "#166534", fontSize: "15px", fontWeight: 700 }}>✓ Calculated GPA Summary ({calcSummary.length} Students)</h4>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                  {calcSummary.slice(0, 10).map((item) => (
-                    <span key={item.studentId} style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "6px 12px", borderRadius: "8px", color: "#15803d", fontSize: "12.5px" }}>
-                      <strong>{item.studentId}</strong> — CGPA: <strong>{item.cgpa || item.semesterGPA}</strong> ({item.totalCredits} Total Cr)
+                  {calcSummary.map((item) => (
+                    <span key={item.studentId} style={{ background: "#ffffff", border: "1px solid #bbf7d0", padding: "8px 14px", borderRadius: "8px", color: "#15803d", fontSize: "13px" }}>
+                      <strong>{item.studentId}</strong> — GPA: <strong>{item.cgpa || item.semesterGPA}</strong> ({item.totalCredits} Credits)
                     </span>
                   ))}
-                  {calcSummary.length > 10 && <span style={{ color: "#64748b", alignSelf: "center" }}>+{calcSummary.length - 10} more...</span>}
                 </div>
               </div>
             )}
-
-            {/* Automated Timed Publication Schedule Control */}
-            <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1.5px dashed #bae6fd" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                <FiClock size={18} color="#0369a1" />
-                <h4 style={{ margin: 0, fontSize: "15px", color: "#0369a1" }}>Automated Scheduled Release Timer (By Session & Level-Term)</h4>
-              </div>
-              <p style={{ margin: "0 0 14px 0", fontSize: "12.5px", color: "#475569" }}>
-                Set a date & time for automatic final result release. Results for the selected session will publish automatically when the timer expires!
-              </p>
-
-              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Session</label>
-                  <select value={schedSession} onChange={(e) => setSchedSession(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-                    {["2025-26", "2024-25", "2023-24", "2022-23", "2021-22"].map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Level</label>
-                  <select value={schedLevel} onChange={(e) => setSchedLevel(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-                    {["Level-1", "Level-2", "Level-3", "Level-4", "Level 1", "Level 2", "Level 3", "Level 4"].map((l) => (
-                      <option key={l} value={l}>{formatLevel(l)}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Term</label>
-                  <select value={schedTerm} onChange={(e) => setSchedTerm(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-                    {["Term-1", "Term-2", "Term 1", "Term 2"].map((t) => (
-                      <option key={t} value={t}>{formatTerm(t)}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Publication Release Date & Time</label>
-                  <input
-                    type="datetime-local"
-                    value={scheduledDateTime}
-                    onChange={(e) => setScheduledDateTime(e.target.value)}
-                    style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}
-                  />
-                </div>
-
-                <button
-                  onClick={handleSchedulePublication}
-                  disabled={scheduling}
-                  style={{
-                    marginTop: "18px",
-                    padding: "9px 18px",
-                    background: "#0284c7",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontWeight: 700,
-                    fontSize: "13px",
-                    cursor: scheduling ? "not-allowed" : "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
-                  <FiClock size={15} /> {scheduling ? "Scheduling..." : "Schedule Automatic Release"}
-                </button>
-              </div>
-            </div>
           </div>
-        )}
-
-        {/* Filter Controls Bar */}
-        <div style={{ background: "#ffffff", padding: "20px", borderRadius: "14px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", marginBottom: "24px", display: "flex", flexWrap: "wrap", gap: "16px", alignItems: "center", justifyContent: "space-between" }}>
-          {/* Status Tabs — available for both Midterm and Final */}
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {["all", "Pending", "Submitted", "Correction Requested", "Published"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "8px",
-                  border: activeTab === tab ? "none" : "1px solid #cbd5e1",
-                  background: activeTab === tab ? "#3b8db3" : "#ffffff",
-                  color: activeTab === tab ? "#ffffff" : "#475569",
-                  fontWeight: 600,
-                  fontSize: "13px",
-                  cursor: "pointer",
-                  textTransform: "capitalize",
-                }}
-              >
-                {tab === "all" ? "All Batches" : tab}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <select value={sessionFilter} onChange={(e) => setSessionFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-              <option value="all">All Sessions</option>
-              {uniqueSessions.map((s) => (<option key={s} value={s}>{s}</option>))}
-            </select>
-
-            <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-              <option value="all">All Levels</option>
-              {uniqueLevels.map((l) => (<option key={l} value={l}>{l}</option>))}
-            </select>
-
-            <select value={termFilter} onChange={(e) => setTermFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-              <option value="all">All Terms</option>
-              {uniqueTerms.map((t) => (<option key={t} value={t}>{t}</option>))}
-            </select>
-          </div>
-        </div>
-
-        {/* Results List */}
-        {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading admin result batches...</div>
-        ) : filteredUploads.length === 0 ? (
-          <div style={{ padding: "60px", background: "#ffffff", borderRadius: "14px", textAlign: "center", color: "#94a3b8" }}>
-            <FiAward size={48} style={{ opacity: 0.3, marginBottom: "12px" }} />
-            <h3>No {resultTypeTab} result batches found for status '{activeTab}'</h3>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            {filteredUploads.map((batch) => (
-              <div key={batch._id} style={{ background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <span style={{ background: "rgba(59,141,179,0.12)", color: "#3b8db3", fontWeight: 700, padding: "4px 10px", borderRadius: "6px", fontSize: "13px" }}>
-                        {batch.courseCode}
-                      </span>
-                      <h3 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>{batch.courseTitle}</h3>
-                    </div>
-                    <div style={{ fontSize: "13px", color: "#64748b", marginTop: "4px" }}>
-                      Dept: <strong>{batch.department || "EDTE"}</strong> • {/^level/i.test(String(batch.level || "").trim()) ? batch.level : `Level ${batch.level || ""}`} • {/^term/i.test(String(batch.term || "").trim()) ? batch.term : `Term ${batch.term || ""}`} • Session: <strong>{batch.session}</strong> • Students: <strong>{batch.totalRecords}</strong>
-                    </div>
-                    {/* Teacher attribution — always visible */}
-                    <div style={{ marginTop: "6px", display: "inline-flex", alignItems: "center", gap: "6px", background: batch.status === "Pending" ? "#fef3c7" : "#f0f9ff", border: `1px solid ${batch.status === "Pending" ? "#fcd34d" : "#bae6fd"}`, borderRadius: "6px", padding: "3px 10px", fontSize: "12.5px", color: batch.status === "Pending" ? "#b45309" : "#0369a1", fontWeight: 600 }}>
-                      {batch.status === "Pending" ? `⚠️ Assigned Teacher: ${batch.teacherName ? `${batch.teacherName} (${batch.teacherEmail || "No Email"})` : (batch.teacherEmail || "Pending Assignment")}` : `📋 Submitted by: ${batch.teacherEmail || "Unknown Teacher"}`}
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                    <span style={{ padding: "4px 12px", borderRadius: "12px", fontWeight: 700, fontSize: "12px",
-                      background: batch.status === "Published" ? "#dcfce7" : batch.status === "Submitted" ? "#fef3c7" : batch.status === "Correction Requested" ? "#fee2e2" : batch.status === "Pending" ? "#fef3c7" : "#e0f2fe",
-                      color: batch.status === "Published" ? "#166534" : batch.status === "Submitted" ? "#b45309" : batch.status === "Correction Requested" ? "#991b1b" : batch.status === "Pending" ? "#b45309" : "#0369a1"
-                    }}>
-                      {batch.status === "Pending" ? "⚠️ Pending Upload" : batch.status}
-                    </span>
-
-                    {batch.status === "Pending" && (
-                      <button
-                        onClick={() => handleOpenReminderModal(batch)}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          padding: "6px 14px",
-                          background: "linear-gradient(135deg, #d97706, #b45309)",
-                          color: "#ffffff",
-                          border: "none",
-                          borderRadius: "8px",
-                          fontWeight: 700,
-                          fontSize: "12.5px",
-                          cursor: "pointer",
-                          boxShadow: "0 2px 6px rgba(217, 119, 6, 0.2)"
-                        }}
-                      >
-                        <FiBell size={14} /> Send Teacher Reminder
-                      </button>
-                    )}
-
-                    {!batch.isPendingAutoCard && (
-                      <button onClick={() => exportAdminResultsCSV(batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
-                        <FiDownload size={14} /> Export CSV
-                      </button>
-                    )}
-
-                    {/* Final result action buttons */}
-                    {resultTypeTab === "Final" && (
-                      <>
-                        {batch.status === "Submitted" && (
-                          <button onClick={() => setCorrectionModalBatch(batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
-                            <FiAlertCircle size={14} /> Request Correction
-                          </button>
-                        )}
-
-                        {batch.status === "Submitted" && (
-                          <button onClick={() => handlePublish(batch._id)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 14px", background: "#16a34a", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
-                            <FiSend size={14} /> Publish to Students
-                          </button>
-                        )}
-                      </>
-                    )}
-
-                    {!batch.isPendingAutoCard && (
-                      <button onClick={() => setViewBatch(viewBatch?._id === batch._id ? null : batch)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "#f1f5f9", color: "#334155", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "12.5px", cursor: "pointer" }}>
-                        <FiEye size={14} /> {viewBatch?._id === batch._id ? "Hide Read-Only Roster" : "View Roster (Read-Only)"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Expanded Roster View */}
-                {viewBatch?._id === batch._id && (
-                  <div style={{ marginTop: "16px", borderTop: "1px solid #f1f5f9", paddingTop: "16px" }}>
-                    <h4 style={{ margin: "0 0 12px 0", color: "#1e293b", fontSize: "14px" }}>Student Grade Roster ({batch.courseCode})</h4>
-                    <div style={{ overflowX: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left" }}>
-                        <thead>
-                          <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
-                            <th style={{ padding: "8px 12px" }}>Student ID</th>
-                            <th style={{ padding: "8px 12px" }}>Student Name</th>
-                            <th style={{ padding: "8px 12px" }}>MT Part A</th>
-                            <th style={{ padding: "8px 12px" }}>MT Part B</th>
-                            <th style={{ padding: "8px 12px" }}>Att.</th>
-                            <th style={{ padding: "8px 12px" }}>Cont. Assmt</th>
-                            <th style={{ padding: "8px 12px" }}>Final Exam</th>
-                            <th style={{ padding: "8px 12px" }}>Total Marks</th>
-                            <th style={{ padding: "8px 12px" }}>GPA</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(batch.results || []).map((r) => (
-                            <tr key={r._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                              <td style={{ padding: "8px 12px", fontWeight: 700, color: "#3b8db3" }}>{r.studentId}</td>
-                              <td style={{ padding: "8px 12px" }}>{r.studentName}</td>
-                              <td style={{ padding: "8px 12px" }}>{r.midPartA ?? "-"}</td>
-                              <td style={{ padding: "8px 12px" }}>{r.midPartB ?? "-"}</td>
-                              <td style={{ padding: "8px 12px" }}>{r.attendance ?? "-"}</td>
-                              <td style={{ padding: "8px 12px" }}>{r.continuousAssessment ?? "-"}</td>
-                              <td style={{ padding: "8px 12px" }}>{r.finalExam ?? "-"}</td>
-                              <td style={{ padding: "8px 12px", fontWeight: 700 }}>{r.totalMarks ?? "-"}</td>
-                              <td style={{ padding: "8px 12px", fontWeight: 700, color: "#16a34a" }}>{r.gradePoint ?? r.letterGrade ?? "-"}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+        )}}
           </div>
         )}
 

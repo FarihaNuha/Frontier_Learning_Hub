@@ -6,6 +6,7 @@ const ctrl = require("../controllers/umsAdminController");
 router.get("/stats", verifyToken, checkRole("admin"), ctrl.getStats);
 router.get("/students", verifyToken, checkRole("admin"), ctrl.getStudents);
 router.get("/teachers", verifyToken, checkRole("admin"), ctrl.getTeachers);
+router.get("/teachers/academic-years", verifyToken, checkRole("admin"), ctrl.getTeacherAcademicYears);
 router.get("/courses", verifyToken, checkRole("admin"), ctrl.getCourses);
 router.get("/advisers", verifyToken, checkRole("admin"), ctrl.getAdvisers);
 

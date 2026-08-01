@@ -25,6 +25,7 @@ import {
   FiAward,
   FiRefreshCw,
   FiCreditCard,
+  FiClipboard,
 } from "react-icons/fi";
 
 export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
@@ -35,6 +36,17 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
 
   const [course, setCourse] = useState(courseInfo || null);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isRegistrationPage =
+    currentPage === "course-registration" ||
+    currentPage === "retake-registration" ||
+    currentPage === "payments" ||
+    window.location.pathname.includes("/student/course-registration") ||
+    window.location.pathname.includes("/student/retake-registration") ||
+    window.location.pathname.includes("/student/registration-payments");
+
+  const [registrationOpen, setRegistrationOpen] = useState(isRegistrationPage);
+
   const [communityOpen, setCommunityOpen] = useState(
     currentPage === "community-hub" ||
       currentPage === "community" ||
@@ -123,6 +135,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           </p>
         </div>
         <div className="sidebar-nav-scrollable">
+          {/* 1. My Courses */}
           <button
             className={`nav-item ${currentPage === "my-courses" || currentPage === "courses" ? "active" : ""}`}
             onClick={() => navigate("/courses")}
@@ -130,13 +143,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <FiBookOpen size={18} />
             <span>My Courses</span>
           </button>
-          <button
-            className={`nav-item ${currentPage === "results" || window.location.pathname.includes("/student/results") ? "active" : ""}`}
-            onClick={() => navigate("/student/results")}
-          >
-            <FiAward size={18} />
-            <span>Result Publication</span>
-          </button>
+
+          {/* 2. Academic Profile */}
           <button
             className={`nav-item ${currentPage === "academic-profile" || window.location.pathname.includes("/student/academic-profile") ? "active" : ""}`}
             onClick={() => navigate("/student/academic-profile")}
@@ -144,6 +152,69 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <FiUser size={18} />
             <span>Academic Profile</span>
           </button>
+
+          {/* 3. Registration Dropdown */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <button
+              className={`nav-item ${isRegistrationPage ? "active" : ""}`}
+              onClick={() => setRegistrationOpen(!registrationOpen)}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <FiCalendar size={18} />
+                <span>Registration</span>
+              </div>
+              {registrationOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+            </button>
+            {registrationOpen && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
+                <button
+                  className={`nav-item ${currentPage === "course-registration" || window.location.pathname.includes("/student/course-registration") ? "active" : ""}`}
+                  onClick={() => navigate("/student/course-registration")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
+                >
+                  <FiCalendar size={15} />
+                  <span>Course Registration</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === "retake-registration" || window.location.pathname.includes("/student/retake-registration") ? "active" : ""}`}
+                  onClick={() => navigate("/student/retake-registration")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
+                >
+                  <FiRefreshCw size={15} />
+                  <span>Retake Registration</span>
+                </button>
+                <button
+                  className={`nav-item ${currentPage === "payments" || window.location.pathname.includes("/student/registration-payments") ? "active" : ""}`}
+                  onClick={() => navigate("/student/registration-payments")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
+                >
+                  <FiCreditCard size={15} />
+                  <span>Registration Payments</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 4. Assessment Marksheet */}
+          <button
+            className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
+            onClick={() => navigate("/student/assessment")}
+          >
+            <FiFileText size={18} />
+            <span>Assessment Marksheet</span>
+          </button>
+
+          {/* 5. Result Publication */}
+          <button
+            className={`nav-item ${currentPage === "results" || window.location.pathname.includes("/student/results") ? "active" : ""}`}
+            onClick={() => navigate("/student/results")}
+          >
+            <FiAward size={18} />
+            <span>Result Publication</span>
+          </button>
+
+          {/* 6. Academic Transcript */}
           <button
             className={`nav-item ${currentPage === "transcript" || window.location.pathname.includes("/student/transcript") ? "active" : ""}`}
             onClick={() => navigate("/student/transcript")}
@@ -151,13 +222,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <FiFileText size={18} />
             <span>Academic Transcript</span>
           </button>
-          <button
-            className={`nav-item ${currentPage === "retake-registration" || window.location.pathname.includes("/student/retake-registration") ? "active" : ""}`}
-            onClick={() => navigate("/student/retake-registration")}
-          >
-            <FiRefreshCw size={18} />
-            <span>Retake Registration</span>
-          </button>
+
+          {/* 7. Academic Calendar */}
           <button
             className={`nav-item ${currentPage === "calendar" || window.location.pathname.includes("/academic-calendar") ? "active" : ""}`}
             onClick={() => navigate("/academic-calendar")}
@@ -165,20 +231,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <FiCalendar size={18} />
             <span>Academic Calendar</span>
           </button>
-          <button
-            className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/student/notices") ? "active" : ""}`}
-            onClick={() => navigate("/student/notices")}
-          >
-            <FiBell size={18} />
-            <span>Notice Board</span>
-          </button>
-          <button
-            className={`nav-item ${currentPage === "payments" || window.location.pathname.includes("/student/registration-payments") ? "active" : ""}`}
-            onClick={() => navigate("/student/registration-payments")}
-          >
-            <FiCreditCard size={18} />
-            <span>Registration Payments</span>
-          </button>
+
+          {/* 8. Community Hub Dropdown */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <button
               className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
@@ -195,36 +249,24 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
                 <button
                   className={`nav-item ${window.location.pathname.includes("/community") ? "active" : ""}`}
-                  onClick={() => navigate(cid ? `/community/courses/${cid}` : "/community")}
-                  style={{
-                    paddingLeft: 32,
-                    fontSize: 13,
-                    fontWeight: 400,
-                  }}
+                  onClick={() => navigate("/community")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiMessageCircle size={15} />
                   <span>Discussion Feed</span>
                 </button>
                 <button
                   className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate(cid ? `/messages?courseId=${cid}` : "/messages")}
-                  style={{
-                    paddingLeft: 32,
-                    fontSize: 13,
-                    fontWeight: 400,
-                  }}
+                  onClick={() => navigate("/messages")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiMail size={15} />
                   <span>Messages</span>
                 </button>
                 <button
                   className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate(cid ? `/messages?tab=requests&courseId=${cid}` : "/messages?tab=requests")}
-                  style={{
-                    paddingLeft: 32,
-                    fontSize: 13,
-                    fontWeight: 400,
-                  }}
+                  onClick={() => navigate("/messages?tab=requests")}
+                  style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiClock size={15} />
                   <span>Contact Requests</span>
@@ -232,19 +274,14 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
               </div>
             )}
           </div>
+
+          {/* 9. Notice Board (FiClipboard icon to prevent clash with FiBell) */}
           <button
-            className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
-            onClick={() => navigate("/student/assessment")}
+            className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/student/notices") ? "active" : ""}`}
+            onClick={() => navigate("/student/notices")}
           >
-            <FiFileText size={18} />
-            <span>Assessment Marksheet</span>
-          </button>
-          <button
-            className={`nav-item ${currentPage === "course-registration" ? "active" : ""}`}
-            onClick={() => navigate("/student/course-registration")}
-          >
-            <FiCalendar size={18} />
-            <span>Course Registration</span>
+            <FiClipboard size={18} />
+            <span>Notice Board</span>
           </button>
         </div>
         <div className="sidebar-footer-fixed">
@@ -267,6 +304,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
     );
   }
 
+  // Active Course Context Sidebar
   return (
     <>
       {/* Mobile Header Bar */}
@@ -327,6 +365,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
         </p>
       </div>
       <div className="sidebar-nav-scrollable">
+        {/* 1. Course Materials */}
         <button
           className={`nav-item ${currentPage === "dashboard" ? "active" : ""}`}
           onClick={() => navigate(`/course/${cid}`)}
@@ -334,20 +373,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           <FiBook size={18} />
           <span>Course Materials</span>
         </button>
-        <button
-          className={`nav-item ${currentPage === "assignments" ? "active" : ""}`}
-          onClick={() => navigate(`/student/assignments/${cid}`)}
-        >
-          <FiFileText size={18} />
-          <span>Assignments</span>
-        </button>
-        <button
-          className={`nav-item ${currentPage === "exams" ? "active" : ""}`}
-          onClick={() => navigate(`/student/exams/${cid}`)}
-        >
-          <FiFileText size={18} />
-          <span>Exams</span>
-        </button>
+
+        {/* 2. Attendance */}
         <button
           className={`nav-item ${currentPage === "attendance" ? "active" : ""}`}
           onClick={() => navigate(`/student/attendance/${cid}`)}
@@ -355,6 +382,44 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           <FiCalendar size={18} />
           <span>Attendance</span>
         </button>
+
+        {/* 3. Exams */}
+        <button
+          className={`nav-item ${currentPage === "exams" ? "active" : ""}`}
+          onClick={() => navigate(`/student/exams/${cid}`)}
+        >
+          <FiFileText size={18} />
+          <span>Exams</span>
+        </button>
+
+        {/* 4. Assignments */}
+        <button
+          className={`nav-item ${currentPage === "assignments" ? "active" : ""}`}
+          onClick={() => navigate(`/student/assignments/${cid}`)}
+        >
+          <FiFileText size={18} />
+          <span>Assignments</span>
+        </button>
+
+        {/* 5. Assessment Marks */}
+        <button
+          className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
+          onClick={() => navigate(`/student/assessment/${cid}`)}
+        >
+          <FiFileText size={18} />
+          <span>Assessment Marks</span>
+        </button>
+
+        {/* 6. Performance Analytics */}
+        <button
+          className={`nav-item ${currentPage === "analytics" ? "active" : ""}`}
+          onClick={() => navigate(`/student/analytics/${cid}`)}
+        >
+          <FiActivity size={18} />
+          <span>Performance Analytics</span>
+        </button>
+
+        {/* 7. Community Dropdown */}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <button
             className={`nav-item ${currentPage === "community" ? "active" : ""}`}
@@ -372,11 +437,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
               <button
                 className={`nav-item ${window.location.pathname.includes("/community") ? "active" : ""}`}
                 onClick={() => navigate(`/community/courses/${cid}`)}
-                style={{
-                  paddingLeft: 32,
-                  fontSize: 13,
-                  fontWeight: 400,
-                }}
+                style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
               >
                 <FiMessageCircle size={15} />
                 <span>Discussion Feed</span>
@@ -384,11 +445,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
               <button
                 className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
                 onClick={() => navigate(`/messages?courseId=${cid}`)}
-                style={{
-                  paddingLeft: 32,
-                  fontSize: 13,
-                  fontWeight: 400,
-                }}
+                style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
               >
                 <FiMail size={15} />
                 <span>Messages</span>
@@ -396,11 +453,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
               <button
                 className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
                 onClick={() => navigate(`/messages?tab=requests&courseId=${cid}`)}
-                style={{
-                  paddingLeft: 32,
-                  fontSize: 13,
-                  fontWeight: 400,
-                }}
+                style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
               >
                 <FiClock size={15} />
                 <span>Contact Requests</span>
@@ -408,29 +461,24 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             </div>
           )}
         </div>
-
         <button
-          className={`nav-item ${currentPage === "analytics" ? "active" : ""}`}
-          onClick={() => navigate(`/student/analytics/${cid}`)}
+          className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/notice") ? "active" : ""}`}
+          onClick={() => navigate(`/student/course/${cid}/notice`)}
         >
-          <FiActivity size={18} />
-          <span>Activity Analytics</span>
-        </button>
-        <button
-          className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
-          onClick={() => navigate(`/student/assessment/${cid}`)}
-        >
-          <FiFileText size={18} />
-          <span>Assessment Marksheet</span>
+          <FiClipboard size={18} />
+          <span>Notice Board</span>
         </button>
       </div>
       <div className="sidebar-footer-fixed">
         <div id="sidebar-notification-portal" style={{ width: "100%" }}></div>
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
+
+        {/* 8. Back to Courses */}
         <button className="nav-item" onClick={() => navigate("/courses")}>
           <FiArrowLeft size={18} />
           <span>Back to Courses</span>
         </button>
+
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
         <button
           className={`nav-item ${currentPage === "settings" ? "active" : ""}`}

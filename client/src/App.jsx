@@ -654,7 +654,23 @@ function AppContent() {
             }
           />
           <Route
+            path="/teacher/course/:id/notice"
+            element={
+              <ProtectedRoute>
+                <TeacherNoticePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/student/notices"
+            element={
+              <ProtectedRoute>
+                <StudentNoticePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/course/:id/notice"
             element={
               <ProtectedRoute>
                 <StudentNoticePage />

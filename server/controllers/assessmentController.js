@@ -115,79 +115,325 @@ exports.uploadMarksheet = async (req, res) => {
       });
     }
 
-    // 1b. Teacher Course Assignment Verification
+    // 1b. Strict Teacher Course Assignment & Section Metadata Verification
+    const Teacher = require("../models/Teacher");
+    const TeacherImportBatch = require("../models/TeacherImportBatch");
+
     const teacherUser = await User.findById(req.user.uid);
     const teacherEmail = (teacherUser?.email || "").toLowerCase().trim();
+    const teacherIdStr = String(teacherUser?.teacherId || "").trim();
 
-    const Teacher = require("../models/Teacher");
+    // Fetch teacher assignment from Teacher collection
     const teacherDoc = await Teacher.findOne({
       $or: [
-        { email: teacherEmail },
-        { email: { $regex: new RegExp(`^${teacherEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
-      ]
+        teacherEmail ? { email: teacherEmail } : null,
+        teacherEmail ? { email: { $regex: new RegExp(`^${teacherEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } } : null,
+        teacherIdStr ? { teacherId: teacherIdStr } : null,
+      ].filter(Boolean)
     }).lean();
 
+    // Fetch teacher assignment from TeacherImportBatch collection
+    const teacherBatches = await TeacherImportBatch.find().lean();
+
+    // Fetch teacher LMS courses
     const lmsCourses = await Course.find({ teacher: req.user.uid }).lean();
 
-    const assignedCoursesList = [];
-    const assignedCodesSet = new Set();
+    // Fetch CourseImport documents for fallback Level & Term resolution
+    const CourseImport = require("../models/CourseImport");
+    const allCourseImports = await CourseImport.find().lean();
 
+    const findImportDoc = (codeStr, titleStr) => {
+      const cleanC = String(codeStr || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const cleanT = String(titleStr || "").trim().toLowerCase();
+      return allCourseImports.find((ci) => {
+        const ciC = String(ci.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        const ciT = String(ci.courseTitle || "").trim().toLowerCase();
+        return (cleanC && ciC === cleanC) || (cleanT && ciT === cleanT);
+      });
+    };
+
+    const resolveLevelTerm = (acObj, fallbackLTerm, codeStr, titleStr) => {
+      if (acObj && acObj.levelTerm && acObj.levelTerm.trim()) return acObj.levelTerm.trim();
+      if (acObj && (acObj.level || acObj.term)) {
+        const l = String(acObj.level || "").replace(/\D/g, "");
+        const t = String(acObj.term || "").replace(/\D/g, "");
+        if (l && t) return `Level ${l} - Term ${t}`;
+        if (l) return `Level ${l}`;
+        if (t) return `Term ${t}`;
+      }
+      if (fallbackLTerm && fallbackLTerm.trim()) return fallbackLTerm.trim();
+
+      const ci = findImportDoc(codeStr, titleStr);
+      if (ci && (ci.level || ci.term)) {
+        const l = String(ci.level || "").replace(/\D/g, "");
+        const t = String(ci.term || "").replace(/\D/g, "");
+        if (l && t) return `Level ${l} - Term ${t}`;
+        if (l) return `Level ${l}`;
+        if (t) return `Term ${t}`;
+      }
+      return "";
+    };
+
+    // Build validAssignments: each entry is a strict per-course triplet {code, session, levelTerm, department}
+    const validAssignments = [];
+
+    const normalizeSession = (s) =>
+      String(s || "").trim().toLowerCase().replace(/\s+/g, "-").replace(/[^0-9-]/g, "");
+
+    const normalizeLvl = (s) => {
+      const m = String(s || "").match(/(\d+)/);
+      return m ? m[1] : "";
+    };
+
+    // Process Teacher collection
     if (teacherDoc && Array.isArray(teacherDoc.assignedCourses)) {
-      teacherDoc.assignedCourses.forEach((c) => {
-        const code = String(c.courseCode || c.courseName || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-        const sess = (c.session || teacherDoc.assignedSession || "").trim();
-        const lTerm = (c.levelTerm || teacherDoc.assignedLevelTerm || "").trim();
-        if (code) {
-          assignedCodesSet.add(code);
-          const desc = `${c.courseCode || code}${c.courseName ? ` (${c.courseName})` : ""}${sess ? ` — Session: ${sess}` : ""}${lTerm ? `, ${lTerm}` : ""}`;
-          if (!assignedCoursesList.includes(desc)) {
-            assignedCoursesList.push(desc);
-          }
-        }
+      teacherDoc.assignedCourses.forEach((ac) => {
+        const codeClean = String(ac.courseCode || ac.courseName || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        if (!codeClean) return;
+
+        const acSession = (ac.session || "").trim();
+        const acLevelTerm = resolveLevelTerm(ac, teacherDoc.assignedLevelTerm, ac.courseCode || ac.courseName, ac.courseTitle || ac.courseName);
+        const acDept = (ac.department || teacherDoc.department || "").trim().toUpperCase();
+
+        validAssignments.push({
+          code: codeClean,
+          rawCode: ac.courseCode || ac.courseName || "",
+          title: ac.courseTitle || ac.courseName || "",
+          session: acSession,
+          levelTerm: acLevelTerm,
+          department: acDept,
+        });
       });
     }
 
+    // Process TeacherImportBatch
+    if (Array.isArray(teacherBatches)) {
+      teacherBatches.forEach((batch) => {
+        if (!Array.isArray(batch.records)) return;
+        batch.records.forEach((r) => {
+          const rEmail = (r.email || "").toLowerCase().trim();
+          const rId = String(r.teacherId || "").trim();
+          const isMatch = (teacherEmail && rEmail === teacherEmail) || (teacherIdStr && rId === teacherIdStr);
+          if (!isMatch || !Array.isArray(r.assignedCourses)) return;
+
+          r.assignedCourses.forEach((ac) => {
+            const acObj = typeof ac === "object" && ac !== null ? ac : {};
+            const codeClean = String(acObj.courseCode || acObj.courseName || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+            if (!codeClean) return;
+
+            const acSession = (acObj.session || "").trim();
+            const acLevelTerm = resolveLevelTerm(acObj, r.assignedLevelTerm, acObj.courseCode || acObj.courseName, acObj.courseTitle || acObj.courseName);
+            const acDept = (acObj.department || r.department || "").trim().toUpperCase();
+
+            validAssignments.push({
+              code: codeClean,
+              rawCode: acObj.courseCode || acObj.courseName || "",
+              title: acObj.courseTitle || acObj.courseName || "",
+              session: acSession,
+              levelTerm: acLevelTerm,
+              department: acDept,
+            });
+          });
+        });
+      });
+    }
+
+    // Process LMS Courses
     if (Array.isArray(lmsCourses)) {
       lmsCourses.forEach((c) => {
-        const code = String(c.displayCode || c.name || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-        const sess = (c.session || "").trim();
-        if (code) {
-          assignedCodesSet.add(code);
-          const desc = `${c.displayCode || c.name || code}${sess ? ` — Session: ${sess}` : ""}`;
-          if (!assignedCoursesList.includes(desc)) {
-            assignedCoursesList.push(desc);
-          }
+        const codeClean = String(c.displayCode || c.courseCode || c.name || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        if (!codeClean) return;
+
+        let lt = (c.level || c.term) ? `Level ${c.level || "?"} - Term ${c.term || "?"}` : "";
+        if (!lt) {
+          lt = resolveLevelTerm({}, "", c.displayCode || c.courseCode || c.name, c.name);
         }
+
+        validAssignments.push({
+          code: codeClean,
+          rawCode: c.displayCode || c.courseCode || c.name || "",
+          title: c.name || "",
+          session: (c.session || "").trim(),
+          levelTerm: lt,
+          department: (c.department || "").trim().toUpperCase(),
+        });
       });
     }
 
-    const cleanCourseCode = String(courseCode).replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const uploadedCleanCode = String(courseCode).replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const uploadedSessionNorm = normalizeSession(headerSession);
+    const uploadedLevel = normalizeLvl(level);
+    const uploadedTerm = normalizeLvl(term);
 
-    if (req.user.role !== "admin" && assignedCoursesList.length > 0) {
-      const isAssigned = assignedCodesSet.has(cleanCourseCode) ||
-        Array.from(assignedCodesSet).some(k => k.includes(cleanCourseCode) || cleanCourseCode.includes(k));
-
-      if (!isAssigned) {
+    if (req.user.role !== "admin") {
+      if (validAssignments.length === 0) {
         try { fs.unlinkSync(req.file.path); } catch (e) {}
-        
-        let warningLines = [];
-        warningLines.push(`Upload blocked — The uploaded Excel sheet does not match your assigned courses.`);
-        warningLines.push(``);
-        warningLines.push(`Your Excel file details:`);
-        warningLines.push(`  • Course Code : ${courseCode}`);
-        if (headerSession) warningLines.push(`  • Session     : ${headerSession}`);
-        if (level)         warningLines.push(`  • Level       : ${level}`);
-        if (term)          warningLines.push(`  • Term        : ${term}`);
-        if (department)    warningLines.push(`  • Department  : ${department}`);
-        warningLines.push(``);
-        warningLines.push(`Your assigned courses (one must match):`);
-        assignedCoursesList.forEach((ac) => warningLines.push(`  - ${ac}`));
-
         return res.status(400).json({
-          error: warningLines.join("\n")
+          error: "⛔ UPLOAD BLOCKED: No course assignments found for your teacher account. Please contact system admin."
         });
       }
+
+      // Step 1: Find all assignments where course code matches
+      const matchingCodeAssignments = validAssignments.filter((a) => {
+        if (!a.code) return false;
+        return a.code === uploadedCleanCode ||
+          a.code.includes(uploadedCleanCode) ||
+          uploadedCleanCode.includes(a.code);
+      });
+
+      if (matchingCodeAssignments.length === 0) {
+        try { fs.unlinkSync(req.file.path); } catch (e) {}
+        const uniqueAssignmentsMap = new Map();
+        validAssignments.forEach((a) => {
+          const key = `${a.rawCode || a.code}_${a.session}_${a.levelTerm}_${a.department}`;
+          if (!uniqueAssignmentsMap.has(key)) {
+            uniqueAssignmentsMap.set(key, a);
+          }
+        });
+        const uniqueAssignments = Array.from(uniqueAssignmentsMap.values());
+
+        const warningLines = [
+          `⛔ UPLOAD BLOCKED: Unassigned Course Code!`,
+          ``,
+          `Uploaded Course Code: "${courseCode}"`,
+          ``,
+          `Your Assigned Courses:`,
+          ...uniqueAssignments.map((a) =>
+            `  • ${a.rawCode || a.code}${a.title ? ` (${a.title})` : ""}${a.session ? ` — Session: ${a.session}` : ""}${a.levelTerm ? `, ${a.levelTerm}` : ""}${a.department ? `, Dept: ${a.department}` : ""}`
+          ),
+        ];
+        return res.status(400).json({ error: warningLines.join("\n") });
+      }
+
+      // Step 2: Strict parameter matching (Session, Level, Term, Department)
+      let isStrictMatch = false;
+      const mismatchReasons = [];
+
+      const lmsCourseSessionMap = {};
+      for (const lc of lmsCourses) {
+        const lcCode = String(lc.displayCode || lc.courseCode || lc.name || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        if (lcCode && lc.session) {
+          if (!lmsCourseSessionMap[lcCode]) lmsCourseSessionMap[lcCode] = [];
+          lmsCourseSessionMap[lcCode].push({
+            session: (lc.session || "").trim(),
+            level: String(lc.level || ""),
+            term: String(lc.term || ""),
+          });
+        }
+      }
+
+      for (const assignment of matchingCodeAssignments) {
+        const reasons = [];
+
+        // Authoritative Session check
+        let authSession = normalizeSession(assignment.session);
+        if (!authSession) {
+          const lmsEntries = lmsCourseSessionMap[assignment.code] || [];
+          if (lmsEntries.length > 0) {
+            const lmsLevelMatch = lmsEntries.find((e) => {
+              const eLvl = normalizeLvl(e.level);
+              const eTrm = normalizeLvl(e.term);
+              return (eLvl && uploadedLevel ? eLvl === uploadedLevel : true) &&
+                     (eTrm && uploadedTerm ? eTrm === uploadedTerm : true);
+            });
+            if (lmsLevelMatch) {
+              authSession = normalizeSession(lmsLevelMatch.session);
+            } else {
+              authSession = normalizeSession(lmsEntries[0].session);
+            }
+          }
+        }
+
+        if (authSession && uploadedSessionNorm) {
+          if (authSession !== uploadedSessionNorm) {
+            reasons.push(
+              `Session mismatch: Excel has "${headerSession || "N/A"}" but this course (${assignment.rawCode || assignment.code}) requires Session "${assignment.session || authSession}"`
+            );
+          }
+        } else if (authSession && !uploadedSessionNorm) {
+          reasons.push(
+            `Session not found in Excel header: This course requires Session "${assignment.session || authSession}". Please add "Session: XXXX-XX" in your Excel header.`
+          );
+        } else if (!authSession && uploadedSessionNorm) {
+          reasons.push(
+            `Session not configured for this assignment in the system. Please ask admin to set the session for course "${assignment.rawCode || assignment.code}".`
+          );
+        }
+
+        // Strict Level & Term check
+        const assLT = assignment.levelTerm || "";
+        const assLvlMatch = assLT.match(/level\s*:?\s*(\d+)/i) || assLT.match(/L(\d+)/i);
+        const assTrmMatch = assLT.match(/term\s*:?\s*(\d+)/i) || assLT.match(/T(\d+)/i);
+        const assLvl = assLvlMatch ? assLvlMatch[1] : "";
+        const assTrm = assTrmMatch ? assTrmMatch[1] : "";
+
+        if (assLvl && uploadedLevel && assLvl !== uploadedLevel) {
+          reasons.push(
+            `Level mismatch: Excel header specifies "Level ${uploadedLevel}" but this course requires "Level ${assLvl}"`
+          );
+        } else if (assLvl && !uploadedLevel) {
+          reasons.push(
+            `Level missing in Excel header: This course requires "Level ${assLvl}". Please specify "Level: ${assLvl}" in your Excel header.`
+          );
+        }
+
+        if (assTrm && uploadedTerm && assTrm !== uploadedTerm) {
+          reasons.push(
+            `Term mismatch: Excel header specifies "Term ${uploadedTerm}" but this course requires "Term ${assTrm}"`
+          );
+        } else if (assTrm && !uploadedTerm) {
+          reasons.push(
+            `Term missing in Excel header: This course requires "Term ${assTrm}". Please specify "Term: ${assTrm}" in your Excel header.`
+          );
+        }
+
+        // Department check
+        if (assignment.department && department) {
+          if (assignment.department.toUpperCase() !== department.toUpperCase()) {
+            reasons.push(
+              `Department mismatch: Excel header specifies "${department}" but this course requires "${assignment.department}"`
+            );
+          }
+        }
+
+        if (reasons.length === 0) {
+          isStrictMatch = true;
+          break;
+        } else {
+          mismatchReasons.push(
+            `  [Course: ${assignment.rawCode || assignment.code} | Section: Session ${assignment.session || authSession || "?"}, ${assignment.levelTerm || "Level/Term unspecified"}]\n` +
+            reasons.map((r) => `    ❌ ${r}`).join("\n")
+          );
+        }
+      }
+
+      if (!isStrictMatch) {
+        try { fs.unlinkSync(req.file.path); } catch (e) {}
+
+        const warningLines = [
+          `⛔ UPLOAD BLOCKED: Marksheet Parameters Do Not Match Your Assignment!`,
+          ``,
+          `You uploaded an Excel file for Course "${courseCode}" with these parameters:`,
+          headerSession ? `  • Session      : ${headerSession}` : `  • Session      : Not specified in Excel`,
+          (level || term) ? `  • Level & Term : Level ${level || "?"} - Term ${term || "?"}` : `  • Level & Term : Not specified in Excel`,
+          department ? `  • Department   : ${department}` : null,
+          ``,
+          `But this course is assigned to you ONLY for these specific section(s):`,
+          ...matchingCodeAssignments.map((a) =>
+            `  ✅ Session: ${a.session || "Any"} | ${a.levelTerm || "Level/Term unspecified"}${a.department ? ` | Dept: ${a.department}` : ""}`
+          ),
+          ``,
+          `Detected Mismatch Reasons:`,
+          ...mismatchReasons,
+          ``,
+          `Please correct Session / Level / Term in your Excel file header to match your assigned section and re-upload.`,
+        ].filter((l) => l !== null);
+
+        return res.status(400).json({ error: warningLines.join("\n") });
+      }
     }
+
+
 
     // Retrieve Course model doc for notification link and fallbacks
     const courseDoc = await Course.findOne({ displayCode: courseCode.trim().toUpperCase() });
@@ -238,16 +484,25 @@ exports.uploadMarksheet = async (req, res) => {
     const savedRecords = [];
     const duplicateRecords = [];
 
-    // Overwrite behavior: Delete any previous assessment records for this courseCode
-    // so only the newly uploaded file's data remains in the database.
+    // Overwrite behavior: Only delete previous assessment records if ALL parameters match
+    // (courseCode, session, level, term, department, courseTitle, courseType, creditHour)
+    // If ANY parameter differs, keep previous record so a new separate section is created!
     const targetCleanCourseCode = courseCode.trim();
     const cleanRegex = new RegExp(targetCleanCourseCode.replace(/[^a-zA-Z0-9]/g, ""), "i");
-    await Assessment.deleteMany({
+    const targetSession = (headerSession || "").trim();
+
+    const deleteFilter = {
       $or: [
         { courseCode: targetCleanCourseCode },
         { courseCode: { $regex: cleanRegex } }
       ]
-    });
+    };
+    if (targetSession) deleteFilter.session = targetSession;
+    if (level) deleteFilter.level = level;
+    if (term) deleteFilter.term = term;
+    if (department) deleteFilter.department = department;
+
+    await Assessment.deleteMany(deleteFilter);
 
     // 4. Parse student rows
     for (let r = headerRowIndex + 1; r < rows.length; r++) {
@@ -409,16 +664,78 @@ exports.getStudentAssessments = async (req, res) => {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    const assessments = await Assessment.find({
+    const studentIdStr = student.studentId || "";
+    const studentObjId = student._id;
+
+    const Registration = require("../models/Registration");
+    const Student = require("../models/Student");
+    const studentProfile = await Student.findOne({
       $or: [
-        { studentIdNumber: student.studentId },
-        { studentId: student._id }
+        { universityEmail: student.email },
+        { universityEmail: { $regex: new RegExp(`^${(student.email || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+      ]
+    }).lean();
+
+    const effStudentId = studentProfile?.studentId || studentIdStr;
+
+    // Fetch student's APPROVED registrations ONLY
+    const approvedRegs = await Registration.find({
+      $or: [
+        { user: studentObjId },
+        ...(effStudentId ? [{ studentId: effStudentId }] : [])
+      ],
+      status: "Approved"
+    }).lean();
+
+    const approvedLevelTerms = new Set();
+    const approvedCourseCodes = new Set();
+
+    approvedRegs.forEach((reg) => {
+      const lDigit = (reg.level || "").replace(/\D/g, "");
+      const tDigit = (reg.term || "").replace(/\D/g, "");
+      if (lDigit && tDigit) {
+        approvedLevelTerms.add(`Level ${lDigit} - Term ${tDigit}`);
+        approvedLevelTerms.add(`Level ${lDigit} Term ${tDigit}`);
+        approvedLevelTerms.add(`L${lDigit}T${tDigit}`);
+        approvedLevelTerms.add(`${lDigit}-${tDigit}`);
+        approvedLevelTerms.add(`${lDigit}_${tDigit}`);
+      }
+      (reg.selectedCourses || []).forEach((sc) => {
+        const codeClean = (sc.courseCode || sc.code || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        if (codeClean) approvedCourseCodes.add(codeClean);
+      });
+    });
+
+    const rawAssessments = await Assessment.find({
+      $or: [
+        { studentIdNumber: effStudentId },
+        { studentIdNumber: studentIdStr },
+        { studentId: studentObjId }
       ]
     })
       .populate("uploadedBy", "name email")
-      .sort({ courseCode: 1 });
+      .sort({ courseCode: 1 })
+      .lean();
 
-    res.json({ assessments });
+    // STRICT FILTER: If student has no approved registration for a course / Level-Term, DO NOT SHOW assessment marks!
+    const filteredAssessments = rawAssessments.filter((asm) => {
+      if (approvedRegs.length === 0) return false;
+
+      const codeClean = (asm.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const asmLDigit = (asm.level || "").replace(/\D/g, "");
+      const asmTDigit = (asm.term || "").replace(/\D/g, "");
+
+      if (codeClean && approvedCourseCodes.has(codeClean)) return true;
+
+      if (asmLDigit && asmTDigit) {
+        const asmLTKey = `Level ${asmLDigit} - Term ${asmTDigit}`;
+        if (approvedLevelTerms.has(asmLTKey)) return true;
+      }
+
+      return false;
+    });
+
+    res.json({ assessments: filteredAssessments });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

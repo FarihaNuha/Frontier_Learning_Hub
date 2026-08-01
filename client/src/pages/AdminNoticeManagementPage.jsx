@@ -26,6 +26,7 @@ export default function AdminNoticeManagementPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("General");
+  const [targetAudience, setTargetAudience] = useState("All");
   const [isPinned, setIsPinned] = useState(false);
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduledAt, setScheduledAt] = useState("");
@@ -54,6 +55,7 @@ export default function AdminNoticeManagementPage() {
     setTitle("");
     setContent("");
     setCategory("General");
+    setTargetAudience("All");
     setIsPinned(false);
     setIsScheduled(false);
     setScheduledAt("");
@@ -67,6 +69,7 @@ export default function AdminNoticeManagementPage() {
     setTitle(n.title);
     setContent(n.content);
     setCategory(n.category || "General");
+    setTargetAudience(n.targetAudience || "All");
     setIsPinned(Boolean(n.isPinned));
     setIsScheduled(Boolean(n.isScheduled));
     setScheduledAt(n.scheduledAt ? new Date(n.scheduledAt).toISOString().slice(0, 16) : "");
@@ -91,6 +94,7 @@ export default function AdminNoticeManagementPage() {
           title,
           content,
           category,
+          targetAudience,
           isPinned,
           isScheduled,
           scheduledAt: isScheduled && scheduledAt ? scheduledAt : null,
@@ -103,13 +107,14 @@ export default function AdminNoticeManagementPage() {
           title,
           content,
           category,
+          targetAudience,
           isPinned,
           isScheduled,
           scheduledAt: isScheduled && scheduledAt ? scheduledAt : null,
           pdfUrl,
           imageUrls: imgArr,
         });
-        toast.success("Notice created and notifications sent!");
+        toast.success(`Notice created for ${targetAudience}!`);
       }
 
       setShowModal(false);
@@ -190,6 +195,9 @@ export default function AdminNoticeManagementPage() {
                       <span style={{ background: "rgba(59,141,179,0.12)", color: "#3b8db3", fontWeight: 700, padding: "2px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
                         {n.category || "General"}
                       </span>
+                      <span style={{ background: "#fef3c7", color: "#b45309", fontWeight: 700, padding: "2px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
+                        👥 Target: {n.targetAudience || "All"}
+                      </span>
                       <h3 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>{n.title}</h3>
                     </div>
                     <div style={{ fontSize: "12.5px", color: "#64748b", marginTop: "4px" }}>
@@ -247,15 +255,26 @@ export default function AdminNoticeManagementPage() {
                   <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Official Midterm Exam Schedule 2023-24" style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13.5px" }} />
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#334155", marginBottom: "4px" }}>Category</label>
-                  <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13.5px" }}>
-                    <option value="General">General</option>
-                    <option value="Academic">Academic</option>
-                    <option value="Exam">Exam</option>
-                    <option value="Registration">Registration</option>
-                    <option value="Event">Event</option>
-                  </select>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#334155", marginBottom: "4px" }}>Category</label>
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1.5px solid #cbd5e1", fontSize: "13.5px" }}>
+                      <option value="General">General</option>
+                      <option value="Academic">Academic</option>
+                      <option value="Exam">Exam</option>
+                      <option value="Registration">Registration</option>
+                      <option value="Event">Event</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#334155", marginBottom: "4px" }}>Target Audience 👥</label>
+                    <select value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1.5px solid #3b8db3", fontSize: "13.5px", fontWeight: 600, background: "#f0f9ff" }}>
+                      <option value="All">All (Both Teachers & Students)</option>
+                      <option value="Teachers">Teachers Only (Exam Marks Submission)</option>
+                      <option value="Students">Students Only (General Student Notices)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>

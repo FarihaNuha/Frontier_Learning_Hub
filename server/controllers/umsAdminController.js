@@ -173,10 +173,13 @@ exports.importStudents = async (req, res) => {
 
 exports.importTeachers = async (req, res) => {
   try {
-    const { teachers } = req.body;
+    const { teachers, academicYear: rawYear } = req.body;
     if (!Array.isArray(teachers)) {
       return res.status(400).json({ error: "Invalid data format. Expected an array of teachers." });
     }
+
+    const academicYear = (rawYear && String(rawYear).trim()) ? String(rawYear).trim() : "July, 2026";
+    const TeacherImportBatch = require("../models/TeacherImportBatch");
 
     // Group rows by Teacher ID / Email to support multi-line course assignments in Excel
     const groupedTeachers = {};
@@ -232,6 +235,7 @@ exports.importTeachers = async (req, res) => {
           name: currentName,
           email: currentEmail,
           department: currentDept,
+          program: String(record.program || "").trim() || "BSc. Eng in EDTE",
           assignedLevelTerm: String(record.assignedLevelTerm || "").trim(),
           assignedSession: String(record.assignedSession || "").trim(),
           assignedCourses: [],
@@ -272,6 +276,24 @@ exports.importTeachers = async (req, res) => {
       }
     }
 
+    // Save or update batch record for this Academic Year section
+    let batch = await TeacherImportBatch.findOne({ academicYear });
+    if (batch) {
+      batch.records = Object.values(groupedTeachers);
+      batch.totalTeachersCount = Object.keys(groupedTeachers).length;
+      batch.totalCoursesCount = teachers.length;
+      batch.uploadedAt = new Date();
+      await batch.save();
+    } else {
+      await TeacherImportBatch.create({
+        academicYear,
+        uploadedAt: new Date(),
+        totalTeachersCount: Object.keys(groupedTeachers).length,
+        totalCoursesCount: teachers.length,
+        records: Object.values(groupedTeachers),
+      });
+    }
+
     // Ensure all existing teacher & admin users do not have erroneous studentId set
     const User = require("../models/User");
     await User.updateMany(
@@ -309,27 +331,51 @@ exports.importTeachers = async (req, res) => {
         }
       }
 
-      const updateFields = {
-        teacherId: targetTeacherId,
-        name: t.name,
-        email: targetEmail,
-        department: t.department,
-        program: t.program || "BSc. Eng in EDTE",
+      const newHistoryEntry = {
+        academicYear,
         assignedLevelTerm: t.assignedLevelTerm,
         assignedSession: t.assignedSession,
-        assignedCourses: t.assignedCourses,
         adviserSession: t.adviserSession,
+        assignedCourses: t.assignedCourses,
+        updatedAt: new Date(),
       };
 
       let savedTeacher = null;
       if (existingTeacher) {
-        savedTeacher = await Teacher.findByIdAndUpdate(
-          existingTeacher._id,
-          { $set: updateFields },
-          { returnDocument: "after" }
-        );
+        const history = existingTeacher.assignmentHistory || [];
+        const existingHistIdx = history.findIndex((h) => h.academicYear === academicYear);
+        if (existingHistIdx >= 0) {
+          history[existingHistIdx] = newHistoryEntry;
+        } else {
+          history.push(newHistoryEntry);
+        }
+
+        existingTeacher.teacherId = targetTeacherId;
+        if (t.name) existingTeacher.name = t.name;
+        if (t.department) existingTeacher.department = t.department;
+        if (t.program) existingTeacher.program = t.program;
+        existingTeacher.assignedLevelTerm = t.assignedLevelTerm;
+        existingTeacher.assignedSession = t.assignedSession;
+        existingTeacher.assignedCourses = t.assignedCourses;
+        existingTeacher.adviserSession = t.adviserSession;
+        existingTeacher.academicYear = academicYear;
+        existingTeacher.assignmentHistory = history;
+
+        savedTeacher = await existingTeacher.save();
       } else {
-        savedTeacher = await Teacher.create(updateFields);
+        savedTeacher = await Teacher.create({
+          teacherId: targetTeacherId,
+          name: t.name,
+          email: targetEmail,
+          department: t.department,
+          program: t.program || "BSc. Eng in EDTE",
+          assignedLevelTerm: t.assignedLevelTerm,
+          assignedSession: t.assignedSession,
+          assignedCourses: t.assignedCourses,
+          adviserSession: t.adviserSession,
+          academicYear,
+          assignmentHistory: [newHistoryEntry],
+        });
       }
 
       // Also sync/update corresponding User document for login authentication
@@ -353,7 +399,7 @@ exports.importTeachers = async (req, res) => {
       }
     }
 
-    res.json({ message: "Teachers imported and courses synced successfully." });
+    res.json({ message: "Teachers imported and courses synced successfully for Academic Year: " + academicYear });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -402,18 +448,20 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
       if (code) baseConditions.push({ displayCode: code });
       if (name) baseConditions.push({ name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
 
-      // SESSION-ISOLATED MATCHING:
-      // Try to find course card matching displayCode/name AND targetSession
-      let existingCourse = targetSession
-        ? await Course.findOne({ $or: baseConditions, session: targetSession })
-        : await Course.findOne({ $or: baseConditions });
+      // SESSION-STRICT MATCHING:
+      let existingCourse = null;
+      if (targetSession) {
+        existingCourse = await Course.findOne({ $or: baseConditions, session: targetSession });
+      } else {
+        existingCourse = await Course.findOne({ $or: baseConditions });
+      }
 
       if (existingCourse) {
         // Link teacher to existing LMS course for this specific session
         existingCourse.teacher = userDoc._id;
         if (targetSession && !existingCourse.session) existingCourse.session = targetSession;
         await existingCourse.save();
-      } else {
+      } else if (targetSession) {
         // Auto-create LMS Course document for this session if missing in Course collection
         const importMatch = await CourseImport.findOne({
           $or: [
@@ -591,13 +639,52 @@ exports.getStudents = async (req, res) => {
 
 exports.getTeachers = async (req, res) => {
   try {
+    const { academicYear } = req.query;
     const User = require("../models/User");
+    const TeacherImportBatch = require("../models/TeacherImportBatch");
+
     const registeredUsers = await User.find({ isBlocked: { $ne: true } }, "email isRegistered").lean();
     const activeEmails = new Set(
       registeredUsers.map((u) => (u.email || "").toLowerCase().trim()).filter(Boolean)
     );
 
-    const teachers = await Teacher.find().lean();
+    let teachers = await Teacher.find().lean();
+
+    if (academicYear && academicYear !== "all") {
+      const batchDoc = await TeacherImportBatch.findOne({ academicYear }).lean();
+      if (batchDoc && Array.isArray(batchDoc.records) && batchDoc.records.length > 0) {
+        teachers = batchDoc.records.map((r, idx) => ({
+          _id: `batch_${batchDoc._id}_${idx}`,
+          teacherId: r.teacherId,
+          name: r.name,
+          email: r.email,
+          department: r.department,
+          program: r.program,
+          assignedLevelTerm: r.assignedLevelTerm,
+          assignedSession: r.assignedSession,
+          assignedCourses: r.assignedCourses || [],
+          adviserSession: r.adviserSession,
+          academicYear,
+          isHistoricalRecord: true,
+        }));
+      } else {
+        teachers = teachers.map((t) => {
+          const hist = (t.assignmentHistory || []).find((h) => h.academicYear === academicYear);
+          if (hist) {
+            return {
+              ...t,
+              assignedLevelTerm: hist.assignedLevelTerm || t.assignedLevelTerm,
+              assignedSession: hist.assignedSession || t.assignedSession,
+              assignedCourses: hist.assignedCourses || t.assignedCourses,
+              adviserSession: hist.adviserSession || t.adviserSession,
+              academicYear,
+            };
+          }
+          return t;
+        }).filter((t) => t.academicYear === academicYear || (t.assignmentHistory || []).some((h) => h.academicYear === academicYear));
+      }
+    }
+
     teachers.sort((a, b) => {
       const idA = String(a.teacherId || "");
       const idB = String(b.teacherId || "");
@@ -617,6 +704,20 @@ exports.getTeachers = async (req, res) => {
     res.json(enriched);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getTeacherAcademicYears = async (req, res) => {
+  try {
+    const TeacherImportBatch = require("../models/TeacherImportBatch");
+    const batches = await TeacherImportBatch.find().sort({ uploadedAt: -1 }).lean();
+    const yearsFromBatches = batches.map((b) => b.academicYear).filter(Boolean);
+    const yearsFromTeachers = await Teacher.distinct("academicYear");
+
+    const allYears = Array.from(new Set([...yearsFromBatches, ...yearsFromTeachers, "July, 2026"])).filter(Boolean);
+    res.json({ academicYears: allYears });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -685,8 +786,155 @@ exports.getAdvisers = async (req, res) => {
 // ==================== MANUAL EDIT & DELETE HANDLERS ====================
 exports.updateStudent = async (req, res) => {
   try {
-    const updated = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
+    const mongoose = require("mongoose");
+    const User = require("../models/User");
+    const AcademicProfile = require("../models/AcademicProfile");
+    const Registration = require("../models/Registration");
+    const Assessment = require("../models/Assessment");
+    const Result = require("../models/Result");
+    const CGPARecord = require("../models/CGPARecord");
+
+    const rawId = String(req.params.id || "").trim();
+    let oldStudent = null;
+
+    if (mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId) {
+      oldStudent = await Student.findById(rawId);
+    }
+
+    if (!oldStudent) {
+      const searchMatch = [
+        req.body.studentId ? { studentId: req.body.studentId } : null,
+        req.body.universityEmail || req.body.email ? { universityEmail: (req.body.universityEmail || req.body.email).toLowerCase().trim() } : null,
+      ].filter(Boolean);
+      if (searchMatch.length > 0) {
+        oldStudent = await Student.findOne({ $or: searchMatch });
+      }
+    }
+
+    let updated;
+    if (oldStudent) {
+      updated = await Student.findByIdAndUpdate(oldStudent._id, req.body, { new: true }).lean();
+    } else {
+      const created = await Student.create(req.body);
+      updated = created.toObject();
+    }
+
+    const studentOldEmail = (oldStudent?.universityEmail || oldStudent?.email || req.body.universityEmail || req.body.email || "").toLowerCase().trim();
+    const studentOldId = oldStudent?.studentId || req.body.studentId;
+
+    const newEmail = (req.body.universityEmail || req.body.email || "").toLowerCase().trim();
+    const newStudentId = req.body.studentId;
+    const newName = req.body.name;
+    const newDept = req.body.department;
+    const newSess = req.body.session;
+    const newBatch = req.body.batch;
+    const newLevel = req.body.currentLevel !== undefined ? Number(req.body.currentLevel) : (req.body.level !== undefined ? Number(req.body.level) : undefined);
+    const newTerm = req.body.currentTerm !== undefined ? Number(req.body.currentTerm) : (req.body.term !== undefined ? Number(req.body.term) : undefined);
+    const newPhone = req.body.phone || req.body.mobile;
+
+    // 1. User collection sync
+    const userMatch = [
+      studentOldEmail ? { email: studentOldEmail } : null,
+      studentOldId ? { studentId: studentOldId } : null,
+      oldStudent?.user ? { _id: oldStudent.user } : null,
+    ].filter(Boolean);
+
+    if (userMatch.length > 0) {
+      const userSet = {};
+      if (newName) userSet.name = newName;
+      if (newStudentId) userSet.studentId = newStudentId;
+      if (newEmail) userSet.email = newEmail;
+      if (newDept) userSet.department = newDept;
+      if (newSess) userSet.session = newSess;
+      if (newBatch) userSet.batch = newBatch;
+      if (newLevel !== undefined && !isNaN(newLevel)) userSet.currentLevel = newLevel;
+      if (newTerm !== undefined && !isNaN(newTerm)) userSet.currentTerm = newTerm;
+      if (newPhone) userSet.mobile = newPhone;
+
+      if (Object.keys(userSet).length > 0) {
+        await User.updateMany({ $or: userMatch }, { $set: userSet });
+      }
+    }
+
+    // 2. AcademicProfile sync
+    const apMatch = [
+      studentOldId ? { studentId: studentOldId } : null,
+      studentOldEmail ? { email: studentOldEmail } : null,
+    ].filter(Boolean);
+
+    if (apMatch.length > 0) {
+      const apSet = {};
+      if (newName) apSet.studentName = newName;
+      if (newStudentId) apSet.studentId = newStudentId;
+      if (newDept) apSet.department = newDept;
+      if (newSess) apSet.session = newSess;
+      if (newBatch) apSet.batch = newBatch;
+      if (newLevel !== undefined && !isNaN(newLevel)) apSet.currentLevel = newLevel;
+      if (newTerm !== undefined && !isNaN(newTerm)) apSet.currentTerm = newTerm;
+
+      if (Object.keys(apSet).length > 0) {
+        await AcademicProfile.updateMany({ $or: apMatch }, { $set: apSet });
+      }
+    }
+
+    // 3. Registration collection sync
+    const regMatch = [
+      studentOldId ? { studentId: studentOldId } : null,
+      studentOldEmail ? { studentEmail: studentOldEmail } : null,
+    ].filter(Boolean);
+
+    if (regMatch.length > 0) {
+      const regSet = {};
+      if (newName) regSet.studentName = newName;
+      if (newStudentId) regSet.studentId = newStudentId;
+      if (newEmail) regSet.studentEmail = newEmail;
+      if (newDept) regSet.department = newDept;
+      if (newSess) regSet.session = newSess;
+
+      if (Object.keys(regSet).length > 0) {
+        await Registration.updateMany({ $or: regMatch }, { $set: regSet });
+      }
+    }
+
+    // 4. Assessment collection sync
+    if (studentOldId && newStudentId) {
+      await Assessment.updateMany(
+        { studentIdNumber: studentOldId },
+        { $set: { studentIdNumber: newStudentId } }
+      );
+    }
+
+    // 5. Result collection sync
+    const resMatch = [
+      studentOldId ? { studentId: studentOldId } : null,
+      studentOldEmail ? { studentEmail: studentOldEmail } : null,
+    ].filter(Boolean);
+
+    if (resMatch.length > 0) {
+      const resSet = {};
+      if (newName) resSet.studentName = newName;
+      if (newStudentId) resSet.studentId = newStudentId;
+      if (newEmail) resSet.studentEmail = newEmail;
+
+      if (Object.keys(resSet).length > 0) {
+        await Result.updateMany({ $or: resMatch }, { $set: resSet });
+      }
+    }
+
+    // 6. CGPARecord collection sync
+    if (studentOldId) {
+      const cgpaSet = {};
+      if (newName) cgpaSet.studentName = newName;
+      if (newStudentId) cgpaSet.studentId = newStudentId;
+      if (newDept) cgpaSet.department = newDept;
+      if (newSess) cgpaSet.session = newSess;
+
+      if (Object.keys(cgpaSet).length > 0) {
+        await CGPARecord.updateMany({ studentId: studentOldId }, { $set: cgpaSet });
+      }
+    }
+
+    res.json({ ...updated, _id: rawId });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -694,7 +942,17 @@ exports.updateStudent = async (req, res) => {
 
 exports.deleteStudent = async (req, res) => {
   try {
-    await Student.findByIdAndDelete(req.params.id);
+    const mongoose = require("mongoose");
+    const rawId = String(req.params.id || "").trim();
+
+    if (mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId) {
+      await Student.findByIdAndDelete(rawId);
+    } else {
+      await Student.deleteMany({
+        $or: [{ studentId: rawId }, { universityEmail: rawId.toLowerCase() }]
+      });
+    }
+
     res.json({ message: "Student record deleted successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -703,11 +961,70 @@ exports.deleteStudent = async (req, res) => {
 
 exports.updateTeacher = async (req, res) => {
   try {
-    const updated = await Teacher.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (updated) {
-      await syncTeacherCourseAssignments(updated);
+    const mongoose = require("mongoose");
+    const TeacherImportBatch = require("../models/TeacherImportBatch");
+
+    const rawId = String(req.params.id || "").trim();
+    let teacherDoc = null;
+
+    // 1. Check if rawId is a valid Mongo ObjectId
+    const isMongoId = mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId;
+    if (isMongoId) {
+      teacherDoc = await Teacher.findById(rawId);
     }
-    res.json(updated);
+
+    // 2. If not found by _id, match by email or teacherId in req.body or rawId
+    const emailToMatch = (req.body.email || (rawId.includes("@") ? rawId : "")).toLowerCase().trim();
+    const teacherIdToMatch = req.body.teacherId || "";
+
+    if (!teacherDoc && (emailToMatch || teacherIdToMatch)) {
+      teacherDoc = await Teacher.findOne({
+        $or: [
+          emailToMatch ? { email: emailToMatch } : null,
+          teacherIdToMatch ? { teacherId: teacherIdToMatch } : null,
+        ].filter(Boolean),
+      });
+    }
+
+    // 3. Check if rawId is in batch format: batch_<batchDocId>_<idx>
+    let batchDocId = null;
+    let batchIdx = -1;
+    if (rawId.startsWith("batch_")) {
+      const parts = rawId.split("_");
+      if (parts.length >= 3) {
+        batchDocId = parts[1];
+        batchIdx = parseInt(parts[2], 10);
+      }
+    }
+
+    // 4. Perform update on Teacher model doc (or create if editing a historical batch entry not in Teacher collection)
+    let updatedDoc;
+    if (teacherDoc) {
+      updatedDoc = await Teacher.findByIdAndUpdate(teacherDoc._id, req.body, { new: true }).lean();
+    } else {
+      // Upsert into Teacher collection
+      const created = await Teacher.create(req.body);
+      updatedDoc = created.toObject();
+    }
+
+    // 5. Also sync changes to TeacherImportBatch if it came from an Excel batch upload
+    if (batchDocId && mongoose.Types.ObjectId.isValid(batchDocId) && batchIdx >= 0) {
+      const batchDoc = await TeacherImportBatch.findById(batchDocId);
+      if (batchDoc && Array.isArray(batchDoc.records) && batchDoc.records[batchIdx]) {
+        batchDoc.records[batchIdx] = {
+          ...batchDoc.records[batchIdx],
+          ...req.body,
+        };
+        batchDoc.markModified("records");
+        await batchDoc.save();
+      }
+    }
+
+    if (updatedDoc) {
+      await syncTeacherCourseAssignments(updatedDoc);
+    }
+
+    res.json({ ...updatedDoc, _id: rawId });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -715,7 +1032,50 @@ exports.updateTeacher = async (req, res) => {
 
 exports.deleteTeacher = async (req, res) => {
   try {
-    await Teacher.findByIdAndDelete(req.params.id);
+    const mongoose = require("mongoose");
+    const TeacherImportBatch = require("../models/TeacherImportBatch");
+
+    const rawId = String(req.params.id || "").trim();
+
+    // 1. Delete by Mongo ObjectId if valid
+    if (mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId) {
+      const teacher = await Teacher.findById(rawId);
+      if (teacher) {
+        await Teacher.findByIdAndDelete(rawId);
+        await TeacherImportBatch.updateMany(
+          {},
+          { $pull: { records: { $or: [{ email: teacher.email }, { teacherId: teacher.teacherId }] } } }
+        );
+      }
+    }
+
+    // 2. Handle batch ID format: batch_<batchDocId>_<idx>
+    if (rawId.startsWith("batch_")) {
+      const parts = rawId.split("_");
+      if (parts.length >= 3) {
+        const batchDocId = parts[1];
+        const batchIdx = parseInt(parts[2], 10);
+        if (mongoose.Types.ObjectId.isValid(batchDocId) && batchIdx >= 0) {
+          const batchDoc = await TeacherImportBatch.findById(batchDocId);
+          if (batchDoc && Array.isArray(batchDoc.records) && batchDoc.records[batchIdx]) {
+            const targetRecord = batchDoc.records[batchIdx];
+            batchDoc.records.splice(batchIdx, 1);
+            batchDoc.markModified("records");
+            await batchDoc.save();
+
+            if (targetRecord.email || targetRecord.teacherId) {
+              await Teacher.deleteMany({
+                $or: [
+                  targetRecord.email ? { email: targetRecord.email.toLowerCase().trim() } : null,
+                  targetRecord.teacherId ? { teacherId: targetRecord.teacherId } : null,
+                ].filter(Boolean),
+              });
+            }
+          }
+        }
+      }
+    }
+
     res.json({ message: "Teacher record deleted successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -724,8 +1084,17 @@ exports.deleteTeacher = async (req, res) => {
 
 exports.updateCourse = async (req, res) => {
   try {
-    const updated = await CourseImport.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
+    const mongoose = require("mongoose");
+    const rawId = String(req.params.id || "").trim();
+    let updated;
+
+    if (mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId) {
+      updated = await CourseImport.findByIdAndUpdate(rawId, req.body, { new: true }).lean();
+    }
+    if (!updated && req.body.courseCode) {
+      updated = await CourseImport.findOneAndUpdate({ courseCode: req.body.courseCode }, req.body, { new: true, upsert: true }).lean();
+    }
+    res.json(updated ? { ...updated, _id: rawId } : req.body);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -733,7 +1102,14 @@ exports.updateCourse = async (req, res) => {
 
 exports.deleteCourse = async (req, res) => {
   try {
-    await CourseImport.findByIdAndDelete(req.params.id);
+    const mongoose = require("mongoose");
+    const rawId = String(req.params.id || "").trim();
+
+    if (mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId) {
+      await CourseImport.findByIdAndDelete(rawId);
+    } else {
+      await CourseImport.deleteMany({ courseCode: rawId });
+    }
     res.json({ message: "Course record deleted successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -742,8 +1118,20 @@ exports.deleteCourse = async (req, res) => {
 
 exports.updateAdviser = async (req, res) => {
   try {
-    const updated = await Adviser.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
+    const mongoose = require("mongoose");
+    const rawId = String(req.params.id || "").trim();
+    let updated;
+
+    if (mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId) {
+      updated = await Adviser.findByIdAndUpdate(rawId, req.body, { new: true }).lean();
+    }
+    if (!updated && (req.body.teacherEmail || req.body.teacherId)) {
+      const match = [];
+      if (req.body.teacherEmail) match.push({ teacherEmail: req.body.teacherEmail.toLowerCase().trim() });
+      if (req.body.teacherId) match.push({ teacherId: req.body.teacherId });
+      updated = await Adviser.findOneAndUpdate({ $or: match }, req.body, { new: true, upsert: true }).lean();
+    }
+    res.json(updated ? { ...updated, _id: rawId } : req.body);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -751,7 +1139,16 @@ exports.updateAdviser = async (req, res) => {
 
 exports.deleteAdviser = async (req, res) => {
   try {
-    await Adviser.findByIdAndDelete(req.params.id);
+    const mongoose = require("mongoose");
+    const rawId = String(req.params.id || "").trim();
+
+    if (mongoose.Types.ObjectId.isValid(rawId) && String(new mongoose.Types.ObjectId(rawId)) === rawId) {
+      await Adviser.findByIdAndDelete(rawId);
+    } else {
+      await Adviser.deleteMany({
+        $or: [{ teacherEmail: rawId.toLowerCase() }, { teacherId: rawId }]
+      });
+    }
     res.json({ message: "Adviser assignment record deleted successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });

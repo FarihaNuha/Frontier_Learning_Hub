@@ -30,6 +30,18 @@ const assessmentSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  courseTitle: {
+    type: String,
+    default: "",
+  },
+  courseType: {
+    type: String,
+    default: "",
+  },
+  creditHour: {
+    type: Number,
+    default: null,
+  },
   attendance: {
     type: Number,
     default: 0,

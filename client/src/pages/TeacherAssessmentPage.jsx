@@ -24,6 +24,9 @@ import {
   FiX,
   FiClock,
   FiCheck,
+  FiLock,
+  FiUnlock,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -41,8 +44,9 @@ export default function TeacherAssessmentPage() {
   const [selectedCourseGroup, setSelectedCourseGroup] = useState(null);
   const [showRules, setShowRules] = useState(false);
   
-  // Upload results summary state
+  // Upload results summary and error states
   const [summary, setSummary] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   // Correction Requests state
   const [teacherRequests, setTeacherRequests] = useState([]);
@@ -50,6 +54,22 @@ export default function TeacherAssessmentPage() {
   const [replyTextMap, setReplyTextMap] = useState({});
   const [submittingReplyId, setSubmittingReplyId] = useState(null);
   const [timerValues, setTimerValues] = useState({});
+
+  const [currentCourseInfo, setCurrentCourseInfo] = useState(null);
+
+  useEffect(() => {
+    if (courseId) {
+      api.get(`/courses/${courseId}`)
+        .then((res) => {
+          if (res.data?.course) {
+            setCurrentCourseInfo(res.data.course);
+          }
+        })
+        .catch(() => {});
+    } else {
+      setCurrentCourseInfo(null);
+    }
+  }, [courseId]);
 
   const handleSetAssessmentDeadline = async (group, deadlineVal = null, isCloseNow = false) => {
     try {
@@ -247,6 +267,7 @@ export default function TeacherAssessmentPage() {
 
     setUploading(true);
     setSummary(null);
+    setUploadError(null);
     try {
       const res = await api.post("/assessments/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -267,26 +288,37 @@ export default function TeacherAssessmentPage() {
       fetchAssessments();
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.error || "Failed to process marksheet");
+      const errDetail = error.response?.data?.error || "Failed to process marksheet";
+      setUploadError(errDetail);
+      toast.error(errDetail.split("\n")[0] || "Failed to process marksheet");
     } finally {
       setUploading(false);
     }
   };
 
-  // Group assessments by courseCode + level + term + department
+  // Group assessments by courseCode + level + term + department + session + courseTitle + courseType + creditHour
   const courseGroups = assessments.reduce((acc, item) => {
     const code = item.courseCode || "UNKNOWN";
+    const title = item.courseTitle || "";
     const lvl = item.level || "";
     const trm = item.term || "";
     const dept = item.department || "";
-    const key = `${code}|||${lvl}|||${trm}|||${dept}`;
+    const sess = item.session || "";
+    const cred = item.creditHour !== undefined && item.creditHour !== null ? item.creditHour : "";
+    const type = item.courseType || "";
+
+    const key = `${code}|||${title}|||${lvl}|||${trm}|||${dept}|||${sess}|||${cred}|||${type}`;
     if (!acc[key]) {
       acc[key] = {
         key,
         courseCode: code,
+        courseTitle: title,
         level: lvl,
         term: trm,
         department: dept,
+        session: sess,
+        creditHour: cred,
+        courseType: type,
         items: []
       };
     }
@@ -297,6 +329,19 @@ export default function TeacherAssessmentPage() {
   const uniqueCourseGroups = Object.values(courseGroups);
 
   const filteredUniqueCourseGroups = uniqueCourseGroups.filter((group) => {
+    // 1. If inside a specific course context, isolate strictly by courseCode & session!
+    if (currentCourseInfo) {
+      const cClean = (currentCourseInfo.displayCode || currentCourseInfo.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const gClean = (group.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const codeMatch = cClean === gClean || gClean.includes(cClean);
+
+      const cSess = (currentCourseInfo.session || "").trim().toLowerCase();
+      const gSess = (getCleanSession(group) || "").trim().toLowerCase();
+      const sessMatch = !cSess || !gSess || cSess.includes(gSess) || gSess.includes(cSess);
+
+      if (!codeMatch || !sessMatch) return false;
+    }
+
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase().trim();
     const matchesCode = group.courseCode.toLowerCase().includes(q);
@@ -312,9 +357,16 @@ export default function TeacherAssessmentPage() {
     return matchesCode || matchesLevel || matchesTerm || matchesDept || matchesStudent;
   });
 
-  // Hierarchical Grouping: Department -> Level & Term -> Marksheet Cards
-  const deptLevelTermGroups = filteredUniqueCourseGroups.reduce((acc, group) => {
+  // Hierarchical Grouping: Session -> Department -> Level & Term -> Marksheet Cards
+  const sessionGroupsMap = filteredUniqueCourseGroups.reduce((acc, group) => {
+    const sess = getCleanSession(group) || "GENERAL SESSION";
+    if (!acc[sess]) {
+      acc[sess] = {};
+    }
     const dept = group.department ? group.department.toUpperCase() : "GENERAL / OTHER DEPT";
+    if (!acc[sess][dept]) {
+      acc[sess][dept] = {};
+    }
     let levelTerm = "";
     if (group.level || group.term) {
       const cleanLvl = group.level ? group.level.replace(/^level\s*:?\s*/i, "").trim() : "";
@@ -325,13 +377,10 @@ export default function TeacherAssessmentPage() {
     } else {
       levelTerm = "GENERAL LEVEL & TERM";
     }
-    if (!acc[dept]) {
-      acc[dept] = {};
+    if (!acc[sess][dept][levelTerm]) {
+      acc[sess][dept][levelTerm] = [];
     }
-    if (!acc[dept][levelTerm]) {
-      acc[dept][levelTerm] = [];
-    }
-    acc[dept][levelTerm].push(group);
+    acc[sess][dept][levelTerm].push(group);
     return acc;
   }, {});
 
@@ -399,6 +448,50 @@ export default function TeacherAssessmentPage() {
               <span>Download Template</span>
             </button>
           </div>
+
+          {/* MULTILINE PARAMETER MISMATCH UPLOAD WARNING BANNER */}
+          {uploadError && (
+            <div
+              style={{
+                background: "#fff1f2",
+                border: "2px solid #fecdd3",
+                borderRadius: "14px",
+                padding: "20px 24px",
+                marginBottom: "24px",
+                boxShadow: "0 6px 16px rgba(225, 29, 72, 0.12)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: 700, fontSize: "16px", color: "#be123c" }}>
+                  <FiAlertTriangle size={22} color="#be123c" />
+                  <span>Upload Blocked — Parameter Mismatch Warning</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setUploadError(null)}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "#be123c", fontWeight: 700, fontSize: "18px" }}
+                  title="Dismiss warning"
+                >
+                  ✕
+                </button>
+              </div>
+              <div
+                style={{
+                  fontFamily: "monospace",
+                  fontSize: "13px",
+                  background: "#ffffff",
+                  padding: "16px 20px",
+                  borderRadius: "10px",
+                  border: "1px solid #ffe4e6",
+                  color: "#881337",
+                  whiteSpace: "pre-wrap",
+                  lineHeight: "1.65"
+                }}
+              >
+                {uploadError}
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div className="file-upload-area" style={{ width: "100%" }}>
@@ -561,236 +654,298 @@ export default function TeacherAssessmentPage() {
                   <p>No course, level, term, department, or student matches "{searchQuery}"</p>
                 </div>
               ) : (
-                <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "28px" }}>
-                  {Object.entries(deptLevelTermGroups).map(([deptName, levelTermsMap]) => (
-                    <div key={deptName} style={{ background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-                      {/* Department Section Header */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "12px", borderBottom: "2px solid #3B8DB3", marginBottom: "20px" }}>
-                        <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "6px 14px", borderRadius: "8px", fontWeight: 700, fontSize: "14px", display: "inline-flex", alignItems: "center", gap: "6px", letterSpacing: "0.3px" }}>
-                          🏛️ Dept: {deptName}
-                        </span>
-                      </div>
+                <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "32px" }}>
+                  {Object.entries(sessionGroupsMap)
+                    .sort(([sessA], [sessB]) => sessB.localeCompare(sessA, undefined, { numeric: true }))
+                    .map(([sessionName, deptMap]) => {
+                      const totalCardsInSession = Object.values(deptMap).reduce(
+                        (accDept, ltMap) => accDept + Object.values(ltMap).reduce((accLt, list) => accLt + list.length, 0),
+                        0
+                      );
 
-                      {/* Level & Term under this Department */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                        {Object.entries(levelTermsMap)
-                          .sort(([ltA], [ltB]) => ltA.localeCompare(ltB, undefined, { numeric: true }))
-                          .map(([levelTermName, groupsList]) => (
-                          <div key={levelTermName}>
-                            {/* Level & Term Sub-header */}
-                            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", flexWrap: "wrap" }}>
-                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0369a1", background: "#e0f2fe", padding: "4px 12px", borderRadius: "6px", border: "1px solid #bae6fd" }}>
-                                📅 Session: {getCleanSession(groupsList[0])}
-                              </span>
-                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569", background: "#f1f5f9", padding: "4px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                                🎓 {levelTermName}
-                              </span>
-                              <span style={{ fontSize: "12px", color: "#64748b" }}>
-                                ({groupsList.length} {groupsList.length === 1 ? "Marksheet" : "Marksheets"})
-                              </span>
+                      return (
+                        <div
+                          key={sessionName}
+                          style={{
+                            background: "#ffffff",
+                            borderRadius: "16px",
+                            border: "1px solid #cbd5e1",
+                            padding: "24px",
+                            boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
+                          }}
+                        >
+                          {/* Session Banner Header */}
+                          <div
+                            style={{
+                              background: "linear-gradient(135deg, #0284c7, #0369a1)",
+                              color: "#ffffff",
+                              padding: "16px 24px",
+                              borderRadius: "12px",
+                              marginBottom: "24px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              boxShadow: "0 4px 14px rgba(2,132,199,0.2)",
+                              flexWrap: "wrap",
+                              gap: "12px",
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                              <div style={{ background: "rgba(255,255,255,0.2)", padding: "8px", borderRadius: "10px", display: "flex" }}>
+                                <FiCalendar size={22} color="#ffffff" />
+                              </div>
+                              <div>
+                                <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "#ffffff", letterSpacing: "0.4px" }}>
+                                  Session: {sessionName}
+                                </h2>
+                                <p style={{ margin: "2px 0 0 0", fontSize: "13px", color: "#e0f2fe", opacity: 0.9 }}>
+                                  Assessment marksheets for academic session {sessionName}
+                                </p>
+                              </div>
                             </div>
-
-                            {/* Marksheet Cards Grid */}
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
-                              {groupsList.map((group) => {
-                                const studentCount = group.items.length;
-                                return (
-                                  <div
-                                    key={group.key}
-                                    onClick={() => setSelectedCourseGroup(group)}
-                                    className="assessment-course-card"
-                                    style={{
-                                      position: "relative",
-                                      cursor: "pointer",
-                                      background: "#ffffff",
-                                      borderRadius: "12px",
-                                      padding: "20px",
-                                      border: "1px solid #e2e8f0",
-                                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                                      transition: "all 0.2s ease"
-                                    }}
-                                  >
-                                    {/* Card Accent Line */}
-                                    <div style={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
-                                      width: "6px",
-                                      height: "100%",
-                                      background: "#3B8DB3",
-                                      borderRadius: "12px 0 0 12px"
-                                    }} />
-
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
-                                      <span style={{
-                                        background: "#E8F4FD",
-                                        color: "#3B8DB3",
-                                        padding: "6px 12px",
-                                        borderRadius: "20px",
-                                        fontSize: "13px",
-                                        fontWeight: 700,
-                                        letterSpacing: "0.5px"
-                                      }}>
-                                        {getCleanCourseCode(group.courseCode)}
-                                      </span>
-                                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setViewRequestsModalGroup(group);
-                                          }}
-                                          style={{
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            gap: "5px",
-                                            padding: "4px 10px",
-                                            borderRadius: "16px",
-                                            background: "#e0f2fe",
-                                            color: "#0369a1",
-                                            border: "1px solid #bae6fd",
-                                            fontSize: "12px",
-                                            fontWeight: 600,
-                                            cursor: "pointer"
-                                          }}
-                                          title="View Student Correction Requests"
-                                        >
-                                          <FiMessageSquare size={13} />
-                                          <span>
-                                            Correction Requests (
-                                            {
-                                              teacherRequests.filter((r) =>
-                                                r.courseCode &&
-                                                r.courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() ===
-                                                getCleanCourseCode(group.courseCode).replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
-                                              ).length
-                                            }
-                                            )
-                                          </span>
-                                        </button>
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setDeleteTarget({ type: "course", value: group });
-                                          }}
-                                          style={{
-                                            background: "none",
-                                            border: "none",
-                                            cursor: "pointer",
-                                            color: "#ef4444",
-                                            padding: "4px",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            borderRadius: "4px",
-                                            transition: "background 0.2s"
-                                          }}
-                                          title="Delete Marksheet"
-                                        >
-                                          <FiTrash2 size={18} />
-                                        </button>
-                                        <FiBookOpen size={24} color="#3B8DB3" />
-                                      </div>
-                                    </div>
-
-                                    <h3 style={{ fontSize: "15px", color: "#2c4b66", margin: "0 0 8px 0", fontWeight: 600, lineHeight: 1.4 }}>
-                                      {getCleanCourseTitle(group.courseCode) || "Assessment Marksheet"}
-                                    </h3>
-
-                                    <p style={{ color: "#6b89a0", fontSize: "14px", margin: 0 }}>
-                                      Students Uploaded: <strong style={{ color: "#2c4b66" }}>{studentCount}</strong>
-                                    </p>
-
-                                    {/* Assessment Correction Window Deadline Box */}
-                                    {(() => {
-                                      const firstItem = group.items[0] || {};
-                                      const isClosed = Boolean(firstItem.isCorrectionClosed || (firstItem.correctionWindowEnd && new Date() > new Date(firstItem.correctionWindowEnd)));
-                                      const hasDeadline = Boolean(firstItem.correctionWindowEnd);
-                                      const formattedVal = timerValues[group.key] ?? (firstItem.correctionWindowEnd ? new Date(firstItem.correctionWindowEnd).toISOString().slice(0, 16) : "");
-
-                                      return (
-                                        <div
-                                          onClick={(e) => e.stopPropagation()}
-                                          style={{
-                                            marginTop: "12px",
-                                            padding: "10px 12px",
-                                            borderRadius: "10px",
-                                            background: isClosed ? "#fff1f2" : hasDeadline ? "#f0fdf4" : "#f8fafc",
-                                            border: `1px solid ${isClosed ? "#fecdd3" : hasDeadline ? "#bbf7d0" : "#cbd5e1"}`,
-                                            fontSize: "12px"
-                                          }}
-                                        >
-                                          <div style={{ fontWeight: 700, marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", color: isClosed ? "#be123c" : hasDeadline ? "#15803d" : "#475569" }}>
-                                            <FiClock size={14} />
-                                            {isClosed
-                                              ? `🔒 Marksheet Correction Locked (${firstItem.correctionWindowEnd ? new Date(firstItem.correctionWindowEnd).toLocaleString([], { dateStyle: "short", timeStyle: "short" }) : "Closed"})`
-                                              : hasDeadline
-                                              ? `🔓 Open for Student Correction until: ${new Date(firstItem.correctionWindowEnd).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}`
-                                              : "⏱️ No Correction Deadline Set"}
-                                          </div>
-
-                                          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center", marginTop: "6px" }}>
-                                            <input
-                                              type="datetime-local"
-                                              value={formattedVal}
-                                              onChange={(e) => setTimerValues({ ...timerValues, [group.key]: e.target.value })}
-                                              style={{ padding: "3px 6px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", outline: "none" }}
-                                            />
-                                            <button
-                                              onClick={() => handleSetAssessmentDeadline(group, timerValues[group.key])}
-                                              style={{ padding: "3px 8px", background: "#0284c7", color: "#fff", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}
-                                            >
-                                              Save
-                                            </button>
-                                            <button
-                                              onClick={() => {
-                                                const d = new Date(Date.now() + 48 * 3600 * 1000).toISOString().slice(0, 16);
-                                                handleSetAssessmentDeadline(group, d);
-                                              }}
-                                              style={{ padding: "3px 6px", background: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "10.5px" }}
-                                            >
-                                              +48h
-                                            </button>
-                                            <button
-                                              onClick={() => {
-                                                const d = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 16);
-                                                handleSetAssessmentDeadline(group, d);
-                                              }}
-                                              style={{ padding: "3px 6px", background: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "10.5px" }}
-                                            >
-                                              +7d
-                                            </button>
-                                            <button
-                                              onClick={() => handleSetAssessmentDeadline(group, null, true)}
-                                              style={{ padding: "3px 6px", background: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "10.5px" }}
-                                            >
-                                              🔒 Lock
-                                            </button>
-                                          </div>
-                                        </div>
-                                      );
-                                    })()}
-
-                                    <div style={{
-                                      marginTop: "16px",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "6px",
-                                      color: "#3B8DB3",
-                                      fontSize: "13px",
-                                      fontWeight: 600
-                                    }}>
-                                      <span>View Student Marks</span>
-                                      <span>→</span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                            <span
+                              style={{
+                                background: "rgba(255,255,255,0.25)",
+                                color: "#ffffff",
+                                padding: "6px 16px",
+                                borderRadius: "20px",
+                                fontSize: "13px",
+                                fontWeight: 700,
+                                backdropFilter: "blur(4px)",
+                              }}
+                            >
+                              {totalCardsInSession} {totalCardsInSession === 1 ? "Marksheet Section" : "Marksheet Sections"}
+                            </span>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+
+                          {/* Departments & Level-Terms under this Session */}
+                          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                            {Object.entries(deptMap).map(([deptName, levelTermsMap]) => (
+                              <div key={deptName} style={{ background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "20px" }}>
+                                {/* Department Header */}
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "12px", borderBottom: "2px solid #3b8db3", marginBottom: "20px" }}>
+                                  <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "6px 14px", borderRadius: "8px", fontWeight: 700, fontSize: "14px" }}>
+                                    🏛️ Dept: {deptName}
+                                  </span>
+                                </div>
+
+                                {/* Level & Term list */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                                  {Object.entries(levelTermsMap)
+                                    .sort(([ltA], [ltB]) => ltA.localeCompare(ltB, undefined, { numeric: true }))
+                                    .map(([levelTermName, groupsList]) => (
+                                      <div key={levelTermName}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", flexWrap: "wrap" }}>
+                                          <span style={{ fontSize: "12.5px", fontWeight: 700, color: "#475569", background: "#ffffff", padding: "4px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                                            🎓 {levelTermName}
+                                          </span>
+                                          <span style={{ fontSize: "12px", color: "#64748b" }}>
+                                            ({groupsList.length} {groupsList.length === 1 ? "Marksheet" : "Marksheets"})
+                                          </span>
+                                        </div>
+
+                                        {/* Cards Grid */}
+                                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(440px, 1fr))", gap: "24px" }}>
+                                          {groupsList.map((group) => {
+                                            const studentCount = group.items.length;
+                                            return (
+                                              <div
+                                                key={group.key}
+                                                onClick={() => setSelectedCourseGroup(group)}
+                                                className="assessment-course-card"
+                                                style={{
+                                                  position: "relative",
+                                                  cursor: "pointer",
+                                                  background: "#ffffff",
+                                                  borderRadius: "16px",
+                                                  padding: "24px",
+                                                  border: "1px solid #e2e8f0",
+                                                  boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+                                                  transition: "all 0.2s ease"
+                                                }}
+                                              >
+                                                {/* Card Accent Line */}
+                                                <div style={{
+                                                  position: "absolute",
+                                                  top: 0,
+                                                  left: 0,
+                                                  width: "6px",
+                                                  height: "100%",
+                                                  background: "#3B8DB3",
+                                                  borderRadius: "16px 0 0 16px"
+                                                }} />
+
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+                                                  <span style={{
+                                                    background: "#E8F4FD",
+                                                    color: "#3B8DB3",
+                                                    padding: "6px 14px",
+                                                    borderRadius: "20px",
+                                                    fontSize: "14px",
+                                                    fontWeight: 700,
+                                                    letterSpacing: "0.5px"
+                                                  }}>
+                                                    {getCleanCourseCode(group.courseCode)}
+                                                  </span>
+                                                  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                                                    <button
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setViewRequestsModalGroup(group);
+                                                      }}
+                                                      style={{
+                                                        display: "inline-flex",
+                                                        alignItems: "center",
+                                                        gap: "6px",
+                                                        padding: "6px 12px",
+                                                        borderRadius: "16px",
+                                                        background: "#e0f2fe",
+                                                        color: "#0369a1",
+                                                        border: "1px solid #bae6fd",
+                                                        fontSize: "12.5px",
+                                                        fontWeight: 600,
+                                                        cursor: "pointer"
+                                                      }}
+                                                      title="View Student Correction Requests"
+                                                    >
+                                                      <FiMessageSquare size={14} />
+                                                      <span>
+                                                        Correction Requests (
+                                                        {
+                                                          teacherRequests.filter((r) =>
+                                                            r.courseCode &&
+                                                            r.courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() ===
+                                                            getCleanCourseCode(group.courseCode).replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
+                                                          ).length
+                                                        }
+                                                        )
+                                                      </span>
+                                                    </button>
+                                                    <button
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setDeleteTarget({ type: "course", value: group });
+                                                      }}
+                                                      style={{
+                                                        background: "#fef2f2",
+                                                        border: "1px solid #fecdd3",
+                                                        cursor: "pointer",
+                                                        color: "#ef4444",
+                                                        padding: "6px 8px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        borderRadius: "8px",
+                                                        transition: "background 0.2s"
+                                                      }}
+                                                      title="Delete Marksheet"
+                                                    >
+                                                      <FiTrash2 size={16} />
+                                                    </button>
+                                                    <FiBookOpen size={24} color="#3B8DB3" />
+                                                  </div>
+                                                </div>
+
+                                                <h3 style={{ fontSize: "16px", color: "#0f172a", margin: "0 0 6px 0", fontWeight: 700, lineHeight: 1.4 }}>
+                                                  {getCleanCourseTitle(group.courseCode) || "Assessment Marksheet"}
+                                                </h3>
+
+                                                <p style={{ color: "#64748b", fontSize: "14px", margin: 0 }}>
+                                                  Students Uploaded: <strong style={{ color: "#0f172a" }}>{studentCount}</strong>
+                                                </p>
+
+                                                {/* Assessment Correction Window Deadline Box */}
+                                                {(() => {
+                                                  const firstItem = group.items[0] || {};
+                                                  const isClosed = Boolean(firstItem.isCorrectionClosed || (firstItem.correctionWindowEnd && new Date() > new Date(firstItem.correctionWindowEnd)));
+                                                  const hasDeadline = Boolean(firstItem.correctionWindowEnd);
+                                                  const formattedVal = timerValues[group.key] ?? (firstItem.correctionWindowEnd ? new Date(firstItem.correctionWindowEnd).toISOString().slice(0, 16) : "");
+
+                                                  return (
+                                                    <div
+                                                      onClick={(e) => e.stopPropagation()}
+                                                      style={{
+                                                        marginTop: "16px",
+                                                        padding: "14px 16px",
+                                                        borderRadius: "12px",
+                                                        background: isClosed ? "#fff1f2" : hasDeadline ? "#f0fdf4" : "#f8fafc",
+                                                        border: `1px solid ${isClosed ? "#fecdd3" : hasDeadline ? "#bbf7d0" : "#cbd5e1"}`,
+                                                        fontSize: "12.5px"
+                                                      }}
+                                                    >
+                                                      <div style={{ fontWeight: 700, marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px", color: isClosed ? "#be123c" : hasDeadline ? "#15803d" : "#475569" }}>
+                                                        <FiClock size={15} />
+                                                        {isClosed
+                                                          ? `Marksheet Correction Locked (${firstItem.correctionWindowEnd ? new Date(firstItem.correctionWindowEnd).toLocaleString([], { dateStyle: "short", timeStyle: "short" }) : "Closed"})`
+                                                          : hasDeadline
+                                                          ? `Open for Student Correction until: ${new Date(firstItem.correctionWindowEnd).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}`
+                                                          : "No Correction Deadline Set"}
+                                                      </div>
+
+                                                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center", marginTop: "8px" }}>
+                                                        <input
+                                                          type="datetime-local"
+                                                          value={formattedVal}
+                                                          onChange={(e) => setTimerValues({ ...timerValues, [group.key]: e.target.value })}
+                                                          style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px", outline: "none" }}
+                                                        />
+                                                        <button
+                                                          onClick={() => handleSetAssessmentDeadline(group, timerValues[group.key])}
+                                                          style={{ padding: "6px 14px", background: "#0284c7", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "12.5px" }}
+                                                        >
+                                                          Save
+                                                        </button>
+                                                        <button
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleSetAssessmentDeadline(group, timerValues[group.key] || null, !isClosed);
+                                                          }}
+                                                          style={{
+                                                            display: "inline-flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            padding: "6px 12px",
+                                                            background: isClosed ? "#fee2e2" : "#f1f5f9",
+                                                            color: isClosed ? "#be123c" : "#475569",
+                                                            border: `1px solid ${isClosed ? "#fca5a5" : "#cbd5e1"}`,
+                                                            borderRadius: "8px",
+                                                            cursor: "pointer",
+                                                            transition: "all 0.2s ease"
+                                                          }}
+                                                          title={isClosed ? "Click to Unlock Marksheet Correction" : "Click to Lock Marksheet Correction"}
+                                                        >
+                                                          {isClosed ? <FiLock size={16} color="#be123c" /> : <FiUnlock size={16} color="#475569" />}
+                                                        </button>
+                                                      </div>
+                                                    </div>
+                                                  );
+                                                })()}
+
+                                                <div style={{
+                                                  marginTop: "16px",
+                                                  display: "flex",
+                                                  alignItems: "center",
+                                                  gap: "6px",
+                                                  color: "#3B8DB3",
+                                                  fontSize: "13px",
+                                                  fontWeight: 600
+                                                }}>
+                                                  <span>View Student Marks</span>
+                                                  <span>→</span>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               )}
             </div>

@@ -109,12 +109,11 @@ export default function StudentAcademicProfilePage() {
                     </span>
                   </div>
                   <div style={{ fontSize: "14px", color: "#94a3b8", marginTop: "4px" }}>
-                    Department of <strong>{profile.department}</strong> • {profile.program}
+                    Department of <strong>{profile.department || "EDTE"}</strong> {profile.program ? `• ${profile.program}` : ""}
                   </div>
-                  <div style={{ display: "flex", gap: "16px", marginTop: "12px", fontSize: "13px", color: "#cbd5e1", flexWrap: "wrap" }}>
-                    <span>Session: <strong style={{ color: "#ffffff" }}>{profile.session}</strong></span>
-                    <span>Batch: <strong style={{ color: "#ffffff" }}>{profile.batch}</strong></span>
-                    <span>Hall: <strong style={{ color: "#ffffff" }}>{profile.hallName || "N/A"}</strong></span>
+                  <div style={{ display: "flex", gap: "18px", marginTop: "12px", fontSize: "13.5px", color: "#cbd5e1", flexWrap: "wrap" }}>
+                    <span>Session: <strong style={{ color: "#ffffff" }}>{profile.session || "2024-25"}</strong></span>
+                    <span>Batch: <strong style={{ color: "#ffffff" }}>{profile.batch || (profile.session ? profile.session.split("-")[0] : "2024")}</strong></span>
                   </div>
                 </div>
               </div>
@@ -134,7 +133,7 @@ export default function StudentAcademicProfilePage() {
                   Status: {profile.academicStatus || "Regular / Good Standing"}
                 </span>
                 <div style={{ fontSize: "13px", color: "#94a3b8" }}>
-                  Current Level: <strong style={{ color: "#38bdf8" }}>{profile.currentLevel}</strong> • <strong style={{ color: "#38bdf8" }}>{profile.currentTerm}</strong>
+                  Current Level: <strong style={{ color: "#38bdf8" }}>{profile.currentLevel || "Level-1"}</strong> • <strong style={{ color: "#38bdf8" }}>{profile.currentTerm || "Term-1"}</strong>
                 </div>
               </div>
             </div>
@@ -145,7 +144,7 @@ export default function StudentAcademicProfilePage() {
               <div style={{ background: "#ffffff", padding: "22px 24px", borderRadius: "16px", boxShadow: "0 4px 14px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
                 <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>Overall CGPA</div>
                 <div style={{ fontSize: "30px", fontWeight: 900, color: "#0284c7" }}>
-                  {(profile.currentCGPA || 0).toFixed(2)} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>/ 4.00</span>
+                  {Number(profile.currentCGPA || profile.cgpaSummary?.overallCGPA || 0).toFixed(2)} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>/ 4.00</span>
                 </div>
                 <div style={{ fontSize: "11.5px", color: "#64748b", marginTop: "4px" }}>Average across completed semesters</div>
               </div>
@@ -154,7 +153,7 @@ export default function StudentAcademicProfilePage() {
               <div style={{ background: "#ffffff", padding: "22px 24px", borderRadius: "16px", boxShadow: "0 4px 14px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
                 <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>Previous Semester GPA</div>
                 <div style={{ fontSize: "30px", fontWeight: 900, color: "#8b5cf6" }}>
-                  {(profile.lastSemesterGPA || 0).toFixed(2)} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>/ 4.00</span>
+                  {Number(profile.lastSemesterGPA || profile.cgpaSummary?.lastSemGPA || 0).toFixed(2)} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>/ 4.00</span>
                 </div>
                 <div style={{ fontSize: "11.5px", color: "#64748b", marginTop: "4px" }}>GPA of last completed semester</div>
               </div>
@@ -163,7 +162,7 @@ export default function StudentAcademicProfilePage() {
               <div style={{ background: "#ffffff", padding: "22px 24px", borderRadius: "16px", boxShadow: "0 4px 14px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
                 <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>Credits Earned</div>
                 <div style={{ fontSize: "30px", fontWeight: 900, color: "#16a34a" }}>
-                  {profile.totalCreditsEarned || 0} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>/ {profile.totalCreditsRequired || 140}</span>
+                  {profile.totalCreditsEarned || profile.cgpaSummary?.totalCreditsEarned || 0} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>/ {profile.totalCreditsRequired || 140}</span>
                 </div>
                 <div style={{ fontSize: "11.5px", color: "#64748b", marginTop: "4px" }}>Completed course credits out of 140</div>
               </div>
@@ -172,7 +171,7 @@ export default function StudentAcademicProfilePage() {
               <div style={{ background: "#ffffff", padding: "22px 24px", borderRadius: "16px", boxShadow: "0 4px 14px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
                 <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>Credits Remaining</div>
                 <div style={{ fontSize: "30px", fontWeight: 900, color: "#ea580c" }}>
-                  {profile.creditsRemaining || 140} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>Credits</span>
+                  {profile.creditsRemaining !== undefined ? profile.creditsRemaining : (profile.cgpaSummary?.creditsRemaining !== undefined ? profile.cgpaSummary.creditsRemaining : 140)} <span style={{ fontSize: "14px", fontWeight: 600, color: "#94a3b8" }}>Credits</span>
                 </div>
                 <div style={{ fontSize: "11.5px", color: "#64748b", marginTop: "4px" }}>Remaining degree credits</div>
               </div>
@@ -181,7 +180,7 @@ export default function StudentAcademicProfilePage() {
               <div style={{ background: "#ffffff", padding: "22px 24px", borderRadius: "16px", boxShadow: "0 4px 14px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
                 <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>Current Level & Term</div>
                 <div style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a" }}>
-                  {profile.currentLevel || "Level-1"} {profile.currentTerm ? (profile.currentTerm.startsWith("Term") ? `• ${profile.currentTerm}` : `• Term-${profile.currentTerm}`) : "• Term-1"}
+                  {profile.currentLevel || "Level-1"} {profile.currentTerm ? (String(profile.currentTerm).startsWith("Term") ? `• ${profile.currentTerm}` : `• Term-${profile.currentTerm}`) : "• Term-1"}
                 </div>
                 <div style={{ fontSize: "11.5px", color: "#64748b", marginTop: "4px" }}>Currently registered level & term</div>
               </div>

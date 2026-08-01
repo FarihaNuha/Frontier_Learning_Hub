@@ -315,37 +315,90 @@ exports.getStudentAcademicProfile = async (req, res) => {
       department: { $regex: new RegExp(`^${studentDept.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
     }).lean();
 
-    const completedCodes = new Set((profile?.completedCourses || []).map((c) => (c.courseCode || "").toUpperCase()));
-    const incompleteCourses = deptImports.filter((ci) => !completedCodes.has((ci.courseCode || "").toUpperCase()));
+    // Gather all distinct courses the student has registered for, completed, or enrolled in up to current situation
+    const registeredCoursesMap = new Map();
 
-    const currentLevelStr = activeReg?.level || profile?.currentLevel || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
-    const currentTermStr = activeReg?.term || profile?.currentTerm || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
-    const activeSessionStr = activeReg?.session || studentProfile?.session || req.user.session || "2025-26";
-    const activeBatchStr = studentProfile?.batch || req.user.batch || "2023";
-    const activeProgramStr = studentProfile?.program || req.user.program || `B.Sc. in ${studentDept}`;
+    // 1. From completed courses
+    (profile?.completedCourses || []).forEach((c) => {
+      const code = (c.courseCode || "").toUpperCase().trim();
+      if (code && !registeredCoursesMap.has(code)) {
+        registeredCoursesMap.set(code, Number(c.creditHours) || 3);
+      }
+    });
+
+    // 2. From all Registrations for this student
+    const allStudentRegs = await Registration.find({
+      $or: [
+        ...(userId ? [{ student: userId }] : []),
+        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+        ...(req.user.email ? [{ studentEmail: req.user.email }] : []),
+      ],
+    }).lean();
+
+    allStudentRegs.forEach((reg) => {
+      (reg.selectedCourses || []).forEach((sc) => {
+        const code = (sc.courseCode || sc.code || "").toUpperCase().trim();
+        const cr = Number(sc.creditHours) || 3;
+        if (code && (!registeredCoursesMap.has(code) || cr > registeredCoursesMap.get(code))) {
+          registeredCoursesMap.set(code, cr);
+        }
+      });
+    });
+
+    // 3. From Enrollments
+    const enrollments = await Enrollment.find({
+      $or: [
+        ...(userId ? [{ student: userId }] : []),
+        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+      ]
+    }).populate("course").lean();
+
+    enrollments.forEach((e) => {
+      if (e.course && e.course.displayCode) {
+        const code = (e.course.displayCode || "").toUpperCase().trim();
+        if (code && !registeredCoursesMap.has(code)) {
+          registeredCoursesMap.set(code, 3);
+        }
+      }
+    });
+
+    let totalRegisteredCredits = 0;
+    registeredCoursesMap.forEach((cr) => {
+      totalRegisteredCredits += cr;
+    });
+
+    const totalReqCredits = 140;
+    const finalCreditsEarned = totalRegisteredCredits > 0 ? totalRegisteredCredits : (cgpaSummary.totalCreditsEarned || profile?.totalCreditsEarned || 0);
+    const finalCreditsRemaining = Math.max(0, totalReqCredits - finalCreditsEarned);
+
+    const currentLevelStr = activeReg?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : profile?.currentLevel || "Level-1");
+    const currentTermStr = activeReg?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : profile?.currentTerm || "Term-1");
+    const activeSessionStr = studentProfile?.session || activeReg?.session || profile?.session || req.user.session || "2024-25";
+    const activeBatchStr = studentProfile?.batch || profile?.batch || req.user.batch || (activeSessionStr ? activeSessionStr.split("-")[0] : "2024");
+    const activeProgramStr = studentProfile?.program || profile?.program || req.user.program || `B.Sc. in ${studentDept}`;
+
+    const profileObj = {
+      ...(profile || {}),
+      studentName: studentProfile?.name || req.user.name || activeReg?.studentName || profile?.studentName || "Student",
+      studentId: studentIdStr || req.user.studentId || activeReg?.studentId || profile?.studentId || "N/A",
+      department: studentProfile?.department || req.user.department || activeReg?.department || profile?.department || "EDTE",
+      program: activeProgramStr,
+      session: activeSessionStr,
+      batch: activeBatchStr,
+      universityEmail: studentProfile?.universityEmail || req.user.email,
+      currentLevel: currentLevelStr,
+      currentTerm: currentTermStr,
+      totalCreditsRequired: totalReqCredits,
+      totalCreditsEarned: finalCreditsEarned,
+      creditsRemaining: finalCreditsRemaining,
+      currentCGPA: cgpaSummary.overallCGPA || profile?.currentCGPA || 0.0,
+      lastSemesterGPA: cgpaSummary.lastSemGPA || profile?.lastSemesterGPA || 0.0,
+      academicStatus: profile?.academicStatus || "Regular",
+      cgpaSummary,
+    };
 
     res.json({
-      profile: {
-        studentName: studentProfile?.name || req.user.name || activeReg?.studentName || "Student",
-        studentId: studentIdStr || req.user.studentId || activeReg?.studentId || "N/A",
-        department: studentDept,
-        program: activeProgramStr,
-        session: activeSessionStr,
-        batch: activeBatchStr,
-        hallName: studentProfile?.hallName || req.user.hallName || "N/A",
-        phone: studentProfile?.phone || req.user.phone || "N/A",
-        universityEmail: studentProfile?.universityEmail || req.user.email,
-        ...(profile || {}),
-        currentLevel: currentLevelStr,
-        currentTerm: currentTermStr,
-        totalCreditsRequired: profile?.totalCreditsRequired || 140,
-        totalCreditsEarned: cgpaSummary.totalCreditsEarned || profile?.totalCreditsEarned || 0,
-        creditsRemaining: cgpaSummary.creditsRemaining || profile?.creditsRemaining || 140,
-        currentCGPA: cgpaSummary.overallCGPA || profile?.currentCGPA || 0.0,
-        lastSemesterGPA: cgpaSummary.lastSemGPA || profile?.lastSemesterGPA || 0.0,
-        academicStatus: profile?.academicStatus || "Regular",
-        cgpaSummary,
-      },
+      profile: profileObj,
       completedCourses: profile?.completedCourses || [],
       incompleteCourses,
       retakes,

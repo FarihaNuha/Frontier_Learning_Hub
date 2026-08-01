@@ -18,6 +18,7 @@ import {
   FiLayers,
   FiMessageSquare,
   FiSearch,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import TeacherSidebar from "../components/TeacherSidebar";
 import "../styles/dashboard.css";
@@ -31,6 +32,7 @@ export default function TeacherResultManagementPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [parsedData, setParsedData] = useState([]);
   const [validationErrors, setValidationErrors] = useState([]);
+  const [uploadError, setUploadError] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [updatingBatch, setUpdatingBatch] = useState(null);
 
@@ -231,7 +233,8 @@ export default function TeacherResultManagementPage() {
         const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
 
         let metaSession = "";
-        let metaLevelTerm = "";
+        let metaLevel = "";
+        let metaTerm = "";
         let metaCourseCode = "";
         let metaCourseTitle = "";
         let metaCourseType = "";
@@ -244,23 +247,96 @@ export default function TeacherResultManagementPage() {
           return combined.includes("lab") || combined.includes("sessional") || combined.includes("practical");
         };
 
-        // Scan top 5 rows for header metadata (e.g. "Session: 2022-23", "Course Code: ET 315")
-        for (let r = 0; r < Math.min(rawRows.length, 5); r++) {
-          const rowStr = rawRows[r].map((cell) => String(cell)).join(" ");
-          if (rowStr.toLowerCase().includes("session:") || rowStr.toLowerCase().includes("course code:") || rowStr.toLowerCase().includes("level:")) {
-            rawRows[r].forEach((cell) => {
-              const str = String(cell).trim();
-              const lower = str.toLowerCase();
-              if (lower.includes("session:")) metaSession = str.split(":")[1]?.trim() || "";
-              if (lower.includes("level:")) metaLevelTerm = str.split(":")[1]?.trim() || "";
-              if (lower.includes("course code:")) metaCourseCode = str.split(":")[1]?.trim() || "";
-              if (lower.includes("course title:")) metaCourseTitle = str.split(":")[1]?.trim() || "";
-              if (lower.includes("course type:")) metaCourseType = str.split(":")[1]?.trim() || "";
-              if (lower.includes("credit hours:") || lower.includes("credit:")) {
-                const parsedVal = Number(str.split(":")[1]?.trim());
-                if (!isNaN(parsedVal) && parsedVal > 0) metaCreditHours = parsedVal;
+        // Robust scan of top 10 rows for metadata
+        for (let r = 0; r < Math.min(rawRows.length, 10); r++) {
+          const row = rawRows[r];
+          if (!row || !Array.isArray(row)) continue;
+
+          for (let c = 0; c < row.length; c++) {
+            const cellVal = String(row[c] || "").trim();
+            if (!cellVal) continue;
+            const lower = cellVal.toLowerCase();
+
+            // Session
+            if (!metaSession && lower.includes("session")) {
+              const m = cellVal.match(/session\s*:?\s*(\d{4}[-\s]\d{2,4})/i);
+              if (m) {
+                metaSession = m[1].replace(/\s+/, "-");
+              } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+                const nextM = String(row[c + 1]).match(/(\d{4}[-\s]\d{2,4})/);
+                if (nextM) metaSession = nextM[1].replace(/\s+/, "-");
               }
-            });
+            }
+
+            // Level
+            if (!metaLevel && lower.includes("level")) {
+              const m = cellVal.match(/level\s*:?\s*(\d+)/i);
+              if (m) {
+                metaLevel = m[1];
+              } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+                const nextM = String(row[c + 1]).match(/(\d+)/);
+                if (nextM) metaLevel = nextM[1];
+              }
+            }
+
+            // Term
+            if (!metaTerm && lower.includes("term")) {
+              const m = cellVal.match(/term\s*:?\s*(\d+)/i);
+              if (m) {
+                metaTerm = m[1];
+              } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+                const nextM = String(row[c + 1]).match(/(\d+)/);
+                if (nextM) metaTerm = nextM[1];
+              }
+            }
+
+            // Course Code
+            if (!metaCourseCode && lower.includes("course code")) {
+              if (lower.includes("course code:")) {
+                const after = cellVal.split(/course code:\s*/i)[1] || "";
+                const clean = after.split(/course title|course type|credit|level|term|dept|[\n,;]/i)[0]?.trim();
+                if (clean) metaCourseCode = clean;
+              }
+              if (!metaCourseCode && row[c + 1] !== undefined && row[c + 1] !== null) {
+                const nextVal = String(row[c + 1]).trim();
+                if (nextVal && !nextVal.toLowerCase().includes("title")) {
+                  metaCourseCode = nextVal;
+                }
+              }
+            }
+
+            // Course Title
+            if (!metaCourseTitle && lower.includes("course title")) {
+              if (lower.includes("course title:")) {
+                const after = cellVal.split(/course title:\s*/i)[1] || "";
+                const clean = after.split(/course type|credit|level|term|dept|[\n,;]/i)[0]?.trim();
+                if (clean) metaCourseTitle = clean;
+              }
+              if (!metaCourseTitle && row[c + 1] !== undefined && row[c + 1] !== null) {
+                const nextVal = String(row[c + 1]).trim();
+                if (nextVal) metaCourseTitle = nextVal;
+              }
+            }
+
+            // Course Type
+            if (!metaCourseType && lower.includes("course type")) {
+              if (lower.includes("course type:")) {
+                metaCourseType = cellVal.split(":")[1]?.trim() || "";
+              } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+                metaCourseType = String(row[c + 1]).trim();
+              }
+            }
+
+            // Credit Hours
+            if (metaCreditHours === null && (lower.includes("credit hour") || lower.includes("credit:"))) {
+              const m = cellVal.match(/credit\s*hours?\s*:?\s*(\d+(?:\.\d+)?)/i);
+              if (m) {
+                metaCreditHours = Number(m[1]);
+              } else if (row[c + 1] !== undefined && row[c + 1] !== null) {
+                const num = Number(String(row[c + 1]).trim());
+                if (!isNaN(num) && num > 0) metaCreditHours = num;
+              }
+            }
           }
 
           const isHeaderRow = rawRows[r].some((c) => {
@@ -273,6 +349,12 @@ export default function TeacherResultManagementPage() {
             break;
           }
         }
+
+        const levelDigit = (metaLevel || "").replace(/\D/g, "");
+        const termDigit = (metaTerm || "").replace(/\D/g, "");
+        const metaLevelTermCombined = (levelDigit && termDigit)
+          ? `Level ${levelDigit} - Term ${termDigit}`
+          : (levelDigit ? `Level ${levelDigit}` : (metaTerm ? `Term ${termDigit}` : ""));
 
         const isLabMeta = isLabOrSessional(metaCourseType, metaCourseTitle, metaCourseCode);
         if (metaCreditHours === null) {
@@ -294,11 +376,17 @@ export default function TeacherResultManagementPage() {
               });
 
               const studentId = String(rowObj["ID"] || rowObj["Student ID"] || rowObj["studentId"] || "").trim();
-              const courseCode = String(rowObj["Course Code"] || rowObj["courseCode"] || metaCourseCode || "ET 315").trim().toUpperCase();
-              const courseTitle = String(rowObj["Course Title"] || rowObj["courseTitle"] || metaCourseTitle || "STEAM Education Design and Development").trim();
+              const courseCode = String(rowObj["Course Code"] || rowObj["courseCode"] || metaCourseCode || "ET 117").trim().toUpperCase();
+              const courseTitle = String(rowObj["Course Title"] || rowObj["courseTitle"] || metaCourseTitle || "Instructional Design, Methodologies and Technologies").trim();
               const courseType = String(rowObj["Course Type"] || rowObj["courseType"] || metaCourseType || (isLabMeta ? "Lab" : "Theory")).trim();
-              const session = String(rowObj["Session"] || rowObj["session"] || metaSession || "2022-23").trim();
-              const levelTerm = String(rowObj["Level-Term"] || rowObj["Level"] || rowObj["levelTerm"] || metaLevelTerm || "Level 3 - Term 2").trim();
+              const session = String(rowObj["Session"] || rowObj["session"] || metaSession || "2025-26").trim();
+              
+              let rowLevel = String(rowObj["Level"] || rowObj["level"] || metaLevel || "").replace(/\D/g, "");
+              let rowTerm = String(rowObj["Term"] || rowObj["term"] || metaTerm || "").replace(/\D/g, "");
+              
+              const levelTerm = (rowLevel && rowTerm)
+                ? `Level ${rowLevel} - Term ${rowTerm}`
+                : String(rowObj["Level-Term"] || rowObj["levelTerm"] || metaLevelTermCombined || "").trim();
 
               const isLabRow = isLabOrSessional(courseType, courseTitle, courseCode);
               let creditHours = rowObj["Credit Hours"] !== undefined && rowObj["Credit Hours"] !== "" 
@@ -388,6 +476,7 @@ export default function TeacherResultManagementPage() {
 
     setUploading(true);
     setValidationErrors([]);
+    setUploadError(null);
 
     try {
       await api.post("/results/upload", {
@@ -400,13 +489,15 @@ export default function TeacherResultManagementPage() {
       setSelectedFile(null);
       setParsedData([]);
       setUpdatingBatch(null);
+      setUploadError(null);
       fetchResults();
     } catch (err) {
+      const errMsg = err.response?.data?.error || (err.response?.data?.validationErrors || []).join("\n") || "Upload failed.";
+      setUploadError(errMsg);
       if (err.response?.data?.validationErrors) {
         setValidationErrors(err.response.data.validationErrors);
-      } else {
-        toast.error(err.response?.data?.error || "Upload failed.");
       }
+      toast.error("Upload Blocked: Marksheet parameters do not match your assignment!");
     } finally {
       setUploading(false);
     }
@@ -861,6 +952,50 @@ export default function TeacherResultManagementPage() {
           </div>
         </div>
 
+        {/* PARAMETER MISMATCH WARNING BANNER */}
+        {uploadError && (
+          <div
+            style={{
+              marginBottom: "24px",
+              background: "#fff1f2",
+              border: "2px solid #f43f5e",
+              borderRadius: "14px",
+              padding: "20px 24px",
+              boxShadow: "0 4px 20px rgba(244, 63, 94, 0.12)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#9f1239", fontWeight: 800, fontSize: "16px" }}>
+                <FiAlertTriangle size={22} color="#e11d48" />
+                <span>Upload Blocked — Parameter Mismatch Warning</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUploadError(null)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#be123c", fontWeight: 700, fontSize: "18px" }}
+                title="Dismiss warning"
+              >
+                ✕
+              </button>
+            </div>
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: "13px",
+                background: "#ffffff",
+                padding: "16px 20px",
+                borderRadius: "10px",
+                border: "1px solid #ffe4e6",
+                color: "#881337",
+                whiteSpace: "pre-wrap",
+                lineHeight: "1.65"
+              }}
+            >
+              {uploadError}
+            </div>
+          </div>
+        )}
+
         {/* Primary Tabs: Mid Term Result vs Final Result */}
         <div style={{ display: "flex", gap: "12px", background: "#ffffff", padding: "6px", borderRadius: "12px", border: "1px solid #cbd5e1", width: "fit-content", marginBottom: "24px" }}>
           <button
@@ -1197,31 +1332,6 @@ export default function TeacherResultManagementPage() {
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <button
-                    onClick={() => {
-                      if (isAdminDeadlinePassed) {
-                        toast.error("Submission deadline has passed. Marksheet edits are locked.");
-                        return;
-                      }
-                      handleSaveMarksheetChanges();
-                    }}
-                    disabled={savingBatchMarks || isAdminDeadlinePassed}
-                    style={{
-                      padding: "8px 18px",
-                      background: isAdminDeadlinePassed ? "#cbd5e1" : "#16a34a",
-                      color: isAdminDeadlinePassed ? "#94a3b8" : "#ffffff",
-                      border: "none",
-                      borderRadius: "8px",
-                      fontWeight: 700,
-                      fontSize: "13px",
-                      cursor: (savingBatchMarks || isAdminDeadlinePassed) ? "not-allowed" : "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px"
-                    }}
-                  >
-                    <FiCheckCircle size={15} /> {isAdminDeadlinePassed ? "Editing Locked" : savingBatchMarks ? "Saving..." : "Save Marksheet Changes"}
-                  </button>
                   <div
                     onClick={() => setViewBatch(null)}
                     style={{ background: "#f1f5f9", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b" }}
@@ -1368,6 +1478,50 @@ export default function TeacherResultManagementPage() {
                 <h3 style={{ margin: 0, color: "#0f172a", fontSize: "18px" }}>Upload {resultTypeTab} Course Results (Excel)</h3>
                 <FiX size={20} color="#64748b" cursor="pointer" onClick={() => setShowUploadModal(false)} />
               </div>
+
+              {/* PARAMETER MISMATCH WARNING BANNER */}
+              {uploadError && (
+                <div
+                  style={{
+                    marginBottom: "20px",
+                    background: "#fff1f2",
+                    border: "2px solid #f43f5e",
+                    borderRadius: "14px",
+                    padding: "16px 20px",
+                    boxShadow: "0 4px 20px rgba(244, 63, 94, 0.12)",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#9f1239", fontWeight: 800, fontSize: "15px" }}>
+                      <FiAlertTriangle size={20} color="#e11d48" />
+                      <span>Upload Blocked — Parameter Mismatch</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setUploadError(null)}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#be123c", fontWeight: 700, fontSize: "16px" }}
+                      title="Dismiss warning"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "monospace",
+                      fontSize: "12.5px",
+                      background: "#ffffff",
+                      padding: "12px 14px",
+                      borderRadius: "8px",
+                      border: "1px solid #ffe4e6",
+                      color: "#881337",
+                      whiteSpace: "pre-wrap",
+                      lineHeight: "1.6"
+                    }}
+                  >
+                    {uploadError}
+                  </div>
+                </div>
+              )}
 
               <div style={{ marginBottom: "20px" }}>
                 <label style={{ display: "block", fontSize: "13.5px", fontWeight: 600, color: "#334155", marginBottom: "8px" }}>

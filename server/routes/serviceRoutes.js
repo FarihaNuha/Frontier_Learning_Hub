@@ -6,6 +6,8 @@ const searchCtrl = require("../controllers/searchController");
 
 // Notice Endpoints
 router.get("/notices", verifyToken, noticeCtrl.getNotices);
+router.get("/notices/course/:courseId", verifyToken, noticeCtrl.getCourseNotices);
+router.post("/notices/course/:courseId", verifyToken, checkRole("teacher", "admin"), noticeCtrl.createCourseNotice);
 router.post("/notices", verifyToken, checkRole("admin"), noticeCtrl.createNotice);
 router.put("/notices/:id", verifyToken, checkRole("admin"), noticeCtrl.updateNotice);
 router.delete("/notices/:id", verifyToken, checkRole("admin"), noticeCtrl.deleteNotice);

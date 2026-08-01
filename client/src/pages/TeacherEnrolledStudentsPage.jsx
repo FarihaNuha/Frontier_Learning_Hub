@@ -102,7 +102,7 @@ export default function TeacherEnrolledStudentsPage() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
-      <TeacherSidebar currentPage="enrolled-students" courseId={selectedCourseId} />
+      <TeacherSidebar currentPage="enrolled-students" courseId={courseIdParam} />
 
       <div
         style={{

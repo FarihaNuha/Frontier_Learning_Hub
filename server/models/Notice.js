@@ -70,6 +70,20 @@ const noticeSchema = new mongoose.Schema({
     enum: ["Teachers", "Students", "All"],
     default: "All",
   },
+  scope: {
+    type: String,
+    enum: ["Global", "Course"],
+    default: "Global",
+  },
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
+    default: null,
+  },
+  courseCode: {
+    type: String,
+    default: "",
+  },
   // For result deadlines set by admin
   deadlineDate: {
     type: Date,

@@ -16,6 +16,8 @@ import {
   FiSearch,
   FiX,
   FiBookOpen,
+  FiLock,
+  FiLayers,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -125,6 +127,102 @@ export default function CourseListPage() {
   const [sessionFilter, setSessionFilter] = useState("all");
   const [levelFilter, setLevelFilter] = useState("all");
   const [termFilter, setTermFilter] = useState("all");
+
+  const [studentRegistrationData, setStudentRegistrationData] = useState(null);
+  const [selectedStudentLevelTerm, setSelectedStudentLevelTerm] = useState("L1T1");
+
+  const studentLevelTermCards = [
+    { key: "L1T1", label: "Level 1 • Term 1", level: "level-1", term: "term-1", index: 1 },
+    { key: "L1T2", label: "Level 1 • Term 2", level: "level-1", term: "term-2", index: 2 },
+    { key: "L2T1", label: "Level 2 • Term 1", level: "level-2", term: "term-1", index: 3 },
+    { key: "L2T2", label: "Level 2 • Term 2", level: "level-2", term: "term-2", index: 4 },
+    { key: "L3T1", label: "Level 3 • Term 1", level: "level-3", term: "term-1", index: 5 },
+    { key: "L3T2", label: "Level 3 • Term 2", level: "level-3", term: "term-2", index: 6 },
+    { key: "L4T1", label: "Level 4 • Term 1", level: "level-4", term: "term-1", index: 7 },
+    { key: "L4T2", label: "Level 4 • Term 2", level: "level-4", term: "term-2", index: 8 },
+  ];
+
+  const getCourseLevelTermIndex = (c) => {
+    if (!c) return 1;
+    let lNum = null;
+    let tNum = null;
+
+    if (c.level) {
+      const m = String(c.level).match(/\d/);
+      if (m) lNum = parseInt(m[0]);
+    }
+    if (c.term) {
+      const m = String(c.term).match(/\d/);
+      if (m) tNum = parseInt(m[0]);
+    }
+
+    if (c.displayCode) {
+      const codeClean = String(c.displayCode).trim().toUpperCase();
+      if (!lNum) {
+        const m = codeClean.match(/(\d)\d{2}/);
+        if (m) lNum = parseInt(m[1]);
+      }
+      if (lNum && !tNum) {
+        const m = codeClean.match(/\d(\d\d)/);
+        if (m) {
+          const numVal = parseInt(m[1]);
+          if (lNum === 1) {
+            tNum = (numVal >= 10 || (numVal === 9 && codeClean.includes("MATH"))) ? 2 : 1;
+          } else {
+            tNum = numVal >= 10 ? 2 : 1;
+          }
+        }
+      }
+    }
+
+    const finalL = lNum || 1;
+    const finalT = tNum || 1;
+    return (finalL - 1) * 2 + finalT;
+  };
+
+  const isCardUnlocked = (cardIndex) => {
+    const cLvl = studentRegistrationData?.student?.currentLevel || studentRegistrationData?.currentLevel || user?.currentLevel || 1;
+    const cTrm = studentRegistrationData?.student?.currentTerm || studentRegistrationData?.currentTerm || user?.currentTerm || 1;
+    const maxFromProfile = (cLvl - 1) * 2 + cTrm;
+
+    if (cardIndex <= maxFromProfile) return true;
+
+    const targetL = Math.ceil(cardIndex / 2);
+    const targetT = cardIndex % 2 === 1 ? 1 : 2;
+
+    const regs = studentRegistrationData?.registrations || [];
+    const hasReg = regs.some((r) => {
+      const rL = Number(String(r.level || "").replace(/[^0-9]/g, ""));
+      const rT = Number(String(r.term || "").replace(/[^0-9]/g, ""));
+      return rL === targetL && rT === targetT;
+    });
+    if (hasReg) return true;
+
+    const hasCourse = (courses || []).some((c) => getCourseLevelTermIndex(c) === cardIndex);
+    if (hasCourse) return true;
+
+    return false;
+  };
+
+  useEffect(() => {
+    if (user?.role === "student") {
+      api.get("/registration/my-status")
+        .then((res) => {
+          if (res.data) {
+            setStudentRegistrationData(res.data);
+            const cLvl = res.data.student?.currentLevel || res.data.currentLevel || 1;
+            const cTrm = res.data.student?.currentTerm || res.data.currentTerm || 1;
+            const currentIdx = (cLvl - 1) * 2 + cTrm;
+            const currentCard = studentLevelTermCards.find((c) => c.index === currentIdx);
+            if (currentCard) {
+              setSelectedStudentLevelTerm(currentCard.key);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user]);
+
   const assignedGroups = useMemo(() => {
     const map = new Map();
     (courses || []).forEach((c) => {
@@ -188,6 +286,14 @@ export default function CourseListPage() {
   if (!user) return null;
 
   const filterCourse = (course, q) => {
+    if (user?.role === "student" && selectedStudentLevelTerm !== "all") {
+      const activeCard = studentLevelTermCards.find((card) => card.key === selectedStudentLevelTerm);
+      if (activeCard) {
+        const courseCardIdx = getCourseLevelTermIndex(course);
+        if (courseCardIdx !== activeCard.index) return false;
+      }
+    }
+
     if (sessionFilter !== "all" && course.session && course.session !== sessionFilter) {
       return false;
     }
@@ -680,6 +786,76 @@ export default function CourseListPage() {
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* Student Level-Term Cards Section */}
+        {user?.role === "student" && (
+          <div style={{ marginBottom: "28px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+              <FiLayers size={20} color="#3b8db3" />
+              <h2 style={{ margin: 0, fontSize: "19px", color: "#0f172a" }}>Academic Level-Term Course Cards</h2>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: "14px" }}>
+              {studentLevelTermCards.map((card) => {
+                const unlocked = isCardUnlocked(card.index);
+                const isLocked = !unlocked;
+                const isSelected = selectedStudentLevelTerm === card.key;
+
+                const cardCourses = courses.filter((c) => getCourseLevelTermIndex(c) === card.index);
+
+                return (
+                  <div
+                    key={card.key}
+                    onClick={() => {
+                      if (isLocked) {
+                        toast.error(`Level ${Math.ceil(card.index / 2)} Term ${card.index % 2 === 1 ? 1 : 2} is locked. Complete registration for this level-term first.`);
+                        return;
+                      }
+                      if (isSelected) {
+                        setSelectedStudentLevelTerm("all");
+                      } else {
+                        setSelectedStudentLevelTerm(card.key);
+                      }
+                    }}
+                    style={{
+                      background: isLocked
+                        ? "#f1f5f9"
+                        : isSelected
+                        ? "linear-gradient(135deg, #7EC8E3, #3B8DB3)"
+                        : "#ffffff",
+                      color: isLocked ? "#94a3b8" : isSelected ? "#ffffff" : "#1e293b",
+                      border: isLocked
+                        ? "1px dashed #cbd5e1"
+                        : isSelected
+                        ? "none"
+                        : "1px solid #cbd5e1",
+                      borderRadius: "14px",
+                      padding: "18px",
+                      cursor: isLocked ? "not-allowed" : "pointer",
+                      opacity: isLocked ? 0.75 : 1,
+                      boxShadow: isSelected ? "0 6px 18px rgba(59,141,179,0.25)" : "0 2px 6px rgba(0,0,0,0.03)",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ fontWeight: 700, fontSize: "14.5px" }}>{card.label}</div>
+                      {isLocked ? <FiLock size={16} color="#94a3b8" /> : <FiBookOpen size={16} />}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}>
+                      <span style={{ fontSize: "12px", opacity: 0.9 }}>
+                        {isLocked ? "Locked" : `${cardCourses.length} Assigned Courses`}
+                      </span>
+                      {isLocked && (
+                        <span style={{ fontSize: "11px", fontWeight: 700, background: "#e2e8f0", color: "#64748b", padding: "2px 7px", borderRadius: "10px" }}>
+                          🔒 Locked
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

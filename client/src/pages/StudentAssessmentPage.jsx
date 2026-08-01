@@ -14,6 +14,8 @@ import {
   FiAlertCircle,
   FiX,
   FiEdit3,
+  FiLock,
+  FiLayers,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import StudentSidebar from "../components/StudentSidebar";
@@ -29,10 +31,37 @@ export default function StudentAssessmentPage() {
   const [courseLoading, setCourseLoading] = useState(Boolean(courseId));
   const [showRules, setShowRules] = useState(false);
 
+  const [studentInfo, setStudentInfo] = useState(null);
+  const [selectedLevelTerm, setSelectedLevelTerm] = useState("All");
+
   const [selectedRecordForIssue, setSelectedRecordForIssue] = useState(null);
   const [issueMessage, setIssueMessage] = useState("");
   const [submittingIssue, setSubmittingIssue] = useState(false);
   const [myRequests, setMyRequests] = useState([]);
+
+  const levelTermSemesters = [
+    "Level 1 - Term 1",
+    "Level 1 - Term 2",
+    "Level 2 - Term 1",
+    "Level 2 - Term 2",
+    "Level 3 - Term 1",
+    "Level 3 - Term 2",
+    "Level 4 - Term 1",
+    "Level 4 - Term 2",
+  ];
+
+  useEffect(() => {
+    api.get("/registration/my-status")
+      .then((res) => {
+        if (res.data) {
+          setStudentInfo(res.data);
+          const lvl = res.data.student?.currentLevel || res.data.currentLevel || 1;
+          const trm = res.data.student?.currentTerm || res.data.currentTerm || 1;
+          setSelectedLevelTerm(`Level ${lvl} - Term ${trm}`);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchMyRequests = async () => {
     try {
@@ -104,13 +133,43 @@ export default function StudentAssessmentPage() {
 
   const isDataLoading = loading || (Boolean(courseId) && courseLoading);
 
-  const displayedAssessments = courseId
+  const rawAssessments = courseId
     ? (courseInfo
         ? assessments.filter(
             (a) => (a.courseCode || "").trim().toLowerCase() === (courseInfo.displayCode || "").trim().toLowerCase()
           )
         : [])
     : assessments;
+
+  const displayedAssessments = selectedLevelTerm === "All"
+    ? rawAssessments
+    : rawAssessments.filter((a) => {
+        const lvlTermStr = (a.levelTerm || a.level || "").toLowerCase();
+        const selStr = selectedLevelTerm.toLowerCase();
+        const lMatch = selStr.match(/level\s*(\d)/);
+        const tMatch = selStr.match(/term\s*(\d)/);
+        if (lMatch && tMatch) {
+          const lNum = lMatch[1];
+          const tNum = tMatch[1];
+          return lvlTermStr.includes(lNum) && lvlTermStr.includes(tNum);
+        }
+        return true;
+      });
+
+  const isAssessmentCardUnlocked = (cardIndex) => {
+    const targetL = Math.ceil(cardIndex / 2);
+    const targetT = cardIndex % 2 === 1 ? 1 : 2;
+
+    const regs = studentInfo?.registrations || [];
+    const hasApprovedReg = regs.some((r) => {
+      const rL = Number(String(r.level || "").replace(/[^0-9]/g, ""));
+      const rT = Number(String(r.term || "").replace(/[^0-9]/g, ""));
+      const isAppr = r.status === "Approved" || r.status === "Registered";
+      return rL === targetL && rT === targetT && isAppr;
+    });
+
+    return hasApprovedReg;
+  };
 
   return (
     <div className="dashboard-container">
@@ -133,6 +192,77 @@ export default function StudentAssessmentPage() {
             </p>
           </div>
         </div>
+
+        {/* 8 LEVEL-TERM CARDS (Only on main page !courseId) */}
+        {!courseId && (
+          <div style={{ marginBottom: "28px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+              <FiLayers size={20} color="#3b8db3" />
+              <h2 style={{ margin: 0, fontSize: "19px", color: "#0f172a" }}>Assessment Marksheet Level-Term Cards</h2>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: "14px" }}>
+              {levelTermSemesters.map((semKey, idx) => {
+                const cardIndex = idx + 1;
+                const isLocked = !isAssessmentCardUnlocked(cardIndex);
+                const isSelected = selectedLevelTerm === semKey && !isLocked;
+
+                const cardAssessments = rawAssessments.filter((a) => {
+                  const lt = (a.levelTerm || a.level || "").toLowerCase();
+                  const lNum = Math.ceil(cardIndex / 2);
+                  const tNum = cardIndex % 2 === 1 ? 1 : 2;
+                  return lt.includes(String(lNum)) && lt.includes(String(tNum));
+                });
+
+                return (
+                  <div
+                    key={semKey}
+                    onClick={() => {
+                      if (isLocked) {
+                        toast.error(`Level ${Math.ceil(cardIndex / 2)} Term ${cardIndex % 2 === 1 ? 1 : 2} is locked. Complete registration for previous semesters first.`);
+                        return;
+                      }
+                      setSelectedLevelTerm(semKey);
+                    }}
+                    style={{
+                      background: isLocked
+                        ? "#f1f5f9"
+                        : isSelected
+                        ? "linear-gradient(135deg, #7EC8E3, #3B8DB3)"
+                        : "#ffffff",
+                      color: isLocked ? "#94a3b8" : isSelected ? "#ffffff" : "#1e293b",
+                      border: isLocked
+                        ? "1px dashed #cbd5e1"
+                        : isSelected
+                        ? "none"
+                        : "1px solid #cbd5e1",
+                      borderRadius: "14px",
+                      padding: "18px",
+                      cursor: isLocked ? "not-allowed" : "pointer",
+                      opacity: isLocked ? 0.75 : 1,
+                      boxShadow: isSelected ? "0 6px 18px rgba(59,141,179,0.25)" : "0 2px 6px rgba(0,0,0,0.03)",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ fontWeight: 700, fontSize: "14.5px" }}>{semKey}</div>
+                      {isLocked ? <FiLock size={16} color="#94a3b8" /> : <FiBookOpen size={16} />}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}>
+                      <span style={{ fontSize: "12px", opacity: 0.9 }}>
+                        {isLocked ? "Locked" : cardAssessments.length > 0 ? `${cardAssessments.length} Marksheets` : "No Marks Yet"}
+                      </span>
+                      {isLocked && (
+                        <span style={{ fontSize: "11px", fontWeight: 700, background: "#e2e8f0", color: "#64748b", padding: "2px 7px", borderRadius: "10px" }}>
+                          🔒 Locked
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* ASSESSMENT STRUCTURE & RULES GUIDE */}
         <div style={{

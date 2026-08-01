@@ -11,6 +11,10 @@ export default function AdminTeachers() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
+  // Academic Year Section states
+  const [academicYears, setAcademicYears] = useState([]);
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState("all");
+
   // Inline editing states
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
@@ -39,10 +43,20 @@ export default function AdminTeachers() {
     return matchesSearch && matchesDept && matchesAdvSess && matchesStatus;
   });
 
-  const fetchTeachers = async () => {
+  const fetchAcademicYears = async () => {
+    try {
+      const res = await api.get("/ums/admin/teachers/academic-years");
+      if (res.data?.academicYears) {
+        setAcademicYears(res.data.academicYears);
+      }
+    } catch (err) {}
+  };
+
+  const fetchTeachers = async (year = selectedAcademicYear) => {
     setLoading(true);
     try {
-      const res = await api.get("/ums/admin/teachers");
+      const url = year && year !== "all" ? `/ums/admin/teachers?academicYear=${encodeURIComponent(year)}` : "/ums/admin/teachers";
+      const res = await api.get(url);
       setTeachers(res.data);
     } catch (err) {
       toast.error("Failed to load teachers list.");
@@ -52,6 +66,7 @@ export default function AdminTeachers() {
   };
 
   useEffect(() => {
+    fetchAcademicYears();
     fetchTeachers();
   }, []);
 
@@ -132,10 +147,35 @@ export default function AdminTeachers() {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
 
-        // defval:"" so merged/blank cells return "" instead of undefined
-        const rawJson = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        const rawGrid = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        let extractedAcademicYear = "July, 2026";
 
-        // Flexible field matching
+        if (rawGrid.length > 0) {
+          const row1Str = (rawGrid[0] || []).join(" ");
+          const match = row1Str.match(/Academic\s*Year\s*:?\s*([^,]+,[^\n\r]+|[^\n\r]+)/i);
+          if (match && match[1] && match[1].trim()) {
+            extractedAcademicYear = match[1].replace(/Academic\s*Year\s*:?/i, "").trim();
+          }
+        }
+
+        const row0Str = (rawGrid[0] || []).join(" ");
+        const isRow0Header = row0Str.toLowerCase().includes("academic year");
+
+        let rawJson = [];
+        if (isRow0Header) {
+          const headers = (rawGrid[1] || []).map(h => String(h).trim());
+          for (let i = 2; i < rawGrid.length; i++) {
+            const rowArr = rawGrid[i];
+            const obj = {};
+            headers.forEach((h, colIdx) => {
+              if (h) obj[h] = rowArr[colIdx] !== undefined ? String(rowArr[colIdx]).trim() : "";
+            });
+            rawJson.push(obj);
+          }
+        } else {
+          rawJson = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        }
+
         const findVal = (row, keys) => {
           const rowKeys = Object.keys(row);
           for (const key of keys) {
@@ -149,7 +189,6 @@ export default function AdminTeachers() {
           return "";
         };
 
-        // Carry-forward state for merged cell rows
         let lastTeacherId = "";
         let lastName = "";
         let lastEmail = "";
@@ -160,7 +199,6 @@ export default function AdminTeachers() {
         let lastSession = "";
 
         const normalized = rawJson.map((row) => {
-          // Update carry-forward values only when the cell has real data
           const tid = findVal(row, ["Teacher ID", "teacherId", "TeacherID", "ID", "id"]);
           const name = findVal(row, ["Full Name", "Name", "name", "Teacher Name"]);
           const email = findVal(row, ["Email", "email", "University Email", "universityEmail"]);
@@ -193,7 +231,6 @@ export default function AdminTeachers() {
           };
         });
 
-        // Filter valid rows (must have some identity AND a course)
         const validTeachers = normalized.filter(t =>
           (t.teacherId || t.name || t.email) && t.assignedCourses
         );
@@ -204,8 +241,12 @@ export default function AdminTeachers() {
           return;
         }
 
-        await api.post("/ums/admin/import/teachers", { teachers: validTeachers });
-        toast.success(`Successfully imported teachers with ${validTeachers.length} course rows.`);
+        await api.post("/ums/admin/import/teachers", {
+          academicYear: extractedAcademicYear,
+          teachers: validTeachers
+        });
+        toast.success(`Successfully imported section for Academic Year: ${extractedAcademicYear}`);
+        fetchAcademicYears();
         fetchTeachers();
       } catch (err) {
         toast.error(err.response?.data?.error || "Error importing teachers Excel.");
@@ -273,69 +314,36 @@ export default function AdminTeachers() {
           <div style={{ display: "flex", gap: "12px" }}>
             <button
               onClick={() => {
-                const sampleData = [
-                  {
-                    "Teacher ID": "1",
-                    "Name": "Aditya Rajbongshi",
-                    "Email": "farihanuha356@gmail.com",
-                    "Department": "EDTE",
-                    "Program": "BSc. Eng in EDTE",
-                    "Assigned Courses": "Android and Web Application Development",
-                    "Assigned Level Term": "Level 2- Term 2",
-                    "Assigned Session": "2023-24",
-                  },
-                  {
-                    "Teacher ID": "",
-                    "Name": "",
-                    "Email": "",
-                    "Department": "",
-                    "Program": "",
-                    "Assigned Courses": "Android and Web Application Development Sessional",
-                    "Assigned Level Term": "Level 2- Term 2",
-                    "Assigned Session": "2023-24",
-                  },
-                  {
-                    "Teacher ID": "",
-                    "Name": "",
-                    "Email": "",
-                    "Department": "",
-                    "Program": "",
-                    "Assigned Courses": "Object Oriented Programming Language",
-                    "Assigned Level Term": "Level 1- Term 2",
-                    "Assigned Session": "2024-25",
-                  },
-                  {
-                    "Teacher ID": "2",
-                    "Name": "Rabbi Khan",
-                    "Email": "farihatasnim0903@gmail.com",
-                    "Department": "EDTE",
-                    "Program": "BSc. Eng in EDTE",
-                    "Assigned Courses": "Educational Measurement and Evaluation",
-                    "Assigned Level Term": "Level 2- Term 2",
-                    "Assigned Session": "2023-24",
-                  },
-                  {
-                    "Teacher ID": "",
-                    "Name": "",
-                    "Email": "",
-                    "Department": "",
-                    "Program": "",
-                    "Assigned Courses": "Blended Education Design and Development",
-                    "Assigned Level Term": "Level 3- Term 2",
-                    "Assigned Session": "2022-23",
-                  },
-                  {
-                    "Teacher ID": "3",
-                    "Name": "Munira Akter Lata",
-                    "Email": "lata@gmail.com",
-                    "Department": "EDTE",
-                    "Program": "BSc. Eng in EDTE",
-                    "Assigned Courses": "Computer Networking",
-                    "Assigned Level Term": "Level 3- Term 2",
-                    "Assigned Session": "2022-23",
-                  },
+                const wsData = [
+                  ["", "", "", "", "Academic Year: July, 2026", "", "", ""],
+                  [
+                    "Teacher ID",
+                    "Name",
+                    "Email",
+                    "Department",
+                    "Program",
+                    "Assigned Courses",
+                    "Assigned Level-Term",
+                    "Assigned Session"
+                  ],
+                  ["1", "Aditya Rajbongshi", "farihanuha356@gmail.com", "EDTE", "BSc. Eng in EDTE", "Android and Web Application Development", "Level 2- Term 2", "2023-24"],
+                  ["", "", "", "", "", "Android and Web Application Development Sessional", "Level 2- Term 2", "2023-24"],
+                  ["2", "Rabbi Khan", "farihatasnim0903@gmail.com", "EDTE", "BSc. Eng in EDTE", "Object Oriented Programming Language", "Level 1 - Term 2", "2024-25"],
+                  ["", "", "", "", "", "Educational Measurement and Evaluation", "Level 2- Term 2", "2023-24"],
+                  ["", "", "", "", "", "Blended Education Design and Development", "Level 3- Term 2", "2022-23"],
+                  ["", "", "", "", "", "Blended Education Design and Development Sessional", "Level 3- Term 2", "2022-23"],
+                  ["", "", "", "", "", "Educational Research and Data Analysis", "Level 4 Term 1", "2021-22"],
+                  ["3", "Munira Akter Lata", "lata@gmail.com", "EDTE", "BSc. Eng in EDTE", "Computer Networking", "Level 3- Term 2", "2022-23"],
+                  ["", "", "", "", "", "Computer Networking Sessional", "Level 3- Term 2", "2022-23"],
+                  ["4", "Sunjida Akter", "sunjida@gmail.com", "EDTE", "BSc. Eng in EDTE", "Cloud Computing", "Level 3- Term 2", "2022-23"],
+                  ["", "", "", "", "", "Cloud Computing Sessional", "Level 3- Term 2", "2022-23"],
+                  ["5", "Kanon sir", "kanon@gmail.com", "FDTE", "BSc. Eng in FDTE", "STEAM Education Design and Development", "Level 3- Term 2", "2022-23"],
+                  ["", "", "", "", "", "STEAM Education Design and Development Sessional", "Level 3- Term 2", "2022-23"],
+                  ["6", "Ashraf Uzzaman", "ashraf@gmail.com", "EDTE", "BSc. Eng in EDTE", "Introduction to Education", "Level 1 - Term 1", "2025-26"],
+                  ["7", "Rubel Sheikh", "rubel@gmail.com", "EDTE", "BSc. Eng in EDTE", "Discrete Mathematics and Graph Theory", "Level 1 - Term 2", "2024-25"],
+                  ["8", "Rezaul Sir", "rezaul@gmail.com", "EDTE", "BSc. Eng in EDTE", "Structured Programming Language", "Level 1 - Term 1", "2025-26"]
                 ];
-                const ws = XLSX.utils.json_to_sheet(sampleData);
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Teachers");
                 XLSX.writeFile(wb, "Teacher_Import_Template.xlsx");
@@ -405,10 +413,10 @@ export default function AdminTeachers() {
           color: "#0369a1"
         }}>
           <div style={{ fontWeight: "600", marginBottom: "6px", display: "flex", alignItems: "center", gap: "8px" }}>
-            📋 Required Excel Column Format:
+            📋 Required Excel Column Format (Row 1: Academic Year Header, Row 2: Table Columns):
           </div>
           <div style={{ fontSize: "13px", fontFamily: "monospace", background: "#ffffff", padding: "8px 12px", borderRadius: "6px", color: "#0f172a" }}>
-            Teacher ID | Name | Email | Department | Program | Assigned Courses | Assigned Level Term | Assigned Session
+            [Row 1 Cell E1]: Academic Year: July, 2026 | [Row 2]: Teacher ID | Name | Email | Department | Program | Assigned Courses | Assigned Level Term | Assigned Session
           </div>
         </div>
 
@@ -424,7 +432,7 @@ export default function AdminTeachers() {
           flexWrap: "wrap",
           alignItems: "center"
         }}>
-          <div style={{ flex: "1 1 260px", position: "relative" }}>
+          <div style={{ flex: "1 1 240px", position: "relative" }}>
             <FiSearch style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
             <input
               type="text"
@@ -448,6 +456,24 @@ export default function AdminTeachers() {
               <FiFilter size={15} /> Filters:
             </span>
 
+            {/* Academic Year Section Dropdown */}
+            <select
+              value={selectedAcademicYear}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSelectedAcademicYear(val);
+                fetchTeachers(val);
+              }}
+              style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #3B8DB3", fontSize: "13px", fontWeight: 700, background: "#f0f9ff", color: "#0369a1" }}
+            >
+              <option value="all">All Academic Year Sections</option>
+              {academicYears.map((ay) => (
+                <option key={ay} value={ay}>
+                  📅 Section: {ay}
+                </option>
+              ))}
+            </select>
+
             <select
               value={deptFilter}
               onChange={(e) => setDeptFilter(e.target.value)}
@@ -467,12 +493,14 @@ export default function AdminTeachers() {
               <option value="inactive">Inactive (Not Signed Up)</option>
             </select>
 
-            {(searchQuery || deptFilter !== "all" || statusFilter !== "all") && (
+            {(searchQuery || deptFilter !== "all" || statusFilter !== "all" || selectedAcademicYear !== "all") && (
               <button
                 onClick={() => {
                   setSearchQuery("");
                   setDeptFilter("all");
                   setStatusFilter("all");
+                  setSelectedAcademicYear("all");
+                  fetchTeachers("all");
                 }}
                 style={{ padding: "8px 14px", borderRadius: "8px", border: "none", background: "#f1f5f9", color: "#64748b", fontSize: "12.5px", fontWeight: 600, cursor: "pointer" }}
               >

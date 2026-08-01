@@ -67,6 +67,8 @@ export default function StudentAcademicResultsPage() {
     }
   };
 
+  const [studentRegistrationData, setStudentRegistrationData] = useState(null);
+
   useEffect(() => {
     api
       .get("/results/student")
@@ -83,9 +85,29 @@ export default function StudentAcademicResultsPage() {
       .finally(() => {
         setLoading(false);
       });
+
+    api.get("/registration/my-status")
+      .then((res) => {
+        if (res.data) {
+          setStudentRegistrationData(res.data);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const resultsByLevelTerm = data?.resultsByLevelTerm || {};
+
+  const isResultsCardUnlocked = (cardIndex, semKey) => {
+    const targetL = Math.ceil(cardIndex / 2);
+    const targetT = cardIndex % 2 === 1 ? 1 : 2;
+    const regs = studentRegistrationData?.registrations || [];
+    const hasApprovedReg = regs.some((r) => {
+      const rL = Number(String(r.level || "").replace(/[^0-9]/g, ""));
+      const rT = Number(String(r.term || "").replace(/[^0-9]/g, ""));
+      return rL === targetL && rT === targetT && (r.status === "Approved" || r.status === "Registered");
+    });
+    return hasApprovedReg;
+  };
 
   // All 8 Level-Term Semesters
   const levelTermSemesters = [
@@ -209,39 +231,62 @@ export default function StudentAcademicResultsPage() {
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" }}>
-                {levelTermSemesters.map((semKey) => {
+                {levelTermSemesters.map((semKey, index) => {
+                  const cardIndex = index + 1;
+                  const unlocked = isResultsCardUnlocked(cardIndex, semKey);
+                  const isLocked = !unlocked;
                   const count = (resultsByLevelTerm[semKey] || []).length;
-                  const isSelected = selectedSemester === semKey;
+                  const isSelected = selectedSemester === semKey && !isLocked;
                   const semGPA = calculateGPA(resultsByLevelTerm[semKey]);
 
                   return (
                     <div
                       key={semKey}
-                      onClick={() => setSelectedSemester(semKey)}
+                      onClick={() => {
+                        if (isLocked) {
+                          toast.error(`Level ${Math.ceil(cardIndex / 2)} Term ${cardIndex % 2 === 1 ? 1 : 2} is locked. You can only view results up to your current Level-Term (${data?.student?.currentLevel ? `Level ${data.student.currentLevel} Term ${data.student.currentTerm}` : `Level 1 Term 1`}).`);
+                          return;
+                        }
+                        setSelectedSemester(semKey);
+                      }}
                       style={{
-                        background: isSelected ? "linear-gradient(135deg, #7EC8E3, #3B8DB3)" : "#ffffff",
-                        color: isSelected ? "#ffffff" : "#1e293b",
-                        border: isSelected ? "none" : "1px solid #cbd5e1",
+                        background: isLocked
+                          ? "#f1f5f9"
+                          : isSelected
+                          ? "linear-gradient(135deg, #7EC8E3, #3B8DB3)"
+                          : "#ffffff",
+                        color: isLocked ? "#94a3b8" : isSelected ? "#ffffff" : "#1e293b",
+                        border: isLocked
+                          ? "1px dashed #cbd5e1"
+                          : isSelected
+                          ? "none"
+                          : "1px solid #cbd5e1",
                         borderRadius: "14px",
                         padding: "20px",
-                        cursor: "pointer",
+                        cursor: isLocked ? "not-allowed" : "pointer",
+                        opacity: isLocked ? 0.75 : 1,
                         boxShadow: isSelected ? "0 6px 20px rgba(59,141,179,0.25)" : "0 2px 6px rgba(0,0,0,0.03)",
                         transition: "all 0.15s ease",
+                        position: "relative",
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div style={{ fontWeight: 700, fontSize: "15px" }}>{semKey}</div>
-                        <FiBookOpen size={16} />
+                        {isLocked ? <FiLock size={16} color="#94a3b8" /> : <FiBookOpen size={16} />}
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px" }}>
                         <span style={{ fontSize: "12px", opacity: 0.9 }}>
-                          {count > 0 ? `${count} Published Courses` : "No Results Yet"}
+                          {isLocked ? "Locked" : count > 0 ? `${count} Published Courses` : "No Results Yet"}
                         </span>
-                        {count > 0 && (
+                        {isLocked ? (
+                          <span style={{ fontSize: "11px", fontWeight: 700, background: "#e2e8f0", color: "#64748b", padding: "3px 8px", borderRadius: "10px" }}>
+                            🔒 Locked
+                          </span>
+                        ) : count > 0 ? (
                           <span style={{ fontSize: "11px", fontWeight: 800, background: isSelected ? "rgba(255,255,255,0.25)" : "#dcfce7", color: isSelected ? "#fff" : "#166534", padding: "3px 8px", borderRadius: "10px" }}>
                             GPA: {semGPA}
                           </span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   );

@@ -386,13 +386,20 @@ exports.submitRegistration = async (req, res) => {
 };
 
 // Helper: Ensure real LMS Course document exists for approved course registration
+// SESSION-ISOLATED: each (courseCode + session) pair gets its own unique LMS Course card.
+// A course card created for session 2024-25 will NEVER be reused for session 2025-26.
 const linkOrCreateLmsCourse = async (courseItem, reg, studentDept) => {
   try {
     const Course = require("../models/Course");
     const User = require("../models/User");
 
     const codeStr = (courseItem.courseCode || courseItem.code || "COURSE").toUpperCase().trim();
-    let lmsCourse = await Course.findOne({ displayCode: codeStr });
+    const sessionStr = (reg.session || "").trim();
+
+    // FIXED: Always filter by session so each academic session gets its own course card
+    const courseQuery = { displayCode: codeStr };
+    if (sessionStr) courseQuery.session = sessionStr;
+    let lmsCourse = await Course.findOne(courseQuery);
 
     if (!lmsCourse) {
       let teacherId = null;
@@ -668,11 +675,13 @@ exports.approveRegistration = async (req, res) => {
       (reg.selectedCourses || []).map(async (courseItem) => {
         try {
           const lmsCourse = await linkOrCreateLmsCourse(courseItem, reg, student?.department);
-          
+
+          // FIXED: Include session in upsert filter so each session gets its own Enrollment record
           await Enrollment.findOneAndUpdate(
             {
               student: reg.user,
               courseCode: courseItem.courseCode,
+              session: reg.session,
             },
             {
               studentId: reg.studentId,
@@ -759,8 +768,9 @@ exports.approveAllPendingRegistrations = async (req, res) => {
         await Promise.all(
           (reg.selectedCourses || []).map(async (courseItem) => {
             const lmsCourse = await linkOrCreateLmsCourse(courseItem, reg, student?.department);
+            // FIXED: Include session in upsert filter so each session gets its own Enrollment record
             await Enrollment.findOneAndUpdate(
-              { student: reg.user, courseCode: courseItem.courseCode },
+              { student: reg.user, courseCode: courseItem.courseCode, session: reg.session },
               {
                 studentId: reg.studentId,
                 course: lmsCourse ? lmsCourse._id : undefined,

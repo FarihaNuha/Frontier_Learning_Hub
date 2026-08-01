@@ -69,7 +69,12 @@ exports.getMyCourses = async (req, res) => {
           const codeStr = (courseItem.courseCode || courseItem.code || "").toUpperCase().trim();
           if (!codeStr) continue;
 
-          let lmsCourse = await Course.findOne({ displayCode: codeStr });
+          // FIXED: Filter by both displayCode AND session — each session gets its own fresh Course card.
+          // This prevents 2025-26 students from being added to old 2024-25 cards.
+          const regSession = reg.session || studentProfile?.session || "";
+          const lmsQuery = { displayCode: codeStr };
+          if (regSession) lmsQuery.session = regSession;
+          let lmsCourse = await Course.findOne(lmsQuery);
           if (!lmsCourse) {
             let teacherId = null;
             if (reg.adviserEmail) {
@@ -109,11 +114,12 @@ exports.getMyCourses = async (req, res) => {
             );
           }
 
+          // FIXED: Include session in upsert filter so each session gets its own Enrollment record
           await Enrollment.findOneAndUpdate(
             {
               $or: [
-                { student: userId, courseCode: codeStr },
-                ...(studentIdStr ? [{ studentId: studentIdStr, courseCode: codeStr }] : [])
+                { student: userId, courseCode: codeStr, session: reg.session },
+                ...(studentIdStr ? [{ studentId: studentIdStr, courseCode: codeStr, session: reg.session }] : [])
               ]
             },
             {
@@ -158,9 +164,12 @@ exports.getMyCourses = async (req, res) => {
         return res.json([]);
       }
 
-      // Fetch ONLY LMS courses matching approved course codes
+      // Fetch ONLY LMS courses matching approved course codes AND where this student is enrolled.
+      // Using students:userId ensures we see ONLY the session-specific cards where this student
+      // was added — not old sessions' cards with overlapping course codes.
       let lmsCourses = await Course.find({
-        displayCode: { $in: Array.from(approvedCourseCodes) }
+        displayCode: { $in: Array.from(approvedCourseCodes) },
+        students: userId,
       })
         .populate("teacher", "name email profilePicture department")
         .sort({ createdAt: -1 })
@@ -267,20 +276,81 @@ exports.getMyCourses = async (req, res) => {
         .sort({ createdAt: -1 })
         .lean();
 
-      if (teacherProfile && Array.isArray(teacherProfile.assignedCourses) && teacherProfile.assignedCourses.length > 0) {
-        const assignedCodes = new Set(
-          teacherProfile.assignedCourses.map((ac) => (ac.courseCode || "").trim().toUpperCase()).filter(Boolean)
-        );
-        const assignedNames = teacherProfile.assignedCourses
-          .map((ac) => (ac.courseName || "").trim().toLowerCase())
-          .filter(Boolean);
+      // Helper to consolidate duplicate course cards for the same (displayCode + session)
+      const deduplicateTeacherCourses = async (rawCourses) => {
+        if (!Array.isArray(rawCourses) || rawCourses.length === 0) return [];
+        const CourseModel = require("../models/Course");
+        const EnrollmentModel = require("../models/Enrollment");
 
+        const uniqueMap = new Map();
+        const dupIdsToDelete = [];
+
+        for (const c of rawCourses) {
+          const normCode = (c.displayCode || c.name || "").replace(/[-\s]/g, "").toUpperCase();
+          const normSess = (c.session || "").replace(/[-\s]/g, "").toLowerCase();
+          const key = `${normCode}_${normSess}`;
+
+          if (!uniqueMap.has(key)) {
+            uniqueMap.set(key, { ...c, students: [...(c.students || [])] });
+          } else {
+            const primary = uniqueMap.get(key);
+            const existingStudentIds = new Set((primary.students || []).map(s => (s._id || s).toString()));
+            (c.students || []).forEach(s => {
+              const sid = (s._id || s).toString();
+              if (!existingStudentIds.has(sid)) {
+                primary.students.push(s);
+                existingStudentIds.add(sid);
+              }
+            });
+            dupIdsToDelete.push(c._id);
+          }
+        }
+
+        if (dupIdsToDelete.length > 0) {
+          try {
+            for (const primary of uniqueMap.values()) {
+              const studentObjIds = (primary.students || []).map(s => s._id || s);
+              await CourseModel.findByIdAndUpdate(primary._id, { students: studentObjIds }).catch(() => {});
+            }
+            for (const dupId of dupIdsToDelete) {
+              const dupDoc = rawCourses.find(c => c._id.toString() === dupId.toString());
+              if (dupDoc) {
+                const normCode = (dupDoc.displayCode || dupDoc.name || "").replace(/[-\s]/g, "").toUpperCase();
+                const normSess = (dupDoc.session || "").replace(/[-\s]/g, "").toLowerCase();
+                const primary = uniqueMap.get(`${normCode}_${normSess}`);
+                if (primary) {
+                  await EnrollmentModel.updateMany({ course: dupId }, { course: primary._id }).catch(() => {});
+                }
+              }
+              await CourseModel.findByIdAndDelete(dupId).catch(() => {});
+            }
+          } catch (e) {
+            console.error("Non-fatal duplicate cleanup error:", e.message);
+          }
+        }
+
+        return Array.from(uniqueMap.values());
+      };
+
+      if (teacherProfile && Array.isArray(teacherProfile.assignedCourses) && teacherProfile.assignedCourses.length > 0) {
         courses = courses.filter((c) => {
           const code = (c.displayCode || "").trim().toUpperCase();
           const name = (c.name || "").trim().toLowerCase();
-          return assignedCodes.has(code) || assignedNames.some((n) => n && name === n);
+          const sess = (c.session || "").trim().toLowerCase();
+
+          return teacherProfile.assignedCourses.some((ac) => {
+            const acCode = (ac.courseCode || "").trim().toUpperCase();
+            const acName = (ac.courseName || "").trim().toLowerCase();
+            const acSess = (ac.session || "").trim().toLowerCase();
+
+            const codeMatch = (acCode && acCode === code) || (acName && acName === name);
+            const sessMatch = !acSess || !sess || acSess === sess;
+            return codeMatch && sessMatch;
+          });
         });
       }
+
+      courses = await deduplicateTeacherCourses(courses);
 
       const courseImports = await CourseImport.find().lean();
 
@@ -289,6 +359,11 @@ exports.getMyCourses = async (req, res) => {
           (ci) => ci.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()
         );
         const matchAssigned = teacherProfile?.assignedCourses?.find(
+          (ac) =>
+            ((ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
+            (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())) &&
+            (!ac.session || !c.session || ac.session.trim().toLowerCase() === c.session.trim().toLowerCase())
+        ) || teacherProfile?.assignedCourses?.find(
           (ac) =>
             (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
             (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
@@ -318,7 +393,7 @@ exports.getMyCourses = async (req, res) => {
           ...c,
           level: formattedLevel,
           term: formattedTerm,
-          session: matchAssigned?.session || c.session || "2023-24",
+          session: c.session || matchAssigned?.session || "2023-24",
           courseType: c.courseType || matchImport?.courseType || "Theory",
           creditHours: c.creditHours || matchImport?.creditHours || 3,
         };
@@ -376,13 +451,45 @@ exports.getTeacherDashboardSummary = async (req, res) => {
         }
       }
 
-      // Strictly retain ONLY courses assigned to this teacher by Admin
       courses = courses.filter((c) => {
         const code = (c.displayCode || "").trim().toUpperCase();
         const name = (c.name || "").trim().toLowerCase();
-        return assignedCodes.has(code) || assignedNames.some((n) => n && name === n);
+        const sess = (c.session || "").trim().toLowerCase();
+
+        return TeacherProfile.assignedCourses.some((ac) => {
+          const acCode = (ac.courseCode || "").trim().toUpperCase();
+          const acName = (ac.courseName || "").trim().toLowerCase();
+          const acSess = (ac.session || "").trim().toLowerCase();
+
+          const codeMatch = (acCode && acCode === code) || (acName && acName === name);
+          const sessMatch = !acSess || !sess || acSess === sess;
+          return codeMatch && sessMatch;
+        });
       });
     }
+
+    // Deduplicate duplicate cards for the same session
+    const uniqueMap = new Map();
+    for (const c of courses) {
+      const normCode = (c.displayCode || c.name || "").replace(/[-\s]/g, "").toUpperCase();
+      const normSess = (c.session || "").replace(/[-\s]/g, "").toLowerCase();
+      const key = `${normCode}_${normSess}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, c);
+      } else {
+        const primary = uniqueMap.get(key);
+        const existingStudentIds = new Set((primary.students || []).map(s => (s._id || s).toString()));
+        (c.students || []).forEach(s => {
+          const sid = (s._id || s).toString();
+          if (!existingStudentIds.has(sid)) {
+            primary.students = primary.students || [];
+            primary.students.push(s);
+            existingStudentIds.add(sid);
+          }
+        });
+      }
+    }
+    courses = Array.from(uniqueMap.values());
 
     const courseIds = courses.map(c => c._id);
     const courseImports = await CourseImport.find().lean();
@@ -426,6 +533,10 @@ exports.getTeacherDashboardSummary = async (req, res) => {
     const formattedCourses = courses.map(c => {
       let matchImport = courseImports.find(ci => ci.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase());
       let matchAssigned = TeacherProfile?.assignedCourses?.find(ac =>
+        ((ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
+        (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())) &&
+        (!ac.session || !c.session || ac.session.trim().toLowerCase() === c.session.trim().toLowerCase())
+      ) || TeacherProfile?.assignedCourses?.find(ac =>
         (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
         (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
       );
@@ -450,6 +561,7 @@ exports.getTeacherDashboardSummary = async (req, res) => {
         ...c,
         level,
         term,
+        session: c.session || matchAssigned?.session || "2023-24",
         totalEnrolled: (c.students || []).length,
       };
     });

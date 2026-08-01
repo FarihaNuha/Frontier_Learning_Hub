@@ -394,23 +394,27 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
     for (const item of assigned) {
       const code = (item.courseCode || "").trim().toUpperCase();
       const name = (item.courseName || "").trim();
+      const targetSession = item.session || teacherDoc.assignedSession || "";
 
       if (!code && !name) continue;
 
-      const orConditions = [];
-      if (code) orConditions.push({ displayCode: code });
-      if (name) orConditions.push({ name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
+      const baseConditions = [];
+      if (code) baseConditions.push({ displayCode: code });
+      if (name) baseConditions.push({ name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
 
-      let existingCourses = await Course.find({ $or: orConditions });
+      // SESSION-ISOLATED MATCHING:
+      // Try to find course card matching displayCode/name AND targetSession
+      let existingCourse = targetSession
+        ? await Course.findOne({ $or: baseConditions, session: targetSession })
+        : await Course.findOne({ $or: baseConditions });
 
-      if (existingCourses.length > 0) {
-        // Link teacher to existing LMS courses
-        await Course.updateMany(
-          { $or: orConditions },
-          { teacher: userDoc._id, session: item.session || teacherDoc.assignedSession || "" }
-        );
+      if (existingCourse) {
+        // Link teacher to existing LMS course for this specific session
+        existingCourse.teacher = userDoc._id;
+        if (targetSession && !existingCourse.session) existingCourse.session = targetSession;
+        await existingCourse.save();
       } else {
-        // Auto-create LMS Course document if missing in Course collection
+        // Auto-create LMS Course document for this session if missing in Course collection
         const importMatch = await CourseImport.findOne({
           $or: [
             ...(code ? [{ courseCode: code }] : []),
@@ -420,10 +424,10 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
 
         const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
         await Course.create({
-          name: name || importMatch?.courseTitle || "New Course",
+          name: name || importMatch?.courseTitle || code || "New Course",
           displayCode: (code || importMatch?.courseCode || "COURSE").toUpperCase(),
-          session: item.session || teacherDoc.assignedSession || "",
-          department: teacherDoc.department || importMatch?.department || "",
+          session: targetSession,
+          department: teacherDoc.department || importMatch?.department || "EDTE",
           teacher: userDoc._id,
           joinCode: joinCode,
           students: [],
@@ -949,12 +953,32 @@ exports.assignTeacherToCourse = async (req, res) => {
     });
     await teacherDoc.save();
 
-    // Reassign LMS Course if existing
+    // SESSION-ISOLATED: Reassign or create LMS Course for this specific session
     if (teacherUser && courseCode) {
-      await Course.updateMany(
-        { displayCode: (courseCode || "").toUpperCase() },
-        { teacher: teacherUser._id, session: session || "" }
-      );
+      const codeStr = (courseCode || "").toUpperCase().trim();
+      const sessStr = (session || "").trim();
+
+      let existingCourse = sessStr
+        ? await Course.findOne({ displayCode: codeStr, session: sessStr })
+        : await Course.findOne({ displayCode: codeStr });
+
+      if (existingCourse) {
+        existingCourse.teacher = teacherUser._id;
+        if (sessStr) existingCourse.session = sessStr;
+        await existingCourse.save();
+      } else {
+        const importMatch = await CourseImport.findOne({ courseCode: codeStr }).lean();
+        const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await Course.create({
+          name: importMatch?.courseTitle || codeStr,
+          displayCode: codeStr,
+          session: sessStr,
+          department: teacherDoc.department || importMatch?.department || "EDTE",
+          teacher: teacherUser._id,
+          joinCode: joinCode,
+          students: [],
+        });
+      }
     }
 
     res.json({ message: "Teacher assigned to course successfully.", teacher: teacherDoc });

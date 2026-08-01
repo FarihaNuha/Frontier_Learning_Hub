@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-08-01)
 
 ## Corpus Check
-- 241 files · ~205,198 words
+- 241 files · ~205,885 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1489 nodes · 2341 edges · 135 communities (99 shown, 36 thin omitted)
+- 1489 nodes · 2340 edges · 135 communities (99 shown, 36 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a93ebdbe`
+- Built from commit: `1e3e5b25`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -313,8 +313,8 @@ Cohesion: 0.30
 Nodes (4): PaymentCheckoutModal(), RegistrationInvoiceModal(), FIXED_REGISTRATION_FEES, FIXED_REGISTRATION_FEES
 
 ### Community 42 - "ShareModal.jsx"
-Cohesion: 0.15
-Nodes (17): ShareModal(), CommentItem(), CommunityHub(), CreatePostModal(), EditPostModal(), getFileUrl(), PostCard(), renderAttachments() (+9 more)
+Cohesion: 0.16
+Nodes (16): ShareModal(), CommentItem(), CourseCommunity(), CoursePostCard(), EditPostModal(), getFileUrl(), renderAttachments(), renderContentWithLinks() (+8 more)
 
 ### Community 47 - "deadlineReminder.js"
 Cohesion: 0.22
@@ -333,8 +333,8 @@ Cohesion: 0.06
 Nodes (21): Assessment, assessmentSchema, mongoose, Assessment, dns, mongoose, path, Assessment (+13 more)
 
 ### Community 51 - "useAuth"
-Cohesion: 0.33
-Nodes (9): FilePreviewModal(), CommentItem(), CourseCommunity(), CoursePostCard(), EditPostModal(), getFileUrl(), renderAttachments(), renderContentWithLinks() (+1 more)
+Cohesion: 0.29
+Nodes (10): FilePreviewModal(), CommentItem(), CommunityHub(), CreatePostModal(), EditPostModal(), getFileUrl(), PostCard(), renderAttachments() (+2 more)
 
 ### Community 52 - "apiCache.js"
 Cohesion: 0.19
@@ -437,8 +437,8 @@ Cohesion: 0.40
 Nodes (5): createCorrectionRequest(), getStudentCorrectionRequests(), getTeacherCorrectionRequests(), replyToCorrectionRequest(), ResultCorrectionRequest
 
 ### Community 80 - "@testing-library/user-event"
-Cohesion: 0.29
-Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 84 - "TeacherHomeDashboard.jsx"
 Cohesion: 0.25
@@ -557,8 +557,8 @@ Cohesion: 0.33
 Nodes (4): dns, mongoose, path, Teacher
 
 ### Community 134 - "axios"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.29
+Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
 
 ## Knowledge Gaps
 - **754 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+749 more)
@@ -569,9 +569,9 @@ Nodes (3): ctrl, router, { verifyToken, checkRole }
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `StudentRegistrationPaymentPage()` connect `test_assignment_controller.js` to `examRoutes.js`?**
-  _High betweenness centrality (0.173) - this node is a cross-community bridge._
+  _High betweenness centrality (0.171) - this node is a cross-community bridge._
 - **Why does `api` connect `emailService.js` to `App.jsx`, `examRoutes.js`, `ShareModal.jsx`, `useAuth`, `apiCache.js`, `upload.js`, `courseRoutes.js`?**
-  _High betweenness centrality (0.116) - this node is a cross-community bridge._
+  _High betweenness centrality (0.117) - this node is a cross-community bridge._
 - **What connects `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin` to the rest of the system?**
   _757 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `dependencies` be split into smaller, more focused modules?**

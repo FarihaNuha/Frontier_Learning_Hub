@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
-    "mtime": 1785526275.8854446,
-    "ast_hash": "398f666ad8b912acc97bc6eb1eda552d",
+    "mtime": 1785527054.4889455,
+    "ast_hash": "96ab526ef47d45d7436fcd5d1fe5ea50",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "server/controllers/courseController.js": {
-    "mtime": 1785514294.4226198,
-    "ast_hash": "c52b3840a803d2b3600aeea03e85f8b9",
+    "mtime": 1785570312.6601448,
+    "ast_hash": "254c59df1c941cc07bce8dda9436bfb1",
     "semantic_hash": ""
   },
   "server/controllers/examController.js": {
@@ -585,8 +585,8 @@
     "semantic_hash": ""
   },
   "server/controllers/umsAdminController.js": {
-    "mtime": 1785511936.552833,
-    "ast_hash": "b275b1d708197dea71b394685096e7d5",
+    "mtime": 1785570306.6517007,
+    "ast_hash": "fb2fa73f52390924ad535fa143bef287",
     "semantic_hash": ""
   },
   "server/models/Adviser.js": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "server/controllers/registrationController.js": {
-    "mtime": 1785515466.6484785,
-    "ast_hash": "558d826a871fb32dd334d0996b0fec76",
+    "mtime": 1785569206.130139,
+    "ast_hash": "a283c9d49a43a634fce0e4c925ea7937",
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "server/models/Enrollment.js": {
-    "mtime": 1785018170.13178,
-    "ast_hash": "73088c76a6da6ca66e27c1967d95a02b",
+    "mtime": 1785569236.5267415,
+    "ast_hash": "3360479c9fb968bb00508636d8335799",
     "semantic_hash": ""
   },
   "server/models/Payment.js": {

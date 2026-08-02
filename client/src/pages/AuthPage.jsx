@@ -250,37 +250,11 @@ export default function AuthPage() {
 
             <div className="form-scrollable-area">
               <div className="form-group">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required={!isLogin}
-                />
-              </div>
-
-              {role === "student" && (
-                <div className="form-group">
-                  <label>Student ID</label>
-                  <input
-                    type="text"
-                    name="studentId"
-                    placeholder="Enter your student ID (e.g., 2202001)"
-                    value={formData.studentId}
-                    onChange={handleChange}
-                    required={!isLogin && role === "student"}
-                  />
-                </div>
-              )}
-
-              <div className="form-group">
                 <label>Email Address</label>
                 <input
                   type="email"
                   name="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter your registered email"
                   value={formData.email}
                   onChange={handleChange}
                   required={!isLogin}
@@ -308,22 +282,6 @@ export default function AuthPage() {
                     {showRegisterPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                   </button>
                 </div>
-              </div>
-
-              <div className="form-group">
-                <label>Department</label>
-                <select
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  required={!isLogin}
-                >
-                  <option value="EDTE">EDTE</option>
-                  <option value="IRE">IRE</option>
-                  <option value="CySE">CySE</option>
-                  <option value="DSE">DSE</option>
-                  <option value="SWE">SWE</option>
-                </select>
               </div>
             </div>
 
@@ -416,24 +374,18 @@ export default function AuthPage() {
           <div className="overlay">
             <div className="overlay-panel overlay-left">
               <h2>UFTB Moodle</h2>
-              <ul className="overlay-features">
-                <li>⚡ Live real-time updates & chat</li>
-                <li>📚 Instant course material access</li>
-                <li>💬 Community forum discussions</li>
-                <li>📊 Grade & attendance tracking</li>
-              </ul>
+              <p className="overlay-motto">
+                "Empowering academic excellence through seamless digital learning, intelligent evaluation, and real-time collaboration."
+              </p>
               <button type="button" className="ghost-btn" onClick={() => { setIsLogin(true); setError(""); }}>
                 SIGN IN
               </button>
             </div>
             <div className="overlay-panel overlay-right">
               <h2>Welcome Back!</h2>
-              <ul className="overlay-features">
-                <li>⚡ Live real-time updates & chat</li>
-                <li>📚 Instant course material access</li>
-                <li>💬 Community forum discussions</li>
-                <li>📊 Grade & attendance tracking</li>
-              </ul>
+              <p className="overlay-motto">
+                "Empowering academic excellence through seamless digital learning, intelligent evaluation, and real-time collaboration."
+              </p>
               <button type="button" className="ghost-btn" onClick={() => { setIsLogin(false); setError(""); }}>
                 SIGN UP
               </button>

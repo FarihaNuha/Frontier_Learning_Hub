@@ -640,7 +640,7 @@ export default function AdminResultManagementPage() {
               <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
                   <FiClock size={20} color="#166534" />
-                  <h3 style={{ margin: 0, fontSize: "16px", color="#166534", fontWeight: 800 }}>Set Result Submission Cutoff Deadline</h3>
+                  <h3 style={{ margin: 0, fontSize: "16px", color: "#166534", fontWeight: 800 }}>Set Result Submission Cutoff Deadline</h3>
                 </div>
 
                 <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
@@ -685,7 +685,7 @@ export default function AdminResultManagementPage() {
               <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
                   <FiClock size={20} color="#0369a1" />
-                  <h3 style={{ margin: 0, fontSize: "16px", color="#0369a1", fontWeight: 800 }}>Schedule Automated Timed Release</h3>
+                  <h3 style={{ margin: 0, fontSize: "16px", color: "#0369a1", fontWeight: 800 }}>Schedule Automated Timed Release</h3>
                 </div>
 
                 <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
@@ -864,8 +864,6 @@ export default function AdminResultManagementPage() {
                 </div>
               </div>
             )}
-          </div>
-        )}}
           </div>
         )}
 

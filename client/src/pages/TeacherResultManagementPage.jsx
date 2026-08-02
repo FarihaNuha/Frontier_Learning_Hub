@@ -1369,20 +1369,20 @@ export default function TeacherResultManagementPage() {
                             <input
                               type="number"
                               value={rowData.midPartA ?? ""}
-                              onChange={(e) => !isAdminDeadlinePassed && handleCellMarkChange(r._id, "midPartA", e.target.value)}
-                              readOnly={isAdminDeadlinePassed}
-                              disabled={isAdminDeadlinePassed}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isAdminDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isAdminDeadlinePassed ? "not-allowed" : "auto" }}
+                              onChange={(e) => (!isAdminDeadlinePassed && viewBatch?.resultType !== "Final") && handleCellMarkChange(r._id, "midPartA", e.target.value)}
+                              readOnly={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
+                              disabled={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
+                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "#f1f5f9" : "#fff", cursor: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "not-allowed" : "auto", color: viewBatch?.resultType === "Final" ? "#64748b" : "inherit" }}
                             />
                           </td>
                           <td style={{ padding: "8px 12px" }}>
                             <input
                               type="number"
                               value={rowData.midPartB ?? ""}
-                              onChange={(e) => !isAdminDeadlinePassed && handleCellMarkChange(r._id, "midPartB", e.target.value)}
-                              readOnly={isAdminDeadlinePassed}
-                              disabled={isAdminDeadlinePassed}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isAdminDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isAdminDeadlinePassed ? "not-allowed" : "auto" }}
+                              onChange={(e) => (!isAdminDeadlinePassed && viewBatch?.resultType !== "Final") && handleCellMarkChange(r._id, "midPartB", e.target.value)}
+                              readOnly={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
+                              disabled={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
+                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "#f1f5f9" : "#fff", cursor: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "not-allowed" : "auto", color: viewBatch?.resultType === "Final" ? "#64748b" : "inherit" }}
                             />
                           </td>
                           {viewBatch.resultType === "Final" && (

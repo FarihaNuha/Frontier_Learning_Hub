@@ -31,15 +31,12 @@ import {
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherHomeDashboard from "../components/TeacherHomeDashboard";
+import TeacherSidebar from "../components/TeacherSidebar";
 
 export default function TeacherDashboard({ courseId, courseCode }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // If no courseId is provided (e.g. at /teacher/dashboard), render the main overview dashboard
-  if (!courseId) {
-    return <TeacherHomeDashboard />;
-  }
   const [lectures, setLectures] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -178,14 +175,6 @@ export default function TeacherDashboard({ courseId, courseCode }) {
   });
   const [files, setFiles] = useState([]);
 
-  useEffect(() => {
-    if (user) {
-      fetchLectures();
-    }
-  }, [user]);
-
-  if (!user) return null;
-
   const fetchLectures = async (forceRefresh = false) => {
     try {
       const url = `/lectures?courseId=${courseId || ""}`;
@@ -195,6 +184,17 @@ export default function TeacherDashboard({ courseId, courseCode }) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchLectures();
+    }
+  }, [user]);
+
+  if (!user) return null;
+  if (!courseId) {
+    return <TeacherHomeDashboard />;
+  }
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files || []);

@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AuthPage.jsx": {
-    "mtime": 1785698059.5161316,
-    "ast_hash": "ef59a474d798bb4f672d774a7c2c43f8",
+    "mtime": 1785433431.4608655,
+    "ast_hash": "6b7488af2ed7daec09999c10408b29e0",
     "semantic_hash": ""
   },
   "client/src/pages/CommunityHub.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1785698059.5190594,
-    "ast_hash": "9dcc1b885f08336ef324dac4a6877f21",
+    "mtime": 1785023579.2288094,
+    "ast_hash": "764eabc98c932e82cc19708779018d72",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -650,8 +650,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminResultManagementPage.jsx": {
-    "mtime": 1785698156.6254952,
-    "ast_hash": "617f5fb8183792932d7e27b572c0e090",
+    "mtime": 1785602974.4705646,
+    "ast_hash": "38c97e81d67c84a82df4c34fde9f8b01",
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
@@ -660,8 +660,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAcademicResultsPage.jsx": {
-    "mtime": 1785698059.51762,
-    "ast_hash": "28c730a0c92d646b385cefb91c6012c7",
+    "mtime": 1785599967.9081657,
+    "ast_hash": "46c45434cb7c35778e4a848981a1db4b",
     "semantic_hash": ""
   },
   "client/src/pages/StudentLevelTermPage.jsx": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherResultManagementPage.jsx": {
-    "mtime": 1785698059.5214057,
-    "ast_hash": "17b81419a8af8b97d455cf4d867e0998",
+    "mtime": 1785600955.9116561,
+    "ast_hash": "621ecffaa73da4a6625f37969d50d8c3",
     "semantic_hash": ""
   },
   "server/controllers/announcementController.js": {
@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
-    "mtime": 1785698059.5259922,
-    "ast_hash": "883f1a466398bf47a4abe5b7490a8b79",
+    "mtime": 1785602952.2019026,
+    "ast_hash": "dd0707cb5143a86637789573be8ead54",
     "semantic_hash": ""
   },
   "server/models/Announcement.js": {

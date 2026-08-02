@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "server/controllers/assessmentController.js": {
-    "mtime": 1785599941.4602635,
-    "ast_hash": "a0a9359d169424471161500fdb710570",
+    "mtime": 1785600976.941463,
+    "ast_hash": "dd90fd945d1e9c066099fbbc13e7f3fe",
     "semantic_hash": ""
   },
   "server/controllers/assignmentController.js": {
@@ -650,8 +650,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminResultManagementPage.jsx": {
-    "mtime": 1785522196.5451975,
-    "ast_hash": "26ddb4554273c4a2656227dffd9c261a",
+    "mtime": 1785602843.6375556,
+    "ast_hash": "67ca645fb34dae03677db76c0bfc2aa6",
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
@@ -670,8 +670,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherEnrolledStudentsPage.jsx": {
-    "mtime": 1785105250.8875709,
-    "ast_hash": "0a7a8d3a1fc1fc6383ce2a8026095ac0",
+    "mtime": 1785601827.9980192,
+    "ast_hash": "275f31d54e1ee4b46da3945968a347bb",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherRegistrationApprovalPage.jsx": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherResultManagementPage.jsx": {
-    "mtime": 1785598661.270465,
-    "ast_hash": "00d987761dd1f497857acab221b9ce43",
+    "mtime": 1785600955.9116561,
+    "ast_hash": "621ecffaa73da4a6625f37969d50d8c3",
     "semantic_hash": ""
   },
   "server/controllers/announcementController.js": {
@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
-    "mtime": 1785599950.1067262,
-    "ast_hash": "8fca7a1c98e98c6ad97433a8b6ece232",
+    "mtime": 1785602834.3170326,
+    "ast_hash": "5dbf0a4cffd986fa3272b3af755da40d",
     "semantic_hash": ""
   },
   "server/models/Announcement.js": {

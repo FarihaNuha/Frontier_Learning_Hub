@@ -177,6 +177,11 @@ export default function AdminResultManagementPage() {
     }
   };
 
+  const [cgpaRecords, setCgpaRecords] = useState([]);
+  const [cgpaDeptFilter, setCgpaDeptFilter] = useState("all");
+  const [cgpaSessionFilter, setCgpaSessionFilter] = useState("all");
+  const [cgpaLevelFilter, setCgpaLevelFilter] = useState("all");
+
   const fetchAdminResults = async () => {
     setLoading(true);
     try {
@@ -184,6 +189,7 @@ export default function AdminResultManagementPage() {
       const res = await api.get(`/results/admin?${params.toString()}`);
       setUploads(res.data.uploads || []);
       setNotices(res.data.notices || []);
+      setCgpaRecords(res.data.cgpaRecords || []);
     } catch (err) {
       toast.error("Failed to load admin result management data.");
     } finally {
@@ -640,7 +646,7 @@ export default function AdminResultManagementPage() {
               <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
                   <FiClock size={20} color="#166534" />
-                  <h3 style={{ margin: 0, fontSize: "16px", color="#166534", fontWeight: 800 }}>Set Result Submission Cutoff Deadline</h3>
+                  <h3 style={{ margin: 0, fontSize: "16px", color: "#166534", fontWeight: 800 }}>Set Result Submission Cutoff Deadline</h3>
                 </div>
 
                 <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
@@ -685,7 +691,7 @@ export default function AdminResultManagementPage() {
               <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
                   <FiClock size={20} color="#0369a1" />
-                  <h3 style={{ margin: 0, fontSize: "16px", color="#0369a1", fontWeight: 800 }}>Schedule Automated Timed Release</h3>
+                  <h3 style={{ margin: 0, fontSize: "16px", color: "#0369a1", fontWeight: 800 }}>Schedule Automated Timed Release</h3>
                 </div>
 
                 <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
@@ -727,70 +733,156 @@ export default function AdminResultManagementPage() {
               </div>
             </div>
 
-            {/* Active Deadlines & Schedules Table (Like Registration Calendar) */}
-            <div style={{ background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
+            {/* Table 1: 📅 Result Submission Cutoff Deadlines Registry */}
+            <div style={{ background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #bbf7d0", marginBottom: "28px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                <h3 style={{ margin: 0, color: "#0f172a", fontSize: "17px", fontWeight: 800 }}>📅 Active Deadlines & Schedules Registry</h3>
-                <span style={{ fontSize: "12.5px", color: "#64748b", fontWeight: 600 }}>Total Records: {notices.length}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#16a34a" }} />
+                  <h3 style={{ margin: 0, color: "#166534", fontSize: "16.5px", fontWeight: 800 }}>📅 Result Submission Cutoff Deadlines Table</h3>
+                </div>
+                <span style={{ fontSize: "12px", color: "#166534", fontWeight: 700, background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "4px 10px", borderRadius: "8px" }}>
+                  Active Cutoffs: {notices.filter(n => n.targetAudience === "Teachers" || (n.title && n.title.includes("Cutoff")) || n.resultDeadlineType === "Midterm" || n.resultDeadlineType === "Final").length}
+                </span>
               </div>
 
-              {notices.length === 0 ? (
-                <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8", fontSize: "13.5px" }}>
-                  No active deadlines or scheduled releases recorded yet.
-                </div>
-              ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-                    <thead>
-                      <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #e2e8f0" }}>
-                        <th style={{ padding: "10px 14px" }}>Session</th>
-                        <th style={{ padding: "10px 14px" }}>Level-Term</th>
-                        <th style={{ padding: "10px 14px" }}>Type / Audience</th>
-                        <th style={{ padding: "10px 14px" }}>Notice Title</th>
-                        <th style={{ padding: "10px 14px" }}>Cutoff / Release Date & Time</th>
-                        <th style={{ padding: "10px 14px" }}>Status</th>
-                        <th style={{ padding: "10px 14px", textAlign: "center" }}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {notices.map((n) => {
-                        const targetDate = n.deadlineDate || n.scheduledPublishDate;
-                        const isExpired = targetDate ? new Date(targetDate) < new Date() : false;
+              {(() => {
+                const cutoffNotices = notices.filter(n => n.targetAudience === "Teachers" || (n.title && n.title.includes("Cutoff")) || n.resultDeadlineType === "Midterm" || n.resultDeadlineType === "Final");
+                if (cutoffNotices.length === 0) {
+                  return (
+                    <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", fontSize: "13px" }}>
+                      No result submission cutoff deadlines set yet.
+                    </div>
+                  );
+                }
+                return (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                      <thead>
+                        <tr style={{ background: "#f0fdf4", color: "#166534", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #bbf7d0" }}>
+                          <th style={{ padding: "10px 14px" }}>Session</th>
+                          <th style={{ padding: "10px 14px" }}>Level-Term</th>
+                          <th style={{ padding: "10px 14px" }}>Notice / Exam Title</th>
+                          <th style={{ padding: "10px 14px" }}>Target Audience</th>
+                          <th style={{ padding: "10px 14px" }}>Cutoff Date & Time</th>
+                          <th style={{ padding: "10px 14px" }}>Status</th>
+                          <th style={{ padding: "10px 14px", textAlign: "center" }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cutoffNotices.map((n) => {
+                          const targetDate = n.deadlineDate || n.scheduledPublishDate;
+                          const isExpired = targetDate ? new Date(targetDate) < new Date() : false;
+                          return (
+                            <tr key={n._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0f172a" }}>{n.session || "All Sessions"}</td>
+                              <td style={{ padding: "10px 14px" }}>{n.level && n.term ? `${formatLevel(n.level)} ${formatTerm(n.term)}` : "All Level-Terms"}</td>
+                              <td style={{ padding: "10px 14px", fontWeight: 600 }}>{n.title}</td>
+                              <td style={{ padding: "10px 14px" }}>
+                                <span style={{ background: "#fef3c7", color: "#b45309", fontWeight: 700, padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
+                                  Teachers 👤
+                                </span>
+                              </td>
+                              <td style={{ padding: "10px 14px", fontWeight: 700, color: isExpired ? "#991b1b" : "#166534" }}>
+                                {targetDate ? new Date(targetDate).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "No Date Set"}
+                              </td>
+                              <td style={{ padding: "10px 14px" }}>
+                                <span style={{ background: isExpired ? "#fee2e2" : "#dcfce7", color: isExpired ? "#991b1b" : "#166534", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
+                                  {isExpired ? "Cutoff Passed 🔴" : "Active 🟢"}
+                                </span>
+                              </td>
+                              <td style={{ padding: "10px 14px", textAlign: "center" }}>
+                                <button
+                                  onClick={() => handleDeleteNotice(n._id)}
+                                  style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}
+                                  title="Remove deadline record"
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
 
-                        return (
-                          <tr key={n._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                            <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0f172a" }}>{n.session || "All Sessions"}</td>
-                            <td style={{ padding: "10px 14px" }}>{n.level && n.term ? `${formatLevel(n.level)} ${formatTerm(n.term)}` : "All Level-Terms"}</td>
-                            <td style={{ padding: "10px 14px" }}>
-                              <span style={{ background: "#e0f2fe", color: "#0369a1", fontWeight: 700, padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
-                                {n.resultDeadlineType || n.targetAudience || "Academic"}
-                              </span>
-                            </td>
-                            <td style={{ padding: "10px 14px", fontWeight: 600 }}>{n.title}</td>
-                            <td style={{ padding: "10px 14px", fontWeight: 700, color: isExpired ? "#991b1b" : "#166534" }}>
-                              {targetDate ? new Date(targetDate).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "No Date Set"}
-                            </td>
-                            <td style={{ padding: "10px 14px" }}>
-                              <span style={{ background: isExpired ? "#fee2e2" : "#dcfce7", color: isExpired ? "#991b1b" : "#166534", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
-                                {isExpired ? "Expired / Passed" : "Active 🟢"}
-                              </span>
-                            </td>
-                            <td style={{ padding: "10px 14px", textAlign: "center" }}>
-                              <button
-                                onClick={() => handleDeleteNotice(n._id)}
-                                style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}
-                                title="Remove schedule record"
-                              >
-                                Remove
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+            {/* Table 2: ⏱️ Scheduled Automated Timed Releases Registry */}
+            <div style={{ background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #bae6fd" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#0284c7" }} />
+                  <h3 style={{ margin: 0, color: "#0369a1", fontSize: "16.5px", fontWeight: 800 }}>⏱️ Scheduled Automated Timed Releases Table</h3>
                 </div>
-              )}
+                <span style={{ fontSize: "12px", color: "#0369a1", fontWeight: 700, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "4px 10px", borderRadius: "8px" }}>
+                  Active Timers: {notices.filter(n => n.targetAudience === "Students" || (n.title && (n.title.includes("Timed Release") || n.title.includes("Release Schedule")))).length}
+                </span>
+              </div>
+
+              {(() => {
+                const timedNotices = notices.filter(n => n.targetAudience === "Students" || (n.title && (n.title.includes("Timed Release") || n.title.includes("Release Schedule"))));
+                if (timedNotices.length === 0) {
+                  return (
+                    <div style={{ padding: "32px", textAlign: "center", color: "#94a3b8", fontSize: "13px" }}>
+                      No automated release timers scheduled yet.
+                    </div>
+                  );
+                }
+                return (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                      <thead>
+                        <tr style={{ background: "#f0f9ff", color: "#0369a1", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #bae6fd" }}>
+                          <th style={{ padding: "10px 14px" }}>Session</th>
+                          <th style={{ padding: "10px 14px" }}>Level-Term</th>
+                          <th style={{ padding: "10px 14px" }}>Announcement Title</th>
+                          <th style={{ padding: "10px 14px" }}>Target Audience</th>
+                          <th style={{ padding: "10px 14px" }}>Scheduled Release Date & Time</th>
+                          <th style={{ padding: "10px 14px" }}>Timer Status</th>
+                          <th style={{ padding: "10px 14px", textAlign: "center" }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {timedNotices.map((n) => {
+                          const targetDate = n.deadlineDate || n.scheduledPublishDate;
+                          const isExpired = targetDate ? new Date(targetDate) < new Date() : false;
+                          return (
+                            <tr key={n._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0f172a" }}>{n.session || "All Sessions"}</td>
+                              <td style={{ padding: "10px 14px" }}>{n.level && n.term ? `${formatLevel(n.level)} ${formatTerm(n.term)}` : "All Level-Terms"}</td>
+                              <td style={{ padding: "10px 14px", fontWeight: 600 }}>{n.title}</td>
+                              <td style={{ padding: "10px 14px" }}>
+                                <span style={{ background: "#e0f2fe", color: "#0369a1", fontWeight: 700, padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
+                                  Students 🎓
+                                </span>
+                              </td>
+                              <td style={{ padding: "10px 14px", fontWeight: 700, color: isExpired ? "#166534" : "#0284c7" }}>
+                                {targetDate ? new Date(targetDate).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "No Date Set"}
+                              </td>
+                              <td style={{ padding: "10px 14px" }}>
+                                <span style={{ background: isExpired ? "#dcfce7" : "#e0f2fe", color: isExpired ? "#166534" : "#0284c7", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
+                                  {isExpired ? "Released & Published 🟢" : "Scheduled Timer ⏳"}
+                                </span>
+                              </td>
+                              <td style={{ padding: "10px 14px", textAlign: "center" }}>
+                                <button
+                                  onClick={() => handleDeleteNotice(n._id)}
+                                  style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}
+                                  title="Remove release schedule record"
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
@@ -864,8 +956,93 @@ export default function AdminResultManagementPage() {
                 </div>
               </div>
             )}
-          </div>
-        )}}
+
+            {/* Department & Session-wise Calculated CGPA Audit Table */}
+            <div style={{ marginTop: "28px", background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#16a34a" }} />
+                  <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16.5px", fontWeight: 800 }}>📅 Department-Wise Calculated GPA & CGPA History Registry</h3>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  <select value={cgpaDeptFilter} onChange={(e) => setCgpaDeptFilter(e.target.value)} style={{ padding: "6.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                    <option value="all">All Departments</option>
+                    <option value="EDTE">EDTE</option>
+                  </select>
+
+                  <select value={cgpaSessionFilter} onChange={(e) => setCgpaSessionFilter(e.target.value)} style={{ padding: "6.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                    <option value="all">All Sessions</option>
+                    {["2025-26", "2024-25", "2023-24", "2022-23", "2021-22"].map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+
+                  <select value={cgpaLevelFilter} onChange={(e) => setCgpaLevelFilter(e.target.value)} style={{ padding: "6.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                    <option value="all">All Levels</option>
+                    {["Level-1", "Level-2", "Level-3", "Level-4"].map(l => <option key={l} value={l}>{formatLevel(l)}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {(() => {
+                const filteredCgpa = cgpaRecords.filter((r) => {
+                  if (cgpaDeptFilter !== "all" && (r.department || "EDTE") !== cgpaDeptFilter) return false;
+                  if (cgpaSessionFilter !== "all" && r.session !== cgpaSessionFilter) return false;
+                  if (cgpaLevelFilter !== "all" && !String(r.level).toLowerCase().includes(cgpaLevelFilter.toLowerCase().replace("level-", ""))) return false;
+                  return true;
+                });
+
+                if (filteredCgpa.length === 0) {
+                  return (
+                    <div style={{ padding: "36px", textAlign: "center", color: "#94a3b8", fontSize: "13px" }}>
+                      No calculated GPA / CGPA records found for the selected department & session filters.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #e2e8f0" }}>
+                          <th style={{ padding: "10px 14px" }}>Dept</th>
+                          <th style={{ padding: "10px 14px" }}>Session</th>
+                          <th style={{ padding: "10px 14px" }}>Level-Term</th>
+                          <th style={{ padding: "10px 14px" }}>Student ID & Name</th>
+                          <th style={{ padding: "10px 14px" }}>Semester GPA</th>
+                          <th style={{ padding: "10px 14px" }}>Earned Credits</th>
+                          <th style={{ padding: "10px 14px" }}>Calculated Date & Time</th>
+                          <th style={{ padding: "10px 14px" }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredCgpa.map((r) => (
+                          <tr key={r._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "10px 14px", fontWeight: 700, color: "#3b8db3" }}>{r.department || "EDTE"}</td>
+                            <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0f172a" }}>{r.session}</td>
+                            <td style={{ padding: "10px 14px" }}>{formatLevel(r.level)} {formatTerm(r.term)}</td>
+                            <td style={{ padding: "10px 14px", fontWeight: 700 }}>
+                              {r.studentId} <span style={{ fontWeight: 400, color: "#64748b" }}>({r.studentName || "Student"})</span>
+                            </td>
+                            <td style={{ padding: "10px 14px", fontWeight: 800, color: "#16a34a" }}>
+                              {r.semesterGPA || r.cumulativeCGPA || "-"} / 4.00
+                            </td>
+                            <td style={{ padding: "10px 14px", fontWeight: 600 }}>{r.semesterCredits || r.totalCumulativeCredits || "-"} Cr</td>
+                            <td style={{ padding: "10px 14px", color: "#64748b", fontSize: "12px" }}>
+                              {r.calculatedAt ? new Date(r.calculatedAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "N/A"}
+                            </td>
+                            <td style={{ padding: "10px 14px" }}>
+                              <span style={{ background: "#dcfce7", color: "#166534", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
+                                Recorded 🟢
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         )}
 

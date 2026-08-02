@@ -650,8 +650,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminResultManagementPage.jsx": {
-    "mtime": 1785522196.5451975,
-    "ast_hash": "26ddb4554273c4a2656227dffd9c261a",
+    "mtime": 1785602974.4705646,
+    "ast_hash": "38c97e81d67c84a82df4c34fde9f8b01",
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
-    "mtime": 1785600973.5498052,
-    "ast_hash": "81e0b4a12fa7240bb3be47a8c86ddb91",
+    "mtime": 1785602952.2019026,
+    "ast_hash": "dd0707cb5143a86637789573be8ead54",
     "semantic_hash": ""
   },
   "server/models/Announcement.js": {
@@ -805,8 +805,8 @@
     "semantic_hash": ""
   },
   "server/models/CGPARecord.js": {
-    "mtime": 1785067540.3820875,
-    "ast_hash": "a905bd21466a66bd2933afa712b3f278",
+    "mtime": 1785602937.7566915,
+    "ast_hash": "590de9bb2012bad643d9fe12852fb070",
     "semantic_hash": ""
   },
   "server/models/RetakeRequest.js": {

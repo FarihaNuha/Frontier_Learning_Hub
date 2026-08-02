@@ -966,11 +966,13 @@ exports.getAdminResults = async (req, res) => {
         };
       });
 
+      const cgpaRecords = await CGPARecord.find({}).sort({ calculatedAt: -1 }).lean();
+
       if (status && status.toLowerCase() === "pending") {
-        return res.json({ uploads: pendingWithDeadlines, notices: activeNotices });
+        return res.json({ uploads: pendingWithDeadlines, notices: activeNotices, cgpaRecords });
       }
 
-      res.json({ uploads: [...uploadsWithDeadlines, ...pendingWithDeadlines], notices: activeNotices });
+      res.json({ uploads: [...uploadsWithDeadlines, ...pendingWithDeadlines], notices: activeNotices, cgpaRecords });
     } else {
       const activeNotices = await Notice.find({
         $or: [
@@ -978,7 +980,8 @@ exports.getAdminResults = async (req, res) => {
           { category: "Academic" }
         ]
       }).sort({ createdAt: -1 }).lean();
-      res.json({ uploads: uploadsWithResults, notices: activeNotices });
+      const cgpaRecords = await CGPARecord.find({}).sort({ calculatedAt: -1 }).lean();
+      res.json({ uploads: uploadsWithResults, notices: activeNotices, cgpaRecords });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1341,6 +1344,7 @@ exports.calculateSemesterGPA = async (req, res) => {
             session,
             level,
             term,
+            department: "EDTE",
             semesterGPA: cgpa,
             semesterCredits: totalCi,
             cumulativeCGPA: cgpa,
@@ -1533,11 +1537,15 @@ exports.schedulePublicationBySession = async (req, res) => {
     // Create targeted Notice announcement for students
     const formattedDate = pubDate.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
     const notice = await Notice.create({
-      title: `Final Results Release Schedule: ${level} ${term} (${session})`,
+      title: `Final Results Timed Release Schedule — ${session} ${level} ${term}`,
       content: `Official Final Results for ${level} ${term} (Session: ${session}) are scheduled for automatic publication on ${formattedDate}.`,
       author: req.user._id || req.user.id,
       authorName: req.user.name || "System Admin",
       targetAudience: "Students",
+      deadlineDate: pubDate,
+      session,
+      level,
+      term,
       isPinned: true,
       category: "Academic",
     });

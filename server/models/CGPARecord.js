@@ -11,6 +11,14 @@ const cgpaRecordSchema = new mongoose.Schema({
     required: true,
     uppercase: true,
   },
+  studentName: {
+    type: String,
+    default: "",
+  },
+  department: {
+    type: String,
+    default: "EDTE",
+  },
   session: {
     type: String,
     required: true,

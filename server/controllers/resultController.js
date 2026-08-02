@@ -452,6 +452,27 @@ exports.uploadResultExcel = async (req, res) => {
       );
     }
 
+    // Preserve existing MT Part A & B marks when uploading Final results
+    const existingMtMarksMap = {};
+    if (activeResultType === "Final") {
+      const dbExistingResults = await Result.find({
+        courseCode,
+        session: { $regex: new RegExp(String(session).replace("-", "[- ]?"), "i") }
+      }).lean();
+
+      for (const resDoc of dbExistingResults) {
+        if (!existingMtMarksMap[resDoc.studentId]) {
+          existingMtMarksMap[resDoc.studentId] = {};
+        }
+        if (resDoc.midPartA !== undefined && resDoc.midPartA !== null) {
+          existingMtMarksMap[resDoc.studentId].midPartA = resDoc.midPartA;
+        }
+        if (resDoc.midPartB !== undefined && resDoc.midPartB !== null) {
+          existingMtMarksMap[resDoc.studentId].midPartB = resDoc.midPartB;
+        }
+      }
+    }
+
     if (uploadBatch) {
       await Result.deleteMany({ uploadId: uploadBatch._id });
 
@@ -503,6 +524,18 @@ exports.uploadResultExcel = async (req, res) => {
         resCreditHours = isLab ? 1 : 3;
       }
 
+      let parsedMidA = parseOptionalNumber(row.midPartA ?? row["MT Part A Marks"] ?? row["MT Part A"] ?? row["MT part A Marks"]);
+      let parsedMidB = parseOptionalNumber(row.midPartB ?? row["MT Part B Marks"] ?? row["MT Part B"] ?? row["MT part B Marks"]);
+
+      if (activeResultType === "Final" && existingMtMarksMap[sId]) {
+        if (existingMtMarksMap[sId].midPartA !== undefined && existingMtMarksMap[sId].midPartA !== null) {
+          parsedMidA = existingMtMarksMap[sId].midPartA;
+        }
+        if (existingMtMarksMap[sId].midPartB !== undefined && existingMtMarksMap[sId].midPartB !== null) {
+          parsedMidB = existingMtMarksMap[sId].midPartB;
+        }
+      }
+
       const rDoc = await Result.create({
         uploadId: uploadBatch._id,
         resultType: activeResultType,
@@ -520,8 +553,8 @@ exports.uploadResultExcel = async (req, res) => {
         session: row.session || row["Session"] || session,
         level: row.level || level,
         term: row.term || term,
-        midPartA: parseOptionalNumber(row.midPartA ?? row["MT Part A Marks"] ?? row["MT Part A"] ?? row["MT part A Marks"]),
-        midPartB: parseOptionalNumber(row.midPartB ?? row["MT Part B Marks"] ?? row["MT Part B"] ?? row["MT part B Marks"]),
+        midPartA: parsedMidA,
+        midPartB: parsedMidB,
         finalPartA: parseOptionalNumber(row.finalPartA ?? row["FT Part A Marks"] ?? row["FT Part A"] ?? row["FT part A Marks"]),
         finalPartB: parseOptionalNumber(row.finalPartB ?? row["FT Part B Marks"] ?? row["FT Part B"] ?? row["FT part B Marks"]),
         attendance: parseOptionalNumber(row.attendance ?? row["Attendance Marks"] ?? row["Attendance"] ?? row["Attendanc"]),
@@ -630,6 +663,11 @@ exports.updateDraftResult = async (req, res) => {
 
     if (resultDoc.status !== "Draft" && resultDoc.status !== "Correction Requested") {
       return res.status(400).json({ error: "Cannot edit result after submission unless Correction Requested." });
+    }
+
+    if (resultDoc.resultType === "Final") {
+      delete req.body.midPartA;
+      delete req.body.midPartB;
     }
 
     Object.assign(resultDoc, req.body);
@@ -2018,8 +2056,10 @@ exports.batchUpdateMarks = async (req, res) => {
     for (const item of updatedResults) {
       const rDoc = await Result.findById(item.resultId || item._id);
       if (rDoc) {
-        if (item.midPartA !== undefined) rDoc.midPartA = parseOptionalNumber(item.midPartA);
-        if (item.midPartB !== undefined) rDoc.midPartB = parseOptionalNumber(item.midPartB);
+        if (rDoc.resultType !== "Final") {
+          if (item.midPartA !== undefined) rDoc.midPartA = parseOptionalNumber(item.midPartA);
+          if (item.midPartB !== undefined) rDoc.midPartB = parseOptionalNumber(item.midPartB);
+        }
         if (item.finalPartA !== undefined) rDoc.finalPartA = parseOptionalNumber(item.finalPartA);
         if (item.finalPartB !== undefined) rDoc.finalPartB = parseOptionalNumber(item.finalPartB);
         if (item.attendance !== undefined) rDoc.attendance = parseOptionalNumber(item.attendance);

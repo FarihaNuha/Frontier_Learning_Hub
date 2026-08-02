@@ -19,7 +19,7 @@ import "../styles/dashboard.css";
 export default function StudentAcademicResultsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSemester, setSelectedSemester] = useState("Level 1 - Term 1");
+  const [selectedSemester, setSelectedSemester] = useState(null);
   const [resultTypeTab, setResultTypeTab] = useState("Midterm"); // "Midterm" or "Final"
 
   const [studentRequests, setStudentRequests] = useState([]);
@@ -122,7 +122,7 @@ export default function StudentAcademicResultsPage() {
   ];
 
   // Filter semester results based on selected Midterm vs Final tab
-  const rawSemesterResults = resultsByLevelTerm[selectedSemester] || [];
+  const rawSemesterResults = selectedSemester ? (resultsByLevelTerm[selectedSemester] || []) : [];
   const currentSemesterResults = rawSemesterResults.filter((r) => {
     if (resultTypeTab === "Midterm") {
       return r.resultType === "Midterm";
@@ -134,25 +134,25 @@ export default function StudentAcademicResultsPage() {
   const calculateGPA = (resultsList) => {
     if (!resultsList || resultsList.length === 0) return "N/A";
 
-    const finalResultsOnly = resultsList.filter(r => r.resultType === "Final" || (!r.resultType && r.gradePoint !== null));
-    if (finalResultsOnly.length === 0) return "N/A (Midterm)";
-
-    const storedGPA = finalResultsOnly.find((r) => r.semesterGPA !== null && r.semesterGPA !== undefined)?.semesterGPA;
-    if (storedGPA !== undefined && storedGPA !== null) return Number(storedGPA).toFixed(2);
+    const finalResultsOnly = resultsList.filter(r => 
+      (r.resultType === "Final" || (!r.resultType && r.gradePoint !== null)) &&
+      (r.finalPartA !== null && r.finalPartA !== undefined && r.finalPartA !== "") &&
+      (r.finalPartB !== null && r.finalPartB !== undefined && r.finalPartB !== "") &&
+      r.gradePoint !== null && r.gradePoint !== undefined && Number(r.gradePoint) > 0
+    );
+    if (finalResultsOnly.length === 0) return "N/A";
 
     let totalPoints = 0;
     let totalCredits = 0;
     let validGradesCount = 0;
 
     finalResultsOnly.forEach((r) => {
-      if (r.gradePoint !== null && r.gradePoint !== undefined) {
-        const isLab = (r.courseType + " " + r.courseTitle + " " + r.courseCode).toLowerCase().includes("lab") || (r.courseType + " " + r.courseTitle + " " + r.courseCode).toLowerCase().includes("sessional");
-        const cr = isLab ? 1 : (Number(r.creditHours) || 3);
-        const gp = Number(r.gradePoint) || 0;
-        totalPoints += gp * cr;
-        totalCredits += cr;
-        validGradesCount++;
-      }
+      const isLab = (r.courseType + " " + r.courseTitle + " " + r.courseCode).toLowerCase().includes("lab") || (r.courseType + " " + r.courseTitle + " " + r.courseCode).toLowerCase().includes("sessional");
+      const cr = isLab ? 1 : (Number(r.creditHours) || 3);
+      const gp = Number(r.gradePoint) || 0;
+      totalPoints += gp * cr;
+      totalCredits += cr;
+      validGradesCount++;
     });
 
     if (validGradesCount === 0 || totalCredits === 0) return "N/A";
@@ -282,7 +282,7 @@ export default function StudentAcademicResultsPage() {
                           <span style={{ fontSize: "11px", fontWeight: 700, background: "#e2e8f0", color: "#64748b", padding: "3px 8px", borderRadius: "10px" }}>
                             🔒 Locked
                           </span>
-                        ) : count > 0 ? (
+                        ) : count > 0 && semGPA !== "N/A" ? (
                           <span style={{ fontSize: "11px", fontWeight: 800, background: isSelected ? "rgba(255,255,255,0.25)" : "#dcfce7", color: isSelected ? "#fff" : "#166534", padding: "3px 8px", borderRadius: "10px" }}>
                             GPA: {semGPA}
                           </span>
@@ -295,217 +295,225 @@ export default function StudentAcademicResultsPage() {
             </div>
 
             {/* 2. Selected Semester Result Roster */}
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>
-                    Published Results: <strong>{selectedSemester}</strong>
-                  </h3>
-                  <p style={{ margin: "2px 0 0 0", fontSize: "13px", color: "#64748b" }}>
-                    Official grade breakdown for {selectedSemester}
-                  </p>
-                </div>
-
-                <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "12px", padding: "10px 20px", display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "13.5px", color: "#166534", fontWeight: 700 }}>Semester GPA / CGPA:</span>
-                  <span style={{ fontSize: "22px", fontWeight: 800, color: "#15803d" }}>
-                    {currentSemesterGPA}
-                  </span>
-                </div>
+            {!selectedSemester ? (
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "40px 28px", textAlign: "center", border: "1.5px dashed #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
+                <FiAward size={44} style={{ color: "#94a3b8", marginBottom: "10px", opacity: 0.4 }} />
+                <h3 style={{ margin: "0 0 6px 0", fontSize: "17px", color: "#334155", fontWeight: 700 }}>Select an Academic Level-Term Card</h3>
+                <p style={{ margin: 0, fontSize: "13.5px", color: "#64748b" }}>Click on any unlocked Level-Term card above to view its published course results and GPA breakdown.</p>
               </div>
-
-              {/* Lock Timer Banner for Active Semester */}
-              {currentSemesterResults.length > 0 && (() => {
-                const activeTimerRes = currentSemesterResults.find(r => r.correctionWindowEnd || r.isCorrectionClosed);
-                if (!activeTimerRes) return null;
-
-                const cDate = activeTimerRes.correctionWindowEnd ? new Date(activeTimerRes.correctionWindowEnd) : null;
-                const isLocked = Boolean(activeTimerRes.isCorrectionClosed || (cDate && new Date() > cDate));
-                const localTimeString = cDate ? cDate.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "Deadline Passed";
-
-                return (
-                  <div
-                    style={{
-                      marginBottom: "20px",
-                      padding: "16px 20px",
-                      borderRadius: "12px",
-                      background: isLocked ? "linear-gradient(135deg, #fee2e2, #fecaca)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
-                      border: `1.5px solid ${isLocked ? "#dc2626" : "#0284c7"}`,
-                      color: isLocked ? "#991b1b" : "#0369a1",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "14px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-                    }}
-                  >
-                    <div style={{ fontSize: "26px", lineHeight: 1 }}>{isLocked ? "🚨" : "⏳"}</div>
-                    <div style={{ flex: 1 }}>
-                      {isLocked ? (
-                        <div>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                            <strong style={{ fontSize: "15px", color: "#991b1b" }}>🔒 Correction Request Window Expired / Locked</strong>
-                            <span style={{ background: "#dc2626", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
-                              Deadline Passed
-                            </span>
-                          </div>
-                          <div style={{ fontSize: "13px", color: "#7f1d1d", marginTop: "4px" }}>
-                            The correction request window for this marksheet closed on <strong>{localTimeString}</strong>. No further correction requests or modifications can be submitted.
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                            <strong style={{ fontSize: "15px", color: "#0369a1" }}>🔓 Student Correction Window Open</strong>
-                            <span style={{ background: "#0284c7", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
-                              Open for Corrections
-                            </span>
-                          </div>
-                          <div style={{ fontSize: "13px", color: "#0369a1", marginTop: "4px" }}>
-                            If you notice any discrepancy in your marks, click <strong>"Request Correction"</strong> below before the deadline expires on <strong>{localTimeString}</strong>.
-                          </div>
-                        </div>
-                      )}
-                    </div>
+            ) : (
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>
+                      Published Results: <strong>{selectedSemester}</strong>
+                    </h3>
+                    <p style={{ margin: "2px 0 0 0", fontSize: "13px", color: "#64748b" }}>
+                      Official grade breakdown for {selectedSemester}
+                    </p>
                   </div>
-                );
-              })()}
 
-              {currentSemesterResults.length === 0 ? (
-                <div style={{ padding: "50px", textAlign: "center", color: "#94a3b8" }}>
-                  <FiClock size={44} style={{ opacity: 0.3, marginBottom: "10px" }} />
-                  <p style={{ margin: 0, fontSize: "14.5px" }}>
-                    No published results available yet for {selectedSemester}.
-                  </p>
+                  <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "12px", padding: "10px 20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "13.5px", color: "#166534", fontWeight: 700 }}>Semester GPA:</span>
+                    <span style={{ fontSize: "22px", fontWeight: 800, color: "#15803d" }}>
+                      {currentSemesterGPA}
+                    </span>
+                  </div>
                 </div>
-              ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
-                    <thead>
-                      <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
-                        <th style={{ padding: "12px 14px" }}>Course Code</th>
-                        <th style={{ padding: "12px 14px" }}>Course Title</th>
-                        <th style={{ padding: "12px 14px" }}>Course Type</th>
-                        <th style={{ padding: "12px 14px" }}>Credit Hours</th>
-                        <th style={{ padding: "12px 14px" }}>MT Part A</th>
-                        <th style={{ padding: "12px 14px" }}>MT Part B</th>
-                        <th style={{ padding: "12px 14px" }}>FT Part A</th>
-                        <th style={{ padding: "12px 14px" }}>FT Part B</th>
-                        <th style={{ padding: "12px 14px" }}>Attendance</th>
-                        <th style={{ padding: "12px 14px" }}>Continuous Assmt</th>
-                        <th style={{ padding: "12px 14px" }}>Total</th>
-                        <th style={{ padding: "12px 14px" }}>GPA</th>
-                        <th style={{ padding: "12px 14px", textAlign: "center" }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentSemesterResults.map((r) => {
-                        const isExpired = Boolean(r.isCorrectionClosed || (r.correctionWindowEnd && new Date() > new Date(r.correctionWindowEnd)));
-                        const existingReq = studentRequests.find((req) => req.resultId === r._id || (req.uploadId === r.uploadId && req.courseCode === r.courseCode));
-                        const isBtnDisabled = isExpired && !existingReq;
 
-                        const renderVal = (v) => {
-                          if (v === null || v === undefined || String(v).trim() === "" || String(v).trim() === "-") {
-                            return "-";
-                          }
-                          return v;
-                        };
+                {/* Lock Timer Banner for Active Semester */}
+                {currentSemesterResults.length > 0 && (() => {
+                  const activeTimerRes = currentSemesterResults.find(r => r.correctionWindowEnd || r.isCorrectionClosed);
+                  if (!activeTimerRes) return null;
 
-                        const isMidtermBatch = r.resultType === "Midterm" || (!r.finalPartA && !r.finalPartB && (r.gradePoint === null || r.gradePoint === undefined || r.gradePoint === 0) && (!r.letterGrade || r.letterGrade === "-"));
-                        const courseGPAVal = isMidtermBatch
-                          ? "-"
-                          : (r.gradePoint !== null && r.gradePoint !== undefined && r.gradePoint !== "-" ? r.gradePoint : (r.letterGrade && r.letterGrade !== "-" ? r.letterGrade : "-"));
+                  const cDate = activeTimerRes.correctionWindowEnd ? new Date(activeTimerRes.correctionWindowEnd) : null;
+                  const isLocked = Boolean(activeTimerRes.isCorrectionClosed || (cDate && new Date() > cDate));
+                  const localTimeString = cDate ? cDate.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "Deadline Passed";
 
-                        return (
-                          <React.Fragment key={r._id}>
-                            <tr style={{ borderBottom: "1px solid #f1f5f9" }}>
-                              <td style={{ padding: "12px 14px", fontWeight: 700, color: "#3b8db3" }}>{r.courseCode}</td>
-                              <td style={{ padding: "12px 14px", fontWeight: 600, color: "#0f172a" }}>{r.courseTitle}</td>
-                              <td style={{ padding: "12px 14px", color: "#64748b" }}>{r.courseType}</td>
-                              <td style={{ padding: "12px 14px", color: "#64748b" }}>{r.creditHours}</td>
-                              <td style={{ padding: "12px 14px" }}>{renderVal(r.midPartA)}</td>
-                              <td style={{ padding: "12px 14px" }}>{renderVal(r.midPartB)}</td>
-                              <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartA)}</td>
-                              <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartB)}</td>
-                              <td style={{ padding: "12px 14px" }}>{renderVal(r.attendance)}</td>
-                              <td style={{ padding: "12px 14px" }}>{renderVal(r.continuousAssessment)}</td>
-                              <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>{renderVal(r.totalMarks)}</td>
-                              <td style={{ padding: "12px 14px", fontWeight: 800, color: courseGPAVal === "-" ? "#64748b" : "#16a34a" }}>
-                                {courseGPAVal}
-                              </td>
-                              <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                                <button
-                                  disabled={isBtnDisabled}
-                                  onClick={() => {
-                                    if (isExpired && !existingReq) {
-                                      toast.error("The correction request window for this marksheet has expired.");
-                                      return;
-                                    }
-                                    setSelectedResultForIssue(r);
-                                  }}
-                                  style={{
-                                    padding: "6px 12px",
-                                    borderRadius: "6px",
-                                    border: "none",
-                                    background: isBtnDisabled ? "#e2e8f0" : existingReq ? "#0284c7" : "#3b8db3",
-                                    color: isBtnDisabled ? "#94a3b8" : "#ffffff",
-                                    fontWeight: 600,
-                                    fontSize: "11.5px",
-                                    cursor: isBtnDisabled ? "not-allowed" : "pointer",
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: "5px",
-                                  }}
-                                >
-                                  <FiMessageSquare size={13} />
-                                  {existingReq ? "View / Update Request" : isExpired ? "🔒 Correction Closed" : "Correction Request"}
-                                </button>
-                              </td>
-                            </tr>
-                            {existingReq && (
-                              <tr style={{ background: "#f8fafc" }}>
-                                <td colSpan={13} style={{ padding: "10px 18px", fontSize: "12px" }}>
-                                  <div style={{ background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "10px 14px" }}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                                      <span style={{ fontWeight: 700, color: "#334155" }}>💬 Your Request to Teacher:</span>
-                                      <span style={{ fontWeight: 700, color: existingReq.status === "Resolved" ? "#16a34a" : existingReq.status === "Replied" ? "#0284c7" : "#d97706" }}>
-                                        Status: {existingReq.status}
-                                      </span>
-                                    </div>
-                                    <div style={{ color: "#475569", marginBottom: "6px" }}>"{existingReq.studentMessage}"</div>
-                                    {existingReq.teacherReply && (
-                                      <div style={{ background: "#f0fdf4", borderLeft: "3px solid #16a34a", padding: "8px 12px", borderRadius: "4px", color: "#166534" }}>
-                                        <strong>Teacher's Reply:</strong> {existingReq.teacherReply}
-                                      </div>
-                                    )}
-                                  </div>
+                  return (
+                    <div
+                      style={{
+                        marginBottom: "20px",
+                        padding: "16px 20px",
+                        borderRadius: "12px",
+                        background: isLocked ? "linear-gradient(135deg, #fee2e2, #fecaca)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+                        border: `1.5px solid ${isLocked ? "#dc2626" : "#0284c7"}`,
+                        color: isLocked ? "#991b1b" : "#0369a1",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "14px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
+                      }}
+                    >
+                      <div style={{ fontSize: "26px", lineHeight: 1 }}>{isLocked ? "🚨" : "⏳"}</div>
+                      <div style={{ flex: 1 }}>
+                        {isLocked ? (
+                          <div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                              <strong style={{ fontSize: "15px", color: "#991b1b" }}>🔒 Correction Request Window Expired / Locked</strong>
+                              <span style={{ background: "#dc2626", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
+                                Deadline Passed
+                              </span>
+                            </div>
+                            <div style={{ fontSize: "13px", color: "#7f1d1d", marginTop: "4px" }}>
+                              The correction request window for this marksheet closed on <strong>{localTimeString}</strong>. No further correction requests or modifications can be submitted.
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                              <strong style={{ fontSize: "15px", color: "#0369a1" }}>🔓 Student Correction Window Open</strong>
+                              <span style={{ background: "#0284c7", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
+                                Open for Corrections
+                              </span>
+                            </div>
+                            <div style={{ fontSize: "13px", color: "#0369a1", marginTop: "4px" }}>
+                              If you notice any discrepancy in your marks, click <strong>"Request Correction"</strong> below before the deadline expires on <strong>{localTimeString}</strong>.
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {currentSemesterResults.length === 0 ? (
+                  <div style={{ padding: "50px", textAlign: "center", color: "#94a3b8" }}>
+                    <FiClock size={44} style={{ opacity: 0.3, marginBottom: "10px" }} />
+                    <p style={{ margin: 0, fontSize: "14.5px" }}>
+                      No published results available yet for {selectedSemester}.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
+                          <th style={{ padding: "12px 14px" }}>Course Code</th>
+                          <th style={{ padding: "12px 14px" }}>Course Title</th>
+                          <th style={{ padding: "12px 14px" }}>Course Type</th>
+                          <th style={{ padding: "12px 14px" }}>Credit Hours</th>
+                          <th style={{ padding: "12px 14px" }}>MT Part A</th>
+                          <th style={{ padding: "12px 14px" }}>MT Part B</th>
+                          <th style={{ padding: "12px 14px" }}>FT Part A</th>
+                          <th style={{ padding: "12px 14px" }}>FT Part B</th>
+                          <th style={{ padding: "12px 14px" }}>Attendance</th>
+                          <th style={{ padding: "12px 14px" }}>Continuous Assmt</th>
+                          <th style={{ padding: "12px 14px" }}>Total</th>
+                          <th style={{ padding: "12px 14px" }}>GPA</th>
+                          <th style={{ padding: "12px 14px", textAlign: "center" }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentSemesterResults.map((r) => {
+                          const isExpired = Boolean(r.isCorrectionClosed || (r.correctionWindowEnd && new Date() > new Date(r.correctionWindowEnd)));
+                          const existingReq = studentRequests.find((req) => req.resultId === r._id || (req.uploadId === r.uploadId && req.courseCode === r.courseCode));
+                          const isBtnDisabled = isExpired && !existingReq;
+
+                          const renderVal = (v) => {
+                            if (v === null || v === undefined || String(v).trim() === "" || String(v).trim() === "-") {
+                              return "-";
+                            }
+                            return v;
+                          };
+
+                          const isMidtermBatch = r.resultType === "Midterm" || (!r.finalPartA && !r.finalPartB && (r.gradePoint === null || r.gradePoint === undefined || r.gradePoint === 0) && (!r.letterGrade || r.letterGrade === "-"));
+                          const courseGPAVal = isMidtermBatch
+                            ? "-"
+                            : (r.gradePoint !== null && r.gradePoint !== undefined && r.gradePoint !== "-" ? r.gradePoint : (r.letterGrade && r.letterGrade !== "-" ? r.letterGrade : "-"));
+
+                          return (
+                            <React.Fragment key={r._id}>
+                              <tr style={{ borderBottom: "1px solid #f1f5f9" }}>
+                                <td style={{ padding: "12px 14px", fontWeight: 700, color: "#3b8db3" }}>{r.courseCode}</td>
+                                <td style={{ padding: "12px 14px", fontWeight: 600, color: "#0f172a" }}>{r.courseTitle}</td>
+                                <td style={{ padding: "12px 14px", color: "#64748b" }}>{r.courseType}</td>
+                                <td style={{ padding: "12px 14px", color: "#64748b" }}>{r.creditHours}</td>
+                                <td style={{ padding: "12px 14px" }}>{renderVal(r.midPartA)}</td>
+                                <td style={{ padding: "12px 14px" }}>{renderVal(r.midPartB)}</td>
+                                <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartA)}</td>
+                                <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartB)}</td>
+                                <td style={{ padding: "12px 14px" }}>{renderVal(r.attendance)}</td>
+                                <td style={{ padding: "12px 14px" }}>{renderVal(r.continuousAssessment)}</td>
+                                <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>{renderVal(r.totalMarks)}</td>
+                                <td style={{ padding: "12px 14px", fontWeight: 800, color: courseGPAVal === "-" ? "#64748b" : "#16a34a" }}>
+                                  {courseGPAVal}
+                                </td>
+                                <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                                  <button
+                                    disabled={isBtnDisabled}
+                                    onClick={() => {
+                                      if (isExpired && !existingReq) {
+                                        toast.error("The correction request window for this marksheet has expired.");
+                                        return;
+                                      }
+                                      setSelectedResultForIssue(r);
+                                    }}
+                                    style={{
+                                      padding: "6px 12px",
+                                      borderRadius: "6px",
+                                      border: "none",
+                                      background: isBtnDisabled ? "#e2e8f0" : existingReq ? "#0284c7" : "#3b8db3",
+                                      color: isBtnDisabled ? "#94a3b8" : "#ffffff",
+                                      fontWeight: 600,
+                                      fontSize: "11.5px",
+                                      cursor: isBtnDisabled ? "not-allowed" : "pointer",
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "5px",
+                                    }}
+                                  >
+                                    <FiMessageSquare size={13} />
+                                    {existingReq ? "View / Update Request" : isExpired ? "🔒 Correction Closed" : "Correction Request"}
+                                  </button>
                                 </td>
                               </tr>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
-                    </tbody>
-                    {/* Bottom Row showing Total Calculated CGPA */}
-                    <tfoot>
-                      <tr style={{ background: "#f0f9ff", borderTop: "2px solid #bae6fd", fontWeight: 800, fontSize: "14px", color: "#0369a1" }}>
-                        <td colSpan={3} style={{ padding: "14px" }}>
-                          TOTAL SEMESTER SUMMARY ({selectedSemester})
-                        </td>
-                        <td style={{ padding: "14px" }}>
-                          {currentSemesterResults.reduce((acc, c) => acc + (Number(c.creditHours) || 0), 0)} Credits
-                        </td>
-                        <td colSpan={8} style={{ padding: "14px", textAlign: "right" }}>
-                          Total Calculated Semester GPA / CGPA:
-                        </td>
-                        <td style={{ padding: "14px", fontSize: "16px", color: "#15803d" }}>
-                          {currentSemesterGPA}
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              )}
-            </div>
+                              {existingReq && (
+                                <tr style={{ background: "#f8fafc" }}>
+                                  <td colSpan={13} style={{ padding: "10px 18px", fontSize: "12px" }}>
+                                    <div style={{ background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "10px 14px" }}>
+                                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                                        <span style={{ fontWeight: 700, color: "#334155" }}>💬 Your Request to Teacher:</span>
+                                        <span style={{ fontWeight: 700, color: existingReq.status === "Resolved" ? "#16a34a" : existingReq.status === "Replied" ? "#0284c7" : "#d97706" }}>
+                                          Status: {existingReq.status}
+                                        </span>
+                                      </div>
+                                      <div style={{ color: "#475569", marginBottom: "6px" }}>"{existingReq.studentMessage}"</div>
+                                      {existingReq.teacherReply && (
+                                        <div style={{ background: "#f0fdf4", borderLeft: "3px solid #16a34a", padding: "8px 12px", borderRadius: "4px", color: "#166534" }}>
+                                          <strong>Teacher's Reply:</strong> {existingReq.teacherReply}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </tbody>
+                      {/* Bottom Row showing Total Calculated CGPA */}
+                      <tfoot>
+                        <tr style={{ background: "#f0f9ff", borderTop: "2px solid #bae6fd", fontWeight: 800, fontSize: "14px", color: "#0369a1" }}>
+                          <td colSpan={3} style={{ padding: "14px" }}>
+                            TOTAL SEMESTER SUMMARY ({selectedSemester})
+                          </td>
+                          <td style={{ padding: "14px" }}>
+                            {currentSemesterResults.reduce((acc, c) => acc + (Number(c.creditHours) || 0), 0)} Credits
+                          </td>
+                          <td colSpan={8} style={{ padding: "14px", textAlign: "right" }}>
+                            Total Calculated Semester GPA / CGPA:
+                          </td>
+                          <td style={{ padding: "14px", fontSize: "16px", color: "#15803d" }}>
+                            {currentSemesterGPA}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
 

@@ -234,22 +234,15 @@ body.dark-theme .auth-card:hover {
   margin-bottom: 30px;
 }
 
-.overlay-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 30px 0;
-  text-align: left;
-  max-width: 280px;
-}
-
-.overlay-features li {
-  font-size: 14px;
-  line-height: 22px;
-  margin-bottom: 12px;
-  color: rgba(255, 255, 255, 0.95);
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.overlay-motto {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95) !important;
+  margin: 18px 0 28px 0;
+  text-align: center;
+  max-width: 290px;
+  font-style: italic;
+  font-weight: 500;
 }
 
 .overlay-left {

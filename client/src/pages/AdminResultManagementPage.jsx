@@ -1043,6 +1043,8 @@ export default function AdminResultManagementPage() {
                 );
               })()}
             </div>
+=======
+>>>>>>> 590ac6afd2788b7b0eb2e9f13c126236e5196cb9
           </div>
         )}
 

@@ -388,27 +388,6 @@ export default function AdminSidebar() {
           <span>Result Publication</span>
         </Link>
 
-        {/* System Audit Logs */}
-        <Link 
-          to="/admin/audit-logs" 
-          className={`sidebar-menu-item ${location.pathname === "/admin/audit-logs" ? "active" : ""}`}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            color: location.pathname === "/admin/audit-logs" ? "#ffffff" : "#2C4B66",
-            background: location.pathname === "/admin/audit-logs" ? "#3B8DB3" : "transparent",
-            textDecoration: "none",
-            marginBottom: "8px",
-            fontWeight: location.pathname === "/admin/audit-logs" ? "600" : "500",
-          }}
-        >
-          <FiShield size={18} />
-          <span>System Audit Logs</span>
-        </Link>
-
         {/* Settings */}
         <Link 
           to="/admin/settings" 

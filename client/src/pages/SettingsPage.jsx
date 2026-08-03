@@ -816,18 +816,42 @@ export default function SettingsPage() {
                     <input 
                       type="text" 
                       value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
+                      onChange={(e) => user?.role !== "student" && setEditName(e.target.value)}
+                      readOnly={user?.role === "student"}
+                      disabled={user?.role === "student"}
                       placeholder="Enter full name"
-                      style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--border-light)", borderRadius: "8px", fontSize: "14px", background: "var(--bg-white)", color: "var(--text-dark)", outline: "none" }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        border: "1px solid var(--border-light)",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        background: user?.role === "student" ? "#f1f5f9" : "var(--bg-white)",
+                        color: user?.role === "student" ? "#64748b" : "var(--text-dark)",
+                        cursor: user?.role === "student" ? "not-allowed" : "auto",
+                        outline: "none"
+                      }}
                     />
+                    {user?.role === "student" && <span style={{ fontSize: "11px", color: "#94a3b8", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}><FiLock size={11} /> Fixed by Admin</span>}
                   </div>
 
                   <div>
                     <label style={{ display: "block", color: "var(--text-gray)", marginBottom: "6px", fontWeight: "600" }}>Department</label>
                     <select 
                       value={editDept}
-                      onChange={(e) => setEditDept(e.target.value)}
-                      style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--border-light)", borderRadius: "8px", fontSize: "14px", background: "var(--bg-white)", color: "var(--text-dark)", outline: "none" }}
+                      onChange={(e) => user?.role !== "student" && setEditDept(e.target.value)}
+                      disabled={user?.role === "student"}
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        border: "1px solid var(--border-light)",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        background: user?.role === "student" ? "#f1f5f9" : "var(--bg-white)",
+                        color: user?.role === "student" ? "#64748b" : "var(--text-dark)",
+                        cursor: user?.role === "student" ? "not-allowed" : "auto",
+                        outline: "none"
+                      }}
                     >
                       <option value="EDTE">EDTE</option>
                       <option value="IRE">IRE</option>
@@ -836,6 +860,7 @@ export default function SettingsPage() {
                       <option value="DataScience">DataScience</option>
                       <option value="General">General</option>
                     </select>
+                    {user?.role === "student" && <span style={{ fontSize: "11px", color: "#94a3b8", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}><FiLock size={11} /> Fixed by Admin</span>}
                   </div>
 
                   {user?.role === "student" && (
@@ -845,9 +870,22 @@ export default function SettingsPage() {
                         type="text" 
                         value={editStudentId}
                         onChange={(e) => setEditStudentId(e.target.value)}
+                        readOnly={true}
+                        disabled={true}
                         placeholder="Enter student ID"
-                        style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--border-light)", borderRadius: "8px", fontSize: "14px", background: "var(--bg-white)", color: "var(--text-dark)", outline: "none" }}
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          border: "1px solid var(--border-light)",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                          background: "#f1f5f9",
+                          color: "#64748b",
+                          cursor: "not-allowed",
+                          outline: "none"
+                        }}
                       />
+                      <span style={{ fontSize: "11px", color: "#94a3b8", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}><FiLock size={11} /> Fixed by Admin</span>
                     </div>
                   )}
                 </div>

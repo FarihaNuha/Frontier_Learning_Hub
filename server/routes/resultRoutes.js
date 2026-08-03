@@ -7,7 +7,7 @@ router.post("/upload", verifyToken, checkRole("teacher"), ctrl.uploadResultExcel
 router.get("/teacher", verifyToken, checkRole("teacher"), ctrl.getTeacherResults);
 router.get("/teacher/deadlines", verifyToken, checkRole("teacher"), ctrl.getResultDeadlines);
 router.put("/draft/:id", verifyToken, checkRole("teacher"), ctrl.updateDraftResult);
-router.delete("/draft-batch/:uploadId", verifyToken, checkRole("teacher"), ctrl.deleteDraftUpload);
+router.delete("/draft-batch/:uploadId", verifyToken, checkRole("teacher", "admin"), ctrl.deleteDraftUpload);
 router.post("/submit/:uploadId", verifyToken, checkRole("teacher"), ctrl.submitResultToAdmin);
 router.post("/teacher/set-correction-deadline/:uploadId", verifyToken, checkRole("teacher"), ctrl.setMidtermCorrectionDeadline);
 router.post("/teacher/batch-update-marks", verifyToken, checkRole("teacher"), ctrl.batchUpdateMarks);

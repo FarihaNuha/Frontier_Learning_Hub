@@ -48,6 +48,16 @@ export default function TeacherResultManagementPage() {
   const [deadlines, setDeadlines] = useState({ midtermDeadline: null, finalDeadline: null });
   const [assignedCourses, setAssignedCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Live timer for precise countdown (hours, minutes, seconds)
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = React.useRef(null);
 
@@ -1064,24 +1074,37 @@ export default function TeacherResultManagementPage() {
 
                   {/* Targeted Section Deadline Notice Banner (Appears ONLY on matching section) */}
                   {sectionDl && (() => {
-                    const now = new Date();
+                    const now = currentTime;
                     const isExpired = secDlDate && secDlDate < now;
                     const msLeft = secDlDate ? secDlDate - now : null;
-                    const daysLeft = msLeft ? Math.ceil(msLeft / (1000 * 60 * 60 * 24)) : null;
-                    const hoursLeft = msLeft ? Math.ceil(msLeft / (1000 * 60 * 60)) : null;
 
-                    const timeLabel = isExpired
-                      ? "⛔ Deadline Passed"
-                      : daysLeft > 1
-                        ? `⏳ ${daysLeft} days remaining`
-                        : hoursLeft > 0
-                          ? `🔴 Only ${hoursLeft} hours left!`
-                          : "🔴 Less than 1 hour remaining!";
+                    let timeLabel = "⛔ Deadline Passed";
+                    let daysLeft = 0;
+
+                    if (!isExpired && msLeft > 0) {
+                      const totalSeconds = Math.floor(msLeft / 1000);
+                      daysLeft = Math.floor(totalSeconds / (3600 * 24));
+                      const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+                      const minutes = Math.floor((totalSeconds % 3600) / 60);
+                      const seconds = totalSeconds % 60;
+
+                      if (daysLeft > 1) {
+                        timeLabel = `⏳ ${daysLeft} days remaining`;
+                      } else if (daysLeft === 1) {
+                        timeLabel = `⏳ 1 day ${hours}h ${minutes}m left`;
+                      } else if (hours > 0) {
+                        timeLabel = `🔴 Only ${hours}h ${minutes}m ${seconds}s left!`;
+                      } else if (minutes > 0) {
+                        timeLabel = `🔴 Only ${minutes}m ${seconds}s left!`;
+                      } else {
+                        timeLabel = `🔴 Only ${seconds}s left!`;
+                      }
+                    }
 
                     return (
                       <div style={{
-                        background: isExpired ? "linear-gradient(135deg, #fee2e2, #fecaca)" : daysLeft <= 2 ? "linear-gradient(135deg, #fef3c7, #fde68a)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
-                        border: `1.5px solid ${isExpired ? "#fca5a5" : daysLeft <= 2 ? "#f59e0b" : "#3b8db3"}`,
+                        background: isExpired ? "linear-gradient(135deg, #fee2e2, #fecaca)" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "linear-gradient(135deg, #fef3c7, #fde68a)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+                        border: `1.5px solid ${isExpired ? "#fca5a5" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#f59e0b" : "#3b8db3"}`,
                         borderRadius: "12px",
                         padding: "16px 20px",
                         marginBottom: "20px",
@@ -1092,12 +1115,12 @@ export default function TeacherResultManagementPage() {
                         <div style={{ fontSize: "28px", lineHeight: 1 }}>📋</div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                            <strong style={{ fontSize: "14.5px", color: isExpired ? "#991b1b" : daysLeft <= 2 ? "#92400e" : "#0369a1" }}>
+                            <strong style={{ fontSize: "14.5px", color: isExpired ? "#991b1b" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#92400e" : "#0369a1" }}>
                               {sectionDl.title}
                             </strong>
                             <span style={{
                               padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px",
-                              background: isExpired ? "#dc2626" : daysLeft <= 2 ? "#f59e0b" : "#3b8db3",
+                              background: isExpired ? "#dc2626" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#f59e0b" : "#3b8db3",
                               color: "#fff"
                             }}>
                               {timeLabel}

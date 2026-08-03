@@ -14,6 +14,9 @@ import {
   FiBell,
   FiCpu,
   FiClock,
+  FiCheck,
+  FiFileText,
+  FiTrash2,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 
@@ -35,7 +38,7 @@ export default function AdminResultManagementPage() {
   const [uploads, setUploads] = useState([]);
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [resultTypeTab, setResultTypeTab] = useState("Final"); // "Midterm" or "Final"
+  const [resultTypeTab, setResultTypeTab] = useState("Midterm"); // "Midterm" or "Final"
   const [viewTab, setViewTab] = useState("batches"); // "batches", "schedules", "cgpa"
   const [activeTab, setActiveTab] = useState("all");
 
@@ -58,6 +61,55 @@ export default function AdminResultManagementPage() {
   const [reminderModalBatch, setReminderModalBatch] = useState(null);
   const [reminderMessage, setReminderMessage] = useState("");
   const [sendingReminder, setSendingReminder] = useState(false);
+
+  // Editable CGPA Formula State
+  const [cgpaFormulaInput, setCgpaFormulaInput] = useState("=SUM(GradePoint * CreditHours) / SUM(CreditHours)");
+  const [cgpaScaleInput, setCgpaScaleInput] = useState("4.0");
+
+  // Live Search State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Bulk Selection State
+  const [selectedBatchIds, setSelectedBatchIds] = useState([]);
+
+  const toggleSelectBatch = (id) => {
+    setSelectedBatchIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = (filteredUploads) => {
+    if (filteredUploads.length > 0 && selectedBatchIds.length === filteredUploads.length) {
+      setSelectedBatchIds([]);
+    } else {
+      setSelectedBatchIds(filteredUploads.map((b) => b._id));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedBatchIds.length === 0) return;
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${selectedBatchIds.length} selected result batch(es)?`
+      )
+    )
+      return;
+
+    try {
+      await Promise.all(
+        selectedBatchIds.map((id) =>
+          api.delete(`/results/draft-batch/${id}?resultType=${resultTypeTab}`)
+        )
+      );
+      toast.success(`${selectedBatchIds.length} result batch(es) deleted successfully!`);
+      setSelectedBatchIds([]);
+      fetchAdminResults();
+    } catch (err) {
+      toast.error("Failed to delete selected batches.");
+      fetchAdminResults();
+    }
+  };
 
   const handleOpenReminderModal = (batch) => {
     setReminderModalBatch(batch);
@@ -246,6 +298,22 @@ export default function AdminResultManagementPage() {
     }
   };
 
+  const handleDeleteBatch = async (batch) => {
+    const batchId = typeof batch === "string" ? batch : batch?._id;
+    if (!window.confirm("Are you sure you want to delete this result batch? All associated student marks for this batch will be permanently removed.")) {
+      return;
+    }
+
+    try {
+      await api.delete(`/results/draft-batch/${batchId}?resultType=${resultTypeTab}`);
+      toast.success("Result batch deleted successfully!");
+      if (viewBatch?._id === batchId) setViewBatch(null);
+      fetchAdminResults();
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to delete result batch.");
+    }
+  };
+
   const handleCalculateCGPA = async () => {
     setCalculating(true);
     setCalcSummary(null);
@@ -323,8 +391,40 @@ export default function AdminResultManagementPage() {
     if (sessionFilter !== "all" && u.session !== sessionFilter) return false;
     if (levelFilter !== "all" && u.level !== levelFilter) return false;
     if (termFilter !== "all" && u.term !== termFilter) return false;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchCode = (u.courseCode || "").toLowerCase().includes(q);
+      const matchTitle = (u.courseTitle || "").toLowerCase().includes(q);
+      const tName = u.teacherName || u.teacherId?.name || "";
+      const matchTeacher = tName.toLowerCase().includes(q);
+      const matchDept = (u.department || "").toLowerCase().includes(q);
+      const matchLevel = (u.level || "").toLowerCase().includes(q);
+      const matchTerm = (u.term || "").toLowerCase().includes(q);
+      const matchSession = (u.session || "").toLowerCase().includes(q);
+      const matchStatus = (u.status || "").toLowerCase().includes(q);
+      return matchCode || matchTitle || matchTeacher || matchDept || matchLevel || matchTerm || matchSession || matchStatus;
+    }
     return true;
   });
+
+  const searchSuggestions = React.useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase().trim();
+    const set = new Set();
+
+    uploads.forEach((u) => {
+      if ((u.courseCode || "").toLowerCase().includes(q)) set.add(u.courseCode);
+      if ((u.courseTitle || "").toLowerCase().includes(q)) set.add(u.courseTitle);
+      const tName = u.teacherName || u.teacherId?.name;
+      if (tName && tName.toLowerCase().includes(q)) set.add(tName);
+      if ((u.session || "").toLowerCase().includes(q)) set.add(u.session);
+      if ((u.level || "").toLowerCase().includes(q)) set.add(u.level);
+      if ((u.term || "").toLowerCase().includes(q)) set.add(u.term);
+    });
+
+    return Array.from(set).slice(0, 6);
+  }, [searchQuery, uploads]);
 
   const uniqueSessions = Array.from(new Set(uploads.map((u) => u.session).filter(Boolean)));
   const uniqueLevels = Array.from(new Set(uploads.map((u) => u.level).filter(Boolean)));
@@ -369,8 +469,48 @@ export default function AdminResultManagementPage() {
           </button>
         </div>
 
-        {/* Navigation Sub-Tabs */}
-        <div style={{ display: "flex", gap: "10px", background: "#ffffff", padding: "6px", borderRadius: "12px", border: "1px solid #cbd5e1", width: "fit-content", marginBottom: "24px" }}>
+        {/* ROW 1: Mid Term Result Batches vs Final Result Batches */}
+        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+          <button
+            onClick={() => {
+              setResultTypeTab("Midterm");
+            }}
+            style={{
+              padding: "10px 22px",
+              borderRadius: "8px",
+              border: resultTypeTab === "Midterm" ? "none" : "1px solid #cbd5e1",
+              background: resultTypeTab === "Midterm" ? "linear-gradient(135deg, #5c93b4, #3b8db3)" : "#ffffff",
+              color: resultTypeTab === "Midterm" ? "#ffffff" : "#475569",
+              fontWeight: 700,
+              fontSize: "13.5px",
+              cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
+            }}
+          >
+            Mid Term Result Batches
+          </button>
+          <button
+            onClick={() => {
+              setResultTypeTab("Final");
+            }}
+            style={{
+              padding: "10px 22px",
+              borderRadius: "8px",
+              border: resultTypeTab === "Final" ? "none" : "1px solid #cbd5e1",
+              background: resultTypeTab === "Final" ? "linear-gradient(135deg, #5c93b4, #3b8db3)" : "#ffffff",
+              color: resultTypeTab === "Final" ? "#ffffff" : "#475569",
+              fontWeight: 700,
+              fontSize: "13.5px",
+              cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
+            }}
+          >
+            Final Result Batches
+          </button>
+        </div>
+
+        {/* ROW 2: Navigation Sub-Tabs */}
+        <div style={{ display: "flex", gap: "10px", background: "#ffffff", padding: "6px", borderRadius: "12px", border: "1px solid #cbd5e1", width: "fit-content", marginBottom: "20px" }}>
           <button
             onClick={() => setViewTab("batches")}
             style={{
@@ -429,42 +569,175 @@ export default function AdminResultManagementPage() {
           </button>
         </div>
 
+        {/* ROW 3: Custom SVG Pill Socket Search Bar with Live Suggestions */}
+        <div style={{ position: "relative", width: "320px", height: "50px", marginBottom: "24px" }}>
+          {/* SVG pill with built-in socket notch on top-left */}
+          <svg
+            width="320"
+            height="50"
+            viewBox="0 0 300 50"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+              filter: "drop-shadow(0 3px 10px rgba(59,141,179,0.2))",
+            }}
+          >
+            <path
+              d="M 8 8
+                 C 8 20, 16 32, 30 36
+                 C 44 40, 54 30, 56 16
+                 C 57 9, 64 6, 72 6
+                 L 278 6
+                 C 290 6, 297 14, 297 25
+                 C 297 36, 290 44, 278 44
+                 L 22 44
+                 C 10 44, 3 36, 3 25
+                 C 3 16, 5 10, 8 8 Z"
+              fill="#F3F4F6"
+              stroke="#3B8DB3"
+              strokeWidth="2"
+            />
+          </svg>
+
+          {/* Badge sitting in the socket notch */}
+          <div
+            style={{
+              position: "absolute",
+              top: "6px",
+              left: "16px",
+              width: "48px",
+              height: "36px",
+              borderRadius: "0 0 24px 24px",
+              background: "linear-gradient(160deg, #7EC8E3 0%, #3B8DB3 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#ffffff",
+              zIndex: 2,
+              boxShadow: "0 3px 8px rgba(59,141,179,0.3)",
+            }}
+          >
+            <FiSearch size={17} />
+          </div>
+
+          {/* Input field */}
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onFocus={() => setShowSuggestions(true)}
+            placeholder="Search course or code..."
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 2,
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              paddingLeft: "68px",
+              paddingRight: searchQuery ? "36px" : "16px",
+              fontSize: "13.5px",
+              color: "#1A4F6E",
+              fontWeight: 500,
+              borderRadius: "24px",
+            }}
+          />
+
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setShowSuggestions(false);
+              }}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 3,
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+                color: "#64748b",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+              }}
+            >
+              <FiX size={15} />
+            </button>
+          )}
+
+          {/* Live Suggestions Dropdown */}
+          {showSuggestions && searchQuery.trim() !== "" && (
+            <div
+              style={{
+                position: "absolute",
+                top: "54px",
+                left: 0,
+                right: 0,
+                background: "#ffffff",
+                border: "1.5px solid #3B8DB3",
+                borderRadius: "14px",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
+                zIndex: 100,
+                maxHeight: "240px",
+                overflowY: "auto",
+                padding: "6px",
+              }}
+            >
+              {searchSuggestions.length > 0 ? (
+                searchSuggestions.map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setSearchQuery(item);
+                      setShowSuggestions(false);
+                    }}
+                    style={{
+                      padding: "9px 14px",
+                      cursor: "pointer",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#1A4F6E",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      background: "#ffffff",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#eef7fc")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#ffffff")}
+                  >
+                    <FiSearch size={13} color="#3B8DB3" />
+                    <span>{item}</span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: "10px 14px", fontSize: "12.5px", color: "#94a3b8", textAlign: "center" }}>
+                  No matching suggestions found for "{searchQuery}"
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* TAB 1: RESULT BATCHES & VERIFICATION */}
         {viewTab === "batches" && (
           <div>
-            {/* Primary Switcher: Midterm vs Final */}
-            <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-              <button
-                onClick={() => setResultTypeTab("Midterm")}
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: "8px",
-                  border: resultTypeTab === "Midterm" ? "none" : "1px solid #cbd5e1",
-                  background: resultTypeTab === "Midterm" ? "#0284c7" : "#ffffff",
-                  color: resultTypeTab === "Midterm" ? "#ffffff" : "#475569",
-                  fontWeight: 700,
-                  fontSize: "13px",
-                  cursor: "pointer",
-                }}
-              >
-                Mid Term Result Batches
-              </button>
-              <button
-                onClick={() => setResultTypeTab("Final")}
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: "8px",
-                  border: resultTypeTab === "Final" ? "none" : "1px solid #cbd5e1",
-                  background: resultTypeTab === "Final" ? "#0284c7" : "#ffffff",
-                  color: resultTypeTab === "Final" ? "#ffffff" : "#475569",
-                  fontWeight: 700,
-                  fontSize: "13px",
-                  cursor: "pointer",
-                }}
-              >
-                Final Result Batches
-              </button>
-            </div>
 
             {/* Filter Bar */}
             <div style={{ background: "#ffffff", padding: "16px 20px", borderRadius: "14px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", marginBottom: "24px", display: "flex", flexWrap: "wrap", gap: "14px", alignItems: "center", justifyContent: "space-between" }}>
@@ -507,6 +780,43 @@ export default function AdminResultManagementPage() {
               </div>
             </div>
 
+            {/* Bulk Selection Bar */}
+            {!loading && filteredUploads.length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#ffffff", padding: "10px 18px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "16px", boxShadow: "0 2px 6px rgba(0,0,0,0.02)" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                  <input
+                    type="checkbox"
+                    checked={selectedBatchIds.length > 0 && selectedBatchIds.length === filteredUploads.length}
+                    onChange={() => toggleSelectAll(filteredUploads)}
+                    style={{ width: "17px", height: "17px", cursor: "pointer", accentColor: "#ef4444" }}
+                  />
+                  <span>Select All Batches ({selectedBatchIds.length} / {filteredUploads.length} selected)</span>
+                </label>
+
+                {selectedBatchIds.length > 0 && (
+                  <button
+                    onClick={handleDeleteSelected}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "6px 14px",
+                      background: "#ef4444",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontWeight: 700,
+                      fontSize: "12.5px",
+                      cursor: "pointer",
+                      boxShadow: "0 3px 10px rgba(239, 68, 68, 0.35)",
+                    }}
+                  >
+                    <FiTrash2 size={14} /> Delete Selected ({selectedBatchIds.length})
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Upload Batches Roster */}
             {loading ? (
               <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading result batches...</div>
@@ -521,7 +831,14 @@ export default function AdminResultManagementPage() {
                   <div key={batch._id} style={{ background: "#ffffff", borderRadius: "14px", padding: "20px 24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
                       <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedBatchIds.includes(batch._id)}
+                            onChange={() => toggleSelectBatch(batch._id)}
+                            style={{ width: "18px", height: "18px", cursor: "pointer", accentColor: "#ef4444" }}
+                            title="Select for bulk delete"
+                          />
                           <span style={{ background: "rgba(59,141,179,0.12)", color: "#3b8db3", fontWeight: 800, padding: "3px 10px", borderRadius: "6px", fontSize: "13px" }}>
                             {batch.courseCode}
                           </span>
@@ -590,6 +907,24 @@ export default function AdminResultManagementPage() {
                             <FiEye size={13} /> {viewBatch?._id === batch._id ? "Hide Roster" : "View Roster"}
                           </button>
                         )}
+
+                        <button
+                          onClick={() => handleDeleteBatch(batch)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "7px 10px",
+                            background: "#fee2e2",
+                            color: "#ef4444",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                          }}
+                          title="Delete result batch permanently"
+                        >
+                          <FiTrash2 size={15} />
+                        </button>
                       </div>
                     </div>
 
@@ -793,10 +1128,10 @@ export default function AdminResultManagementPage() {
                               <td style={{ padding: "10px 14px", textAlign: "center" }}>
                                 <button
                                   onClick={() => handleDeleteNotice(n._id)}
-                                  style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}
+                                  style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
                                   title="Remove deadline record"
                                 >
-                                  Remove
+                                  <FiTrash2 size={15} />
                                 </button>
                               </td>
                             </tr>
@@ -869,10 +1204,10 @@ export default function AdminResultManagementPage() {
                               <td style={{ padding: "10px 14px", textAlign: "center" }}>
                                 <button
                                   onClick={() => handleDeleteNotice(n._id)}
-                                  style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}
+                                  style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
                                   title="Remove release schedule record"
                                 >
-                                  Remove
+                                  <FiTrash2 size={15} />
                                 </button>
                               </td>
                             </tr>
@@ -893,6 +1228,111 @@ export default function AdminResultManagementPage() {
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
               <FiCpu size={22} color="#0369a1" />
               <h3 style={{ margin: 0, fontSize: "18px", color: "#0369a1", fontWeight: 800 }}>Automatic Semester GPA & CGPA Calculator</h3>
+            </div>
+
+            {/* Editable CGPA Formula Box */}
+            <div
+              style={{
+                marginBottom: "20px",
+                padding: "12px 16px",
+                background: "#f0f9ff",
+                border: "1px solid #bae6fd",
+                borderRadius: "10px",
+                fontSize: "13px",
+                color: "#0369a1",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                <FiFileText size={16} style={{ color: "#0369a1" }} />
+                <strong>Excel Marks Formula</strong>
+                <span style={{ color: "#64748b", fontSize: "12px" }}>
+                  (Variables: <code>GradePoint</code> = Course GPA [0.0 - 4.0], <code>CreditHours</code> = Course Credits, Max Scale: {cgpaScaleInput})
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", marginBottom: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <strong style={{ color: "#0369a1", fontSize: "13px", whiteSpace: "nowrap" }}>Max GPA Scale:</strong>
+                  <input
+                    type="text"
+                    value={cgpaScaleInput}
+                    onChange={(e) => setCgpaScaleInput(e.target.value)}
+                    style={{
+                      width: "60px",
+                      padding: "6px 8px",
+                      border: "1.5px solid #bae6fd",
+                      borderRadius: "6px",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      textAlign: "center",
+                      background: "white",
+                      color: "#0369a1",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", flex: 1, gap: "8px", alignItems: "center", minWidth: "280px" }}>
+                  <span style={{ fontWeight: 700, color: "#0369a1", fontSize: "15px", whiteSpace: "nowrap" }}>fx =</span>
+                  <input
+                    type="text"
+                    value={cgpaFormulaInput}
+                    onChange={(e) => setCgpaFormulaInput(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: "6px 12px",
+                      border: "1.5px solid #bae6fd",
+                      borderRadius: "6px",
+                      fontSize: "13px",
+                      fontFamily: "monospace",
+                      background: "white",
+                      color: "#0f172a",
+                      fontWeight: 600,
+                      outline: "none",
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toast.success("CGPA Formula settings saved!")}
+                  style={{
+                    padding: "6px 14px",
+                    background: "#0284c7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <FiCheck size={14} /> Save Settings
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCgpaFormulaInput("=SUM(GradePoint * CreditHours) / SUM(CreditHours)");
+                    setCgpaScaleInput("4.0");
+                    toast.info("CGPA Formula reset to default.");
+                  }}
+                  style={{
+                    padding: "6px 12px",
+                    background: "white",
+                    color: "#64748b",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  ↩ Reset
+                </button>
+              </div>
+              <div style={{ fontSize: "12px", color: "#475569" }}>
+                Formula: <strong>CGPA = ∑(GradePoint × CreditHours) / ∑(CreditHours)</strong> | Active Scale: <strong>{cgpaScaleInput}</strong>
+              </div>
             </div>
 
             <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "flex-end", marginBottom: "20px" }}>

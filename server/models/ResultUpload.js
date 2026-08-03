@@ -52,8 +52,12 @@ const resultUploadSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Draft", "Submitted", "Verified", "Published", "Correction Requested"],
+    enum: ["Draft", "Submitted", "Verified", "Published", "Correction Requested", "Deleted"],
     default: "Draft",
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
   },
   correctionComment: {
     type: String,

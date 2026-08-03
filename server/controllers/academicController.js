@@ -278,10 +278,15 @@ exports.calculateStudentCGPA = calculateStudentCGPA;
 exports.getStudentAcademicProfile = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id || req.user.uid;
+    const emailLower = (req.user.email || "").toLowerCase().trim();
+
     const cgpaSummary = await calculateStudentCGPA(req.user);
 
     const studentOrConditions = [];
-    if (req.user.email) studentOrConditions.push({ universityEmail: req.user.email });
+    if (emailLower) {
+      studentOrConditions.push({ universityEmail: emailLower });
+      studentOrConditions.push({ universityEmail: { $regex: new RegExp(`^${emailLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
+    }
     if (req.user.studentId) studentOrConditions.push({ studentId: req.user.studentId });
 
     const studentProfile = studentOrConditions.length > 0
@@ -294,7 +299,7 @@ exports.getStudentAcademicProfile = async (req, res) => {
       $or: [
         ...(userId ? [{ student: userId }] : []),
         ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
-        ...(req.user.email ? [{ studentEmail: req.user.email }] : []),
+        ...(emailLower ? [{ studentEmail: { $regex: new RegExp(`^${emailLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }] : []),
       ],
     }).sort({ createdAt: -1 }).lean();
 
@@ -311,14 +316,10 @@ exports.getStudentAcademicProfile = async (req, res) => {
       : [];
 
     const studentDept = studentProfile?.department || req.user.department || activeReg?.department || "EDTE";
-    const deptImports = await CourseImport.find({
-      department: { $regex: new RegExp(`^${studentDept.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
-    }).lean();
 
-    // Gather all distinct courses the student has registered for, completed, or enrolled in up to current situation
+    // Gather all distinct courses the student has registered for, completed, or enrolled in
     const registeredCoursesMap = new Map();
 
-    // 1. From completed courses
     (profile?.completedCourses || []).forEach((c) => {
       const code = (c.courseCode || "").toUpperCase().trim();
       if (code && !registeredCoursesMap.has(code)) {
@@ -326,12 +327,11 @@ exports.getStudentAcademicProfile = async (req, res) => {
       }
     });
 
-    // 2. From all Registrations for this student
     const allStudentRegs = await Registration.find({
       $or: [
         ...(userId ? [{ student: userId }] : []),
         ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
-        ...(req.user.email ? [{ studentEmail: req.user.email }] : []),
+        ...(emailLower ? [{ studentEmail: { $regex: new RegExp(`^${emailLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }] : []),
       ],
     }).lean();
 
@@ -345,7 +345,6 @@ exports.getStudentAcademicProfile = async (req, res) => {
       });
     });
 
-    // 3. From Enrollments
     const enrollments = await Enrollment.find({
       $or: [
         ...(userId ? [{ student: userId }] : []),
@@ -371,11 +370,34 @@ exports.getStudentAcademicProfile = async (req, res) => {
     const finalCreditsEarned = totalRegisteredCredits > 0 ? totalRegisteredCredits : (cgpaSummary.totalCreditsEarned || profile?.totalCreditsEarned || 0);
     const finalCreditsRemaining = Math.max(0, totalReqCredits - finalCreditsEarned);
 
-    const currentLevelStr = activeReg?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : profile?.currentLevel || "Level-1");
-    const currentTermStr = activeReg?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : profile?.currentTerm || "Term-1");
+    const formatLvl = (l) => {
+      if (!l) return null;
+      const s = String(l).trim();
+      if (s.toLowerCase().startsWith("level-")) return s;
+      if (s.toLowerCase().startsWith("level")) return s.replace(/level\s*/i, "Level-");
+      return `Level-${s}`;
+    };
+
+    const formatTrm = (t) => {
+      if (!t) return null;
+      const s = String(t).trim();
+      if (s.toLowerCase().startsWith("term-")) return s;
+      if (s.toLowerCase().startsWith("term")) return s.replace(/term\s*/i, "Term-");
+      return `Term-${s}`;
+    };
+
+    const rawLevel = activeReg?.level || studentProfile?.currentLevel || profile?.currentLevel || req.user?.currentLevel;
+    const rawTerm = activeReg?.term || studentProfile?.currentTerm || profile?.currentTerm || req.user?.currentTerm;
+
+    const currentLevelStr = formatLvl(rawLevel) || "Level-3";
+    const currentTermStr = formatTrm(rawTerm) || "Term-2";
+
     const activeSessionStr = studentProfile?.session || activeReg?.session || profile?.session || req.user.session || "2024-25";
     const activeBatchStr = studentProfile?.batch || profile?.batch || req.user.batch || (activeSessionStr ? activeSessionStr.split("-")[0] : "2024");
     const activeProgramStr = studentProfile?.program || profile?.program || req.user.program || `B.Sc. in ${studentDept}`;
+
+    // Define incompleteCourses array
+    const incompleteCourses = [];
 
     const profileObj = {
       ...(profile || {}),

@@ -280,13 +280,15 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (name) user.name = name.trim();
-    if (department !== undefined && department !== null) {
-      user.department = String(department).trim();
+    if (user.role === "student") {
+      // Students are restricted from editing admin-assigned name, department, or studentId
+    } else {
+      if (name) user.name = name.trim();
+      if (department !== undefined && department !== null) {
+        user.department = String(department).trim();
+      }
     }
-    if (user.role === "student" && studentId !== undefined) {
-      user.studentId = String(studentId).trim();
-    }
+
     if (profilePicture !== undefined) {
       user.profilePicture = profilePicture;
     }

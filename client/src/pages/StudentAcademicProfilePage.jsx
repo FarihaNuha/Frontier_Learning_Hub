@@ -28,7 +28,7 @@ export default function StudentAcademicProfilePage() {
         setData(res.data);
       })
       .catch((err) => {
-        toast.error("Failed to load academic profile.");
+        toast.error("Failed to load academic profile.", { id: "academic-profile-error" });
       })
       .finally(() => {
         setLoading(false);

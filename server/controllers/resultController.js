@@ -684,20 +684,51 @@ exports.updateDraftResult = async (req, res) => {
 exports.deleteDraftUpload = async (req, res) => {
   try {
     const { uploadId } = req.params;
+    const isAdmin = req.user.role === "admin";
+
+    // Handle virtual pending auto card deletion
+    if (String(uploadId).startsWith("pending_")) {
+      const parts = String(uploadId).split("_");
+      // pending_code_sess_ldig_tdig
+      const code = parts[1] || "COURSE";
+      const sess = parts[2] || "2022-23";
+      const ldig = parts[3] || "1";
+      const tdig = parts[4] || "1";
+      const activeResultType = req.query.resultType === "Midterm" ? "Midterm" : "Final";
+
+      await ResultUpload.create({
+        teacher: req.user._id || req.user.id,
+        teacherEmail: req.user.email || "admin@uftb.ac.bd",
+        resultType: activeResultType,
+        department: "EDTE",
+        courseCode: code,
+        courseTitle: code,
+        session: sess,
+        level: `Level-${ldig}`,
+        term: `Term-${tdig}`,
+        totalRecords: 0,
+        status: "Deleted",
+        isDeleted: true,
+      });
+
+      return res.json({ message: "Result batch deleted successfully." });
+    }
+
     const upload = await ResultUpload.findById(uploadId);
     if (!upload) {
       return res.status(404).json({ error: "Upload batch not found." });
     }
 
-    const isTeacher = upload.teacherEmail.toLowerCase() === req.user.email.toLowerCase() || String(upload.teacher) === String(req.user._id || req.user.id);
-    const isAdmin = req.user.role === "admin";
+    const isTeacher = upload.teacherEmail.toLowerCase() === (req.user.email || "").toLowerCase() || String(upload.teacher) === String(req.user._id || req.user.id);
 
     if (!isTeacher && !isAdmin) {
       return res.status(403).json({ error: "Unauthorized to delete this result batch." });
     }
 
     await Result.deleteMany({ uploadId: upload._id });
-    await ResultUpload.findByIdAndDelete(upload._id);
+    upload.isDeleted = true;
+    upload.status = "Deleted";
+    await upload.save();
 
     await ResultLog.create({
       uploadId: upload._id,
@@ -805,7 +836,11 @@ exports.getAdminResults = async (req, res) => {
     const { status, session, level, term, department, resultType } = req.query;
 
     const activeResultType = resultType === "Midterm" ? "Midterm" : "Final";
-    const query = { resultType: activeResultType };
+    const query = {
+      resultType: activeResultType,
+      isDeleted: { $ne: true },
+      status: { $ne: "Deleted" },
+    };
     if (status && status !== "all" && status.toLowerCase() !== "pending") query.status = status;
     if (session && session !== "all") query.session = session;
     if (level && level !== "all") query.level = level;
@@ -842,7 +877,10 @@ exports.getAdminResults = async (req, res) => {
     // If status filter is "all" or "Pending", discover pending assigned courses that haven't been uploaded yet
     if (!status || status === "all" || status.toLowerCase() === "pending") {
       const existingUploadKeys = new Set();
-      uploadsWithResults.forEach((u) => {
+
+      // Include all uploads (even deleted ones) so deleted courses don't re-appear as pendingAutoCards
+      const allUploadsForKeys = await ResultUpload.find({ resultType: activeResultType }).lean();
+      allUploadsForKeys.forEach((u) => {
         const code = (u.courseCode || "").trim().toUpperCase();
         const sess = (u.session || "").trim();
         const ldig = (String(u.level || "").match(/\d+/) || [])[0] || "1";

@@ -622,6 +622,8 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
           registrationStatus: reg ? reg.status : "Approved",
           currentLevel: profile?.currentLevel || 1,
           currentTerm: profile?.currentTerm || 1,
+          level: profile?.currentLevel ? `Level-${profile.currentLevel}` : (profile?.level || reg?.level || "Level-1"),
+          term: profile?.currentTerm ? `Term-${profile.currentTerm}` : (profile?.term || reg?.term || "Term-1"),
         };
       })
     );

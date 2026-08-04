@@ -133,5 +133,11 @@
   "131": "jspdf",
   "132": "react-dom",
   "133": "react-scripts",
-  "137": "RegistrationCalendar.js"
+  "134": "TeacherImportBatch.js",
+  "135": "axios",
+  "136": "react-dom",
+  "137": "RegistrationCalendar.js",
+  "138": "react-icons",
+  "139": "@testing-library/jest-dom",
+  "140": "@testing-library/react"
 }

@@ -162,6 +162,25 @@ exports.importStudents = async (req, res) => {
       } else {
         savedDoc = await Student.create(studentUpdateData);
       }
+
+      // Sync matching User model record if student user account exists
+      const User = require("../models/User");
+      const userOrConditions = [];
+      if (sEmail) userOrConditions.push({ email: sEmail });
+      if (sId) userOrConditions.push({ studentId: sId });
+      if (userOrConditions.length > 0) {
+        await User.updateMany(
+          { $or: userOrConditions },
+          {
+            $set: {
+              name: studentUpdateData.name,
+              studentId: studentUpdateData.studentId,
+              department: studentUpdateData.department,
+            },
+          }
+        ).catch(() => {});
+      }
+
       if (savedDoc) savedStudents.push(savedDoc);
     }
 

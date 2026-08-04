@@ -133,8 +133,8 @@ export default function AdminStudents() {
     const reader = new FileReader();
     reader.onload = async (evt) => {
       try {
-        const data = evt.target.result;
-        const workbook = XLSX.read(data, { type: "binary" });
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const rawJson = XLSX.utils.sheet_to_json(sheet);
@@ -224,13 +224,13 @@ export default function AdminStudents() {
         toast.success(`Successfully imported ${validStudents.length} students.`);
         fetchStudents();
       } catch (err) {
-        toast.error(err.response?.data?.error || "Error reading Excel file.");
+        toast.error(err.response?.data?.error || "Error reading uploaded file.");
       } finally {
         setUploading(false);
         e.target.value = "";
       }
     };
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
   };
 
   return (
@@ -366,8 +366,8 @@ export default function AdminStudents() {
               boxShadow: "0 4px 12px rgba(59, 141, 179, 0.2)"
             }}>
               <FiUpload size={18} />
-              <span>{uploading ? "Uploading..." : "Upload Excel"}</span>
-              <input type="file" accept=".xlsx,.xls" onChange={handleFileUpload} style={{ display: "none" }} disabled={uploading} />
+              <span>{uploading ? "Uploading..." : "Upload Excel / CSV"}</span>
+              <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFileUpload} style={{ display: "none" }} disabled={uploading} />
             </label>
           </div>
         </div>

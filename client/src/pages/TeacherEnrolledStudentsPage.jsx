@@ -86,9 +86,10 @@ export default function TeacherEnrolledStudentsPage() {
       toast.error("No students to export.");
       return;
     }
-    let csv = "Student ID,Student Name,Email,Department,Batch,Session,Academic Status,Registration Status\n";
+    let csv = "Student ID,Student Name,Email,Department,Batch,Session,Level & Term,Academic Status,Registration Status\n";
     filteredStudents.forEach((s) => {
-      csv += `"${s.studentId}","${s.name}","${s.email}","${s.department}","${s.batch}","${s.session}","${s.academicStatus}","${s.registrationStatus}"\n`;
+      const lvlTermStr = `Level ${s.currentLevel || 1}- Term ${s.currentTerm || 1}`;
+      csv += `"${s.studentId}","${s.name}","${s.email}","${s.department}","${s.batch}","${s.session}","${lvlTermStr}","${s.academicStatus}","${s.registrationStatus}"\n`;
     });
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -321,6 +322,7 @@ export default function TeacherEnrolledStudentsPage() {
                   <th style={{ padding: "14px 20px" }}>Student Name</th>
                   <th style={{ padding: "14px 20px" }}>Department</th>
                   <th style={{ padding: "14px 20px" }}>Batch & Session</th>
+                  <th style={{ padding: "14px 20px" }}>Level & Term</th>
                   <th style={{ padding: "14px 20px" }}>Academic Status</th>
                   <th style={{ padding: "14px 20px" }}>Registration Status</th>
                 </tr>
@@ -360,6 +362,22 @@ export default function TeacherEnrolledStudentsPage() {
                     </td>
                     <td style={{ padding: "14px 20px", color: "#475569", fontSize: "13.5px" }}>
                       {student.batch !== "N/A" ? `Batch ${student.batch}` : ""} {student.session !== "N/A" ? `(${student.session})` : ""}
+                    </td>
+                    <td style={{ padding: "14px 20px" }}>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          padding: "5px 12px",
+                          borderRadius: "14px",
+                          background: "#e0f2fe",
+                          color: "#0369a1",
+                          display: "inline-block",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Level {student.currentLevel || 1}- Term {student.currentTerm || 1}
+                      </span>
                     </td>
                     <td style={{ padding: "14px 20px" }}>
                       <span

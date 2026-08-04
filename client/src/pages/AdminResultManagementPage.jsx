@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -249,6 +250,21 @@ export default function AdminResultManagementPage() {
     }
   };
 
+  const location = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const type = searchParams.get("type");
+    if (type === "final" && resultTypeTab !== "Final") {
+      setResultTypeTab("Final");
+    } else if (type === "midterm" && resultTypeTab !== "Midterm") {
+      setResultTypeTab("Midterm");
+      if (viewTab === "cgpa") {
+        setViewTab("batches");
+      }
+    }
+  }, [location.search]);
+
   useEffect(() => {
     setActiveTab("all");
     fetchAdminResults();
@@ -469,45 +485,7 @@ export default function AdminResultManagementPage() {
           </button>
         </div>
 
-        {/* ROW 1: Mid Term Result Batches vs Final Result Batches */}
-        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
-          <button
-            onClick={() => {
-              setResultTypeTab("Midterm");
-            }}
-            style={{
-              padding: "10px 22px",
-              borderRadius: "8px",
-              border: resultTypeTab === "Midterm" ? "none" : "1px solid #cbd5e1",
-              background: resultTypeTab === "Midterm" ? "linear-gradient(135deg, #5c93b4, #3b8db3)" : "#ffffff",
-              color: resultTypeTab === "Midterm" ? "#ffffff" : "#475569",
-              fontWeight: 700,
-              fontSize: "13.5px",
-              cursor: "pointer",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
-            }}
-          >
-            Mid Term Result Batches
-          </button>
-          <button
-            onClick={() => {
-              setResultTypeTab("Final");
-            }}
-            style={{
-              padding: "10px 22px",
-              borderRadius: "8px",
-              border: resultTypeTab === "Final" ? "none" : "1px solid #cbd5e1",
-              background: resultTypeTab === "Final" ? "linear-gradient(135deg, #5c93b4, #3b8db3)" : "#ffffff",
-              color: resultTypeTab === "Final" ? "#ffffff" : "#475569",
-              fontWeight: 700,
-              fontSize: "13.5px",
-              cursor: "pointer",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
-            }}
-          >
-            Final Result Batches
-          </button>
-        </div>
+
 
         {/* ROW 2: Navigation Sub-Tabs */}
         <div style={{ display: "flex", gap: "10px", background: "#ffffff", padding: "6px", borderRadius: "12px", border: "1px solid #cbd5e1", width: "fit-content", marginBottom: "20px" }}>
@@ -527,7 +505,7 @@ export default function AdminResultManagementPage() {
               gap: "8px",
             }}
           >
-            <FiAward size={16} /> Result Batches & Verification
+            <FiAward size={16} /> {resultTypeTab === "Midterm" ? "Mid Term Result Batches & Verification" : "Final Result Batches & Verification"}
           </button>
 
           <button
@@ -546,27 +524,30 @@ export default function AdminResultManagementPage() {
               gap: "8px",
             }}
           >
-            <FiClock size={16} /> Deadlines & Schedules Table
+            <FiClock size={16} /> {resultTypeTab === "Midterm" ? "Mid Term Deadlines & Schedules" : "Final Term Deadlines & Schedules"}
           </button>
 
-          <button
-            onClick={() => setViewTab("cgpa")}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "8px",
-              border: "none",
-              background: viewTab === "cgpa" ? "linear-gradient(135deg, #3b8db3, #2C4B66)" : "transparent",
-              color: viewTab === "cgpa" ? "#ffffff" : "#64748b",
-              fontWeight: 700,
-              fontSize: "13.5px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <FiCpu size={16} /> GPA & CGPA Calculator
-          </button>
+          {/* Render GPA & CGPA Calculator sub-tab ONLY for Final Term */}
+          {resultTypeTab === "Final" && (
+            <button
+              onClick={() => setViewTab("cgpa")}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "8px",
+                border: "none",
+                background: viewTab === "cgpa" ? "linear-gradient(135deg, #3b8db3, #2C4B66)" : "transparent",
+                color: viewTab === "cgpa" ? "#ffffff" : "#64748b",
+                fontWeight: 700,
+                fontSize: "13.5px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FiCpu size={16} /> CGPA Calculator
+            </button>
+          )}
         </div>
 
         {/* ROW 3: Custom SVG Pill Socket Search Bar with Live Suggestions */}
@@ -1022,50 +1003,52 @@ export default function AdminResultManagementPage() {
                 </div>
               </div>
 
-              {/* Schedule Auto-Release Card */}
-              <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-                  <FiClock size={20} color="#0369a1" />
-                  <h3 style={{ margin: 0, fontSize: "16px", color: "#0369a1", fontWeight: 800 }}>Schedule Automated Timed Release</h3>
-                </div>
+              {/* Schedule Auto-Release Card - ONLY for Final Term */}
+              {resultTypeTab === "Final" && (
+                <div style={{ background: "#ffffff", padding: "20px 24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                    <FiClock size={20} color="#0369a1" />
+                    <h3 style={{ margin: 0, fontSize: "16px", color: "#0369a1", fontWeight: 800 }}>Schedule Automated Timed Release</h3>
+                  </div>
 
-                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Session</label>
-                    <select value={schedSession} onChange={(e) => setSchedSession(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
-                      {["2025-26", "2024-25", "2023-24", "2022-23", "2021-22"].map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Session</label>
+                      <select value={schedSession} onChange={(e) => setSchedSession(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                        {["2025-26", "2024-25", "2023-24", "2022-23", "2021-22"].map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Level</label>
+                      <select value={schedLevel} onChange={(e) => setSchedLevel(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                        {["Level-1", "Level-2", "Level-3", "Level-4"].map(l => <option key={l} value={l}>{l}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Term</label>
+                      <select value={schedTerm} onChange={(e) => setSchedTerm(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                        {["Term-1", "Term-2"].map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Level</label>
-                    <select value={schedLevel} onChange={(e) => setSchedLevel(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
-                      {["Level-1", "Level-2", "Level-3", "Level-4"].map(l => <option key={l} value={l}>{l}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>Term</label>
-                    <select value={schedTerm} onChange={(e) => setSchedTerm(e.target.value)} style={{ padding: "7.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
-                      {["Term-1", "Term-2"].map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </div>
-                </div>
 
-                <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-                  <input
-                    type="datetime-local"
-                    value={scheduledDateTime}
-                    onChange={(e) => setScheduledDateTime(e.target.value)}
-                    style={{ flex: 1, minWidth: "180px", padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}
-                  />
-                  <button
-                    onClick={handleSchedulePublication}
-                    disabled={scheduling}
-                    style={{ padding: "8.5px 16px", background: "#0284c7", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: scheduling ? "not-allowed" : "pointer" }}
-                  >
-                    {scheduling ? "Scheduling..." : "Schedule Release"}
-                  </button>
+                  <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                    <input
+                      type="datetime-local"
+                      value={scheduledDateTime}
+                      onChange={(e) => setScheduledDateTime(e.target.value)}
+                      style={{ flex: 1, minWidth: "180px", padding: "8px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}
+                    />
+                    <button
+                      onClick={handleSchedulePublication}
+                      disabled={scheduling}
+                      style={{ padding: "8.5px 16px", background: "#0284c7", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13px", cursor: scheduling ? "not-allowed" : "pointer" }}
+                    >
+                      {scheduling ? "Scheduling..." : "Schedule Release"}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Table 1: 📅 Result Submission Cutoff Deadlines Registry */}
@@ -1227,7 +1210,15 @@ export default function AdminResultManagementPage() {
           <div style={{ background: "#ffffff", padding: "24px", borderRadius: "14px", border: "1px solid #cbd5e1", boxShadow: "0 4px 16px rgba(0,0,0,0.04)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
               <FiCpu size={22} color="#0369a1" />
-              <h3 style={{ margin: 0, fontSize: "18px", color: "#0369a1", fontWeight: 800 }}>Automatic Semester GPA & CGPA Calculator</h3>
+              <h3 style={{ margin: 0, fontSize: "18px", color: "#0369a1", fontWeight: 800 }}>Automatic Semester CGPA Calculator</h3>
+            </div>
+
+            {/* Informative Banner */}
+            <div style={{ background: "#e0f2fe", border: "1px solid #bae6fd", borderRadius: "10px", padding: "12px 16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px", color: "#0369a1", fontSize: "13px", fontWeight: 600 }}>
+              <FiAlertCircle size={18} style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Final Term Result Policy:</strong> Semester GPA & Cumulative CGPA calculations apply exclusively to <strong>Final Term Examination Results</strong>. Mid-Term examinations only track raw assessment marks.
+              </span>
             </div>
 
             {/* Editable CGPA Formula Box */}
@@ -1314,7 +1305,7 @@ export default function AdminResultManagementPage() {
                   onClick={() => {
                     setCgpaFormulaInput("=SUM(GradePoint * CreditHours) / SUM(CreditHours)");
                     setCgpaScaleInput("4.0");
-                    toast.info("CGPA Formula reset to default.");
+                    toast("CGPA Formula reset to default.", { icon: "ℹ️" });
                   }}
                   style={{
                     padding: "6px 12px",
@@ -1483,8 +1474,6 @@ export default function AdminResultManagementPage() {
                 );
               })()}
             </div>
-=======
->>>>>>> 590ac6afd2788b7b0eb2e9f13c126236e5196cb9
           </div>
         )}
 

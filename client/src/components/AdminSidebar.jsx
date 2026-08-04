@@ -34,9 +34,13 @@ export default function AdminSidebar() {
     location.pathname === "/admin/registration-payments" ||
     location.pathname === "/admin/registrations";
 
+  const isResultActive =
+    location.pathname === "/admin/results" || location.pathname.startsWith("/admin/results");
+
   const [studentsOpen, setStudentsOpen] = useState(isStudentsActive);
   const [teachersOpen, setTeachersOpen] = useState(isTeachersActive);
   const [registrationOpen, setRegistrationOpen] = useState(isRegistrationActive);
+  const [resultsOpen, setResultsOpen] = useState(isResultActive);
 
   return (
     <div className="sidebar admin-sidebar" style={{
@@ -367,26 +371,73 @@ export default function AdminSidebar() {
           )}
         </div>
 
-        {/* Result Publication */}
-        <Link 
-          to="/admin/results" 
-          className={`sidebar-menu-item ${location.pathname === "/admin/results" ? "active" : ""}`}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            color: location.pathname === "/admin/results" ? "#ffffff" : "#2C4B66",
-            background: location.pathname === "/admin/results" ? "#3B8DB3" : "transparent",
-            textDecoration: "none",
-            marginBottom: "8px",
-            fontWeight: location.pathname === "/admin/results" ? "600" : "500",
-          }}
-        >
-          <FiAward size={18} />
-          <span>Result Publication</span>
-        </Link>
+        {/* Expandable Result Publication Section (Mid Term & Final Term) */}
+        <div style={{ marginBottom: "8px" }}>
+          <button
+            onClick={() => setResultsOpen(!resultsOpen)}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              color: isResultActive ? "#3B8DB3" : "#2C4B66",
+              background: isResultActive ? "#E8F4FD" : "transparent",
+              border: "none",
+              fontWeight: "600",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <FiAward size={18} />
+              <span>Result Publication</span>
+            </div>
+            {resultsOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+          </button>
+
+          {resultsOpen && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px", paddingLeft: "16px" }}>
+              <Link
+                to="/admin/results?type=midterm"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/results" && (!location.search || location.search.includes("midterm")) ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/results" && (!location.search || location.search.includes("midterm")) ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/results" && (!location.search || location.search.includes("midterm")) ? "600" : "500",
+                }}
+              >
+                <FiAward size={16} />
+                <span>Mid Term</span>
+              </Link>
+              <Link
+                to="/admin/results?type=final"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  color: location.pathname === "/admin/results" && location.search.includes("final") ? "#ffffff" : "#475569",
+                  background: location.pathname === "/admin/results" && location.search.includes("final") ? "#3B8DB3" : "transparent",
+                  textDecoration: "none",
+                  fontWeight: location.pathname === "/admin/results" && location.search.includes("final") ? "600" : "500",
+                }}
+              >
+                <FiAward size={16} />
+                <span>Final Term</span>
+              </Link>
+            </div>
+          )}
+        </div>
 
         {/* Settings */}
         <Link 

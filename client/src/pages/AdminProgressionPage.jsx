@@ -462,12 +462,16 @@ export default function AdminProgressionPage() {
                     >
                       <thead>
                         <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
-                          <th style={{ padding: "10px 14px", width: "40px" }}>
-                            <input
-                              type="checkbox"
-                              checked={allSessSelected}
-                              onChange={(e) => handleSelectAllForSession(sessKey, e.target.checked)}
-                            />
+                          <th style={{ padding: "10px 14px", minWidth: "65px" }}>
+                            <label style={{ display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", userSelect: "none" }} title="Select all students in this session">
+                              <input
+                                type="checkbox"
+                                checked={allSessSelected}
+                                onChange={(e) => handleSelectAllForSession(sessKey, e.target.checked)}
+                                style={{ cursor: "pointer" }}
+                              />
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569" }}>All</span>
+                            </label>
                           </th>
                           <th style={{ padding: "10px 14px" }}>Student ID</th>
                           <th style={{ padding: "10px 14px" }}>Name</th>

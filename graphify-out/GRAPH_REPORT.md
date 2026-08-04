@@ -1,7 +1,7 @@
 # Graph Report - UFTB_Moodle  (2026-08-04)
 
 ## Corpus Check
-- 246 files · ~219,851 words
+- 246 files · ~220,160 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `889cbaee`
+- Built from commit: `543f91f6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -144,7 +144,7 @@
 - inspect_student_docs.js
 - jspdf
 - react-dom
-- react-scripts
+- attendanceRoutes.js
 - RegistrationCalendar.js
 
 ## God Nodes (most connected - your core abstractions)
@@ -226,7 +226,7 @@ Nodes (18): concurrently, author, dependencies, concurrently, nodemon, descripti
 
 ### Community 12 - "dependencies"
 Cohesion: 0.11
-Nodes (19): dependencies, axios, jspdf-autotable, react-dom, react-icons, react-scripts, socket.io-client, @testing-library/jest-dom (+11 more)
+Nodes (19): dependencies, axios, jspdf-autotable, react-hot-toast, react-icons, socket.io-client, @testing-library/dom, @testing-library/jest-dom (+11 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.14
@@ -257,8 +257,8 @@ Cohesion: 0.50
 Nodes (3): plugin, $schema, .opencode/plugins/graphify.js
 
 ### Community 22 - "authMiddleware.js"
-Cohesion: 0.13
-Nodes (10): mongoose, registrationSchema, Course, Enrollment, mongoose, Registration, Student, User (+2 more)
+Cohesion: 0.18
+Nodes (8): enrollmentSchema, mongoose, Course, Enrollment, mongoose, Registration, Student, User
 
 ### Community 23 - "scripts"
 Cohesion: 0.08
@@ -421,8 +421,8 @@ Cohesion: 0.50
 Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 77 - "examRoutes.js"
-Cohesion: 0.18
-Nodes (8): enrollmentSchema, mongoose, Course, Enrollment, mongoose, Registration, Student, User
+Cohesion: 0.25
+Nodes (6): Course, Enrollment, mongoose, Registration, Student, User
 
 ### Community 78 - "@testing-library/jest-dom"
 Cohesion: 0.33
@@ -488,10 +488,6 @@ Nodes (5): dns, mongoose, path, Student, User
 Cohesion: 0.25
 Nodes (6): axios, dns, jwt, mongoose, path, User
 
-### Community 101 - "Course.js"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
-
 ### Community 102 - "PrivateMessage.js"
 Cohesion: 0.25
 Nodes (6): axios, dns, jwt, mongoose, path, User
@@ -509,8 +505,8 @@ Cohesion: 0.22
 Nodes (7): checkRole(), ctrl, router, { verifyToken, checkRole }, ctrl, router, { verifyToken, checkRole }
 
 ### Community 106 - "jszip"
-Cohesion: 0.25
-Nodes (6): Course, Enrollment, mongoose, Registration, Student, User
+Cohesion: 0.13
+Nodes (10): mongoose, registrationSchema, mongoose, Registration, Course, Enrollment, mongoose, Registration (+2 more)
 
 ### Community 107 - "previewService.js"
 Cohesion: 0.29
@@ -551,6 +547,10 @@ Nodes (6): AcademicProfile, mongoose, Registration, Student, academicProfileSche
 ### Community 130 - "inspect_student_docs.js"
 Cohesion: 0.22
 Nodes (6): mongoose, studentSchema, dns, mongoose, path, Student
+
+### Community 134 - "attendanceRoutes.js"
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 137 - "RegistrationCalendar.js"
 Cohesion: 0.29

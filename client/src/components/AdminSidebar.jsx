@@ -392,7 +392,7 @@ export default function AdminSidebar() {
           >
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <FiAward size={18} />
-              <span>Result Publication</span>
+              <span>Result</span>
             </div>
             {resultsOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
           </button>

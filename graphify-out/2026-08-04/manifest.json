@@ -140,13 +140,13 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssessmentPage.jsx": {
-    "mtime": 1785597020.9559703,
-    "ast_hash": "d3c37743fb372eb77dc8760be091b051",
+    "mtime": 1785840387.8147955,
+    "ast_hash": "58dbf5bf4cfee9588ed7fc24fbbcf546",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1784383113.369686,
-    "ast_hash": "b172cb5df154894323766756fea83c53",
+    "mtime": 1785840378.6109364,
+    "ast_hash": "e3aefab0d8fd2568ec37a531aa911867",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1785698059.5190594,
-    "ast_hash": "9dcc1b885f08336ef324dac4a6877f21",
+    "mtime": 1785840367.8850708,
+    "ast_hash": "cb649b7ddae7d22a085fe3d7503d06d9",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -585,8 +585,8 @@
     "semantic_hash": ""
   },
   "server/controllers/umsAdminController.js": {
-    "mtime": 1785822966.6825616,
-    "ast_hash": "b9ea93a4d3e8e90c243fa3afd95daeab",
+    "mtime": 1785839027.745584,
+    "ast_hash": "6d024d394aeccb3b48456723095f8ac8",
     "semantic_hash": ""
   },
   "server/models/Adviser.js": {
@@ -650,8 +650,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminResultManagementPage.jsx": {
-    "mtime": 1785825833.4825566,
-    "ast_hash": "a311a79df68ef7275886fcec4474a789",
+    "mtime": 1785825956.7075825,
+    "ast_hash": "106ae85fc73edaeaafd08a9622f1cd7a",
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
@@ -765,8 +765,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminProgressionPage.jsx": {
-    "mtime": 1785425897.986913,
-    "ast_hash": "b975d375a24d49aebe3d9da490f03d8b",
+    "mtime": 1785839374.170827,
+    "ast_hash": "e19eb4b181ccc0125da3ace9faf89a14",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAcademicProfilePage.jsx": {

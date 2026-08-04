@@ -274,7 +274,7 @@ export default function TeacherHomeDashboard() {
                       <FiAward size={20} />
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Result Publication</h3>
+                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Result</h3>
                       <span style={{ fontSize: "12px", color: "#64748b" }}>Marks & Grade Processing</span>
                     </div>
                   </div>

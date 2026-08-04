@@ -173,7 +173,7 @@ export default function StudentAcademicResultsPage() {
               <FiAward size={22} />
             </div>
             <h1 style={{ color: "#1e293b", margin: 0, fontSize: "26px", fontWeight: 700 }}>
-              Result Publication Portal
+              Result Portal
             </h1>
           </div>
           <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>

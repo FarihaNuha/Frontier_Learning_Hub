@@ -447,20 +447,42 @@ export default function TeacherAssignmentPage({
               )}
               <div className="form-group">
                 <label>Attach File (Optional)</label>
-                <div className="file-upload-area">
+                <div
+                  className="file-upload-area"
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const dropped = e.dataTransfer.files ? e.dataTransfer.files[0] : null;
+                    if (dropped) {
+                      setAssignmentFile(dropped);
+                      if (!formData.title.trim()) {
+                        setFormData((prev) => ({ ...prev, title: dropped.name.replace(/\.[^/.]+$/, "") }));
+                      }
+                    }
+                  }}
+                >
                   <input
                     type="file"
-                    onChange={(e) => setAssignmentFile(e.target.files[0])}
+                    onChange={(e) => {
+                      const selected = e.target.files ? e.target.files[0] : null;
+                      if (selected) {
+                        setAssignmentFile(selected);
+                        if (!formData.title.trim()) {
+                          setFormData((prev) => ({ ...prev, title: selected.name.replace(/\.[^/.]+$/, "") }));
+                        }
+                      }
+                    }}
                     id="assignment-file"
                   />
-                  <label htmlFor="assignment-file" className="file-label">
+                  <label htmlFor="assignment-file" className="file-label" style={{ cursor: "pointer" }}>
                     {assignmentFile ? (
                       <>
                         <FiFile size={20} /> {assignmentFile.name}
                       </>
                     ) : (
                       <>
-                        <FiUpload size={24} /> Click to upload
+                        <FiUpload size={24} /> Drag & Drop or Click to upload attachment
                       </>
                     )}
                   </label>

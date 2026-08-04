@@ -211,7 +211,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             onClick={() => navigate("/student/results")}
           >
             <FiAward size={18} />
-            <span>Result Publication</span>
+            <span>Result</span>
           </button>
 
           {/* 6. Academic Transcript */}

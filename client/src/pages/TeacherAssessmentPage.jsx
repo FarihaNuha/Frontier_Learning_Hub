@@ -494,7 +494,18 @@ export default function TeacherAssessmentPage() {
           )}
 
           <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div className="file-upload-area" style={{ width: "100%" }}>
+            <div
+              className="file-upload-area"
+              style={{ width: "100%" }}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                  handleFileChange({ target: { files: e.dataTransfer.files } });
+                }
+              }}
+            >
               <input
                 type="file"
                 id="xlsx-file"
@@ -522,10 +533,10 @@ export default function TeacherAssessmentPage() {
               >
                 <FiUpload size={32} color="var(--pastel-blue-primary)" style={{ marginBottom: 4 }} />
                 <strong style={{ fontSize: 16, color: "var(--pastel-blue-primary)" }}>
-                  {file ? file.name : "Choose Excel or CSV File"}
+                  {file ? file.name : "Drag & Drop or Choose Excel/CSV File"}
                 </strong>
                 <span style={{ fontSize: 12, color: "#6b89a0" }}>
-                  {file ? `${(file.size / 1024).toFixed(1)} KB` : "Click here to upload student marksheet"}
+                  {file ? `${(file.size / 1024).toFixed(1)} KB` : "Drag & drop or click here to upload student marksheet"}
                 </span>
               </label>
             </div>

@@ -210,7 +210,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
             onClick={() => navigate("/teacher/results")}
           >
             <FiAward size={18} />
-            <span>Result Publication</span>
+            <span>Result</span>
           </button>
 
           {/* 7. Academic Calendar */}

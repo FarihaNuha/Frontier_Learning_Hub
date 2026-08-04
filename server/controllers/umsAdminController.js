@@ -69,9 +69,7 @@ exports.getStats = async (req, res) => {
       }
     });
 
-    const Course = require("../models/Course");
-    const lmsCourses = await Course.find().lean();
-    const totalCoursesCount = Math.max(courses.length, lmsCourses.length);
+    const totalCoursesCount = courses.length;
 
     res.json({
       students: {

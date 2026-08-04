@@ -456,7 +456,7 @@ export default function AdminResultManagementPage() {
               <FiAward size={22} />
             </div>
             <div>
-              <h1 style={{ margin: 0, color: "#0f172a", fontSize: "24px", fontWeight: 800 }}>Result Publication & Verification</h1>
+              <h1 style={{ margin: 0, color: "#0f172a", fontSize: "24px", fontWeight: 800 }}>Result & Verification</h1>
             </div>
           </div>
 

@@ -174,6 +174,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     department: user?.department || "Software",
   });
   const [files, setFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const fetchLectures = async (forceRefresh = false) => {
     try {
@@ -191,25 +192,62 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (selectedWeek) {
+      setFormData((prev) => ({ ...prev, week: selectedWeek.toString() }));
+    }
+  }, [selectedWeek]);
+
   if (!user) return null;
   if (!courseId) {
     return <TeacherHomeDashboard />;
   }
 
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files || []);
-    if (selectedFiles.length > 0) {
-      const validFiles = selectedFiles.filter((f) => f.size <= 100 * 1024 * 1024);
-      if (validFiles.length < selectedFiles.length) {
-        toast.error("Some files exceed 100MB limit");
-      }
+  const addValidFiles = (incomingFiles) => {
+    if (!incomingFiles || incomingFiles.length === 0) return;
+    const validFiles = incomingFiles.filter((f) => f.size <= 100 * 1024 * 1024);
+    if (validFiles.length < incomingFiles.length) {
+      toast.error("Some files exceed 100MB limit");
+    }
+    if (validFiles.length > 0) {
       setFiles((prev) => {
         const existingNames = new Set(prev.map((f) => f.name));
         const newUnique = validFiles.filter((f) => !existingNames.has(f.name));
         return [...prev, ...newUnique];
       });
+
+      // Auto-fill title with original filename if title field is currently empty
+      if (!formData.title.trim()) {
+        const firstFileName = validFiles[0].name.replace(/\.[^/.]+$/, "");
+        setFormData((prev) => ({ ...prev, title: firstFileName }));
+      }
     }
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    addValidFiles(selectedFiles);
     e.target.value = "";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const droppedFiles = Array.from(e.dataTransfer.files || []);
+    addValidFiles(droppedFiles);
   };
 
   const handleRemoveFile = (indexToRemove) => {
@@ -233,11 +271,12 @@ export default function TeacherDashboard({ courseId, courseCode }) {
         const fd = new FormData();
         fd.append("file", currentFile);
 
+        const cleanOriginalName = currentFile.name.replace(/\.[^/.]+$/, "");
         let fileTitle = formData.title.trim();
         if (!fileTitle) {
-          fileTitle = currentFile.name.replace(/\.[^/.]+$/, "");
+          fileTitle = cleanOriginalName;
         } else if (files.length > 1) {
-          fileTitle = `${fileTitle} (${i + 1})`;
+          fileTitle = `${cleanOriginalName}`;
         }
 
         fd.append("title", fileTitle);
@@ -384,7 +423,13 @@ export default function TeacherDashboard({ courseId, courseCode }) {
           </div>
           <button
             className="btn-primary"
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              const nextState = !showForm;
+              setShowForm(nextState);
+              if (nextState && selectedWeek) {
+                setFormData((prev) => ({ ...prev, week: selectedWeek.toString() }));
+              }
+            }}
           >
             {showForm ? (
               <>
@@ -479,7 +524,12 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                 <label style={{ fontSize: 16, fontWeight: 600, color: "#2d3748", marginBottom: 8, display: "block" }}>
                   Upload Files
                 </label>
-                <div className="file-upload-area">
+                <div
+                  className="file-upload-area"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
                   <input
                     type="file"
                     multiple
@@ -492,20 +542,25 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                     className="file-label"
                     style={{
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: 10,
+                      gap: 8,
                       cursor: "pointer",
-                      padding: "26px",
+                      padding: "26px 20px",
                       borderRadius: 12,
-                      border: "2px dashed #93c5fd",
-                      background: "#edf5ff",
+                      border: isDragging ? "2px dashed #0284c7" : "2px dashed #93c5fd",
+                      background: isDragging ? "#e0f2fe" : "#edf5ff",
                       transition: "all 0.2s ease",
+                      textAlign: "center",
                     }}
                   >
-                    <FiUpload size={22} style={{ color: "#334155" }} />
-                    <span style={{ fontSize: 16, fontWeight: 500, color: "#334155" }}>
-                      Click to upload file(s)
+                    <FiUpload size={26} style={{ color: isDragging ? "#0284c7" : "#3b8db3" }} />
+                    <span style={{ fontSize: 16, fontWeight: 700, color: isDragging ? "#0284c7" : "#1e293b" }}>
+                      {isDragging ? "Drop file(s) here to upload" : "Drag & Drop file(s) here or click to browse"}
+                    </span>
+                    <span style={{ fontSize: 12.5, color: "#64748b", fontWeight: 500 }}>
+                      File name will automatically be saved as the lecture title
                     </span>
                   </label>
                 </div>

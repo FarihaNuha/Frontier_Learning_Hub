@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "client/src/components/StudentSidebar.jsx": {
-    "mtime": 1785585268.4248033,
-    "ast_hash": "98f547ea618f80c948c9501b01b73ec2",
+    "mtime": 1785842399.9245842,
+    "ast_hash": "22b253eeb2096f5ee8a3ae9e0cfee0f5",
     "semantic_hash": ""
   },
   "client/src/components/common/Navbar.jsx": {
@@ -140,13 +140,13 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssessmentPage.jsx": {
-    "mtime": 1785597020.9559703,
-    "ast_hash": "d3c37743fb372eb77dc8760be091b051",
+    "mtime": 1785840387.8147955,
+    "ast_hash": "58dbf5bf4cfee9588ed7fc24fbbcf546",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1784383113.369686,
-    "ast_hash": "b172cb5df154894323766756fea83c53",
+    "mtime": 1785840378.6109364,
+    "ast_hash": "e3aefab0d8fd2568ec37a531aa911867",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1785698059.5190594,
-    "ast_hash": "9dcc1b885f08336ef324dac4a6877f21",
+    "mtime": 1785840856.4527442,
+    "ast_hash": "d4019265fc43eea4b52efb94cd35070a",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -505,8 +505,8 @@
     "semantic_hash": ""
   },
   "client/src/components/TeacherSidebar.jsx": {
-    "mtime": 1785585264.635243,
-    "ast_hash": "facb4d3dfbac8baf49ce70f1d11782d6",
+    "mtime": 1785842408.4716463,
+    "ast_hash": "80a13a71a1efa612fda19d69a5b4d93a",
     "semantic_hash": ""
   },
   "client/src/pages/CourseAnalyticsPage.jsx": {
@@ -550,8 +550,8 @@
     "semantic_hash": ""
   },
   "client/src/components/AdminSidebar.jsx": {
-    "mtime": 1785825060.7871213,
-    "ast_hash": "e2290cfae71e9318775f0525bac2d7f8",
+    "mtime": 1785842390.7195253,
+    "ast_hash": "56b8465133faf3e6719c3ce4c063f219",
     "semantic_hash": ""
   },
   "client/src/pages/AdminAdvisers.jsx": {
@@ -585,8 +585,8 @@
     "semantic_hash": ""
   },
   "server/controllers/umsAdminController.js": {
-    "mtime": 1785822966.6825616,
-    "ast_hash": "b9ea93a4d3e8e90c243fa3afd95daeab",
+    "mtime": 1785839027.745584,
+    "ast_hash": "6d024d394aeccb3b48456723095f8ac8",
     "semantic_hash": ""
   },
   "server/models/Adviser.js": {
@@ -625,8 +625,8 @@
     "semantic_hash": ""
   },
   "client/src/components/TeacherHomeDashboard.jsx": {
-    "mtime": 1785513222.0241754,
-    "ast_hash": "c3d3703c51ac5b82e52a9eb6fdc806c0",
+    "mtime": 1785842416.7090814,
+    "ast_hash": "677f314d5b6f2441484a68de7038fd8b",
     "semantic_hash": ""
   },
   "client/src/pages/AcademicRegistrationPage.jsx": {
@@ -650,8 +650,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminResultManagementPage.jsx": {
-    "mtime": 1785825956.7075825,
-    "ast_hash": "106ae85fc73edaeaafd08a9622f1cd7a",
+    "mtime": 1785842425.1248598,
+    "ast_hash": "0304fa554ec039c405c71b3ee96ce3b7",
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
@@ -660,8 +660,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAcademicResultsPage.jsx": {
-    "mtime": 1785698059.51762,
-    "ast_hash": "28c730a0c92d646b385cefb91c6012c7",
+    "mtime": 1785842433.7360277,
+    "ast_hash": "efaf30f53a276258d92d87f2e80481e0",
     "semantic_hash": ""
   },
   "client/src/pages/StudentLevelTermPage.jsx": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherResultManagementPage.jsx": {
-    "mtime": 1785821003.3650696,
-    "ast_hash": "1a39dde9c311f93c8d73675fec0384b9",
+    "mtime": 1785842444.9155624,
+    "ast_hash": "ed619ebe8de5f8d446a0ee53538b86b6",
     "semantic_hash": ""
   },
   "server/controllers/announcementController.js": {
@@ -765,8 +765,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminProgressionPage.jsx": {
-    "mtime": 1785425897.986913,
-    "ast_hash": "b975d375a24d49aebe3d9da490f03d8b",
+    "mtime": 1785839374.170827,
+    "ast_hash": "e19eb4b181ccc0125da3ace9faf89a14",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAcademicProfilePage.jsx": {

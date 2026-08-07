@@ -58,47 +58,6 @@ const createNotification = async (userId, title, message) => {
 
 
 
-// Helper to find matching registration calendar rule for a student's Session, Department, Level & Term
-const findRegistrationCalendarRule = async (studentObj, levelString, termString) => {
-  const sessStr = (studentObj.session || "").trim();
-  const sessDigits = sessStr.match(/\d+/g);
-  const sessRegex = sessDigits && sessDigits.length >= 2
-    ? new RegExp(`${sessDigits[0]}.*${sessDigits[1]}`, "i")
-    : new RegExp(sessStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
-
-  const levelDigits = (levelString || "").replace(/[^0-9]/g, "");
-  const termDigits = (termString || "").replace(/[^0-9]/g, "");
-
-  const levelRegex = levelDigits ? new RegExp(`level[\\s-]*${levelDigits}`, "i") : new RegExp((levelString || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
-  const termRegex = termDigits ? new RegExp(`term[\\s-]*${termDigits}`, "i") : new RegExp((termString || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
-
-  const dept = (studentObj.department || "").trim();
-  const deptKeywords = dept.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-
-  // Try matching rule by Session + Department + Level + Term
-  let calendar = await RegistrationCalendar.findOne({
-    $and: [
-      {
-        $or: [
-          { session: { $regex: sessRegex } },
-          { session: "All Sessions" },
-        ]
-      },
-      {
-        $or: [
-          { department: "All Departments" },
-          { department: { $regex: new RegExp(dept, "i") } },
-          ...(deptKeywords.length >= 4 ? [{ department: { $regex: new RegExp(deptKeywords.slice(0, 4), "i") } }] : []),
-        ]
-      },
-      { level: { $regex: levelRegex } },
-      { term: { $regex: termRegex } },
-    ]
-  });
-
-  return calendar;
-};
-
 // Helper for flexible Department & Program matching
 const isDepartmentAndProgramMatch = (courseDept, courseProg, studentDept, studentProg) => {
   const cDept = String(courseDept || "").trim();
@@ -135,6 +94,66 @@ const isDepartmentAndProgramMatch = (courseDept, courseProg, studentDept, studen
   }
 
   return true;
+};
+
+// Helper to find matching registration calendar rule for a student's Session, Department, Level & Term
+const findRegistrationCalendarRule = async (studentObj, levelString, termString) => {
+  const sessStr = (studentObj.session || "").trim();
+  const sessDigits = sessStr.match(/\d+/g);
+  const sessRegex = sessDigits && sessDigits.length >= 2
+    ? new RegExp(`${sessDigits[0]}.*${sessDigits[1]}`, "i")
+    : new RegExp(sessStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
+
+  const levelDigits = (levelString || "").replace(/[^0-9]/g, "");
+  const termDigits = (termString || "").replace(/[^0-9]/g, "");
+
+  const levelRegex = levelDigits ? new RegExp(`level[\\s-]*${levelDigits}`, "i") : new RegExp((levelString || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
+  const termRegex = termDigits ? new RegExp(`term[\\s-]*${termDigits}`, "i") : new RegExp((termString || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
+
+  // Fetch all calendar rules for Level & Term
+  const allCalendars = await RegistrationCalendar.find({
+    $and: [
+      {
+        $or: [
+          { session: { $regex: sessRegex } },
+          { session: "All Sessions" },
+          { session: { $regex: new RegExp(sessStr.replace("-", "[-\\s]?"), "i") } }
+        ]
+      },
+      { level: { $regex: levelRegex } },
+      { term: { $regex: termRegex } },
+    ]
+  }).lean();
+
+  if (!allCalendars || allCalendars.length === 0) {
+    const fallbackCalendars = await RegistrationCalendar.find({
+      level: { $regex: levelRegex },
+      term: { $regex: termRegex },
+    }).lean();
+
+    if (fallbackCalendars && fallbackCalendars.length > 0) {
+      for (const cal of fallbackCalendars) {
+        if (
+          (cal.session === "All Sessions" || (cal.session && cal.session.includes(sessStr))) &&
+          (cal.department === "All Departments" || isDepartmentAndProgramMatch(cal.department, cal.program, studentObj.department, studentObj.program))
+        ) {
+          return cal;
+        }
+      }
+    }
+    return null;
+  }
+
+  for (const cal of allCalendars) {
+    if (
+      cal.department === "All Departments" ||
+      isDepartmentAndProgramMatch(cal.department, cal.program, studentObj.department, studentObj.program)
+    ) {
+      return cal;
+    }
+  }
+
+  return allCalendars[0] || null;
 };
 
 // Fetch available courses for student based on Dept, Level, and Term
@@ -297,7 +316,9 @@ exports.submitRegistration = async (req, res) => {
         $or: [
           { email: adviserMatch.teacherEmail },
           { teacherId: adviserMatch.teacherId },
-          { adviserSession: student.session }
+          ...(adviserMatch.teacherName ? [{ name: { $regex: new RegExp(adviserMatch.teacherName.trim(), "i") } }] : []),
+          { adviserSession: student.session },
+          { assignedSession: student.session }
         ]
       }).lean();
       if (realTeacher?.email) {
@@ -510,33 +531,24 @@ exports.getPendingRegistrationsForAdviser = async (req, res) => {
     const students = studentQueryCriteria.length > 0 ? await Student.find({ $or: studentQueryCriteria }).lean() : [];
     const studentIds = students.map((s) => s.studentId);
 
-    // Ensure registrations match THIS teacher's adviserEmail OR match THIS teacher's assigned batch/session
+    // Ensure registrations match THIS teacher's adviserEmail OR match THIS teacher's assigned batch/session/department
     const regOrCriteria = [
       { adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
     ];
 
     if (studentIds.length > 0) {
-      regOrCriteria.push({
-        studentId: { $in: studentIds },
-        $or: [
-          { adviserEmail: "" },
-          { adviserEmail: null },
-          { adviserEmail: { $exists: false } },
-          { adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
-        ]
-      });
+      regOrCriteria.push({ studentId: { $in: studentIds } });
     }
 
     if (sessions.length > 0) {
-      regOrCriteria.push({
-        session: { $in: sessions },
-        $or: [
-          { adviserEmail: "" },
-          { adviserEmail: null },
-          { adviserEmail: { $exists: false } },
-          { adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
-        ]
-      });
+      regOrCriteria.push({ session: { $in: sessions } });
+    }
+
+    if (teacherDoc?.department) {
+      const deptClean = String(teacherDoc.department || "").trim();
+      if (deptClean && deptClean.length >= 3) {
+        regOrCriteria.push({ department: { $regex: new RegExp(deptClean, "i") } });
+      }
     }
 
     const RegistrationPayment = require("../models/RegistrationPayment");

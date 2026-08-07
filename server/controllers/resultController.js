@@ -1038,7 +1038,7 @@ exports.getAdminResults = async (req, res) => {
         });
         return {
           ...upload,
-          cutoffDeadline: matchedNotice ? matchedNotice.deadlineDate : upload.correctionWindowEnd || null,
+          cutoffDeadline: upload.correctionWindowEnd ? upload.correctionWindowEnd : (matchedNotice ? matchedNotice.deadlineDate : null),
         };
       });
 
@@ -1759,8 +1759,8 @@ exports.getStudentPublishedResults = async (req, res) => {
 
       let cEnd = uBatch?.correctionWindowEnd || r.correctionWindowEnd || null;
 
-      // Check if Admin Notice set a deadline Date for this session/level/term/resultType
-      if (r.session && r.level && r.term) {
+      // Check if Admin Notice set a deadline Date for this session/level/term/resultType ONLY if no custom batch deadline exists
+      if (!cEnd && r.session && r.level && r.term) {
         const lDigit = String(r.level).replace(/\D/g, "");
         const tDigit = String(r.term).replace(/\D/g, "");
         const matchedNotice = deadlineNotices.find(n => {

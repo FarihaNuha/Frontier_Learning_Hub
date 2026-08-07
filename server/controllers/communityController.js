@@ -861,6 +861,7 @@ exports.getUsers = async (req, res) => {
       _id: { $ne: currentUserId },
       role: { $nin: ["admin", "superadmin"] },
       name: { $not: /super admin/i },
+      isRegistered: true,
     };
 
     if (courseId) {
@@ -875,14 +876,15 @@ exports.getUsers = async (req, res) => {
     }
 
     let users = await User.find(filter).select(
-      "name email role department profilePicture"
+      "name email role department profilePicture isRegistered"
     );
 
     users = users.filter(
       (u) =>
         u.role !== "admin" &&
         u.role !== "superadmin" &&
-        !String(u.name || "").toLowerCase().includes("super admin")
+        !String(u.name || "").toLowerCase().includes("super admin") &&
+        u.isRegistered !== false
     );
 
     // Map each user to include their last message and unread count

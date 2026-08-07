@@ -325,29 +325,31 @@ exports.getAttendanceStats = async (req, res) => {
 
     const isLab = (detectedClassType || "theory") === "lab";
     const credit = isLab ? 1 : 3;
+    const maxAttendanceMarks = 10 * credit;
     const formulaString = isLab
       ? (course.labFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 1, 0)")
       : (course.theoryFormula || "=ROUNDUP((4 + 6 * (Percentage - 75) / 25) * 3, 0)");
 
-    const totalClassesForType = isLab
-      ? (course.labTotalClasses !== undefined && course.labTotalClasses !== null ? course.labTotalClasses : 14)
-      : (course.theoryTotalClasses !== undefined && course.theoryTotalClasses !== null ? course.theoryTotalClasses : 28);
+    const actualConductedClasses = allAttendanceRecords.length;
+    const absentCount = Math.max(0, actualConductedClasses - present);
 
-    // Calculate percentage based on totalClassesForType (Present / Total Class Count) * 100
-    const percentage = totalClassesForType > 0
-      ? parseFloat(((present / totalClassesForType) * 100).toFixed(8))
-      : 0;
-    
-    // Evaluate marks dynamically using the formulaString and totalClassesForType as the denominator
-    const attendanceMarks = evaluateExcelFormula(formulaString, present, credit, totalClassesForType);
-    const maxAttendanceMarks = 10 * credit;
+    const percentage = actualConductedClasses > 0
+      ? parseFloat(((present / actualConductedClasses) * 100).toFixed(8))
+      : 100;
+
+    let rawMarks = actualConductedClasses > 0
+      ? evaluateExcelFormula(formulaString, present, credit, actualConductedClasses)
+      : maxAttendanceMarks;
+
+    // Clamp marks between 0 and maxAttendanceMarks so no negative values display
+    const attendanceMarks = Math.max(0, Math.min(maxAttendanceMarks, rawMarks));
 
     res.json({
-      totalClasses: totalClassesForType,
-      actualTotalClasses: totalClasses,
+      totalClasses: actualConductedClasses,
+      actualTotalClasses: actualConductedClasses,
       present,
-      absent: Math.max(0, totalClassesForType - present),
-      percentage: parseFloat(percentage.toFixed(1)),
+      absent: absentCount,
+      percentage: actualConductedClasses > 0 ? parseFloat(percentage.toFixed(1)) : 100.0,
       maxAttendanceMarks,
       attendanceMarks,
       classType: detectedClassType || "theory",

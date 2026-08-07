@@ -455,15 +455,24 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
 
     const assigned = teacherDoc.assignedCourses || [];
     for (const item of assigned) {
-      const code = (item.courseCode || "").trim().toUpperCase();
-      const name = (item.courseName || "").trim();
+      let code = (item.courseCode || "").trim().toUpperCase();
+      const rawName = (item.courseName || "").replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim();
       const targetSession = item.session || teacherDoc.assignedSession || "";
 
-      if (!code && !name) continue;
+      if (!code && !rawName) continue;
+
+      if (!code && rawName) {
+        const importDoc = await CourseImport.findOne({
+          courseTitle: { $regex: new RegExp(rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") }
+        }).lean();
+        if (importDoc?.courseCode) {
+          code = importDoc.courseCode.toUpperCase();
+        }
+      }
 
       const baseConditions = [];
       if (code) baseConditions.push({ displayCode: code });
-      if (name) baseConditions.push({ name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
+      if (rawName) baseConditions.push({ name: { $regex: new RegExp(rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } });
 
       // SESSION-STRICT MATCHING:
       let existingCourse = null;
@@ -483,13 +492,13 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
         const importMatch = await CourseImport.findOne({
           $or: [
             ...(code ? [{ courseCode: code }] : []),
-            ...(name ? [{ courseTitle: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }] : [])
+            ...(rawName ? [{ courseTitle: { $regex: new RegExp(rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } }] : [])
           ]
         }).lean();
 
         const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
         await Course.create({
-          name: name || importMatch?.courseTitle || code || "New Course",
+          name: rawName || importMatch?.courseTitle || code || "New Course",
           displayCode: (code || importMatch?.courseCode || "COURSE").toUpperCase(),
           session: targetSession,
           department: teacherDoc.department || importMatch?.department || "EDTE",
@@ -512,6 +521,24 @@ exports.importCourses = async (req, res) => {
       return res.status(400).json({ error: "Invalid data format. Expected an array of courses." });
     }
 
+    // Clean existing imported courses for the levels & terms present in this file so re-uploads don't duplicate
+    const levelTerms = courses
+      .filter((c) => c.level && c.term)
+      .map((c) => ({
+        level: String(c.level).trim(),
+        term: String(c.term).trim(),
+        department: String(c.department || "").trim(),
+      }));
+
+    if (levelTerms.length > 0) {
+      const deleteConditions = levelTerms.map((lt) => ({
+        level: lt.level,
+        term: lt.term,
+        ...(lt.department ? { department: lt.department } : {}),
+      }));
+      await CourseImport.deleteMany({ $or: deleteConditions });
+    }
+
     for (const record of courses) {
       const {
         courseCode,
@@ -528,26 +555,24 @@ exports.importCourses = async (req, res) => {
         continue;
       }
 
-      let cleanType = String(courseType !== undefined && courseType !== null ? courseType : "").trim();
-      if (cleanType.toLowerCase().includes("lab") || cleanType.toLowerCase().includes("session")) {
-        cleanType = "Sessional";
-      } else {
-        cleanType = "Theory";
-      }
+      const cleanCode = String(courseCode).trim().toUpperCase();
+      const cleanTitle = String(courseTitle).trim();
+      const cleanType = String(courseType !== undefined && courseType !== null ? courseType : "Theory").trim();
+      const cleanDept = String(department !== undefined && department !== null ? department : "").trim();
+      const cleanProg = String(program !== undefined && program !== null ? program : "").trim();
+      const cleanLevel = String(level !== undefined && level !== null ? level : "").trim();
+      const cleanTerm = String(term !== undefined && term !== null ? term : "").trim();
 
-      await CourseImport.findOneAndUpdate(
-        { courseCode: String(courseCode).trim().toUpperCase() },
-        {
-          courseTitle: String(courseTitle).trim(),
-          courseType: cleanType,
-          creditHours: Number(creditHours) || 0,
-          department: String(department !== undefined && department !== null ? department : "").trim(),
-          program: String(program !== undefined && program !== null ? program : "").trim(),
-          level: String(level !== undefined && level !== null ? level : "").trim(),
-          term: String(term !== undefined && term !== null ? term : "").trim(),
-        },
-        { upsert: true, new: true }
-      );
+      await CourseImport.create({
+        courseCode: cleanCode,
+        courseTitle: cleanTitle,
+        courseType: cleanType || "Theory",
+        creditHours: Number(creditHours) || 0,
+        department: cleanDept,
+        program: cleanProg,
+        level: cleanLevel,
+        term: cleanTerm,
+      });
     }
 
     res.json({ message: "Courses imported successfully." });

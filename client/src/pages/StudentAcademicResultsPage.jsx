@@ -323,7 +323,7 @@ export default function StudentAcademicResultsPage() {
 
                 {/* Lock Timer Banner for Active Semester */}
                 {currentSemesterResults.length > 0 && (() => {
-                  const activeTimerRes = currentSemesterResults.find(r => r.correctionWindowEnd || r.isCorrectionClosed);
+                  const activeTimerRes = currentSemesterResults.find(r => r.correctionWindowEnd && !r.isCorrectionClosed) || currentSemesterResults.find(r => r.correctionWindowEnd || r.isCorrectionClosed);
                   if (!activeTimerRes) return null;
 
                   const cDate = activeTimerRes.correctionWindowEnd ? new Date(activeTimerRes.correctionWindowEnd) : null;

@@ -876,7 +876,7 @@ export default function MessagePage() {
                     )}
                     {u.unreadCount > 0 && <span className="user-unread-badge">{u.unreadCount}</span>}
                   </div>
-                  <div className="user-info" style={{ minWidth: 0 }}>
+                  <div className="user-info" style={{ minWidth: 0, flex: 1 }}>
                     <div className="user-info-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <strong style={{ fontSize: "14px", color: "var(--text-primary)", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginRight: "8px" }}>
                         {u.name}
@@ -887,6 +887,19 @@ export default function MessagePage() {
                         </span>
                       )}
                     </div>
+                    {u.email && (
+                      <div className="user-email-text" style={{ 
+                        fontSize: "11.5px", 
+                        color: userId === u._id ? "rgba(255, 255, 255, 0.85)" : "#64748b", 
+                        overflow: "hidden", 
+                        textOverflow: "ellipsis", 
+                        whiteSpace: "nowrap",
+                        margin: "1px 0 3px 0",
+                        fontWeight: 500
+                      }} title={u.email}>
+                        {u.email}
+                      </div>
+                    )}
                     <div className="user-info-body" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: "4px" }}>
                       <span className="user-role" style={{ 
                         fontSize: "9px", 
@@ -903,7 +916,7 @@ export default function MessagePage() {
                       {u.lastMessageContent && (
                         <span className="last-msg-snippet" style={{ 
                           fontSize: "12px", 
-                          color: "#64748b", 
+                          color: userId === u._id ? "rgba(255,255,255,0.75)" : "#64748b", 
                           whiteSpace: "nowrap", 
                           overflow: "hidden", 
                           textOverflow: "ellipsis", 

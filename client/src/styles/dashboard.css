@@ -1,7 +1,6 @@
-/* ============================================
-   UFTB Moodle - Dashboard Styles
-   Pastel Blue Theme
-   ============================================ */
+/* ==========================================================================
+   UniCore - Dashboard Styles
+   ========================================================================== */
 
 /* ======== Dashboard Layout ======== */
 .dashboard-container {
@@ -57,7 +56,12 @@
 }
 
 .badge.student {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #7ec8e3, #5baed4);
+  color: var(--text-white);
+}
+
+.badge.admin {
+  background: linear-gradient(135deg, #7ec8e3, #5baed4);
   color: var(--text-white);
 }
 
@@ -134,7 +138,7 @@
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 12px;
 }
 
 .nav-item:hover {
@@ -781,7 +785,7 @@ tbody tr:hover {
 /* ======== Student Dashboard Additional Styles ======== */
 
 .badge.student {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #7ec8e3, #5baed4);
   color: var(--text-white);
 }
 
@@ -1182,21 +1186,46 @@ tbody tr:hover {
 }
 
 .badge.admin {
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: linear-gradient(135deg, #7ec8e3, #5baed4);
   color: var(--text-white);
 }
 
-/* Course Dashboard - Hide inner sidebars */
+/* Course Dashboard - Hide inner sidebars & prevent duplicate nested scrollbars */
 .course-tab-content .sidebar {
   display: none !important;
 }
 .course-tab-content .dashboard-container {
   display: block !important;
+  min-height: auto !important;
+  height: auto !important;
 }
 .course-tab-content .main-content {
   margin-left: 0 !important;
   padding: 30px !important;
   max-width: 100% !important;
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* Professional custom scrollbar for main-content */
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+.main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.main-content::-webkit-scrollbar-thumb {
+  background: rgba(59, 141, 179, 0.25);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 141, 179, 0.5);
+}
+.main-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 141, 179, 0.25) transparent;
 }
 
 /* Course Select Dropdown */

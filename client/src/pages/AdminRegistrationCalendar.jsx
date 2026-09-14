@@ -13,9 +13,9 @@ export default function AdminRegistrationCalendar() {
   const [editingId, setEditingId] = useState(null);
 
   const initialFormData = {
-    program: "B.Sc. in Educational Technology and Engineering",
+    program: "B.Sc. in EDTE",
     session: "2023-24",
-    department: "Educational Technology and Engineering",
+    department: "EDTE",
     level: "Level-1",
     term: "Term-1",
     startDate: new Date().toISOString().split("T")[0],
@@ -28,15 +28,40 @@ export default function AdminRegistrationCalendar() {
 
   const [formData, setFormData] = useState(initialFormData);
 
+  // Mapping helper to ensure short forms even for existing legacy records
+  const toShortDept = (dept) => {
+    if (!dept || dept === "All Departments") return "All Departments";
+    const d = dept.toLowerCase();
+    if (d.includes("edte") || d.includes("educational")) return "EDTE";
+    if (d.includes("ire") || d.includes("robotics") || d.includes("internet")) return "IRE";
+    if (d.includes("cyse") || d.includes("cyber")) return "CySE";
+    if (d.includes("dse") || d.includes("data")) return "DSE";
+    if (d.includes("swe") || d.includes("software")) return "SWE";
+    return dept;
+  };
+
+  const toShortProg = (prog) => {
+    if (!prog) return "B.Sc. in EDTE";
+    const p = prog.toLowerCase();
+    const isMsc = p.includes("m.sc") || p.includes("msc") || p.includes("master");
+    const prefix = isMsc ? "M.Sc. in" : "B.Sc. in";
+    if (p.includes("edte") || p.includes("educational")) return `${prefix} EDTE`;
+    if (p.includes("ire") || p.includes("robotics") || p.includes("internet")) return `${prefix} IRE`;
+    if (p.includes("cyse") || p.includes("cyber")) return `${prefix} CySE`;
+    if (p.includes("dse") || p.includes("data")) return `${prefix} DSE`;
+    if (p.includes("swe") || p.includes("software")) return `${prefix} SWE`;
+    return prog;
+  };
+
   const populateFormWithRule = (rule) => {
     if (!rule) return;
     const startStr = rule.startDate ? new Date(rule.startDate).toISOString().split("T")[0] : "";
     const endStr = rule.endDate ? new Date(rule.endDate).toISOString().split("T")[0] : "";
 
     setFormData({
-      program: rule.program || "B.Sc. in Educational Technology and Engineering",
+      program: toShortProg(rule.program),
       session: rule.session || "2023-24",
-      department: rule.department || "Educational Technology and Engineering",
+      department: toShortDept(rule.department),
       level: rule.level || "Level-1",
       term: rule.term || "Term-1",
       startDate: startStr || new Date().toISOString().split("T")[0],
@@ -269,16 +294,16 @@ export default function AdminRegistrationCalendar() {
                 onChange={(e) => setFormData({ ...formData, program: e.target.value })}
                 style={{ width: "100%", padding: "9px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box" }}
               >
-                <option value="B.Sc. in Educational Technology and Engineering">B.Sc. in Educational Technology and Engineering</option>
-                <option value="M.Sc. in Educational Technology and Engineering">M.Sc. in Educational Technology and Engineering</option>
-                <option value="B.Sc. in Internet of Things and Robotics Engineering">B.Sc. in Internet of Things and Robotics Engineering</option>
-                <option value="M.Sc. in Internet of Things and Robotics Engineering">M.Sc. in Internet of Things and Robotics Engineering</option>
-                <option value="B.Sc. in Software Engineering">B.Sc. in Software Engineering</option>
-                <option value="M.Sc. in Software Engineering">M.Sc. in Software Engineering</option>
-                <option value="B.Sc. in Cyber Security Engineering">B.Sc. in Cyber Security Engineering</option>
-                <option value="M.Sc. in Cyber Security Engineering">M.Sc. in Cyber Security Engineering</option>
-                <option value="B.Sc. in Data Science Engineering">B.Sc. in Data Science Engineering</option>
-                <option value="M.Sc. in Data Science Engineering">M.Sc. in Data Science Engineering</option>
+                <option value="B.Sc. in EDTE">B.Sc. in EDTE</option>
+                <option value="M.Sc. in EDTE">M.Sc. in EDTE</option>
+                <option value="B.Sc. in IRE">B.Sc. in IRE</option>
+                <option value="M.Sc. in IRE">M.Sc. in IRE</option>
+                <option value="B.Sc. in CySE">B.Sc. in CySE</option>
+                <option value="M.Sc. in CySE">M.Sc. in CySE</option>
+                <option value="B.Sc. in DSE">B.Sc. in DSE</option>
+                <option value="M.Sc. in DSE">M.Sc. in DSE</option>
+                <option value="B.Sc. in SWE">B.Sc. in SWE</option>
+                <option value="M.Sc. in SWE">M.Sc. in SWE</option>
               </select>
             </div>
 
@@ -305,11 +330,11 @@ export default function AdminRegistrationCalendar() {
                 style={{ width: "100%", padding: "9px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box" }}
               >
                 <option value="All Departments">All Departments</option>
-                <option value="Educational Technology and Engineering">Educational Technology and Engineering (EDTE)</option>
-                <option value="Internet of Things and Robotics Engineering">Internet of Things and Robotics Engineering (IRE)</option>
-                <option value="Software Engineering">Software Engineering (SWE)</option>
-                <option value="Cyber Security Engineering">Cyber Security Engineering (CySE)</option>
-                <option value="Data Science Engineering">Data Science Engineering (DSE)</option>
+                <option value="EDTE">EDTE</option>
+                <option value="IRE">IRE</option>
+                <option value="CySE">CySE</option>
+                <option value="DSE">DSE</option>
+                <option value="SWE">SWE</option>
               </select>
             </div>
 
@@ -395,9 +420,9 @@ export default function AdminRegistrationCalendar() {
 
                     return (
                       <tr key={cal._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                        <td style={{ padding: "12px 14px", fontWeight: 600, color: "#1e293b" }}>{cal.program || "B.Sc. in EDTE"}</td>
+                        <td style={{ padding: "12px 14px", fontWeight: 600, color: "#1e293b" }}>{toShortProg(cal.program)}</td>
                         <td style={{ padding: "12px 14px", fontWeight: 600, color: "#0369a1" }}>
-                          {cal.department || "All Departments"}
+                          {toShortDept(cal.department)}
                         </td>
                         <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>{cal.session}</td>
                         <td style={{ padding: "12px 14px", color: "#334155" }}>{cal.level} {cal.term}</td>

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as docx from "docx-preview";
 import { useAuth } from "../contexts/AuthContext";
@@ -327,7 +327,7 @@ export default function StudentDashboard({
   }
 
   return (
-    <div className="dashboard-container" style={propCourseId ? { display: "block" } : {}}>
+    <div className="dashboard-container" style={propCourseId ? { display: "block", minHeight: "auto", height: "auto" } : {}}>
       {!propCourseId && (
         <StudentSidebar
           currentPage="dashboard"
@@ -335,7 +335,7 @@ export default function StudentDashboard({
           courseId={finalCourseId}
         />
       )}
-      <div className="main-content" style={propCourseId ? { padding: 0 } : { padding: "30px" }}>
+      <div className="main-content" style={propCourseId ? { padding: 0, overflow: "visible", maxHeight: "none", height: "auto" } : { padding: "30px" }}>
         <div className="top-bar">
           <div>
             {viewMode === "weekDetail" && selectedWeek ? (

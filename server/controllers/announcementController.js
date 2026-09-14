@@ -63,7 +63,7 @@ exports.createAnnouncement = async (req, res) => {
                 <p style="font-size: 15px; margin-top: 0;">Hello <strong>${recipient.name || "Student"}</strong>,</p>
                 <p style="font-size: 15px; line-height: 1.6; color: #4A5568;">${content}</p>
                 <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;" />
-                <p style="font-size: 12px; color: #718096; margin: 0; text-align: center;">UFTB Moodle Course Announcement</p>
+                <p style="font-size: 12px; color: #718096; margin: 0; text-align: center;">UniCore Course Announcement</p>
               </div>
             </div>
             `

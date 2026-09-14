@@ -14,6 +14,7 @@ const AcademicProfile = require("../models/AcademicProfile");
 const ResultCorrectionRequest = require("../models/ResultCorrectionRequest");
 const { sendEmail } = require("../services/emailService");
 const { getIO } = require("../socket");
+const { resolveCourseCode } = require("../utils/courseUtils");
 
 // Helper to safely parse optional numeric values (preserve null for empty cells)
 const parseOptionalNumber = (val) => {
@@ -628,20 +629,43 @@ exports.getTeacherResults = async (req, res) => {
       $or: [
         { teacher: teacherId },
         { teacherEmail: teacherEmail }
-      ]
+      ],
+      isDeleted: { $ne: true },
+      status: { $ne: "Deleted" }
     };
     if (resultType && resultType !== "all") {
       query.resultType = resultType;
     }
 
     const uploads = await ResultUpload.find(query).sort({ uploadedAt: -1 }).lean();
+    const CourseImport = require("../models/CourseImport");
+    const allCourseImports = await CourseImport.find().lean();
 
     const uploadsWithResults = await Promise.all(
       uploads.map(async (up) => {
         const results = await Result.find({ uploadId: up._id }).sort({ studentId: 1 }).lean();
+
+        const cleanUpCode = (up.courseCode || "").replace(/\s+/g, "").toUpperCase();
+        const matchImport = allCourseImports.find(
+          (ci) => (ci.courseCode || "").replace(/\s+/g, "").toUpperCase() === cleanUpCode
+        );
+        const resolvedTitle = matchImport?.courseTitle || up.courseTitle || up.courseCode;
+
+        const enrichedResults = results.map((r) => {
+          const cleanRCode = (r.courseCode || up.courseCode || "").replace(/\s+/g, "").toUpperCase();
+          const rImport = allCourseImports.find(
+            (ci) => (ci.courseCode || "").replace(/\s+/g, "").toUpperCase() === cleanRCode
+          );
+          return {
+            ...r,
+            courseTitle: rImport?.courseTitle || r.courseTitle || resolvedTitle,
+          };
+        });
+
         return {
           ...up,
-          results,
+          courseTitle: resolvedTitle,
+          results: enrichedResults,
         };
       })
     );
@@ -878,8 +902,13 @@ exports.getAdminResults = async (req, res) => {
     if (!status || status === "all" || status.toLowerCase() === "pending") {
       const existingUploadKeys = new Set();
 
-      // Include all uploads (even deleted ones) so deleted courses don't re-appear as pendingAutoCards
-      const allUploadsForKeys = await ResultUpload.find({ resultType: activeResultType }).lean();
+      // Include all active uploads so courses with an existing upload don't re-appear as pendingAutoCards
+      const allUploadsForKeys = await ResultUpload.find({
+        resultType: activeResultType,
+        status: { $ne: "Deleted" },
+        isDeleted: { $ne: true }
+      }).lean();
+
       allUploadsForKeys.forEach((u) => {
         const code = (u.courseCode || "").trim().toUpperCase();
         const sess = (u.session || "").trim();
@@ -887,112 +916,9 @@ exports.getAdminResults = async (req, res) => {
         const tdig = (String(u.term || "").match(/\d+/) || [])[0] || "1";
         if (code) {
           existingUploadKeys.add(`${code}_${sess}_${ldig}_${tdig}`);
+          existingUploadKeys.add(`${code}_${sess}`);
+          existingUploadKeys.add(`${code}`);
         }
-      });
-
-      const allTeachers = await User.find({ role: "teacher" }).lean();
-      const Course = require("../models/Course");
-      const CourseImport = require("../models/CourseImport");
-      const allLmsCourses = await Course.find({}).populate("teacher", "name email department").lean();
-      const allCourseImports = await CourseImport.find({}).lean();
-
-      const pendingAutoCards = [];
-
-      // 1. From CourseImport (Department Syllabus Curriculum)
-      allCourseImports.forEach((ci) => {
-        const code = (ci.courseCode || "").trim().toUpperCase();
-        if (!code) return;
-        const sess = "2022-23";
-        const ldig = (String(ci.level || "").match(/\d+/) || [])[0] || "3";
-        const tdig = (String(ci.term || "").match(/\d+/) || [])[0] || "2";
-        const key = `${code}_${sess}_${ldig}_${tdig}`;
-
-        if (!existingUploadKeys.has(key)) {
-          existingUploadKeys.add(key);
-
-          const matchedTeacher = allTeachers.find((t) =>
-            t.department === ci.department ||
-            (t.assignedCourses || []).some((ac) => (ac.courseCode || ac.courseName || "").toUpperCase().includes(code))
-          ) || allTeachers[0];
-
-          pendingAutoCards.push({
-            _id: `pending_${code}_${sess}_${ldig}_${tdig}`,
-            isPendingAutoCard: true,
-            courseCode: ci.courseCode,
-            courseTitle: ci.courseTitle,
-            department: ci.department || "EDTE",
-            session: sess,
-            level: ci.level ? (ci.level.startsWith("Level") ? ci.level : `Level-${ci.level}`) : `Level-${ldig}`,
-            term: ci.term ? (ci.term.startsWith("Term") ? ci.term : `Term-${ci.term}`) : `Term-${tdig}`,
-            totalRecords: 0,
-            resultType: activeResultType,
-            status: "Pending",
-            teacherEmail: matchedTeacher?.email || "farihatasnim0903@gmail.com",
-            teacherName: matchedTeacher?.name || "Rabbi Khan",
-            results: [],
-          });
-        }
-      });
-
-      // 2. From LMS Course models
-      allLmsCourses.forEach((c) => {
-        const code = (c.displayCode || c.courseCode || "").trim().toUpperCase();
-        const sess = (c.session || "2022-23").trim();
-        const ldig = (String(c.level || "").match(/\d+/) || [])[0] || "3";
-        const tdig = (String(c.term || "").match(/\d+/) || [])[0] || "2";
-        const key = `${code}_${sess}_${ldig}_${tdig}`;
-
-        if (code && !existingUploadKeys.has(key)) {
-          existingUploadKeys.add(key);
-          pendingAutoCards.push({
-            _id: `pending_${code}_${sess}_${ldig}_${tdig}`,
-            isPendingAutoCard: true,
-            courseCode: c.displayCode || c.courseCode || code,
-            courseTitle: c.courseTitle || c.title || c.name || "Course",
-            department: c.department || c.teacher?.department || "EDTE",
-            session: sess,
-            level: c.level || `Level-${ldig}`,
-            term: c.term || `Term-${tdig}`,
-            totalRecords: 0,
-            resultType: activeResultType,
-            status: "Pending",
-            teacherEmail: c.teacher?.email || "",
-            teacherName: c.teacher?.name || "Assigned Teacher",
-            results: [],
-          });
-        }
-      });
-
-      // 3. From User assignedCourses
-      allTeachers.forEach((t) => {
-        (t.assignedCourses || []).forEach((ac) => {
-          const code = (ac.courseCode || ac.courseName || "").trim().toUpperCase();
-          if (!code) return;
-          const sess = (ac.session || "2022-23").trim();
-          const ldig = (String(ac.level || ac.levelTerm || "").match(/\d+/) || [])[0] || "3";
-          const tdig = (String(ac.term || ac.levelTerm || "").match(/\d+/) || [])[0] || "2";
-          const key = `${code}_${sess}_${ldig}_${tdig}`;
-
-          if (!existingUploadKeys.has(key)) {
-            existingUploadKeys.add(key);
-            pendingAutoCards.push({
-              _id: `pending_${code}_${sess}_${ldig}_${tdig}`,
-              isPendingAutoCard: true,
-              courseCode: ac.displayCode || ac.courseCode || code,
-              courseTitle: ac.name || ac.courseTitle || ac.displayCode || code,
-              department: ac.department || t.department || "EDTE",
-              session: sess,
-              level: ac.level || `Level-${ldig}`,
-              term: ac.term || `Term-${tdig}`,
-              totalRecords: 0,
-              resultType: activeResultType,
-              status: "Pending",
-              teacherEmail: t.email || "",
-              teacherName: t.name || "Assigned Teacher",
-              results: [],
-            });
-          }
-        });
       });
 
       // Fetch active Academic Notices for deadlines & scheduled publication table
@@ -1003,25 +929,64 @@ exports.getAdminResults = async (req, res) => {
         ]
       }).sort({ createdAt: -1 }).lean();
 
-      // Attach deadline Date & Time to pending cards
-      const pendingWithDeadlines = pendingAutoCards.map((card) => {
-        const cL = (String(card.level || "").match(/\d+/) || [])[0];
-        const cT = (String(card.term || "").match(/\d+/) || [])[0];
-        const matchedNotice = activeNotices.find((n) => {
+      // Helper to find cutoff deadline for a specific session/level/term
+      const findCutoffDeadline = (sess, ldig, tdig) => {
+        const matched = activeNotices.find((n) => {
           if (!n.deadlineDate) return false;
-          const sMatch = !n.session || String(n.session).toLowerCase().includes(String(card.session).toLowerCase());
-          const nL = (String(n.level || "").match(/\d+/) || [])[0];
-          const nT = (String(n.term || "").match(/\d+/) || [])[0];
-          const lMatch = !nL || nL === cL;
-          const tMatch = !nT || nT === cT;
           const rMatch = !n.resultDeadlineType || n.resultDeadlineType === activeResultType;
-          return sMatch && lMatch && tMatch && rMatch;
+          const sMatch = !n.session || !sess || String(n.session).toLowerCase().includes(String(sess).toLowerCase());
+          const nLdig = (String(n.level || "").match(/\d+/) || [])[0];
+          const nTdig = (String(n.term || "").match(/\d+/) || [])[0];
+          const lMatch = !nLdig || nLdig === ldig;
+          const tMatch = !nTdig || nTdig === tdig;
+          return rMatch && sMatch && lMatch && tMatch;
         });
-        return {
-          ...card,
-          cutoffDeadline: matchedNotice ? matchedNotice.deadlineDate : null,
-        };
-      });
+        return matched ? matched.deadlineDate : null;
+      };
+
+      const allTeachers = await Teacher.find({}).lean();
+      const allTeacherUsers = await User.find({ role: "teacher" }).lean();
+      const allLmsCourses = await Course.find({}).populate("teacher", "name email department").lean();
+      const allCourseImports = await CourseImport.find({}).lean();
+
+      // Precise Teacher resolution helper
+      const findTeacherForCourse = (courseCode, courseTitle, sess) => {
+        const cleanCode = (courseCode || "").trim().toUpperCase();
+        const cleanTitle = (courseTitle || "").trim().toLowerCase();
+
+        for (const t of allTeachers) {
+          const match = (t.assignedCourses || []).some((ac) => {
+            const acCode = (ac.courseCode || "").trim().toUpperCase();
+            const acName = (ac.courseName || "").trim().toLowerCase();
+            return (acCode && acCode === cleanCode) || (acName && (acName === cleanTitle || cleanTitle.includes(acName) || acName.includes(cleanTitle)));
+          });
+          if (match) return { name: t.name, email: t.email };
+        }
+
+        for (const u of allTeacherUsers) {
+          const match = (u.assignedCourses || []).some((ac) => {
+            const acCode = (ac.courseCode || "").trim().toUpperCase();
+            const acName = (ac.courseName || ac.name || "").trim().toLowerCase();
+            return (acCode && acCode === cleanCode) || (acName && (acName === cleanTitle || cleanTitle.includes(acName) || acName.includes(cleanTitle)));
+          });
+          if (match) return { name: u.name, email: u.email };
+        }
+
+        const lmsMatch = allLmsCourses.find((c) => {
+          const cCode = (c.displayCode || c.courseCode || "").trim().toUpperCase();
+          return cCode && cCode === cleanCode;
+        });
+        if (lmsMatch && lmsMatch.teacher) {
+          return { name: lmsMatch.teacher.name, email: lmsMatch.teacher.email };
+        }
+
+        return { name: "Not Assigned", email: "" };
+      };
+
+      // Pending auto cards generation removed per user request to remove all pending courses from the admin pending tab
+      const pendingAutoCards = [];
+
+      const pendingWithDeadlines = pendingAutoCards;
 
       const uploadsWithDeadlines = uploadsWithResults.map((upload) => {
         const uL = (String(upload.level || "").match(/\d+/) || [])[0];
@@ -1045,7 +1010,10 @@ exports.getAdminResults = async (req, res) => {
       const cgpaRecords = await CGPARecord.find({}).sort({ calculatedAt: -1 }).lean();
 
       if (status && status.toLowerCase() === "pending") {
-        return res.json({ uploads: pendingWithDeadlines, notices: activeNotices, cgpaRecords });
+        const pendingUploadsOnly = uploadsWithDeadlines.filter(
+          (u) => !u.status || u.status === "Draft" || u.status === "Pending Upload" || u.status === "Pending"
+        );
+        return res.json({ uploads: [...pendingUploadsOnly, ...pendingWithDeadlines], notices: activeNotices, cgpaRecords });
       }
 
       res.json({ uploads: [...uploadsWithDeadlines, ...pendingWithDeadlines], notices: activeNotices, cgpaRecords });
@@ -1740,6 +1708,8 @@ exports.getStudentPublishedResults = async (req, res) => {
 
     // Attach correctionWindowEnd from ResultUpload batch or Notice deadline to each result record
     const allUploads = await ResultUpload.find().lean();
+    const CourseImport = require("../models/CourseImport");
+    const allCourseImports = await CourseImport.find().lean();
     const deadlineNotices = await Notice.find({
       category: "Academic",
       deadlineDate: { $ne: null },
@@ -1779,8 +1749,15 @@ exports.getStudentPublishedResults = async (req, res) => {
 
       const isClosed = cEnd ? new Date(cEnd) < nowTime : false;
 
+      const cleanRCode = (r.courseCode || "").replace(/\s+/g, "").toUpperCase();
+      const matchImport = allCourseImports.find(
+        (ci) => (ci.courseCode || "").replace(/\s+/g, "").toUpperCase() === cleanRCode
+      );
+      const officialTitle = matchImport?.courseTitle || r.courseTitle || r.courseCode;
+
       return {
         ...r,
+        courseTitle: officialTitle,
         uploadId: r.uploadId || uBatch?._id || null,
         correctionWindowEnd: cEnd,
         isCorrectionClosed: isClosed,
@@ -1789,6 +1766,9 @@ exports.getStudentPublishedResults = async (req, res) => {
 
     // STRICT FILTER: Fetch student's APPROVED registrations ONLY
     const Registration = require("../models/Registration");
+    const RegistrationPayment = require("../models/RegistrationPayment");
+    const Payment = require("../models/Payment");
+
     const approvedRegs = await Registration.find({
       $or: [
         { user: studentUser._id || studentUser.id },
@@ -1797,6 +1777,55 @@ exports.getStudentPublishedResults = async (req, res) => {
       ],
       status: "Approved"
     }).lean();
+
+    // Also fetch all registration payments and general payments for this student to determine semester payment status
+    const studentRegPayments = await RegistrationPayment.find({
+      $or: [
+        { student: studentUser._id || studentUser.id },
+        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+        ...(studentUser.studentId ? [{ studentId: studentUser.studentId }] : [])
+      ]
+    }).lean();
+
+    const studentGeneralPayments = await Payment.find({
+      $or: [
+        { student: studentUser._id || studentUser.id },
+        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+        ...(studentUser.studentId ? [{ studentId: studentUser.studentId }] : [])
+      ]
+    }).lean();
+
+    // Map payment status for each semester "Level X - Term Y"
+    const semesterPaymentStatus = {};
+    for (let l = 1; l <= 4; l++) {
+      for (let t = 1; t <= 2; t++) {
+        const key = `Level ${l} - Term ${t}`;
+        // Check RegistrationPayment
+        const hasPaidRegPayment = studentRegPayments.some(p => {
+          const pL = Number(String(p.level || "").replace(/[^0-9]/g, ""));
+          const pT = Number(String(p.term || "").replace(/[^0-9]/g, ""));
+          return pL === l && pT === t && (p.paymentStatus === "Paid" || p.status === "Paid");
+        });
+
+        // Check Payment model
+        const hasPaidGeneralPayment = studentGeneralPayments.some(p => {
+          const pL = Number(String(p.level || "").replace(/[^0-9]/g, ""));
+          const pT = Number(String(p.term || "").replace(/[^0-9]/g, ""));
+          return pL === l && pT === t && (p.paymentStatus === "Paid" || p.status === "Paid");
+        });
+
+        // Check Registration model paymentStatus
+        const hasPaidReg = approvedRegs.some(r => {
+          const rL = Number(String(r.level || "").replace(/[^0-9]/g, ""));
+          const rT = Number(String(r.term || "").replace(/[^0-9]/g, ""));
+          return rL === l && rT === t && (r.paymentStatus === "Paid");
+        });
+
+        semesterPaymentStatus[key] = {
+          isPaid: Boolean(hasPaidRegPayment || hasPaidGeneralPayment || hasPaidReg),
+        };
+      }
+    }
 
     const approvedLevelTerms = new Set();
     const approvedCourseCodes = new Set();
@@ -1840,14 +1869,34 @@ exports.getStudentPublishedResults = async (req, res) => {
       return `Level ${lNum} - Term ${tNum}`;
     };
 
-    // Group results by normalized Level-Term
+    // Group results by normalized Level-Term & flag payment lock for Final results
     const resultsByLevelTerm = {};
     publishedResults.forEach(r => {
       const ltKey = normalizeLevelTermKey(r.level, r.term);
       if (!resultsByLevelTerm[ltKey]) {
         resultsByLevelTerm[ltKey] = [];
       }
-      resultsByLevelTerm[ltKey].push(r);
+
+      const isSemPaid = Boolean(semesterPaymentStatus[ltKey]?.isPaid);
+      const isFinalResult = r.resultType === "Final" || (!r.resultType && (r.finalPartA || r.finalPartB || r.gradePoint));
+
+      // If it's a Final Term result and payment for this semester is NOT completed, mask sensitive final result fields
+      if (isFinalResult && !isSemPaid) {
+        resultsByLevelTerm[ltKey].push({
+          ...r,
+          isPaymentLocked: true,
+          finalPartA: null,
+          finalPartB: null,
+          totalMarks: null,
+          gradePoint: null,
+          letterGrade: null,
+        });
+      } else {
+        resultsByLevelTerm[ltKey].push({
+          ...r,
+          isPaymentLocked: false,
+        });
+      }
     });
 
     res.json({
@@ -1857,6 +1906,7 @@ exports.getStudentPublishedResults = async (req, res) => {
       session: studentProfile?.session || "2024-25",
       results: publishedResults,
       resultsByLevelTerm,
+      semesterPaymentStatus,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

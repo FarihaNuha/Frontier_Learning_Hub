@@ -55,18 +55,24 @@ const checkRole = (...roles) => {
       console.log("❌ No user in request");
       return res.status(401).json({ error: "Authentication required" });
     }
-    if (!roles.includes(req.user.role)) {
+    const userRole = req.user.role;
+    const hasRole =
+      roles.includes(userRole) ||
+      (roles.includes("admin") && userRole === "superadmin") ||
+      userRole === "superadmin";
+
+    if (!hasRole) {
       console.log(
         "❌ Role check failed. Required:",
         roles,
         "Got:",
-        req.user.role,
+        userRole,
       );
       return res.status(403).json({
         error: `Access denied. Required roles: ${roles.join(", ")}`,
       });
     }
-    console.log("✅ Role check passed:", req.user.role);
+    console.log("✅ Role check passed:", userRole);
     next();
   };
 };

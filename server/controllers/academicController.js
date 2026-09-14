@@ -239,6 +239,11 @@ const calculateStudentCGPA = async (studentUserObj) => {
           isGraduated: totalCreditsEarned >= totalReqCredits,
         });
       } else if (academicProfile) {
+        if (!academicProfile.studentId) academicProfile.studentId = studentIdStr || studentUser.studentId || "STD_001";
+        if (!academicProfile.department) academicProfile.department = studentProfile?.department || studentUser.department || "EDTE";
+        if (!academicProfile.program) academicProfile.program = studentProfile?.program || studentUser.program || "B.Sc. in EDTE";
+        if (!academicProfile.session) academicProfile.session = studentProfile?.session || studentUser.session || "2022-23";
+        if (!academicProfile.batch) academicProfile.batch = studentProfile?.batch || studentUser.batch || "5th";
         academicProfile.currentLevel = levelStr;
         academicProfile.currentTerm = termStr;
         academicProfile.totalCreditsEarned = totalCreditsEarned;
@@ -260,6 +265,7 @@ const calculateStudentCGPA = async (studentUserObj) => {
       totalCreditsEarned,
       creditsRemaining: Math.max(0, totalReqCredits - totalCreditsEarned),
       academicStatus: academicProfile?.academicStatus || "Regular",
+      completedCourses: completedCoursesList,
     };
   } catch (error) {
     console.error("calculateStudentCGPA error:", error);
@@ -396,8 +402,32 @@ exports.getStudentAcademicProfile = async (req, res) => {
     const activeBatchStr = studentProfile?.batch || profile?.batch || req.user.batch || (activeSessionStr ? activeSessionStr.split("-")[0] : "2024");
     const activeProgramStr = studentProfile?.program || profile?.program || req.user.program || `B.Sc. in ${studentDept}`;
 
-    // Define incompleteCourses array
-    const incompleteCourses = [];
+    // Resolved completed courses: prefer populated profile.completedCourses or fallback to cgpaSummary.completedCourses
+    const resolvedCompletedCourses = (profile?.completedCourses && profile.completedCourses.length > 0)
+      ? profile.completedCourses
+      : (cgpaSummary?.completedCourses || []);
+
+    // Build completed courses lookup set
+    const completedCodeSet = new Set(
+      resolvedCompletedCourses.map((c) => (c.courseCode || "").replace(/\s+/g, "").toUpperCase())
+    );
+
+    // Fetch official curriculum courses for student's department from CourseImport
+    const deptConditions = [
+      { department: new RegExp(`^${studentDept}$`, "i") }
+    ];
+    if (studentDept && studentDept.toUpperCase() === "EDTE") {
+      deptConditions.push({ department: /educational technology/i });
+    }
+    const allCurriculumCourses = await CourseImport.find({ $or: deptConditions })
+      .sort({ level: 1, term: 1, courseCode: 1 })
+      .lean();
+
+    // Filter out courses already completed to get incomplete/remaining courses
+    const incompleteCourses = allCurriculumCourses.filter((ci) => {
+      const cleanCode = (ci.courseCode || "").replace(/\s+/g, "").toUpperCase();
+      return !completedCodeSet.has(cleanCode);
+    });
 
     const profileObj = {
       ...(profile || {}),
@@ -421,7 +451,7 @@ exports.getStudentAcademicProfile = async (req, res) => {
 
     res.json({
       profile: profileObj,
-      completedCourses: profile?.completedCourses || [],
+      completedCourses: resolvedCompletedCourses,
       incompleteCourses,
       retakes,
     });
@@ -722,7 +752,7 @@ exports.processRetakeRequest = async (req, res) => {
   }
 };
 
-// 8. Admin Academic Progression (Promote Students)
+// 8. Admin Academic Progression (Promote Students) - Optimized High-Performance Batch Execution
 exports.promoteStudentsBatch = async (req, res) => {
   try {
     const { studentIds, targetLevel, targetTerm, autoNextStep } = req.body;
@@ -730,55 +760,103 @@ exports.promoteStudentsBatch = async (req, res) => {
       return res.status(400).json({ error: "No students selected for promotion." });
     }
 
+    // 1. Query all targeted students in a single indexed query
+    const studentDocs = await Student.find({ studentId: { $in: studentIds } });
+    if (!studentDocs || studentDocs.length === 0) {
+      return res.status(404).json({ error: "No matching student records found." });
+    }
+
+    const studentBulkOps = [];
+    const emailToProgression = new Map();
     const updatedStudents = [];
-    for (const sId of studentIds) {
-      const sDoc = await Student.findOne({ studentId: sId });
-      if (sDoc) {
-        // Fallback for schema required fields to prevent validation errors on save
-        if (!sDoc.program) sDoc.program = "B.Sc. in EDTE";
-        if (!sDoc.batch) sDoc.batch = sDoc.session || "2022-23";
-        if (!sDoc.admissionSemester) sDoc.admissionSemester = "Spring";
 
-        if (autoNextStep || (!targetLevel && !targetTerm)) {
-          // Automatic +1 Step Progression (e.g. L1T1 -> L1T2 -> L2T1 -> L2T2...)
-          let nextLevel = sDoc.currentLevel || 1;
-          let nextTerm = sDoc.currentTerm || 1;
+    for (const sDoc of studentDocs) {
+      let nextLevel = sDoc.currentLevel || 1;
+      let nextTerm = sDoc.currentTerm || 1;
 
-          if (nextTerm === 1) {
-            nextTerm = 2;
-          } else {
-            nextTerm = 1;
-            nextLevel = Math.min(4, nextLevel + 1);
-          }
-
-          sDoc.currentLevel = nextLevel;
-          sDoc.currentTerm = nextTerm;
+      if (autoNextStep || (!targetLevel && !targetTerm)) {
+        // Automatic +1 Step Progression (e.g. L1T1 -> L1T2 -> L2T1 -> L2T2...)
+        if (nextTerm === 1) {
+          nextTerm = 2;
         } else {
-          if (targetLevel) sDoc.currentLevel = Number(targetLevel);
-          if (targetTerm) sDoc.currentTerm = Number(targetTerm);
+          nextTerm = 1;
+          nextLevel = Math.min(4, nextLevel + 1);
         }
+      } else {
+        if (targetLevel) nextLevel = Number(targetLevel);
+        if (targetTerm) nextTerm = Number(targetTerm);
+      }
 
-        await sDoc.save();
-
-        const userDoc = await User.findOne({ email: sDoc.universityEmail });
-        if (userDoc) {
-          await AcademicProfile.findOneAndUpdate(
-            { student: userDoc._id },
-            {
-              currentLevel: `Level ${sDoc.currentLevel}`,
-              currentTerm: `Term ${sDoc.currentTerm}`,
-              updatedAt: new Date(),
+      studentBulkOps.push({
+        updateOne: {
+          filter: { _id: sDoc._id },
+          update: {
+            $set: {
+              currentLevel: nextLevel,
+              currentTerm: nextTerm,
+              program: sDoc.program || "B.Sc. in EDTE",
+              batch: sDoc.batch || sDoc.session || "2022-23",
+              admissionSemester: sDoc.admissionSemester || "Spring",
             },
-            { upsert: true }
-          );
+          },
+        },
+      });
+
+      if (sDoc.universityEmail) {
+        emailToProgression.set(sDoc.universityEmail.toLowerCase().trim(), {
+          level: nextLevel,
+          term: nextTerm,
+        });
+      }
+      updatedStudents.push(sDoc.studentId);
+    }
+
+    // 2. Perform bulk update on Student collection in a single roundtrip
+    if (studentBulkOps.length > 0) {
+      await Student.bulkWrite(studentBulkOps, { ordered: false });
+    }
+
+    // 3. Batch update corresponding AcademicProfiles
+    const emails = Array.from(emailToProgression.keys());
+    if (emails.length > 0) {
+      const userDocs = await User.find({
+        email: { $in: emails },
+      }).select("_id email").lean();
+
+      if (userDocs && userDocs.length > 0) {
+        const now = new Date();
+        const profileBulkOps = [];
+
+        for (const u of userDocs) {
+          const normEmail = (u.email || "").toLowerCase().trim();
+          const target = emailToProgression.get(normEmail);
+          if (target) {
+            profileBulkOps.push({
+              updateOne: {
+                filter: { student: u._id },
+                update: {
+                  $set: {
+                    currentLevel: `Level ${target.level}`,
+                    currentTerm: `Term ${target.term}`,
+                    updatedAt: now,
+                  },
+                },
+                upsert: true,
+              },
+            });
+          }
         }
-        updatedStudents.push(sId);
+
+        if (profileBulkOps.length > 0) {
+          await AcademicProfile.bulkWrite(profileBulkOps, { ordered: false });
+        }
       }
     }
 
-    await createAuditLog(req, req.user, "Academic Promotion", `Promoted ${updatedStudents.length} students.`);
+    // Non-blocking audit log
+    createAuditLog(req, req.user, "Academic Promotion", `Promoted ${updatedStudents.length} students.`).catch(() => {});
 
-    res.json({ message: `Promoted ${updatedStudents.length} students successfully.` });
+    res.json({ message: `Promoted ${updatedStudents.length} students successfully.`, count: updatedStudents.length });
   } catch (error) {
     console.error("Error in promoteStudentsBatch:", error);
     res.status(500).json({ error: error.message });

@@ -31,7 +31,7 @@ const sendEmail = async (to, subject, html) => {
   try {
     console.log(`✉️ Attempting to send email to: ${to} | Subject: ${subject}`);
     const mailOptions = {
-      from: `"UFTB Moodle" <${process.env.EMAIL_USER}>`,
+      from: `"UniCore" <${process.env.EMAIL_USER}>`,
       to: to,
       subject: subject,
       html: html,
@@ -58,7 +58,7 @@ const emailTemplates = {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-            <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+            <h2 style="color: white; margin: 0;">UniCore</h2>
           </div>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
             <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -85,7 +85,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          <h2 style="color: white; margin: 0;">UniCore</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -107,7 +107,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          <h2 style="color: white; margin: 0;">UniCore</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -130,7 +130,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          <h2 style="color: white; margin: 0;">UniCore</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -152,7 +152,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          <h2 style="color: white; margin: 0;">UniCore</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -177,7 +177,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          <h2 style="color: white; margin: 0;">UniCore</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${recipientName},</h3>
@@ -200,7 +200,7 @@ const emailTemplates = {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-            <h2 style="color: white; margin: 0;">UFTB Moodle Chat</h2>
+            <h2 style="color: white; margin: 0;">UniCore Chat</h2>
           </div>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
             <h3 style="color: #2C4B66;">Hello ${recipientName},</h3>
@@ -223,7 +223,7 @@ const emailTemplates = {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-            <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+            <h2 style="color: white; margin: 0;">UniCore</h2>
           </div>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
             <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -247,7 +247,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          <h2 style="color: white; margin: 0;">UniCore</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${teacherName},</h3>
@@ -273,7 +273,7 @@ const emailTemplates = {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, ${isAccepted ? "#10B981, #059669" : "#EF4444, #DC2626"}); padding: 20px; border-radius: 10px 10px 0 0;">
-            <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+            <h2 style="color: white; margin: 0;">UniCore</h2>
           </div>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
             <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -300,7 +300,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #2C4B66, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle Official Notice</h2>
+          <h2 style="color: white; margin: 0;">UniCore Official Notice</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${recipientName},</h3>
@@ -324,7 +324,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle Course Registration</h2>
+          <h2 style="color: white; margin: 0;">UniCore Course Registration</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -346,7 +346,7 @@ const emailTemplates = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #10B981, #059669); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle</h2>
+          <h2 style="color: white; margin: 0;">UniCore</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${studentName},</h3>
@@ -385,7 +385,7 @@ async function processQueue() {
     const promise = (async () => {
       try {
         const mailOptions = {
-          from: `"UFTB Moodle" <${process.env.EMAIL_USER}>`,
+          from: `"UniCore" <${process.env.EMAIL_USER}>`,
           to,
           subject,
           html,

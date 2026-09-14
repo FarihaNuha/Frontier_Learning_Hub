@@ -101,7 +101,7 @@ export default function AdminDashboard() {
       <AdminSidebar />
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
         <div style={{ marginBottom: "32px" }}>
-          <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Welcome to UMS Admin Dashboard</h1>
+          <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Welcome to Admin Dashboard</h1>
         </div>
 
         {loading ? (

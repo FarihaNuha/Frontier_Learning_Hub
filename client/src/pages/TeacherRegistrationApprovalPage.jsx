@@ -15,7 +15,10 @@ export default function TeacherRegistrationApprovalPage() {
     setLoading(true);
     try {
       const res = await api.get("/registration/adviser/pending");
-      setRequests(res.data);
+      const reqList = Array.isArray(res.data)
+        ? res.data
+        : (res.data?.pendingRegistrations || []);
+      setRequests(reqList);
     } catch (err) {
       toast.error("Failed to fetch pending registration requests.");
     } finally {

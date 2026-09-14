@@ -3,11 +3,11 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
 import toast from "react-hot-toast";
-import { analyzeAnswers } from "../services/aiDetector";
 import {
   FiClock,
   FiCheckCircle,
   FiAlertCircle,
+  FiAlertTriangle,
   FiArrowLeft,
   FiUser,
   FiLogOut,
@@ -423,22 +423,19 @@ export default function StudentExamPage({
     }
 
     const pct = Math.round((obtained / total) * 100);
-    setAiLoading(true);
     setExamSubmitted(true);
     const currentAnswers = answersRef.current;
     const formatted = examData.questions.map((q, i) => ({
       questionIndex: i,
       answer: currentAnswers[i] !== undefined ? currentAnswers[i] : "",
     }));
-    let aiResult = { overallAI: 0 };
-    try {
-      aiResult = await analyzeAnswers(currentAnswers, examData.questions);
-    } catch (e) {}
+
     try {
       if (document.fullscreenElement) {
         document.exitFullscreen().catch(() => {});
       }
     } catch (e) {}
+
     try {
       const res = await api.post("/exams/submit", {
         examId: examData._id,
@@ -448,9 +445,8 @@ export default function StudentExamPage({
         securityViolations: viol ? 1 : 0,
         cheatingDetected: viol,
         reason: msg,
-        aiPercentage: aiResult.overallAI,
+        aiPercentage: 0,
       });
-      setAiLoading(false);
 
       const savedSubmission = res.data.submission;
       const backendObtained = savedSubmission ? savedSubmission.totalMarksObtained : obtained;
@@ -468,7 +464,7 @@ export default function StudentExamPage({
         duration: examData.duration,
         totalQuestions: examData.questions.length,
         submittedAt: new Date().toLocaleString(),
-        aiPercentage: aiResult.overallAI,
+        aiPercentage: 0,
       });
       fetchData();
       if (viol) toast.error(msg);
@@ -478,7 +474,6 @@ export default function StudentExamPage({
       toast.error("Submit failed");
       submitting.current = false;
       examActive.current = true;
-      setAiLoading(false);
       setExamLocked(false);
     }
   };
@@ -925,47 +920,105 @@ export default function StudentExamPage({
           </div>
         )}
 
-        {aiLoading && (
-          <div style={{ textAlign: "center", padding: 60 }}>
-            <h2>Analyzing your answers...</h2>
-            <div className="spinner"></div>
-          </div>
-        )}
-
-        {examSubmitted && !aiLoading && examResult && (
+        {examSubmitted && examResult && (
           <div style={{ textAlign: "center", padding: 30 }}>
-            <h2>Exam Submitted!</h2>
-            <div className="card" style={{ marginTop: 20, padding: 30 }}>
-              <div
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: "50%",
-                  background: "#10B981",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 20px",
-                  color: "white",
-                }}
-              >
-                <FiCheckCircle size={64} />
+            {examResult.isViolation ? (
+              <div>
+                <h2 style={{ color: "#EF4444", fontSize: "28px", fontWeight: "700" }}>Exam Auto-Submitted!</h2>
+                <div
+                  className="card"
+                  style={{
+                    marginTop: 20,
+                    padding: 35,
+                    border: "2px solid #FCA5A5",
+                    background: "#FEF2F2",
+                    borderRadius: "16px",
+                    boxShadow: "0 8px 24px rgba(239, 68, 68, 0.08)"
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 110,
+                      height: 110,
+                      borderRadius: "50%",
+                      background: "#EF4444",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 24px",
+                      color: "white",
+                      boxShadow: "0 6px 18px rgba(239, 68, 68, 0.35)",
+                    }}
+                  >
+                    <FiAlertTriangle size={60} />
+                  </div>
+                  <h3 style={{ color: "#991B1B", fontSize: "22px", fontWeight: 700, marginBottom: "12px" }}>
+                    Full Screen Exited — Exam Auto-Submitted!
+                  </h3>
+                  <p style={{ color: "#DC2626", fontSize: "15px", fontWeight: 600, margin: "0 auto 10px", maxWidth: "550px" }}>
+                    Your exam was automatically submitted because full-screen mode was exited.
+                  </p>
+                  <p style={{ color: "#64748B", fontSize: "14px", margin: "0 0 16px 0" }}>
+                    Your responses up to this point have been recorded successfully.
+                  </p>
+                  <p style={{ fontWeight: 600, color: "#3B8DB3", marginTop: 15, fontSize: "14px" }}>
+                    Results will be published after the exam deadline and grading is complete.
+                  </p>
+                  <button
+                    className="btn-primary"
+                    onClick={resetStudentView}
+                    style={{
+                      marginTop: 24,
+                      padding: "12px 28px",
+                      background: "#EF4444",
+                      border: "none",
+                      color: "#ffffff",
+                      borderRadius: "8px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)"
+                    }}
+                  >
+                    Back to Exams
+                  </button>
+                </div>
               </div>
-              <h3>Thank you for submitting!</h3>
-              <p style={{ color: "#6B89A0", marginTop: 10 }}>
-                Your responses have been recorded successfully.
-              </p>
-              <p style={{ fontWeight: 600, color: "#3B8DB3", marginTop: 15 }}>
-                Results will be published after the exam deadline and grading is complete.
-              </p>
-              <button
-                className="btn-primary"
-                onClick={resetStudentView}
-                style={{ marginTop: 20 }}
-              >
-                Back to Exams
-              </button>
-            </div>
+            ) : (
+              <div>
+                <h2>Exam Submitted!</h2>
+                <div className="card" style={{ marginTop: 20, padding: 30 }}>
+                  <div
+                    style={{
+                      width: 120,
+                      height: 120,
+                      borderRadius: "50%",
+                      background: "#10B981",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 20px",
+                      color: "white",
+                    }}
+                  >
+                    <FiCheckCircle size={64} />
+                  </div>
+                  <h3>Thank you for submitting!</h3>
+                  <p style={{ color: "#6B89A0", marginTop: 10 }}>
+                    Your responses have been recorded successfully.
+                  </p>
+                  <p style={{ fontWeight: 600, color: "#3B8DB3", marginTop: 15 }}>
+                    Results will be published after the exam deadline and grading is complete.
+                  </p>
+                  <button
+                    className="btn-primary"
+                    onClick={resetStudentView}
+                    style={{ marginTop: 20 }}
+                  >
+                    Back to Exams
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

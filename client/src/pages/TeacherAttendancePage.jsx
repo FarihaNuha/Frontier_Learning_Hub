@@ -1370,7 +1370,7 @@ export default function TeacherAttendancePage({
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#e0f2fe", border: "1px solid #bae6fd", borderRadius: "8px", padding: "6px 14px", fontSize: "13px", color: "#0369a1", fontWeight: 600 }}>
-                🎓 Enrolled Students Filtered: <strong>{filteredRecords.length}</strong> / {records.length}
+                Enrolled Students Filtered: <strong>{filteredRecords.length}</strong> / {records.length}
               </div>
             </div>
 

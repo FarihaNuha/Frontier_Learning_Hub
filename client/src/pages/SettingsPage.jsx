@@ -705,7 +705,7 @@ export default function SettingsPage() {
                 <FiSlash size={18} color="#ef4444" /> Suspended Students
               </h3>
               <p style={{ color: "var(--text-gray)", fontSize: "14px", marginBottom: "20px" }}>
-                Review and lift suspensions for students who were blocked from accessing Moodle.
+                Review and lift suspensions for students who were blocked from accessing UniCore.
               </p>
 
               {loadingBlocked ? (

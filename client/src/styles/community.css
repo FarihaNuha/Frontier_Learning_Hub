@@ -770,6 +770,10 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.user-item.active .user-email-text {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
 .user-avatar {
   width: 44px;
   height: 44px;

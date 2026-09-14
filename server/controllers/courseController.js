@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Course = require("../models/Course");
 const User = require("../models/User");
 
@@ -281,7 +282,10 @@ exports.getMyCourses = async (req, res) => {
         const dupIdsToDelete = [];
 
         for (const c of rawCourses) {
-          const normCode = (c.displayCode || c.name || "").replace(/[-\s]/g, "").toUpperCase();
+          const codeKey = (c.displayCode && c.displayCode.toUpperCase() !== "COURSE")
+            ? c.displayCode
+            : (c.name || c.displayCode || "");
+          const normCode = codeKey.replace(/[-\s]/g, "").toUpperCase();
           const normSess = (c.session || "").replace(/[-\s]/g, "").toLowerCase();
           const key = `${normCode}_${normSess}`;
 
@@ -297,23 +301,30 @@ exports.getMyCourses = async (req, res) => {
                 existingStudentIds.add(sid);
               }
             });
-            dupIdsToDelete.push(c._id);
+            if (c._id && !String(c._id).startsWith("assigned_") && !c.isVirtual) {
+              dupIdsToDelete.push(c._id);
+            }
           }
         }
 
         if (dupIdsToDelete.length > 0) {
           try {
             for (const primary of uniqueMap.values()) {
-              const studentObjIds = (primary.students || []).map(s => s._id || s);
-              await CourseModel.findByIdAndUpdate(primary._id, { students: studentObjIds }).catch(() => {});
+              if (primary._id && !String(primary._id).startsWith("assigned_")) {
+                const studentObjIds = (primary.students || []).map(s => s._id || s);
+                await CourseModel.findByIdAndUpdate(primary._id, { students: studentObjIds }).catch(() => {});
+              }
             }
             for (const dupId of dupIdsToDelete) {
-              const dupDoc = rawCourses.find(c => c._id.toString() === dupId.toString());
+              const dupDoc = rawCourses.find(c => c._id && c._id.toString() === dupId.toString());
               if (dupDoc) {
-                const normCode = (dupDoc.displayCode || dupDoc.name || "").replace(/[-\s]/g, "").toUpperCase();
+                const codeKey = (dupDoc.displayCode && dupDoc.displayCode.toUpperCase() !== "COURSE")
+                  ? dupDoc.displayCode
+                  : (dupDoc.name || dupDoc.displayCode || "");
+                const normCode = codeKey.replace(/[-\s]/g, "").toUpperCase();
                 const normSess = (dupDoc.session || "").replace(/[-\s]/g, "").toLowerCase();
                 const primary = uniqueMap.get(`${normCode}_${normSess}`);
-                if (primary) {
+                if (primary && primary._id && !String(primary._id).startsWith("assigned_")) {
                   await EnrollmentModel.updateMany({ course: dupId }, { course: primary._id }).catch(() => {});
                 }
               }
@@ -326,6 +337,8 @@ exports.getMyCourses = async (req, res) => {
 
         return Array.from(uniqueMap.values());
       };
+
+      const courseImports = await CourseImport.find().lean();
 
       if (teacherProfile && Array.isArray(teacherProfile.assignedCourses) && teacherProfile.assignedCourses.length > 0) {
         courses = courses.filter((c) => {
@@ -343,26 +356,82 @@ exports.getMyCourses = async (req, res) => {
             return codeMatch && sessMatch;
           });
         });
+
+        // Ensure every assigned course in teacherProfile exists in courses array even if no LMS Course exists yet
+        for (const ac of teacherProfile.assignedCourses) {
+          const acCode = (ac.courseCode || "").trim().toUpperCase();
+          const acName = (ac.courseName || "").trim().toLowerCase();
+          const acSess = (ac.session || "").trim().toLowerCase();
+
+          if (!acCode && !acName) continue;
+
+          const alreadyExists = courses.some((c) => {
+            const code = (c.displayCode || "").trim().toUpperCase();
+            const name = (c.name || "").trim().toLowerCase();
+            const sess = (c.session || "").trim().toLowerCase();
+
+            const codeMatch = (acCode && acCode === code) || (acName && acName === name);
+            const sessMatch = !acSess || !sess || acSess === sess;
+            return codeMatch && sessMatch;
+          });
+
+          if (!alreadyExists) {
+            const matchImport = courseImports.find((ci) =>
+              (acCode && (ci.courseCode || "").trim().toUpperCase() === acCode) ||
+              (acName && (ci.courseTitle || "").trim().toLowerCase() === acName)
+            );
+
+            const virtualCourse = {
+              _id: `assigned_${ac._id || Math.random().toString(36).substring(2, 9)}`,
+              displayCode: matchImport?.courseCode || ac.courseCode || "COURSE",
+              name: ac.courseName || matchImport?.courseTitle || "Course",
+              session: ac.session || teacherProfile.assignedSession || "2023-24",
+              department: ac.department || teacherProfile.department || "EDTE",
+              levelTerm: ac.levelTerm || "",
+              level: matchImport?.level || ac.level || "",
+              term: matchImport?.term || ac.term || "",
+              students: [],
+              isVirtual: true,
+            };
+            courses.push(virtualCourse);
+          }
+        }
       }
 
       courses = await deduplicateTeacherCourses(courses);
 
-      const courseImports = await CourseImport.find().lean();
+      const { resolveCourseCode } = require("../utils/courseUtils");
 
       courses = courses.map((c) => {
+        const resolvedCode = resolveCourseCode(c.name, c.displayCode, courseImports);
+
+        // Persist resolved displayCode to MongoDB if this is a real Course document and displayCode was "COURSE"
+        if (
+          c._id &&
+          !String(c._id).startsWith("assigned_") &&
+          !c.isVirtual &&
+          (c.displayCode === "COURSE" || !c.displayCode) &&
+          resolvedCode !== "COURSE"
+        ) {
+          const CourseModel = require("../models/Course");
+          CourseModel.findByIdAndUpdate(c._id, { displayCode: resolvedCode }).catch(() => {});
+        }
+
         const matchImport = courseImports.find(
-          (ci) => ci.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()
+          (ci) => ci.courseCode.toUpperCase() === resolvedCode
         );
-        const matchAssigned = teacherProfile?.assignedCourses?.find(
-          (ac) =>
-            ((ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
-            (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())) &&
-            (!ac.session || !c.session || ac.session.trim().toLowerCase() === c.session.trim().toLowerCase())
-        ) || teacherProfile?.assignedCourses?.find(
-          (ac) =>
-            (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
-            (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
-        );
+        const matchAssigned =
+          teacherProfile?.assignedCourses?.find(
+            (ac) =>
+              ((ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
+                (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())) &&
+              (!ac.session || !c.session || ac.session.trim().toLowerCase() === c.session.trim().toLowerCase())
+          ) ||
+          teacherProfile?.assignedCourses?.find(
+            (ac) =>
+              (ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
+              (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
+          );
 
         let rawLevel = matchAssigned?.level || c.level || matchImport?.level || "";
         let rawTerm = matchAssigned?.term || c.term || matchImport?.term || "";
@@ -386,6 +455,7 @@ exports.getMyCourses = async (req, res) => {
 
         return {
           ...c,
+          displayCode: resolvedCode,
           level: formattedLevel,
           term: formattedTerm,
           session: c.session || matchAssigned?.session || "2023-24",
@@ -416,11 +486,24 @@ exports.getTeacherDashboardSummary = async (req, res) => {
     const Submission = require("../models/Submission");
     const Attendance = require("../models/Attendance");
     const CourseImport = require("../models/CourseImport");
+    const { resolveCourseCode } = require("../utils/courseUtils");
 
     const TeacherProfile = await Teacher.findOne({ email: teacherEmail }).lean();
+    if (TeacherProfile) {
+      const { syncTeacherCourseAssignments } = require("./umsAdminController");
+      await syncTeacherCourseAssignments(TeacherProfile);
+    }
+
+    const User = require("../models/User");
+    const teacherUserDoc = await User.findOne({ email: teacherEmail }).lean();
+    const effectiveUserId = teacherUserDoc ? teacherUserDoc._id : userId;
+
+    const courseImports = await CourseImport.find().lean();
 
     // 1. Teacher's Courses (strictly matched by Admin assigned courses in TeacherProfile)
-    let courses = await Course.find({ teacher: userId }).lean();
+    let courses = (effectiveUserId && mongoose.Types.ObjectId.isValid(effectiveUserId))
+      ? await Course.find({ teacher: effectiveUserId }).lean()
+      : [];
 
     if (TeacherProfile && Array.isArray(TeacherProfile.assignedCourses) && TeacherProfile.assignedCourses.length > 0) {
       const assignedCodes = new Set(
@@ -461,12 +544,56 @@ exports.getTeacherDashboardSummary = async (req, res) => {
           return codeMatch && sessMatch;
         });
       });
+
+      // Include all assigned courses from TeacherProfile even if no LMS Course document exists yet
+      for (const ac of TeacherProfile.assignedCourses) {
+        const acCode = (ac.courseCode || "").trim().toUpperCase();
+        const acName = (ac.courseName || "").trim().toLowerCase();
+        const acSess = (ac.session || "").trim().toLowerCase();
+
+        if (!acCode && !acName) continue;
+
+        const alreadyExists = courses.some((c) => {
+          const code = (c.displayCode || "").trim().toUpperCase();
+          const name = (c.name || "").trim().toLowerCase();
+          const sess = (c.session || "").trim().toLowerCase();
+
+          const codeMatch = (acCode && acCode === code) || (acName && acName === name);
+          const sessMatch = !acSess || !sess || acSess === sess;
+          return codeMatch && sessMatch;
+        });
+
+        if (!alreadyExists) {
+          const matchImport = courseImports.find((ci) =>
+            (acCode && (ci.courseCode || "").trim().toUpperCase() === acCode) ||
+            (acName && (ci.courseTitle || "").trim().toLowerCase() === acName)
+          );
+
+          const resolvedCode = resolveCourseCode(ac.courseName, ac.courseCode || matchImport?.courseCode, courseImports);
+          const virtualCourse = {
+            _id: `assigned_${ac._id || Math.random().toString(36).substring(2, 9)}`,
+            displayCode: resolvedCode,
+            name: ac.courseName || matchImport?.courseTitle || "Course",
+            session: ac.session || TeacherProfile.assignedSession || "2023-24",
+            department: ac.department || TeacherProfile.department || "EDTE",
+            levelTerm: ac.levelTerm || "",
+            level: matchImport?.level || ac.level || "",
+            term: matchImport?.term || ac.term || "",
+            students: [],
+            isVirtual: true,
+          };
+          courses.push(virtualCourse);
+        }
+      }
     }
 
     // Deduplicate duplicate cards for the same session
     const uniqueMap = new Map();
     for (const c of courses) {
-      const normCode = (c.displayCode || c.name || "").replace(/[-\s]/g, "").toUpperCase();
+      const codeKey = (c.displayCode && c.displayCode.toUpperCase() !== "COURSE")
+        ? c.displayCode
+        : (c.name || c.displayCode || "");
+      const normCode = codeKey.replace(/[-\s]/g, "").toUpperCase();
       const normSess = (c.session || "").replace(/[-\s]/g, "").toLowerCase();
       const key = `${normCode}_${normSess}`;
       if (!uniqueMap.has(key)) {
@@ -487,7 +614,6 @@ exports.getTeacherDashboardSummary = async (req, res) => {
     courses = Array.from(uniqueMap.values());
 
     const courseIds = courses.map(c => c._id);
-    const courseImports = await CourseImport.find().lean();
 
     // 2. Unique Enrolled Students across all assigned courses
     const allStudentIdsSet = new Set();
@@ -526,13 +652,14 @@ exports.getTeacherDashboardSummary = async (req, res) => {
     const activeTermsSet = new Set();
 
     const formattedCourses = courses.map(c => {
-      let matchImport = courseImports.find(ci => ci.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase());
+      const resolvedCode = resolveCourseCode(c.name, c.displayCode, courseImports);
+      let matchImport = courseImports.find(ci => ci.courseCode.toUpperCase() === resolvedCode);
       let matchAssigned = TeacherProfile?.assignedCourses?.find(ac =>
-        ((ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
+        ((ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
         (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())) &&
         (!ac.session || !c.session || ac.session.trim().toLowerCase() === c.session.trim().toLowerCase())
       ) || TeacherProfile?.assignedCourses?.find(ac =>
-        (ac.courseCode && ac.courseCode.toUpperCase() === (c.displayCode || "").toUpperCase()) ||
+        (ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
         (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
       );
 
@@ -554,6 +681,7 @@ exports.getTeacherDashboardSummary = async (req, res) => {
 
       return {
         ...c,
+        displayCode: resolvedCode,
         level,
         term,
         session: c.session || matchAssigned?.session || "2023-24",
@@ -585,51 +713,229 @@ exports.getTeacherDashboardSummary = async (req, res) => {
 exports.getEnrolledStudentsForCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const course = await Course.findById(courseId).lean();
-    if (!course) {
-      return res.status(404).json({ error: "Course not found." });
-    }
-
     const User = require("../models/User");
     const Student = require("../models/Student");
     const Registration = require("../models/Registration");
+    const Enrollment = require("../models/Enrollment");
+    const Teacher = require("../models/Teacher");
+    const CourseImport = require("../models/CourseImport");
+    const ResultUpload = require("../models/ResultUpload");
+    const Result = require("../models/Result");
 
-    // Fetch user docs for enrolled students
-    const userDocs = await User.find({ _id: { $in: course.students } })
+    let course = null;
+    let courseCode = "";
+    let courseTitle = "";
+    let courseSession = "";
+    let courseDept = "";
+    let courseLevel = "";
+    let courseTerm = "";
+
+    // 1. Resolve Course Document or Virtual Assignment Metadata
+    if (courseId && !courseId.startsWith("assigned_") && mongoose.Types.ObjectId.isValid(courseId)) {
+      course = await Course.findById(courseId).lean();
+    }
+
+    if (course) {
+      courseCode = (course.displayCode || course.courseCode || course.name || "").trim();
+      courseTitle = (course.name || "").trim();
+      courseSession = (course.session || "").trim();
+      courseDept = (course.department || "").trim();
+      courseLevel = (course.level || "").trim();
+      courseTerm = (course.term || "").trim();
+    } else {
+      // Virtual course or unpersisted LMS course fallback
+      const teacherProfile = await Teacher.findOne({ email: req.user.email }).lean();
+      const assigned = teacherProfile?.assignedCourses?.find(
+        (ac) => `assigned_${ac._id}` === courseId || ac.courseCode === courseId || ac.courseName === courseId
+      );
+
+      const allImports = await CourseImport.find().lean();
+      const matchImport = allImports.find(
+        (ci) => (assigned?.courseCode && ci.courseCode.toUpperCase() === assigned.courseCode.toUpperCase()) ||
+                (assigned?.courseName && ci.courseTitle.toLowerCase() === assigned.courseName.toLowerCase())
+      );
+
+      courseCode = assigned?.courseCode || matchImport?.courseCode || "COURSE";
+      courseTitle = assigned?.courseName || matchImport?.courseTitle || "Course";
+      courseSession = assigned?.session || teacherProfile?.assignedSession || "2023-24";
+      courseDept = assigned?.department || teacherProfile?.department || "EDTE";
+      courseLevel = matchImport?.level || assigned?.level || "Level-1";
+      courseTerm = matchImport?.term || assigned?.term || "Term-1";
+
+      course = {
+        _id: courseId,
+        name: courseTitle,
+        displayCode: courseCode,
+        session: courseSession,
+        department: courseDept,
+        level: courseLevel,
+        term: courseTerm,
+        students: [],
+        isVirtual: true,
+      };
+    }
+
+    const normCode = courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const codeRegex = new RegExp(`^${courseCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i");
+    const cleanSession = courseSession.trim();
+
+    // 2. Gather student IDs / User IDs from all enrollment sources
+    const enrolledUserIdsSet = new Set((course.students || []).map((id) => id.toString()));
+    const enrolledStudentIdsSet = new Set();
+    const enrolledEmailsSet = new Set();
+
+    // Source A: Enrollment Collection
+    const enrollQuery = {
+      $or: [
+        { courseCode: { $regex: codeRegex } },
+        { courseTitle: { $regex: new RegExp(courseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } }
+      ]
+    };
+    if (cleanSession) enrollQuery.session = cleanSession;
+
+    const enrollments = await Enrollment.find(enrollQuery).lean();
+    enrollments.forEach((e) => {
+      if (e.student) enrolledUserIdsSet.add(e.student.toString());
+      if (e.studentId) enrolledStudentIdsSet.add(String(e.studentId).trim());
+    });
+
+    // Source B: Approved Registration Collection
+    const regQuery = { status: "Approved" };
+    if (cleanSession) regQuery.session = cleanSession;
+    const approvedRegs = await Registration.find(regQuery).lean();
+
+    approvedRegs.forEach((r) => {
+      const hasCourse = (r.selectedCourses || []).some((c) => {
+        const cCode = (c.courseCode || c.code || c.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        return cCode === normCode || (normCode.length >= 4 && cCode.includes(normCode)) || (cCode.length >= 4 && normCode.includes(cCode));
+      });
+      if (hasCourse) {
+        if (r.user) enrolledUserIdsSet.add(r.user.toString());
+        if (r.studentId) enrolledStudentIdsSet.add(String(r.studentId).trim());
+      }
+    });
+
+    // Source C: ResultUpload / Result Collection
+    const uploadQuery = {
+      $or: [
+        { courseCode: { $regex: codeRegex } },
+        { courseTitle: { $regex: new RegExp(courseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } }
+      ]
+    };
+    if (cleanSession) uploadQuery.session = cleanSession;
+    const resultUploads = await ResultUpload.find(uploadQuery).lean();
+    if (resultUploads.length > 0) {
+      const uploadIds = resultUploads.map((u) => u._id);
+      const results = await Result.find({ uploadId: { $in: uploadIds } }).lean();
+      results.forEach((resItem) => {
+        if (resItem.studentId) enrolledStudentIdsSet.add(String(resItem.studentId).trim());
+      });
+    }
+
+    // Source D: Student model for this course's session
+    if (cleanSession) {
+      const sessionStudents = await Student.find({ session: cleanSession }).lean();
+      sessionStudents.forEach((s) => {
+        if (s.studentId) enrolledStudentIdsSet.add(String(s.studentId).trim());
+        if (s.universityEmail) enrolledEmailsSet.add(s.universityEmail.toLowerCase().trim());
+      });
+    }
+
+    // 3. Consolidate Student Profiles & User Accounts
+    const studentProfiles = await Student.find({
+      $or: [
+        { studentId: { $in: Array.from(enrolledStudentIdsSet) } },
+        { universityEmail: { $in: Array.from(enrolledEmailsSet) } }
+      ]
+    }).lean();
+
+    studentProfiles.forEach((s) => {
+      if (s.studentId) enrolledStudentIdsSet.add(String(s.studentId).trim());
+      if (s.universityEmail) enrolledEmailsSet.add(s.universityEmail.toLowerCase().trim());
+    });
+
+    const userDocs = await User.find({
+      $or: [
+        { _id: { $in: Array.from(enrolledUserIdsSet).filter((id) => mongoose.Types.ObjectId.isValid(id)) } },
+        { email: { $in: Array.from(enrolledEmailsSet) } },
+        { studentId: { $in: Array.from(enrolledStudentIdsSet) } }
+      ]
+    })
       .select("name email profilePicture department studentId role")
       .lean();
 
-    const emails = userDocs.map(u => u.email);
-    const studentProfiles = await Student.find({ universityEmail: { $in: emails } }).lean();
+    // Map unique roster by studentId / email
+    const studentMap = new Map();
 
-    // Map roster
-    const roster = await Promise.all(
-      userDocs.map(async (u) => {
-        const profile = studentProfiles.find(s => s.universityEmail === u.email);
-        const reg = profile ? await Registration.findOne({ studentId: profile.studentId }).sort({ createdAt: -1 }) : null;
+    studentProfiles.forEach((profile) => {
+      const emailClean = (profile.universityEmail || "").toLowerCase().trim();
+      const uDoc = userDocs.find(
+        (u) => (u.studentId && String(u.studentId).trim() === String(profile.studentId).trim()) ||
+               (u.email && u.email.toLowerCase().trim() === emailClean)
+      );
 
-        return {
-          _id: u._id,
-          userId: u._id,
-          studentId: profile?.studentId || u.studentId || "N/A",
-          name: u.name,
-          email: u.email,
-          profilePicture: u.profilePicture || "",
-          department: profile?.department || u.department || course.department || "EDTE",
-          batch: profile?.batch || "N/A",
-          session: profile?.session || course.session || "N/A",
-          academicStatus: profile?.accountStatus || "Active",
-          registrationStatus: reg ? reg.status : "Approved",
-          currentLevel: profile?.currentLevel || 1,
-          currentTerm: profile?.currentTerm || 1,
-          level: profile?.currentLevel ? `Level-${profile.currentLevel}` : (profile?.level || reg?.level || "Level-1"),
-          term: profile?.currentTerm ? `Term-${profile.currentTerm}` : (profile?.term || reg?.term || "Term-1"),
-        };
-      })
+      const key = String(profile.studentId || emailClean).trim();
+      if (!studentMap.has(key)) {
+        studentMap.set(key, {
+          _id: uDoc ? uDoc._id : profile._id,
+          userId: uDoc ? uDoc._id : null,
+          studentId: profile.studentId || uDoc?.studentId || "N/A",
+          name: profile.name || uDoc?.name || "Student",
+          email: profile.universityEmail || uDoc?.email || "N/A",
+          profilePicture: uDoc?.profilePicture || "",
+          department: profile.department || uDoc?.department || courseDept || "EDTE",
+          batch: profile.batch || "N/A",
+          session: profile.session || cleanSession || "N/A",
+          academicStatus: profile.accountStatus || "Active",
+          registrationStatus: "Approved",
+          currentLevel: profile.currentLevel || 1,
+          currentTerm: profile.currentTerm || 1,
+          level: profile.currentLevel ? `Level-${profile.currentLevel}` : (courseLevel || "Level-1"),
+          term: profile.currentTerm ? `Term-${profile.currentTerm}` : (courseTerm || "Term-1"),
+        });
+      }
+    });
+
+    // Also add users who might not have a Student profile doc yet
+    userDocs.forEach((uDoc) => {
+      const emailClean = (uDoc.email || "").toLowerCase().trim();
+      const sid = uDoc.studentId ? String(uDoc.studentId).trim() : emailClean;
+      if (sid && !studentMap.has(sid)) {
+        studentMap.set(sid, {
+          _id: uDoc._id,
+          userId: uDoc._id,
+          studentId: uDoc.studentId || "N/A",
+          name: uDoc.name,
+          email: uDoc.email,
+          profilePicture: uDoc.profilePicture || "",
+          department: uDoc.department || courseDept || "EDTE",
+          batch: "N/A",
+          session: cleanSession || "N/A",
+          academicStatus: "Active",
+          registrationStatus: "Approved",
+          currentLevel: 1,
+          currentTerm: 1,
+          level: courseLevel || "Level-1",
+          term: courseTerm || "Term-1",
+        });
+      }
+    });
+
+    const roster = Array.from(studentMap.values()).sort((a, b) =>
+      String(a.studentId).localeCompare(String(b.studentId), undefined, { numeric: true })
     );
+
+    // 4. Auto-heal LMS Course document students array if real course doc exists
+    if (course && course._id && !course.isVirtual && Array.isArray(roster) && roster.length > 0) {
+      const userObjIds = roster.map((s) => s.userId).filter(Boolean);
+      if (userObjIds.length > 0) {
+        Course.findByIdAndUpdate(course._id, { $addToSet: { students: { $each: userObjIds } } }).catch(() => {});
+      }
+    }
 
     res.json({ course, students: roster });
   } catch (error) {
+    console.error("Error in getEnrolledStudentsForCourse:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -733,7 +1039,7 @@ exports.joinCourse = async (req, res) => {
         const emailHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-              <h2 style="color: white; margin: 0;">UFTB Moodle Course Request</h2>
+              <h2 style="color: white; margin: 0;">UniCore Course Request</h2>
             </div>
             <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
               <h3 style="color: #2C4B66;">Hello ${teacher.name},</h3>

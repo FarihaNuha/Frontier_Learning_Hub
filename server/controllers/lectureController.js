@@ -18,14 +18,34 @@ exports.uploadLecture = async (req, res) => {
       return res.status(400).json({ error: "Please upload a file" });
     }
 
+    // Only store base64 for small non-video files (avoid MongoDB 16MB limit)
+    const VIDEO_AUDIO_TYPES = [
+      "video/mp4", "video/webm", "video/avi", "video/quicktime",
+      "video/x-msvideo", "video/mkv", "video/x-matroska",
+      "audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/m4a",
+    ];
+    const MAX_B64_SIZE = 10 * 1024 * 1024; // 10MB
+    let b64 = "";
+    const isVideoAudio = VIDEO_AUDIO_TYPES.includes(req.file.mimetype);
+    const fileSize = req.file.size || 0;
+    if (!isVideoAudio && fileSize < MAX_B64_SIZE) {
+      try {
+        b64 = fs.readFileSync(req.file.path).toString("base64");
+      } catch (e) {}
+    }
+
+    const allowedDepts = ["EDTE", "IRE", "Software", "Cyber", "DataScience", "General"];
+    const sanitizedDept = allowedDepts.includes(department) ? department : "General";
+
     const lecture = await Lecture.create({
       title,
       course: course || "",
       courseId: courseId || null,
       topic: topic || "",
       week: week || null,
-      department,
+      department: sanitizedDept,
       fileURL: `/uploads/${req.file.filename}`,
+      fileData: b64,
       originalName: req.file.originalname,
       fileType: req.file.mimetype,
       uploadedBy: req.user.uid,
@@ -78,9 +98,20 @@ exports.uploadLecture = async (req, res) => {
       }
     }
 
-    res.status(201).json({ message: "Lecture uploaded successfully", lecture });
+    res.status(201).json({ lecture });
   } catch (error) {
     console.error("Upload error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get single lecture
+exports.getLectureById = async (req, res) => {
+  try {
+    const lecture = await Lecture.findById(req.params.id);
+    if (!lecture) return res.status(404).json({ error: "Lecture not found" });
+    res.json({ lecture });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
@@ -110,18 +141,16 @@ exports.getLectures = async (req, res) => {
   }
 };
 
-// View lecture file in browser
+// View lecture in browser
 exports.viewLecture = async (req, res) => {
   try {
     const token = req.query.token;
     if (!token) {
       return res.status(401).json({ error: "Authentication token is required" });
     }
+
     try {
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET || "your_super_secret_key_change_this",
-      );
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_super_secret_key_change_this");
       req.user = decoded;
     } catch (err) {
       return res.status(403).json({ error: "Invalid or expired token" });
@@ -130,11 +159,21 @@ exports.viewLecture = async (req, res) => {
     const lecture = await Lecture.findById(req.params.id);
     if (!lecture) return res.status(404).json({ error: "Lecture not found" });
 
-    const filePath = path.join(
+    let filePath = path.join(
       __dirname,
       "../../uploads",
       lecture.fileURL.replace("/uploads/", ""),
     );
+
+    // Auto-restore physical file from DB if missing on local disk
+    if (!fs.existsSync(filePath) && lecture.fileData) {
+      try {
+        fs.writeFileSync(filePath, Buffer.from(lecture.fileData, "base64"));
+      } catch (restoreErr) {
+        console.error("Failed to restore lecture file from DB:", restoreErr);
+      }
+    }
+
     if (!fs.existsSync(filePath))
       return res.status(404).json({ error: "File not found on server" });
 
@@ -177,13 +216,48 @@ exports.viewLectureBase64 = async (req, res) => {
     const lecture = await Lecture.findById(req.params.id);
     if (!lecture) return res.status(404).json({ error: "Lecture not found" });
 
-    const filePath = path.join(
+    let filePath = path.join(
       __dirname,
       "../../uploads",
       lecture.fileURL.replace("/uploads/", ""),
     );
-    if (!fs.existsSync(filePath))
-      return res.status(404).json({ error: "File not found on server" });
+
+    // Auto-restore physical file from DB if missing on local disk
+    if (!fs.existsSync(filePath) && lecture.fileData) {
+      try {
+        fs.writeFileSync(filePath, Buffer.from(lecture.fileData, "base64"));
+      } catch (restoreErr) {
+        console.error("Failed to restore lecture file from DB:", restoreErr);
+      }
+    }
+
+    if (!fs.existsSync(filePath)) {
+      const fallbackHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 30px; line-height: 1.6; color: #1e293b; max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 8px;">
+          <h2 style="color: #0369a1; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">📚 ${lecture.title}</h2>
+          <p style="margin: 6px 0; color: #475569;"><strong>Course:</strong> ${lecture.course || "N/A"}</p>
+          <p style="margin: 6px 0; color: #475569;"><strong>Topic:</strong> ${lecture.topic || "General Lecture Material"}</p>
+          <p style="margin: 6px 0; color: #475569;"><strong>Week:</strong> ${lecture.week || "N/A"}</p>
+          <div style="margin-top: 24px; padding: 20px; background: #f8fafc; border-left: 4px solid #0284c7; border-radius: 6px;">
+            <h4 style="margin-top: 0; color: #334155; margin-bottom: 8px;">Course Material Details</h4>
+            <p style="color: #334155; margin: 0;">Original File Name: <strong>${lecture.originalName || lecture.title}</strong></p>
+          </div>
+          <p style="margin-top: 24px; font-size: 12px; color: #64748b; font-style: italic; border-top: 1px dashed #cbd5e1; padding-top: 12px;">
+            📄 Note: Physical binary file was uploaded from another machine. Resource information retrieved from database records.
+          </p>
+        </div>
+      `;
+      return res.json({
+        success: true,
+        title: lecture.title,
+        fileType: "text/html",
+        base64: Buffer.from(fallbackHtml).toString("base64"),
+        previewType: "html",
+        previewHtml: fallbackHtml,
+        previewText: lecture.topic || lecture.title,
+        mimeType: "text/html"
+      });
+    }
 
     const fileBuffer = fs.readFileSync(filePath);
     const base64Data = fileBuffer.toString("base64");

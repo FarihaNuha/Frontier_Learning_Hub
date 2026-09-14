@@ -19,6 +19,8 @@ import {
   FiMessageSquare,
   FiSearch,
   FiAlertTriangle,
+  FiLock,
+  FiUnlock,
 } from "react-icons/fi";
 import TeacherSidebar from "../components/TeacherSidebar";
 import "../styles/dashboard.css";
@@ -582,9 +584,11 @@ export default function TeacherResultManagementPage() {
   const normalizeCode = (c) => String(c || "").replace(/\s+/g, "").toUpperCase();
   const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
 
-  // Combine uploads with assignedCourses to automatically generate cards for unuploaded assigned courses
+  // Combine active (non-deleted) uploads with assignedCourses to automatically generate cards for unuploaded assigned courses
+  const activeUploads = uploads.filter((u) => u.status !== "Deleted" && u.isDeleted !== true);
+
   const existingUploadKeys = new Set();
-  uploads.forEach((u) => {
+  activeUploads.forEach((u) => {
     const code = normalizeCode(u.courseCode);
     const sess = String(u.session || "").trim();
     const ldig = extractDigit(u.level);
@@ -594,7 +598,7 @@ export default function TeacherResultManagementPage() {
     }
   });
 
-  const combinedBatches = [...uploads];
+  const combinedBatches = [...activeUploads];
   assignedCourses.forEach((ac) => {
     const rawCode = ac.displayCode || ac.courseCode || ac.name || ac.courseTitle || "";
     const code = normalizeCode(rawCode);
@@ -1176,7 +1180,7 @@ export default function TeacherResultManagementPage() {
                                   batch.status === "Correction Requested" ? "#991b1b" : "#64748b",
                               }}
                             >
-                              {batch.isAutoCard ? "Pending Upload" : (batch.resultType === "Midterm" && batch.status === "Published" ? "Published (Direct to Students)" : batch.status)}
+                              {batch.isAutoCard ? "Pending Upload" : (batch.resultType === "Midterm" && batch.status === "Published" ? "Published" : batch.status)}
                             </span>
                           </div>
 
@@ -1194,12 +1198,23 @@ export default function TeacherResultManagementPage() {
                               borderRadius: "8px",
                               fontSize: "12px"
                             }}>
-                              <div style={{ fontWeight: 700, color: batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#dc2626" : "#0369a1", marginBottom: "6px" }}>
-                                {batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd)
-                                  ? `🔒 Marksheet Locked (Expired on: ${new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })})`
-                                  : batch.correctionWindowEnd
-                                  ? `🔓 Open for Student Corrections until: ${new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}`
-                                  : "🔓 Open for Student Corrections (No Deadline Set)"}
+                              <div style={{ fontWeight: 700, color: batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? "#dc2626" : "#0369a1", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                                {batch.correctionWindowEnd && new Date() > new Date(batch.correctionWindowEnd) ? (
+                                  <>
+                                    <FiLock size={14} />
+                                    <span>Marksheet Locked (Expired: {new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })})</span>
+                                  </>
+                                ) : batch.correctionWindowEnd ? (
+                                  <>
+                                    <FiUnlock size={14} />
+                                    <span>Open for Student Corrections until: {new Date(batch.correctionWindowEnd).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <FiUnlock size={14} />
+                                    <span>Open for Student Corrections</span>
+                                  </>
+                                )}
                               </div>
                               <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", marginTop: "6px" }}>
                                 <input
@@ -1281,7 +1296,15 @@ export default function TeacherResultManagementPage() {
                             }}
                             title={isSecDlPassed ? "Submission deadline passed. Uploads locked." : batch.isAutoCard ? "Upload Excel marksheet" : "Re-upload Excel to update marksheet"}
                           >
-                            <FiUpload size={13} /> {isSecDlPassed ? "Upload Locked 🔒" : batch.isAutoCard ? "Upload Excel" : "Update Marksheet"}
+                            {isSecDlPassed ? (
+                              <>
+                                <FiLock size={13} /> Upload Locked
+                              </>
+                            ) : (
+                              <>
+                                <FiUpload size={13} /> {batch.isAutoCard ? "Upload Excel" : "Update Marksheet"}
+                              </>
+                            )}
                           </button>
 
                           <button
@@ -1333,7 +1356,12 @@ export default function TeacherResultManagementPage() {
         )}
 
         {/* View Marksheet Large Pop-Up Modal */}
-        {viewBatch && (
+        {viewBatch && (() => {
+          const viewBatchSectionDl = getSectionDeadline(viewBatch.session, viewBatch.level, viewBatch.term);
+          const viewBatchDlDate = viewBatchSectionDl?.deadlineDate ? new Date(viewBatchSectionDl.deadlineDate) : null;
+          const isViewBatchDeadlinePassed = Boolean(viewBatchDlDate && viewBatchDlDate < new Date());
+
+          return (
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.65)", zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
             <div style={{ background: "#ffffff", borderRadius: "18px", padding: "32px", maxWidth: "1050px", width: "95%", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
               {/* Modal Header */}
@@ -1346,8 +1374,8 @@ export default function TeacherResultManagementPage() {
                     <h2 style={{ margin: 0, color: "#0f172a", fontSize: "20px", fontWeight: 700 }}>
                       {viewBatch.courseTitle}
                     </h2>
-                    <span style={{ background: isAdminDeadlinePassed ? "#fee2e2" : (viewBatch.resultType === "Midterm" ? "#e0f2fe" : "#fef3c7"), color: isAdminDeadlinePassed ? "#991b1b" : (viewBatch.resultType === "Midterm" ? "#0369a1" : "#b45309"), fontWeight: 700, padding: "4px 12px", borderRadius: "20px", fontSize: "12.5px" }}>
-                      {isAdminDeadlinePassed ? "🔒 Editing Locked (Deadline Passed)" : `${viewBatch.resultType || "Result"} Marksheet (Editable)`}
+                    <span style={{ background: isViewBatchDeadlinePassed ? "#fee2e2" : (viewBatch.resultType === "Midterm" ? "#e0f2fe" : "#fef3c7"), color: isViewBatchDeadlinePassed ? "#991b1b" : (viewBatch.resultType === "Midterm" ? "#0369a1" : "#b45309"), fontWeight: 700, padding: "4px 12px", borderRadius: "20px", fontSize: "12.5px", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                      {isViewBatchDeadlinePassed ? <><FiLock size={12} /> Editing Locked (Deadline Passed)</> : `${viewBatch.resultType || "Result"} Marksheet (Editable)`}
                     </span>
                   </div>
                   <div style={{ fontSize: "13px", color: "#64748b" }}>
@@ -1392,20 +1420,20 @@ export default function TeacherResultManagementPage() {
                             <input
                               type="number"
                               value={rowData.midPartA ?? ""}
-                              onChange={(e) => (!isAdminDeadlinePassed && viewBatch?.resultType !== "Final") && handleCellMarkChange(r._id, "midPartA", e.target.value)}
-                              readOnly={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
-                              disabled={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "#f1f5f9" : "#fff", cursor: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "not-allowed" : "auto", color: viewBatch?.resultType === "Final" ? "#64748b" : "inherit" }}
+                              onChange={(e) => (!isViewBatchDeadlinePassed && viewBatch?.resultType !== "Final") && handleCellMarkChange(r._id, "midPartA", e.target.value)}
+                              readOnly={isViewBatchDeadlinePassed || viewBatch?.resultType === "Final"}
+                              disabled={isViewBatchDeadlinePassed || viewBatch?.resultType === "Final"}
+                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: (isViewBatchDeadlinePassed || viewBatch?.resultType === "Final") ? "#f1f5f9" : "#fff", cursor: (isViewBatchDeadlinePassed || viewBatch?.resultType === "Final") ? "not-allowed" : "auto", color: viewBatch?.resultType === "Final" ? "#64748b" : "inherit" }}
                             />
                           </td>
                           <td style={{ padding: "8px 12px" }}>
                             <input
                               type="number"
                               value={rowData.midPartB ?? ""}
-                              onChange={(e) => (!isAdminDeadlinePassed && viewBatch?.resultType !== "Final") && handleCellMarkChange(r._id, "midPartB", e.target.value)}
-                              readOnly={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
-                              disabled={isAdminDeadlinePassed || viewBatch?.resultType === "Final"}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "#f1f5f9" : "#fff", cursor: (isAdminDeadlinePassed || viewBatch?.resultType === "Final") ? "not-allowed" : "auto", color: viewBatch?.resultType === "Final" ? "#64748b" : "inherit" }}
+                              onChange={(e) => (!isViewBatchDeadlinePassed && viewBatch?.resultType !== "Final") && handleCellMarkChange(r._id, "midPartB", e.target.value)}
+                              readOnly={isViewBatchDeadlinePassed || viewBatch?.resultType === "Final"}
+                              disabled={isViewBatchDeadlinePassed || viewBatch?.resultType === "Final"}
+                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: (isViewBatchDeadlinePassed || viewBatch?.resultType === "Final") ? "#f1f5f9" : "#fff", cursor: (isViewBatchDeadlinePassed || viewBatch?.resultType === "Final") ? "not-allowed" : "auto", color: viewBatch?.resultType === "Final" ? "#64748b" : "inherit" }}
                             />
                           </td>
                           {viewBatch.resultType === "Final" && (
@@ -1413,10 +1441,10 @@ export default function TeacherResultManagementPage() {
                               <input
                                 type="number"
                                 value={rowData.finalPartA ?? ""}
-                                onChange={(e) => !isAdminDeadlinePassed && handleCellMarkChange(r._id, "finalPartA", e.target.value)}
-                                readOnly={isAdminDeadlinePassed}
-                                disabled={isAdminDeadlinePassed}
-                                style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isAdminDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isAdminDeadlinePassed ? "not-allowed" : "auto" }}
+                                onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "finalPartA", e.target.value)}
+                                readOnly={isViewBatchDeadlinePassed}
+                                disabled={isViewBatchDeadlinePassed}
+                                style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto" }}
                               />
                             </td>
                           )}
@@ -1425,10 +1453,10 @@ export default function TeacherResultManagementPage() {
                               <input
                                 type="number"
                                 value={rowData.finalPartB ?? ""}
-                                onChange={(e) => !isAdminDeadlinePassed && handleCellMarkChange(r._id, "finalPartB", e.target.value)}
-                                readOnly={isAdminDeadlinePassed}
-                                disabled={isAdminDeadlinePassed}
-                                style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isAdminDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isAdminDeadlinePassed ? "not-allowed" : "auto" }}
+                                onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "finalPartB", e.target.value)}
+                                readOnly={isViewBatchDeadlinePassed}
+                                disabled={isViewBatchDeadlinePassed}
+                                style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto" }}
                               />
                             </td>
                           )}
@@ -1436,20 +1464,20 @@ export default function TeacherResultManagementPage() {
                             <input
                               type="number"
                               value={rowData.attendance ?? ""}
-                              onChange={(e) => !isAdminDeadlinePassed && handleCellMarkChange(r._id, "attendance", e.target.value)}
-                              readOnly={isAdminDeadlinePassed}
-                              disabled={isAdminDeadlinePassed}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isAdminDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isAdminDeadlinePassed ? "not-allowed" : "auto" }}
+                              onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "attendance", e.target.value)}
+                              readOnly={isViewBatchDeadlinePassed}
+                              disabled={isViewBatchDeadlinePassed}
+                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto" }}
                             />
                           </td>
                           <td style={{ padding: "8px 12px" }}>
                             <input
                               type="number"
                               value={rowData.continuousAssessment ?? ""}
-                              onChange={(e) => !isAdminDeadlinePassed && handleCellMarkChange(r._id, "continuousAssessment", e.target.value)}
-                              readOnly={isAdminDeadlinePassed}
-                              disabled={isAdminDeadlinePassed}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isAdminDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isAdminDeadlinePassed ? "not-allowed" : "auto" }}
+                              onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "continuousAssessment", e.target.value)}
+                              readOnly={isViewBatchDeadlinePassed}
+                              disabled={isViewBatchDeadlinePassed}
+                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto" }}
                             />
                           </td>
                           <td style={{ padding: "10px 12px", fontWeight: 800, color: "#0f172a", fontSize: "14px" }}>
@@ -1467,9 +1495,9 @@ export default function TeacherResultManagementPage() {
 
               {/* Modal Footer */}
               <div style={{ marginTop: "20px", paddingTop: "14px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "12.5px", color: isAdminDeadlinePassed ? "#dc2626" : "#64748b", fontWeight: isAdminDeadlinePassed ? 600 : 400 }}>
-                  {isAdminDeadlinePassed
-                    ? "🔒 Deadline passed. Marksheet is locked for editing."
+                <span style={{ fontSize: "12.5px", color: isViewBatchDeadlinePassed ? "#dc2626" : "#64748b", fontWeight: isViewBatchDeadlinePassed ? 600 : 400 }}>
+                  {isViewBatchDeadlinePassed
+                    ? <><FiLock size={13} style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px" }} /> Deadline passed. Marksheet is locked for editing.</>
                     : <>💡 Tip: You can edit scores directly in the cells above and click <strong>Save Marksheet Changes</strong> to publish updates.</>}
                 </span>
                 <div style={{ display: "flex", gap: "10px" }}>
@@ -1480,18 +1508,19 @@ export default function TeacherResultManagementPage() {
                     Cancel
                   </button>
                   <button
-                    onClick={isAdminDeadlinePassed ? undefined : handleSaveMarksheetChanges}
-                    disabled={savingBatchMarks || isAdminDeadlinePassed}
-                    style={{ padding: "10px 24px", background: isAdminDeadlinePassed ? "#cbd5e1" : "#16a34a", color: isAdminDeadlinePassed ? "#94a3b8" : "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13.5px", cursor: (savingBatchMarks || isAdminDeadlinePassed) ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: "6px" }}
-                    title={isAdminDeadlinePassed ? "Submission deadline has passed. Editing is locked." : ""}
+                    onClick={isViewBatchDeadlinePassed ? undefined : handleSaveMarksheetChanges}
+                    disabled={savingBatchMarks || isViewBatchDeadlinePassed}
+                    style={{ padding: "10px 24px", background: isViewBatchDeadlinePassed ? "#cbd5e1" : "#16a34a", color: isViewBatchDeadlinePassed ? "#94a3b8" : "#ffffff", border: "none", borderRadius: "8px", fontWeight: 700, fontSize: "13.5px", cursor: (savingBatchMarks || isViewBatchDeadlinePassed) ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                    title={isViewBatchDeadlinePassed ? "Submission deadline has passed. Editing is locked." : ""}
                   >
-                    <FiCheckCircle size={16} /> {isAdminDeadlinePassed ? "Editing Locked" : savingBatchMarks ? "Saving..." : "Save Marksheet Changes"}
+                    <FiCheckCircle size={16} /> {isViewBatchDeadlinePassed ? "Editing Locked" : savingBatchMarks ? "Saving..." : "Save Marksheet Changes"}
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Upload Modal */}
         {showUploadModal && (

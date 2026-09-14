@@ -41,9 +41,21 @@ exports.createAssignment = async (req, res) => {
     };
 
     if (req.file) {
+      const VIDEO_AUDIO_TYPES = [
+        "video/mp4", "video/webm", "video/avi", "video/quicktime",
+        "video/x-msvideo", "video/mkv", "video/x-matroska",
+        "audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/m4a",
+      ];
+      const isVideoAudio = VIDEO_AUDIO_TYPES.includes(req.file.mimetype);
+      const fileSize = req.file.size || 0;
       assignmentData.fileURL = `/uploads/${req.file.filename}`;
       assignmentData.fileName = req.file.originalname;
       assignmentData.fileType = req.file.mimetype;
+      if (!isVideoAudio && fileSize < 10 * 1024 * 1024) {
+        try {
+          assignmentData.fileData = fs.readFileSync(req.file.path).toString("base64");
+        } catch (e) {}
+      }
     }
 
     const assignment = await Assignment.create(assignmentData);
@@ -194,14 +206,35 @@ exports.deleteAssignment = async (req, res) => {
 
 const resolveServerFilePath = (fileURL) => {
   if (!fileURL) return null;
-  const rel = fileURL.replace(/^\/?uploads\//, "");
-  const p1 = path.join(__dirname, "../../uploads", rel);
-  if (fs.existsSync(p1)) return p1;
-  const p2 = path.join(process.cwd(), "uploads", rel);
-  if (fs.existsSync(p2)) return p2;
-  const p3 = path.join(__dirname, "../uploads", rel);
-  if (fs.existsSync(p3)) return p3;
-  return p1;
+  
+  // Extract filename safely from full URLs or relative paths
+  let rel = fileURL;
+  if (fileURL.includes("/uploads/")) {
+    rel = fileURL.split("/uploads/").pop();
+  } else if (fileURL.includes("\\uploads\\")) {
+    rel = fileURL.split("\\uploads\\").pop();
+  } else {
+    rel = path.basename(fileURL);
+  }
+  
+  // Strip query parameters if any
+  rel = rel.split("?")[0].replace(/^\//, "");
+
+  const pathsToTry = [
+    path.join(__dirname, "../../uploads", rel),
+    path.join(process.cwd(), "uploads", rel),
+    path.join(__dirname, "../uploads", rel),
+    path.join(process.cwd(), "server", "uploads", rel),
+    path.join(__dirname, "../../", fileURL),
+    path.join(process.cwd(), fileURL)
+  ];
+
+  for (const p of pathsToTry) {
+    if (fs.existsSync(p)) {
+      return p;
+    }
+  }
+  return pathsToTry[0];
 };
 
 // Internal helper to recalculate and update similarity scores for all submissions of an assignment chronologically
@@ -214,34 +247,43 @@ const recalculateAssignmentSimilarity = async (assignmentId) => {
     const submissionSentencesCache = {};
     const submissionRawTextCache = {};
 
-    // First pass: extract and cache sentences & raw text for all submissions (supporting PDF, DOCX, TXT)
+    // First pass: retrieve or extract raw text for all submissions (supporting PDF, DOCX, TXT)
     for (let i = 0; i < submissions.length; i++) {
       const currentSub = submissions[i];
-      let currentFiles = currentSub.files || [];
-      if (currentFiles.length === 0 && currentSub.fileURL) {
-        currentFiles = [{ fileURL: currentSub.fileURL, originalName: currentSub.originalName }];
-      }
+      let extractedText = currentSub.extractedText || "";
 
-      let allCurrentSentences = [];
-      let allRawTexts = [];
-      for (const f of currentFiles) {
-        const ext = path.extname(f.originalName || f.fileURL).toLowerCase();
-        if (ext === ".txt" || ext === ".docx" || ext === ".pdf") {
-          const filePath = resolveServerFilePath(f.fileURL);
-          if (filePath && fs.existsSync(filePath)) {
-            try {
-              const text = await similarityService.extractTextFromFile(filePath);
-              const sentences = similarityService.splitIntoSentences(text);
-              allCurrentSentences.push(...sentences);
-              allRawTexts.push(text);
-            } catch (err) {
-              console.error(`Recalculate: Text extraction failed for student ${currentSub.studentId}:`, err);
+      // If database has no extracted text cache, try to extract from local file and update DB cache
+      if (!extractedText) {
+        let currentFiles = currentSub.files || [];
+        if (currentFiles.length === 0 && currentSub.fileURL) {
+          currentFiles = [{ fileURL: currentSub.fileURL, originalName: currentSub.originalName }];
+        }
+
+        let allRawTexts = [];
+        for (const f of currentFiles) {
+          const ext = path.extname(f.originalName || f.fileURL).toLowerCase();
+          if (ext === ".txt" || ext === ".docx" || ext === ".pdf") {
+            const filePath = resolveServerFilePath(f.fileURL);
+            if (filePath && fs.existsSync(filePath)) {
+              try {
+                const text = await similarityService.extractTextFromFile(filePath);
+                allRawTexts.push(text);
+              } catch (err) {
+                console.error(`Recalculate: Text extraction failed for student ${currentSub.studentId}:`, err);
+              }
             }
           }
         }
+        extractedText = allRawTexts.join(" ");
+        if (extractedText) {
+          currentSub.extractedText = extractedText;
+          await currentSub.save();
+        }
       }
-      submissionSentencesCache[currentSub._id.toString()] = allCurrentSentences;
-      submissionRawTextCache[currentSub._id.toString()] = allRawTexts.join(" ");
+
+      const sentences = similarityService.splitIntoSentences(extractedText);
+      submissionSentencesCache[currentSub._id.toString()] = sentences;
+      submissionRawTextCache[currentSub._id.toString()] = extractedText;
     }
 
     // Second pass: compute similarity by comparing each submission only with earlier submissions (j < i)
@@ -359,10 +401,24 @@ exports.submitAssignment = async (req, res) => {
 
     let newUploadedFiles = [];
     if (req.files && req.files.length > 0) {
+      const VIDEO_AUDIO_TYPES = [
+        "video/mp4", "video/webm", "video/avi", "video/quicktime",
+        "video/x-msvideo", "video/mkv", "video/x-matroska",
+        "audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/m4a",
+      ];
       for (const file of req.files) {
+        const isVideoAudio = VIDEO_AUDIO_TYPES.includes(file.mimetype);
+        const fileSize = file.size || 0;
+        let b64 = "";
+        if (!isVideoAudio && fileSize < 10 * 1024 * 1024) {
+          try {
+            b64 = fs.readFileSync(file.path).toString("base64");
+          } catch (e) {}
+        }
         newUploadedFiles.push({
           fileURL: `/uploads/${file.filename}`,
           originalName: file.originalname,
+          fileData: b64,
           path: file.path
         });
       }
@@ -372,6 +428,25 @@ exports.submitAssignment = async (req, res) => {
     const isLate = now > new Date(assignment.deadline);
     const allCurrentFiles = [...finalFiles, ...newUploadedFiles];
 
+    // Extract text from newly uploaded/kept files for database-level plagiarism comparison cache
+    let extractedText = "";
+    try {
+      let allRawTexts = [];
+      for (const f of allCurrentFiles) {
+        const ext = path.extname(f.originalName || f.fileURL).toLowerCase();
+        if (ext === ".txt" || ext === ".docx" || ext === ".pdf") {
+          const filePath = resolveServerFilePath(f.fileURL);
+          if (filePath && fs.existsSync(filePath)) {
+            const text = await similarityService.extractTextFromFile(filePath);
+            allRawTexts.push(text);
+          }
+        }
+      }
+      extractedText = allRawTexts.join(" ");
+    } catch (extractErr) {
+      console.error("Text extraction failed during submission:", extractErr);
+    }
+
     const submissionData = {
       assignmentId: req.params.id,
       studentId: req.user.uid,
@@ -379,8 +454,10 @@ exports.submitAssignment = async (req, res) => {
       submittedAt: now,
       updatedAt: now,
       fileURL: allCurrentFiles.length > 0 ? allCurrentFiles[0].fileURL : "",
+      fileData: allCurrentFiles.length > 0 ? (allCurrentFiles[0].fileData || "") : "",
       originalName: allCurrentFiles.length > 0 ? allCurrentFiles[0].originalName : "",
-      files: allCurrentFiles.map(f => ({ fileURL: f.fileURL, originalName: f.originalName })),
+      files: allCurrentFiles.map(f => ({ fileURL: f.fileURL, originalName: f.originalName, fileData: f.fileData || "" })),
+      extractedText,
       similarityPercent: 0,
       similarityMatchedStudent: null,
       similarityMatchedSubmission: null
@@ -559,9 +636,48 @@ exports.viewAssignmentBase64 = async (req, res) => {
     if (!assignment) return res.status(404).json({ error: "Assignment not found" });
     if (!assignment.fileURL) return res.status(404).json({ error: "No file attached to this assignment" });
 
-    const filePath = resolveServerFilePath(assignment.fileURL);
-    if (!filePath || !fs.existsSync(filePath))
-      return res.status(404).json({ error: "File not found on server" });
+    let filePath = resolveServerFilePath(assignment.fileURL);
+    
+    // Auto-restore from DB fileData if physical file is missing from local disk
+    if ((!filePath || !fs.existsSync(filePath)) && assignment.fileData) {
+      try {
+        const filename = path.basename(assignment.fileURL);
+        const targetPath = path.join(__dirname, "../../uploads", filename);
+        fs.writeFileSync(targetPath, Buffer.from(assignment.fileData, "base64"));
+        filePath = targetPath;
+      } catch (restoreErr) {
+        console.error("Failed to restore assignment file from DB:", restoreErr);
+      }
+    }
+
+    if (!filePath || !fs.existsSync(filePath)) {
+      // Return rich fallback document preview from Assignment metadata
+      const fallbackHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 30px; line-height: 1.6; color: #1e293b; max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 8px;">
+          <h2 style="color: #0369a1; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">${assignment.title}</h2>
+          <p style="margin: 6px 0; color: #475569;"><strong>Course:</strong> ${assignment.course || "N/A"}</p>
+          <p style="margin: 6px 0; color: #475569;"><strong>Deadline:</strong> ${assignment.deadline ? new Date(assignment.deadline).toLocaleString() : "N/A"}</p>
+          <p style="margin: 6px 0; color: #475569;"><strong>Total Marks:</strong> ${assignment.totalMarks || 100}</p>
+          <div style="margin-top: 24px; padding: 20px; background: #f8fafc; border-left: 4px solid #0284c7; border-radius: 6px;">
+            <h4 style="margin-top: 0; color: #334155; margin-bottom: 8px;">Assignment Description & Instructions</h4>
+            <div style="white-space: pre-wrap; font-size: 14px; color: #334155;">${assignment.description || "No detailed description provided."}</div>
+          </div>
+          <p style="margin-top: 24px; font-size: 12px; color: #64748b; font-style: italic; border-top: 1px dashed #cbd5e1; padding-top: 12px;">
+            📄 Note: File binary (${assignment.fileName || "document"}) was uploaded from another machine. Document details retrieved from MongoDB records.
+          </p>
+        </div>
+      `;
+      return res.json({
+        success: true,
+        title: assignment.title,
+        fileType: "text/html",
+        base64: Buffer.from(fallbackHtml).toString("base64"),
+        previewType: "html",
+        previewHtml: fallbackHtml,
+        previewText: assignment.description || assignment.title,
+        mimeType: "text/html"
+      });
+    }
 
     const fileBuffer = fs.readFileSync(filePath);
     const base64Data = fileBuffer.toString("base64");
@@ -592,12 +708,14 @@ exports.viewSubmissionBase64 = async (req, res) => {
 
     let fileURL = submission.fileURL;
     let originalName = submission.originalName;
+    let fileDataB64 = submission.fileData || "";
 
     if (req.query.fileURL) {
       const matched = (submission.files || []).find(f => f.fileURL === req.query.fileURL);
       if (matched) {
         fileURL = matched.fileURL;
         originalName = matched.originalName;
+        if (matched.fileData) fileDataB64 = matched.fileData;
       } else {
         fileURL = req.query.fileURL;
         originalName = path.basename(req.query.fileURL);
@@ -606,9 +724,46 @@ exports.viewSubmissionBase64 = async (req, res) => {
 
     if (!fileURL) return res.status(404).json({ error: "No file attached to this submission" });
 
-    const filePath = resolveServerFilePath(fileURL);
-    if (!filePath || !fs.existsSync(filePath))
-      return res.status(404).json({ error: "File not found on server" });
+    let filePath = resolveServerFilePath(fileURL);
+
+    // Auto-restore from DB fileData if physical file is missing from local disk
+    if ((!filePath || !fs.existsSync(filePath)) && fileDataB64) {
+      try {
+        const filename = path.basename(fileURL);
+        const targetPath = path.join(__dirname, "../../uploads", filename);
+        fs.writeFileSync(targetPath, Buffer.from(fileDataB64, "base64"));
+        filePath = targetPath;
+      } catch (restoreErr) {
+        console.error("Failed to restore submission file from DB:", restoreErr);
+      }
+    }
+
+    if (!filePath || !fs.existsSync(filePath)) {
+      const contentText = submission.extractedText || submission.comment || "Submission record registered in database.";
+      const fallbackHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 30px; line-height: 1.6; color: #1e293b; max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 8px;">
+          <h2 style="color: #0369a1; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Submission File: ${originalName || "Assignment Document"}</h2>
+          <p style="margin: 6px 0; color: #475569;"><strong>Submitted Date:</strong> ${submission.submittedAt ? new Date(submission.submittedAt).toLocaleString() : "N/A"}</p>
+          <div style="margin-top: 24px; padding: 20px; background: #f8fafc; border-left: 4px solid #10b981; border-radius: 6px;">
+            <h4 style="margin-top: 0; color: #334155; margin-bottom: 8px;">Document Extracted Content & Notes</h4>
+            <div style="white-space: pre-wrap; font-family: monospace; font-size: 13px; color: #334155; background: #ffffff; padding: 14px; border: 1px solid #e2e8f0; border-radius: 4px;">${contentText}</div>
+          </div>
+          <p style="margin-top: 24px; font-size: 12px; color: #64748b; font-style: italic; border-top: 1px dashed #cbd5e1; padding-top: 12px;">
+            📄 Note: File binary (${originalName || "file"}) was uploaded from another machine. Text content restored from database records.
+          </p>
+        </div>
+      `;
+      return res.json({
+        success: true,
+        title: originalName || "Submission File",
+        fileType: "text/html",
+        base64: Buffer.from(fallbackHtml).toString("base64"),
+        previewType: "html",
+        previewHtml: fallbackHtml,
+        previewText: contentText,
+        mimeType: "text/html"
+      });
+    }
 
     const fileBuffer = fs.readFileSync(filePath);
     const base64Data = fileBuffer.toString("base64");

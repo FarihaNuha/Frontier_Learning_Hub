@@ -91,7 +91,7 @@ export default function StudentLevelTermPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
           <div>
             <h1 style={{ margin: 0, color: "#1e293b", fontSize: "26px" }}>Level {level} - Term {term}</h1>
-            <p style={{ margin: "4px 0 0 0", color: "#64748b" }}>Academic Course Roster & Learning Resources</p>
+            <p style={{ margin: "4px 0 0 0", color: "#64748b" }}>Official Academic Curriculum & Course Outline</p>
           </div>
 
           <span
@@ -262,14 +262,14 @@ export default function StudentLevelTermPage() {
           </div>
         )}
 
-        {/* Course Roster Table with Direct LMS Classroom Links */}
+        {/* Prescribed Curriculum Courses Table */}
         <div>
-          <h3 style={{ color: "#1e293b", marginBottom: "12px" }}>Academic Course Roster & Study Materials</h3>
+          <h3 style={{ color: "#1e293b", marginBottom: "12px" }}>Curriculum Course Outline</h3>
           {coursesToDisplay.length === 0 ? (
             <div style={{ padding: "30px", textAlign: "center", color: "#64748b", background: isPending ? "#fff7ed" : "#f8fafc", borderRadius: "10px", border: isPending ? "1px solid #fed7aa" : "1px solid #e2e8f0" }}>
               {isPending ? (
                 <div style={{ color: "#c2410c", fontWeight: "600" }}>
-                  ⚠️ Your course registration for Level {level} Term {term} is currently pending Adviser approval. Course roster and LMS study materials will unlock as soon as your Adviser approves your registration.
+                  ⚠️ Your course registration for Level {level} Term {term} is currently pending Adviser approval. Registered course details will unlock as soon as your Adviser approves your registration.
                 </div>
               ) : (
                 `No courses found for ${data?.student?.department ? `Department of ${data.student.department}` : "your department"} Level ${level} Term ${term}.`
@@ -284,7 +284,6 @@ export default function StudentLevelTermPage() {
                     <th style={{ padding: "10px" }}>Title</th>
                     <th style={{ padding: "10px" }}>Type</th>
                     <th style={{ padding: "10px" }}>Credits</th>
-                    <th style={{ padding: "10px" }}>Classroom Access</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -298,26 +297,6 @@ export default function StudentLevelTermPage() {
                         </span>
                       </td>
                       <td style={{ padding: "12px 10px" }}>{c.creditHours}</td>
-                      <td style={{ padding: "12px 10px" }}>
-                        <button
-                          onClick={() => navigate("/courses")}
-                          style={{
-                            padding: "6px 12px",
-                            background: "#3b8db3",
-                            color: "#ffffff",
-                            border: "none",
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                          }}
-                        >
-                          <FiBookOpen size={13} /> Access Classroom
-                        </button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>

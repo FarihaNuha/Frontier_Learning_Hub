@@ -62,6 +62,80 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// Auto-restore missing files from DB helper
+const restoreMissingFileFromDB = async (filename, targetFilePath) => {
+  try {
+    const Assignment = require("./models/Assignment");
+    const Submission = require("./models/Submission");
+    const Lecture = require("./models/Lecture");
+    const CommunityPost = require("./models/CommunityPost");
+
+    // 1. Check Assignment
+    const assignmentDoc = await Assignment.findOne({
+      $or: [
+        { fileURL: { $regex: filename, $options: "i" } },
+        { fileName: { $regex: filename, $options: "i" } }
+      ]
+    }).lean();
+
+    if (assignmentDoc && assignmentDoc.fileData) {
+      fs.writeFileSync(targetFilePath, Buffer.from(assignmentDoc.fileData, "base64"));
+      return true;
+    }
+
+    // 2. Check Submission
+    const subDoc = await Submission.findOne({
+      $or: [
+        { fileURL: { $regex: filename, $options: "i" } },
+        { originalName: { $regex: filename, $options: "i" } },
+        { "files.fileURL": { $regex: filename, $options: "i" } },
+        { "files.originalName": { $regex: filename, $options: "i" } }
+      ]
+    }).lean();
+
+    if (subDoc) {
+      let b64 = subDoc.fileData || "";
+      if (!b64 && subDoc.files && subDoc.files.length > 0) {
+        const fMatch = subDoc.files.find(f => f.fileURL && f.fileURL.includes(filename));
+        if (fMatch && fMatch.fileData) b64 = fMatch.fileData;
+      }
+      if (b64) {
+        fs.writeFileSync(targetFilePath, Buffer.from(b64, "base64"));
+        return true;
+      }
+    }
+
+    // 3. Check Lecture
+    const lecDoc = await Lecture.findOne({
+      $or: [
+        { fileURL: { $regex: filename, $options: "i" } },
+        { originalName: { $regex: filename, $options: "i" } }
+      ]
+    }).lean();
+
+    if (lecDoc && lecDoc.fileData) {
+      fs.writeFileSync(targetFilePath, Buffer.from(lecDoc.fileData, "base64"));
+      return true;
+    }
+
+    // 4. Check CommunityPost
+    const commDoc = await CommunityPost.findOne({
+      $or: [
+        { fileUrl: { $regex: filename, $options: "i" } },
+        { "attachments.fileUrl": { $regex: filename, $options: "i" } }
+      ]
+    }).lean();
+
+    if (commDoc && commDoc.fileData) {
+      fs.writeFileSync(targetFilePath, Buffer.from(commDoc.fileData, "base64"));
+      return true;
+    }
+  } catch (err) {
+    console.error("Auto restore file error:", err);
+  }
+  return false;
+};
+
 // Static files - uploads folder (with inline Content-Disposition for browser preview)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
   setHeaders: (res, filePath) => {
@@ -75,6 +149,34 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
     }
   }
 }));
+
+// Fallback for missing uploads: auto-restore from DB if file physical binary is absent on current device
+app.use("/uploads", async (req, res, next) => {
+  try {
+    const filename = req.path.replace(/^\//, "");
+    if (!filename) return next();
+
+    const uploadsDir = path.join(__dirname, "../uploads");
+    const filePath = path.join(uploadsDir, filename);
+
+    if (fs.existsSync(filePath)) {
+      return next();
+    }
+
+    const restored = await restoreMissingFileFromDB(filename, filePath);
+    if (restored && fs.existsSync(filePath)) {
+      const ext = path.extname(filePath).toLowerCase();
+      const inlineTypes = [".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4", ".webm", ".ogg", ".mp3", ".wav"];
+      if (inlineTypes.includes(ext)) {
+        res.setHeader("Content-Disposition", "inline");
+      }
+      return res.sendFile(filePath);
+    }
+  } catch (err) {
+    console.error("Upload fallback restore error:", err);
+  }
+  next();
+});
 
 // ==================== API ROUTES ====================
 app.use("/api/auth", require("./routes/authRoutes"));
@@ -106,7 +208,7 @@ app.get("/api/test", (req, res) => {
 // Root route
 app.get("/", (req, res) => {
   res.json({
-    message: "UFTB_Moodle API is running...",
+    message: "UniCore API is running...",
     version: "1.0.0",
   });
 });

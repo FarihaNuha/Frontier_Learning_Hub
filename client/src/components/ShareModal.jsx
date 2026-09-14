@@ -34,8 +34,8 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
   const fileDownloadUrl = fileUrl ? getAbsoluteFileUrl(fileUrl) : "";
 
   const defaultText = isLecture
-    ? `Check out this lecture on UFTB Moodle: "${postTitle}"`
-    : `Check out this post on UFTB Moodle: "${postTitle}"`;
+    ? `Check out this lecture on UniCore: "${postTitle}"`
+    : `Check out this post on UniCore: "${postTitle}"`;
 
   const fullShareText = fileDownloadUrl 
     ? `${defaultText}\n\n📄 Document Link: ${fileDownloadUrl}\nPage Link: ${cleanShareUrl}`

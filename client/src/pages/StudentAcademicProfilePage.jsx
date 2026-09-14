@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import {
@@ -39,6 +39,39 @@ export default function StudentAcademicProfilePage() {
   const completedCourses = data?.completedCourses || [];
   const incompleteCourses = data?.incompleteCourses || [];
   const retakes = data?.retakes || [];
+
+  // Group incomplete courses by Semester (Level & Term)
+  const groupedIncompleteCourses = useMemo(() => {
+    const groups = {};
+    incompleteCourses.forEach((course) => {
+      let lvl = course.level ? course.level.replace("-", " ").trim() : "Level 1";
+      let trm = course.term ? course.term.replace("-", " ").trim() : "Term 1";
+      const semKey = `${lvl} • ${trm}`;
+      if (!groups[semKey]) {
+        groups[semKey] = {
+          level: lvl,
+          term: trm,
+          courses: [],
+          totalCredits: 0,
+        };
+      }
+      groups[semKey].courses.push(course);
+      groups[semKey].totalCredits += Number(course.creditHours) || 0;
+    });
+
+    return Object.entries(groups).sort(([keyA, a], [keyB, b]) => {
+      const getNum = (str) => {
+        const m = str.match(/\d+/);
+        return m ? parseInt(m[0], 10) : 0;
+      };
+      const lvlA = getNum(a.level);
+      const lvlB = getNum(b.level);
+      if (lvlA !== lvlB) return lvlA - lvlB;
+      const trmA = getNum(a.term);
+      const trmB = getNum(b.term);
+      return trmA - trmB;
+    });
+  }, [incompleteCourses]);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
@@ -222,7 +255,11 @@ export default function StudentAcademicProfilePage() {
                               {c.letterGrade}
                             </span>
                           </td>
-                          <td style={{ padding: "12px 16px", fontWeight: 800, color: "#0f172a" }}>{c.gradePoint}</td>
+                          <td style={{ padding: "12px 16px", fontWeight: 800, color: "#0f172a" }}>
+                            {c.gradePoint !== undefined && c.gradePoint !== null && !isNaN(Number(c.gradePoint))
+                              ? Number(c.gradePoint).toFixed(2)
+                              : c.gradePoint}
+                          </td>
                           <td style={{ padding: "12px 16px", color: "#64748b" }}>{c.completedSession}</td>
                         </tr>
                       ))}
@@ -232,14 +269,14 @@ export default function StudentAcademicProfilePage() {
               )}
             </div>
 
-            {/* Department Curriculum Roster (Remaining Courses for Student's Department) */}
+            {/* Department Curriculum Roster (Remaining Courses for Student's Department - Semester-wise) */}
             <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
-              <div style={{ marginBottom: "20px" }}>
+              <div style={{ marginBottom: "24px" }}>
                 <h3 style={{ margin: "0 0 4px 0", color: "#0f172a", fontSize: "18px", fontWeight: 800, display: "flex", alignItems: "center", gap: "8px" }}>
                   <FiBookOpen style={{ color: "#0284c7" }} /> Remaining Department Curriculum Courses ({incompleteCourses.length})
                 </h3>
                 <p style={{ margin: 0, color: "#64748b", fontSize: "13.5px" }}>
-                  Official curriculum syllabus for Department of <strong>{profile.department}</strong>.
+                  Official curriculum syllabus for Department of <strong>{profile.department}</strong> organized semester-wise.
                 </p>
               </div>
 
@@ -248,18 +285,155 @@ export default function StudentAcademicProfilePage() {
                   🎉 Congratulations! You have completed all required curriculum courses for your degree.
                 </div>
               ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "14px" }}>
-                  {incompleteCourses.map((ci) => (
-                    <div key={ci._id} style={{ background: "#f8fafc", padding: "14px 18px", borderRadius: "12px", border: "1px solid #cbd5e1" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                        <span style={{ fontWeight: 800, color: "#0284c7", fontSize: "13.5px" }}>{ci.courseCode}</span>
-                        <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 8px", borderRadius: "6px", background: "#e0f2fe", color: "#0369a1" }}>
-                          {ci.creditHours} Credits
+                <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+                  {groupedIncompleteCourses.map(([semKey, group]) => (
+                    <div
+                      key={semKey}
+                      style={{
+                        background: "#f8fafc",
+                        borderRadius: "14px",
+                        border: "1px solid #e2e8f0",
+                        padding: "18px 20px",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                      }}
+                    >
+                      {/* Semester Header */}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "14px",
+                          paddingBottom: "10px",
+                          borderBottom: "1.5px solid #e2e8f0",
+                          flexWrap: "wrap",
+                          gap: "8px",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                          <span
+                            style={{
+                              background: "linear-gradient(135deg, #0284c7, #0369a1)",
+                              color: "#ffffff",
+                              fontSize: "13px",
+                              fontWeight: 800,
+                              padding: "4px 12px",
+                              borderRadius: "8px",
+                              letterSpacing: "0.3px",
+                            }}
+                          >
+                            {group.level} — {group.term}
+                          </span>
+                          <span style={{ fontSize: "13.5px", fontWeight: 700, color: "#334155" }}>
+                            {group.courses.length} {group.courses.length === 1 ? "Course" : "Courses"}
+                          </span>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            padding: "3px 10px",
+                            borderRadius: "6px",
+                            background: "#e0f2fe",
+                            color: "#0369a1",
+                          }}
+                        >
+                          Total: {group.totalCredits} Credits
                         </span>
                       </div>
-                      <div style={{ fontSize: "14px", color: "#0f172a", fontWeight: 700 }}>{ci.courseTitle}</div>
-                      <div style={{ fontSize: "12px", color: "#64748b", marginTop: "6px", display: "flex", gap: "10px" }}>
-                        <span>{ci.level || "Level 1"}</span> • <span>{ci.term || "Term 1"}</span> • <span>{ci.courseType || "Theory"}</span>
+
+                      {/* Course Cards Grid */}
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+                          gap: "12px",
+                        }}
+                      >
+                        {group.courses.map((ci) => (
+                          <div
+                            key={ci._id || ci.courseCode}
+                            style={{
+                              background: "#ffffff",
+                              padding: "14px 16px",
+                              borderRadius: "10px",
+                              border: "1px solid #cbd5e1",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "space-between",
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
+                            }}
+                          >
+                            <div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  marginBottom: "6px",
+                                }}
+                              >
+                                <span style={{ fontWeight: 800, color: "#0284c7", fontSize: "13.5px" }}>
+                                  {ci.courseCode}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    padding: "2px 7px",
+                                    borderRadius: "5px",
+                                    background: "#f1f5f9",
+                                    color: "#475569",
+                                    border: "1px solid #e2e8f0",
+                                  }}
+                                >
+                                  {ci.creditHours} Cr
+                                </span>
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: "13.5px",
+                                  color: "#0f172a",
+                                  fontWeight: 600,
+                                  lineHeight: "1.35",
+                                }}
+                              >
+                                {ci.courseTitle}
+                              </div>
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "11.5px",
+                                color: "#64748b",
+                                marginTop: "10px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "6px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  background:
+                                    ci.courseType?.toLowerCase().includes("sessional") ||
+                                    ci.courseType?.toLowerCase().includes("lab")
+                                      ? "#fef3c7"
+                                      : "#e0e7ff",
+                                  color:
+                                    ci.courseType?.toLowerCase().includes("sessional") ||
+                                    ci.courseType?.toLowerCase().includes("lab")
+                                      ? "#92400e"
+                                      : "#3730a3",
+                                  fontWeight: 600,
+                                  fontSize: "11px",
+                                }}
+                              >
+                                {ci.courseType || "Theory"}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}

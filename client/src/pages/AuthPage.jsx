@@ -122,7 +122,7 @@ export default function AuthPage() {
         <div className="auth-card forgot-password-card">
           <div className="auth-header">
             <h2>Reset Password</h2>
-            <p>UFTB Moodle - Learning Management System</p>
+            <p>UniCore — A Unified Learning & University Management Platform</p>
           </div>
 
           {error && <div className="error-message">{error}</div>}
@@ -226,7 +226,7 @@ export default function AuthPage() {
           <form onSubmit={handleRegisterSubmit}>
             <div className="auth-header">
               <h2>Create Account</h2>
-              <p>UFTB Moodle - Learning Management System</p>
+              <p>UniCore — A Unified Learning & University Management Platform</p>
             </div>
 
             <div className="role-toggle">
@@ -303,7 +303,7 @@ export default function AuthPage() {
           <form onSubmit={handleLoginSubmit}>
             <div className="auth-header">
               <h2>Welcome Back!</h2>
-              <p>UFTB Moodle - Learning Management System</p>
+              <p>UniCore — A Unified Learning & University Management Platform</p>
             </div>
 
             {error && isLogin && <div className="error-message">{error}</div>}
@@ -373,7 +373,7 @@ export default function AuthPage() {
         <div className="overlay-container">
           <div className="overlay">
             <div className="overlay-panel overlay-left">
-              <h2>UFTB Moodle</h2>
+              <h2>UniCore</h2>
               <p className="overlay-motto">
                 "Empowering academic excellence through seamless digital learning, intelligent evaluation, and real-time collaboration."
               </p>

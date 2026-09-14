@@ -39,6 +39,10 @@ const assignmentSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  fileData: {
+    type: String,
+    default: "",
+  },
   fileName: {
     type: String,
     default: "",

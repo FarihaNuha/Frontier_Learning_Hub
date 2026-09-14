@@ -174,7 +174,7 @@ export default function CourseRegistrationPage() {
                   Registration Period Closed
                 </h4>
                 <p style={{ margin: 0, color: "#9f1239", fontSize: "13.5px", lineHeight: "1.5" }}>
-                  {data.calendar.message || `Registration for Session ${data.student?.session} (${level} ${term}) is currently CLOSED by UMS Admin.`}
+                  {data.calendar.message || `Registration for Session ${data.student?.session} (${level} ${term}) is currently CLOSED by Admin.`}
                 </p>
               </div>
             </div>

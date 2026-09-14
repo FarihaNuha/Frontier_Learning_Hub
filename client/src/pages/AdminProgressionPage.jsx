@@ -24,15 +24,15 @@ export default function AdminProgressionPage() {
   const [selectedSessionFilter, setSelectedSessionFilter] = useState("all");
   const [selectedProgramFilter, setSelectedProgramFilter] = useState("all");
 
-  const fetchStudents = async () => {
-    setLoading(true);
+  const fetchStudents = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const res = await api.get("/ums/admin/students");
       setStudents(res.data.students || res.data || []);
     } catch (err) {
       toast.error("Failed to load students for progression.");
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -44,17 +44,41 @@ export default function AdminProgressionPage() {
   const filteredStudents = students.filter((s) => {
     if (selectedProgramFilter !== "all") {
       const pFilter = selectedProgramFilter.toLowerCase();
-      const sProg = (s.program || s.degree || s.department || "").toLowerCase();
-      // Match keywords (e.g. EDTE / MSc / BSc / Software / etc.)
-      const isMscFilter = pFilter.includes("m.sc");
-      const isMscStudent = sProg.includes("m.sc") || sProg.includes("msc") || sProg.includes("master");
-      if (isMscFilter && !isMscStudent) return false;
-      if (!isMscFilter && isMscStudent) return false;
+      const sProg = (s.program || s.degree || "").toLowerCase();
+      const sDept = (s.department || "").toLowerCase();
 
-      const filterKey = pFilter.replace(/[^a-z0-9]/g, "");
-      const studentKey = sProg.replace(/[^a-z0-9]/g, "");
-      if (!studentKey.includes(filterKey.slice(0, 6)) && !filterKey.includes(studentKey.slice(0, 6))) {
-        return false;
+      // Degree level: B.Sc. vs M.Sc.
+      const isMscFilter = pFilter.includes("m.sc") || pFilter.includes("msc") || pFilter.includes("master");
+      const isMscStudent = sProg.includes("m.sc") || sProg.includes("msc") || sProg.includes("master");
+      if (isMscFilter !== isMscStudent) return false;
+
+      // Department / Discipline keywords
+      const deptKeywords = {
+        edte: ["edte", "educational technology", "education"],
+        ire: ["ire", "internet of things", "robotics", "iot"],
+        cyse: ["cyse", "cyber security", "cybersecurity"],
+        dse: ["dse", "data science"],
+        swe: ["swe", "software engineering", "software"],
+      };
+
+      let matchedDeptKey = null;
+      for (const [key, words] of Object.entries(deptKeywords)) {
+        if (words.some((w) => pFilter.includes(w))) {
+          matchedDeptKey = key;
+          break;
+        }
+      }
+
+      if (matchedDeptKey) {
+        const words = deptKeywords[matchedDeptKey];
+        const matches = words.some((w) => sProg.includes(w) || sDept.includes(w));
+        if (!matches) return false;
+      } else {
+        const filterKey = pFilter.replace(/[^a-z0-9]/g, "");
+        const studentKey = (sProg + sDept).replace(/[^a-z0-9]/g, "");
+        if (!studentKey.includes(filterKey) && !filterKey.includes(studentKey)) {
+          return false;
+        }
       }
     }
     return true;
@@ -126,10 +150,31 @@ export default function AdminProgressionPage() {
         targetTerm: targetConfig.term || null,
       });
 
+      // Optimistically update student state immediately for 0ms visual delay
+      setStudents((prev) =>
+        prev.map((st) => {
+          if (!idsToPromote.includes(st.studentId)) return st;
+          let nextLevel = st.currentLevel || 1;
+          let nextTerm = st.currentTerm || 1;
+          if (targetConfig.auto !== false || (!targetConfig.level && !targetConfig.term)) {
+            if (nextTerm === 1) {
+              nextTerm = 2;
+            } else {
+              nextTerm = 1;
+              nextLevel = Math.min(4, nextLevel + 1);
+            }
+          } else {
+            if (targetConfig.level) nextLevel = Number(targetConfig.level);
+            if (targetConfig.term) nextTerm = Number(targetConfig.term);
+          }
+          return { ...st, currentLevel: nextLevel, currentTerm: nextTerm };
+        })
+      );
+
       toast.success(`Successfully promoted ${idsToPromote.length} students in ${sessKey}!`);
       // Clear selections for this session
       setSelectedIds((prev) => prev.filter((id) => !idsToPromote.includes(id)));
-      fetchStudents();
+      fetchStudents(true);
     } catch (err) {
       toast.error("Promotion failed: " + (err.response?.data?.error || err.message));
     } finally {
@@ -250,16 +295,16 @@ export default function AdminProgressionPage() {
                   }}
                 >
                   <option value="all">All Programs</option>
-                  <option value="B.Sc. in Educational Technology and Engineering">B.Sc. in Educational Technology and Engineering</option>
-                  <option value="M.Sc. in Educational Technology and Engineering">M.Sc. in Educational Technology and Engineering</option>
-                  <option value="B.Sc. in Internet of Things and Robotics Engineering">B.Sc. in Internet of Things and Robotics Engineering</option>
-                  <option value="M.Sc. in Internet of Things and Robotics Engineering">M.Sc. in Internet of Things and Robotics Engineering</option>
-                  <option value="B.Sc. in Software Engineering">B.Sc. in Software Engineering</option>
-                  <option value="M.Sc. in Software Engineering">M.Sc. in Software Engineering</option>
-                  <option value="B.Sc. in Cyber Security Engineering">B.Sc. in Cyber Security Engineering</option>
-                  <option value="M.Sc. in Cyber Security Engineering">M.Sc. in Cyber Security Engineering</option>
-                  <option value="B.Sc. in Data Science Engineering">B.Sc. in Data Science Engineering</option>
-                  <option value="M.Sc. in Data Science Engineering">M.Sc. in Data Science Engineering</option>
+                  <option value="B.Sc. in EDTE">B.Sc. in EDTE</option>
+                  <option value="M.Sc. in EDTE">M.Sc. in EDTE</option>
+                  <option value="B.Sc. in IRE">B.Sc. in IRE</option>
+                  <option value="M.Sc. in IRE">M.Sc. in IRE</option>
+                  <option value="B.Sc. in CySE">B.Sc. in CySE</option>
+                  <option value="M.Sc. in CySE">M.Sc. in CySE</option>
+                  <option value="B.Sc. in DSE">B.Sc. in DSE</option>
+                  <option value="M.Sc. in DSE">M.Sc. in DSE</option>
+                  <option value="B.Sc. in SWE">B.Sc. in SWE</option>
+                  <option value="M.Sc. in SWE">M.Sc. in SWE</option>
                 </select>
               </div>
 

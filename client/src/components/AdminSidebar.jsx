@@ -60,8 +60,8 @@ export default function AdminSidebar() {
         padding: "0 24px 20px 24px",
         borderBottom: "1px solid var(--border-color, #e0e0e0)"
       }}>
-        <h3 style={{ margin: 0, color: "var(--pastel-blue-deep, #2C4B66)" }}>UMS Admin</h3>
-        <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#64748b" }}>University Management</p>
+        <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 700, color: "var(--pastel-blue-night, #2C4B66)" }}>UniCore</h2>
+        <span className="badge admin">ADMIN</span>
       </div>
 
       <div className="sidebar-menu" style={{ flex: 1, padding: "20px 16px", overflowY: "auto" }}>
@@ -477,10 +477,12 @@ export default function AdminSidebar() {
             fontWeight: "bold",
             color: "var(--pastel-blue-deep, #3B8DB3)"
           }}>
-            {user?.name?.charAt(0) || "A"}
+            {(user?.name === "Super Admin" ? "Admin" : (user?.name || "Admin")).charAt(0)}
           </div>
           <div>
-            <div style={{ fontWeight: "600", fontSize: "14px", color: "var(--text-main, #2C4B66)" }}>{user?.name || "Admin"}</div>
+            <div style={{ fontWeight: "600", fontSize: "14px", color: "var(--text-main, #2C4B66)" }}>
+              {user?.name === "Super Admin" ? "Admin" : (user?.name || "Admin")}
+            </div>
             <div style={{ fontSize: "11px", color: "#64748b" }}>System Administrator</div>
           </div>
         </div>

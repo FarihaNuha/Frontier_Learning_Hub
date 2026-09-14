@@ -107,34 +107,40 @@ export default function TeacherHomeDashboard() {
               <div
                 onClick={() => navigate("/courses")}
                 style={{
-                  background: "#ffffff",
+                  background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
                   padding: "24px",
                   borderRadius: "16px",
-                  boxShadow: "0 4px 16px rgba(59, 141, 179, 0.08)",
-                  border: "1px solid #cbd5e1",
+                  boxShadow: "0 4px 16px rgba(59, 141, 179, 0.15)",
+                  border: "1.5px solid #7EC8E3",
                   cursor: "pointer",
-                  transition: "all 0.2s ease-in-out",
+                  transition: "all 0.25s ease-in-out",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(59, 141, 179, 0.15)";
+                }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
                   <div>
-                    <span style={{ fontSize: "13.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <span style={{ fontSize: "13.5px", color: "#1e293b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Assigned Courses
                     </span>
                     <div style={{ fontSize: "32px", fontWeight: 800, color: "#0f172a", marginTop: "4px" }}>
                       {summary.totalAssignedCourses}
                     </div>
                   </div>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "linear-gradient(135deg, #e0f2fe, #bae6fd)", color: "#0284c7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(255, 255, 255, 0.9)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                     <FiBookOpen size={24} />
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#0284c7", fontWeight: 600 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#0d9488", fontWeight: 700 }}>
                   View All Assigned Courses <FiArrowRight size={14} />
                 </div>
               </div>
@@ -143,34 +149,40 @@ export default function TeacherHomeDashboard() {
               <div
                 onClick={() => navigate("/teacher/enrolled-students")}
                 style={{
-                  background: "#ffffff",
+                  background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
                   padding: "24px",
                   borderRadius: "16px",
-                  boxShadow: "0 4px 16px rgba(59, 141, 179, 0.08)",
-                  border: "1px solid #cbd5e1",
+                  boxShadow: "0 4px 16px rgba(59, 141, 179, 0.15)",
+                  border: "1.5px solid #7EC8E3",
                   cursor: "pointer",
-                  transition: "all 0.2s ease-in-out",
+                  transition: "all 0.25s ease-in-out",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(59, 141, 179, 0.15)";
+                }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
                   <div>
-                    <span style={{ fontSize: "13.5px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <span style={{ fontSize: "13.5px", color: "#1e293b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Total Enrolled Students
                     </span>
                     <div style={{ fontSize: "32px", fontWeight: 800, color: "#0f172a", marginTop: "4px" }}>
                       {summary.totalStudents}
                     </div>
                   </div>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "linear-gradient(135deg, #dcfce7, #bbf7d0)", color: "#15803d", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(255, 255, 255, 0.9)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                     <FiUsers size={24} />
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#15803d", fontWeight: 600 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#0d9488", fontWeight: 700 }}>
                   View Student Directory <FiArrowRight size={14} />
                 </div>
               </div>
@@ -179,34 +191,40 @@ export default function TeacherHomeDashboard() {
               <div
                 onClick={() => navigate("/teacher/registration-approval")}
                 style={{
-                  background: summary.pendingRegistrationRequests > 0 ? "#fff1f2" : "#ffffff",
+                  background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
                   padding: "24px",
                   borderRadius: "16px",
-                  boxShadow: summary.pendingRegistrationRequests > 0 ? "0 4px 20px rgba(225,29,72,0.1)" : "0 4px 16px rgba(59, 141, 179, 0.08)",
-                  border: summary.pendingRegistrationRequests > 0 ? "1.5px solid #fecdd3" : "1px solid #cbd5e1",
+                  boxShadow: summary.pendingRegistrationRequests > 0 ? "0 4px 20px rgba(225,29,72,0.15)" : "0 4px 16px rgba(59, 141, 179, 0.15)",
+                  border: summary.pendingRegistrationRequests > 0 ? "1.5px solid #fca5a5" : "1.5px solid #7EC8E3",
                   cursor: "pointer",
-                  transition: "all 0.2s ease-in-out",
+                  transition: "all 0.25s ease-in-out",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = summary.pendingRegistrationRequests > 0 ? "0 4px 20px rgba(225,29,72,0.15)" : "0 4px 16px rgba(59, 141, 179, 0.15)";
+                }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
                   <div>
-                    <span style={{ fontSize: "13.5px", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <span style={{ fontSize: "13.5px", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#1e293b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Pending Registrations
                     </span>
                     <div style={{ fontSize: "32px", fontWeight: 800, color: summary.pendingRegistrationRequests > 0 ? "#e11d48" : "#0f172a", marginTop: "4px" }}>
                       {summary.pendingRegistrationRequests}
                     </div>
                   </div>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: summary.pendingRegistrationRequests > 0 ? "linear-gradient(135deg, #fee2e2, #fca5a5)" : "linear-gradient(135deg, #f1f5f9, #e2e8f0)", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(255, 255, 255, 0.9)", border: summary.pendingRegistrationRequests > 0 ? "1px solid #fca5a5" : "1px solid #7EC8E3", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                     <FiCheckCircle size={24} />
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#475569", fontWeight: 600 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: summary.pendingRegistrationRequests > 0 ? "#be123c" : "#0d9488", fontWeight: 700 }}>
                   {summary.isAdviser ? (summary.pendingRegistrationRequests > 0 ? "Action Required: Review Applications" : "All Registrations Approved") : "Adviser Alignment Portal"} <FiArrowRight size={14} />
                 </div>
               </div>
@@ -226,31 +244,40 @@ export default function TeacherHomeDashboard() {
                 <div
                   onClick={() => navigate("/teacher/registration-approval")}
                   style={{
-                    background: "#ffffff",
-                    borderRadius: "14px",
+                    background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
+                    borderRadius: "16px",
                     padding: "22px",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    border: "1.5px solid #7EC8E3",
+                    boxShadow: "0 4px 14px rgba(59, 141, 179, 0.12)",
                     cursor: "pointer",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s ease-in-out",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: "120px",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                    e.currentTarget.style.borderColor = "#3B8DB3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(59, 141, 179, 0.12)";
+                    e.currentTarget.style.borderColor = "#7EC8E3";
+                  }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#fff7ed", color: "#c2410c", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FiCheckCircle size={20} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.95)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", flexShrink: 0 }}>
+                      <FiCheckCircle size={22} />
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Registration Approval</h3>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Batch Adviser Panel</span>
+                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", color: "#0f172a", fontWeight: 800, letterSpacing: "-0.2px" }}>Registration Approval</h3>
+                      <span style={{ fontSize: "12.5px", color: "#334155", fontWeight: 600 }}>Batch Adviser Panel</span>
                     </div>
                   </div>
-                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
-                    Review, approve, or reject student level-term course registration applications for your assigned batch.
-                  </p>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#c2410c", display: "flex", alignItems: "center", gap: "4px" }}>
-                    Open Approval Portal <FiArrowRight size={13} />
+                  <div style={{ marginTop: "16px", fontSize: "13.5px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "5px" }}>
+                    Open Approval Portal <FiArrowRight size={14} />
                   </div>
                 </div>
 
@@ -258,31 +285,40 @@ export default function TeacherHomeDashboard() {
                 <div
                   onClick={() => navigate("/teacher/results")}
                   style={{
-                    background: "#ffffff",
-                    borderRadius: "14px",
+                    background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
+                    borderRadius: "16px",
                     padding: "22px",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    border: "1.5px solid #7EC8E3",
+                    boxShadow: "0 4px 14px rgba(59, 141, 179, 0.12)",
                     cursor: "pointer",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s ease-in-out",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: "120px",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                    e.currentTarget.style.borderColor = "#3B8DB3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(59, 141, 179, 0.12)";
+                    e.currentTarget.style.borderColor = "#7EC8E3";
+                  }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#f0fdf4", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FiAward size={20} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.95)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", flexShrink: 0 }}>
+                      <FiAward size={22} />
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Result</h3>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Marks & Grade Processing</span>
+                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", color: "#0f172a", fontWeight: 800, letterSpacing: "-0.2px" }}>Result</h3>
+                      <span style={{ fontSize: "12.5px", color: "#334155", fontWeight: 600 }}>Marks & Grade Processing</span>
                     </div>
                   </div>
-                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
-                    Upload assessment Excel sheets, calculate semester GPA/CGPA, and publish official student result sheets.
-                  </p>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#166534", display: "flex", alignItems: "center", gap: "4px" }}>
-                    Manage Results <FiArrowRight size={13} />
+                  <div style={{ marginTop: "16px", fontSize: "13.5px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "5px" }}>
+                    Manage Results <FiArrowRight size={14} />
                   </div>
                 </div>
 
@@ -290,31 +326,40 @@ export default function TeacherHomeDashboard() {
                 <div
                   onClick={() => navigate("/teacher/retake-approval")}
                   style={{
-                    background: "#ffffff",
-                    borderRadius: "14px",
+                    background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
+                    borderRadius: "16px",
                     padding: "22px",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    border: "1.5px solid #7EC8E3",
+                    boxShadow: "0 4px 14px rgba(59, 141, 179, 0.12)",
                     cursor: "pointer",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s ease-in-out",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: "120px",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                    e.currentTarget.style.borderColor = "#3B8DB3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(59, 141, 179, 0.12)";
+                    e.currentTarget.style.borderColor = "#7EC8E3";
+                  }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#eff6ff", color: "#1d4ed8", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FiRefreshCw size={20} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.95)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", flexShrink: 0 }}>
+                      <FiRefreshCw size={22} />
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Retake Approval</h3>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Improvement & Retake Panel</span>
+                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", color: "#0f172a", fontWeight: 800, letterSpacing: "-0.2px" }}>Retake Approval</h3>
+                      <span style={{ fontSize: "12.5px", color: "#334155", fontWeight: 600 }}>Improvement & Retake Panel</span>
                     </div>
                   </div>
-                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
-                    Manage student course retake applications, verify eligibility criteria, and process retake approvals.
-                  </p>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#1d4ed8", display: "flex", alignItems: "center", gap: "4px" }}>
-                    View Retake Requests <FiArrowRight size={13} />
+                  <div style={{ marginTop: "16px", fontSize: "13.5px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "5px" }}>
+                    View Retake Requests <FiArrowRight size={14} />
                   </div>
                 </div>
 
@@ -322,31 +367,40 @@ export default function TeacherHomeDashboard() {
                 <div
                   onClick={() => navigate("/teacher/enrolled-students")}
                   style={{
-                    background: "#ffffff",
-                    borderRadius: "14px",
+                    background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
+                    borderRadius: "16px",
                     padding: "22px",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    border: "1.5px solid #7EC8E3",
+                    boxShadow: "0 4px 14px rgba(59, 141, 179, 0.12)",
                     cursor: "pointer",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s ease-in-out",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: "120px",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                    e.currentTarget.style.borderColor = "#3B8DB3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(59, 141, 179, 0.12)";
+                    e.currentTarget.style.borderColor = "#7EC8E3";
+                  }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#fbfbfe", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FiUsers size={20} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.95)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", flexShrink: 0 }}>
+                      <FiUsers size={22} />
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Enrolled Students</h3>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Student Roster Directory</span>
+                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", color: "#0f172a", fontWeight: 800, letterSpacing: "-0.2px" }}>Enrolled Students</h3>
+                      <span style={{ fontSize: "12.5px", color: "#334155", fontWeight: 600 }}>Student Roster Directory</span>
                     </div>
                   </div>
-                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
-                    Inspect full student roster, filter by academic session or level-term, and review academic profiles.
-                  </p>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#7c3aed", display: "flex", alignItems: "center", gap: "4px" }}>
-                    Browse Roster <FiArrowRight size={13} />
+                  <div style={{ marginTop: "16px", fontSize: "13.5px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "5px" }}>
+                    Browse Roster <FiArrowRight size={14} />
                   </div>
                 </div>
 
@@ -354,31 +408,40 @@ export default function TeacherHomeDashboard() {
                 <div
                   onClick={() => navigate("/teacher/notices")}
                   style={{
-                    background: "#ffffff",
-                    borderRadius: "14px",
+                    background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
+                    borderRadius: "16px",
                     padding: "22px",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    border: "1.5px solid #7EC8E3",
+                    boxShadow: "0 4px 14px rgba(59, 141, 179, 0.12)",
                     cursor: "pointer",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s ease-in-out",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: "120px",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                    e.currentTarget.style.borderColor = "#3B8DB3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(59, 141, 179, 0.12)";
+                    e.currentTarget.style.borderColor = "#7EC8E3";
+                  }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#f0fdfa", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FiClipboard size={20} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.95)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", flexShrink: 0 }}>
+                      <FiClipboard size={22} />
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Notice Board</h3>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Announcements & Emails</span>
+                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", color: "#0f172a", fontWeight: 800, letterSpacing: "-0.2px" }}>Notice Board</h3>
+                      <span style={{ fontSize: "12.5px", color: "#334155", fontWeight: 600 }}>Announcements & Emails</span>
                     </div>
                   </div>
-                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
-                    Publish class announcements, exam notifications, and dispatch instant email alerts to enrolled students.
-                  </p>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "4px" }}>
-                    Publish Notices <FiArrowRight size={13} />
+                  <div style={{ marginTop: "16px", fontSize: "13.5px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "5px" }}>
+                    Publish Notices <FiArrowRight size={14} />
                   </div>
                 </div>
 
@@ -386,31 +449,40 @@ export default function TeacherHomeDashboard() {
                 <div
                   onClick={() => navigate("/academic-calendar")}
                   style={{
-                    background: "#ffffff",
-                    borderRadius: "14px",
+                    background: "radial-gradient(ellipse at center, #ffffff 25%, #bce5f7 65%, #3B8DB3 100%)",
+                    borderRadius: "16px",
                     padding: "22px",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                    border: "1.5px solid #7EC8E3",
+                    boxShadow: "0 4px 14px rgba(59, 141, 179, 0.12)",
                     cursor: "pointer",
-                    transition: "all 0.2s",
+                    transition: "all 0.25s ease-in-out",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: "120px",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#0284c7")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(59, 141, 179, 0.25)";
+                    e.currentTarget.style.borderColor = "#3B8DB3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(59, 141, 179, 0.12)";
+                    e.currentTarget.style.borderColor = "#7EC8E3";
+                  }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#fef3c7", color: "#b45309", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FiCalendar size={20} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.95)", border: "1px solid #7EC8E3", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.04)", flexShrink: 0 }}>
+                      <FiCalendar size={22} />
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: "16px", color: "#0f172a", fontWeight: 700 }}>Academic Calendar</h3>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Semester Schedule</span>
+                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", color: "#0f172a", fontWeight: 800, letterSpacing: "-0.2px" }}>Academic Calendar</h3>
+                      <span style={{ fontSize: "12.5px", color: "#334155", fontWeight: 600 }}>Semester Schedule</span>
                     </div>
                   </div>
-                  <p style={{ margin: "0 0 14px 0", color: "#475569", fontSize: "13px", lineHeight: "1.5" }}>
-                    Check university registration schedules, examination windows, and official academic term dates.
-                  </p>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#b45309", display: "flex", alignItems: "center", gap: "4px" }}>
-                    View Calendar <FiArrowRight size={13} />
+                  <div style={{ marginTop: "16px", fontSize: "13.5px", fontWeight: 700, color: "#0d9488", display: "flex", alignItems: "center", gap: "5px" }}>
+                    View Calendar <FiArrowRight size={14} />
                   </div>
                 </div>
               </div>
@@ -433,10 +505,10 @@ export default function TeacherHomeDashboard() {
             >
               <div>
                 <h3 style={{ margin: "0 0 4px 0", fontSize: "18px", fontWeight: 700 }}>
-                  Need to manage your assigned course study materials & LMS classrooms?
+                  Need to access and manage your assigned courses?
                 </h3>
                 <p style={{ margin: 0, fontSize: "14px", color: "#e0f2fe" }}>
-                  All your assigned courses, lecture materials, and LMS classroom access are available under <strong>My Courses</strong>.
+                  All your assigned courses, lecture contents, and syllabus materials are organized under <strong>My Courses</strong>.
                 </p>
               </div>
 

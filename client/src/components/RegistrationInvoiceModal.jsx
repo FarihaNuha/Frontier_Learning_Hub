@@ -143,7 +143,7 @@ export default function RegistrationInvoiceModal({
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 700, fontSize: "14.5px" }}>
-              <FiFileText size={18} color="#38bdf8" /> Official Registration Invoice & Fee Statement
+              <FiFileText size={18} color="#38bdf8" /> Registration Invoice & Fee Statement
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <button

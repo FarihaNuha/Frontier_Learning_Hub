@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import {
@@ -12,11 +13,14 @@ import {
   FiUnlock,
   FiSend,
   FiX,
+  FiCreditCard,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import StudentSidebar from "../components/StudentSidebar";
 import "../styles/dashboard.css";
 
 export default function StudentAcademicResultsPage() {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedSemester, setSelectedSemester] = useState(null);
@@ -96,6 +100,29 @@ export default function StudentAcademicResultsPage() {
   }, []);
 
   const resultsByLevelTerm = data?.resultsByLevelTerm || {};
+
+  // Check if student's registration payment is paid for a given semester
+  const checkIsSemesterPaid = (semKey) => {
+    if (data?.semesterPaymentStatus && data.semesterPaymentStatus[semKey] !== undefined) {
+      return Boolean(data.semesterPaymentStatus[semKey]?.isPaid);
+    }
+    // Fallback using studentRegistrationData
+    const lMatch = (semKey || "").match(/Level\s*(\d+)/i)?.[1];
+    const tMatch = (semKey || "").match(/Term\s*(\d+)/i)?.[1];
+    if (lMatch && tMatch && studentRegistrationData?.registrations) {
+      const reg = studentRegistrationData.registrations.find((r) => {
+        const rL = String(r.level || "").replace(/[^0-9]/g, "");
+        const rT = String(r.term || "").replace(/[^0-9]/g, "");
+        return rL === lMatch && rT === tMatch;
+      });
+      if (reg) {
+        return reg.paymentStatus === "Paid";
+      }
+    }
+    return false;
+  };
+
+  const isSelectedSemesterPaid = checkIsSemesterPaid(selectedSemester);
 
   const isResultsCardUnlocked = (cardIndex, semKey) => {
     const targetL = Math.ceil(cardIndex / 2);
@@ -235,9 +262,14 @@ export default function StudentAcademicResultsPage() {
                   const cardIndex = index + 1;
                   const unlocked = isResultsCardUnlocked(cardIndex, semKey);
                   const isLocked = !unlocked;
-                  const count = (resultsByLevelTerm[semKey] || []).length;
+                  const semResults = resultsByLevelTerm[semKey] || [];
+                  const uniqueCourseCodes = new Set(
+                    semResults.map((r) => (r.courseCode || "").replace(/\s+/g, "").toUpperCase()).filter(Boolean)
+                  );
+                  const count = uniqueCourseCodes.size;
                   const isSelected = selectedSemester === semKey && !isLocked;
-                  const semGPA = calculateGPA(resultsByLevelTerm[semKey]);
+                  const isPaid = checkIsSemesterPaid(semKey);
+                  const semGPA = calculateGPA(semResults);
 
                   return (
                     <div
@@ -272,15 +304,25 @@ export default function StudentAcademicResultsPage() {
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div style={{ fontWeight: 700, fontSize: "15px" }}>{semKey}</div>
-                        {isLocked ? <FiLock size={16} color="#94a3b8" /> : <FiBookOpen size={16} />}
+                        {isLocked ? (
+                          <FiLock size={16} color="#94a3b8" />
+                        ) : resultTypeTab === "Final" && !isPaid ? (
+                          <FiLock size={16} color={isSelected ? "#ffffff" : "#ea580c"} />
+                        ) : (
+                          <FiBookOpen size={16} />
+                        )}
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px" }}>
                         <span style={{ fontSize: "12px", opacity: 0.9 }}>
-                          {isLocked ? "Locked" : count > 0 ? `${count} Published Courses` : "No Results Yet"}
+                          {isLocked ? "Upcoming Term" : count > 0 ? `${count} Published Courses` : "No Results Yet"}
                         </span>
                         {isLocked ? (
-                          <span style={{ fontSize: "11px", fontWeight: 700, background: "#e2e8f0", color: "#64748b", padding: "3px 8px", borderRadius: "10px" }}>
-                            🔒 Locked
+                          <span style={{ fontSize: "11px", fontWeight: 600, background: "#e2e8f0", color: "#64748b", padding: "3px 8px", borderRadius: "10px" }}>
+                            Locked
+                          </span>
+                        ) : resultTypeTab === "Final" && !isPaid ? (
+                          <span style={{ fontSize: "11px", fontWeight: 700, background: isSelected ? "rgba(255,255,255,0.25)" : "#ffedd5", color: isSelected ? "#fff" : "#c2410c", padding: "3px 8px", borderRadius: "10px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                            <FiLock size={10} /> Payment Due
                           </span>
                         ) : count > 0 && semGPA !== "N/A" ? (
                           <span style={{ fontSize: "11px", fontWeight: 800, background: isSelected ? "rgba(255,255,255,0.25)" : "#dcfce7", color: isSelected ? "#fff" : "#166534", padding: "3px 8px", borderRadius: "10px" }}>
@@ -313,71 +355,114 @@ export default function StudentAcademicResultsPage() {
                     </p>
                   </div>
 
-                  <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "12px", padding: "10px 20px", display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span style={{ fontSize: "13.5px", color: "#166534", fontWeight: 700 }}>Semester GPA:</span>
-                    <span style={{ fontSize: "22px", fontWeight: 800, color: "#15803d" }}>
-                      {currentSemesterGPA}
-                    </span>
-                  </div>
+                  {/* GPA badge: only show if Midterm or (Final and Paid) */}
+                  {(resultTypeTab === "Midterm" || isSelectedSemesterPaid) && (
+                    <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "12px", padding: "10px 20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span style={{ fontSize: "13.5px", color: "#166534", fontWeight: 700 }}>Semester GPA:</span>
+                      <span style={{ fontSize: "22px", fontWeight: 800, color: "#15803d" }}>
+                        {currentSemesterGPA}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Lock Timer Banner for Active Semester */}
                 {currentSemesterResults.length > 0 && (() => {
-                  const activeTimerRes = currentSemesterResults.find(r => r.correctionWindowEnd && !r.isCorrectionClosed) || currentSemesterResults.find(r => r.correctionWindowEnd || r.isCorrectionClosed);
-                  if (!activeTimerRes) return null;
-
-                  const cDate = activeTimerRes.correctionWindowEnd ? new Date(activeTimerRes.correctionWindowEnd) : null;
-                  const isLocked = Boolean(activeTimerRes.isCorrectionClosed || (cDate && new Date() > cDate));
-                  const localTimeString = cDate ? cDate.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "Deadline Passed";
+                  const openCount = currentSemesterResults.filter(r => !r.isCorrectionClosed && (!r.correctionWindowEnd || new Date() <= new Date(r.correctionWindowEnd))).length;
+                  const closedCount = currentSemesterResults.length - openCount;
 
                   return (
                     <div
                       style={{
                         marginBottom: "20px",
-                        padding: "16px 20px",
+                        padding: "14px 20px",
                         borderRadius: "12px",
-                        background: isLocked ? "linear-gradient(135deg, #fee2e2, #fecaca)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
-                        border: `1.5px solid ${isLocked ? "#dc2626" : "#0284c7"}`,
-                        color: isLocked ? "#991b1b" : "#0369a1",
+                        background: openCount > 0 ? "linear-gradient(135deg, #e0f2fe, #bae6fd)" : "linear-gradient(135deg, #fee2e2, #fecaca)",
+                        border: `1.5px solid ${openCount > 0 ? "#0284c7" : "#dc2626"}`,
+                        color: openCount > 0 ? "#0369a1" : "#991b1b",
                         display: "flex",
                         alignItems: "center",
                         gap: "14px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.04)"
                       }}
                     >
-                      <div style={{ fontSize: "26px", lineHeight: 1 }}>{isLocked ? "🚨" : "⏳"}</div>
+                      <div style={{ fontSize: "24px", lineHeight: 1 }}>{openCount > 0 ? "⏳" : "🚨"}</div>
                       <div style={{ flex: 1 }}>
-                        {isLocked ? (
-                          <div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                              <strong style={{ fontSize: "15px", color: "#991b1b" }}>🔒 Correction Request Window Expired / Locked</strong>
-                              <span style={{ background: "#dc2626", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
-                                Deadline Passed
-                              </span>
-                            </div>
-                            <div style={{ fontSize: "13px", color: "#7f1d1d", marginTop: "4px" }}>
-                              The correction request window for this marksheet closed on <strong>{localTimeString}</strong>. No further correction requests or modifications can be submitted.
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                              <strong style={{ fontSize: "15px", color: "#0369a1" }}>🔓 Student Correction Window Open</strong>
-                              <span style={{ background: "#0284c7", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
-                                Open for Corrections
-                              </span>
-                            </div>
-                            <div style={{ fontSize: "13px", color: "#0369a1", marginTop: "4px" }}>
-                              If you notice any discrepancy in your marks, click <strong>"Request Correction"</strong> below before the deadline expires on <strong>{localTimeString}</strong>.
-                            </div>
-                          </div>
-                        )}
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                          <strong style={{ fontSize: "14.5px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            {openCount > 0 ? <><FiUnlock size={15} /> Course Correction Windows Active</> : <><FiLock size={15} /> All Correction Windows Closed</>}
+                          </strong>
+                          <span style={{ background: openCount > 0 ? "#0284c7" : "#dc2626", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
+                            {openCount > 0 ? `${openCount} Course(s) Open` : "All Closed"}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: "13px", marginTop: "3px", opacity: 0.9 }}>
+                          {openCount > 0
+                            ? "Each course teacher sets their individual correction deadline. Check the action column below for specific course deadlines."
+                            : "The correction request windows for all courses in this semester have ended."}
+                        </div>
                       </div>
                     </div>
                   );
                 })()}
 
-                {currentSemesterResults.length === 0 ? (
+                {resultTypeTab === "Final" && !isSelectedSemesterPaid ? (
+                  <div
+                    style={{
+                      padding: "48px 24px",
+                      textAlign: "center",
+                      background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)",
+                      borderRadius: "14px",
+                      border: "1.5px solid #fed7aa",
+                      boxShadow: "0 4px 20px rgba(234,88,12,0.06)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "64px",
+                        height: "64px",
+                        borderRadius: "50%",
+                        background: "#ea580c",
+                        color: "#ffffff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        margin: "0 auto 18px",
+                        boxShadow: "0 6px 16px rgba(234,88,12,0.3)",
+                      }}
+                    >
+                      <FiLock size={30} />
+                    </div>
+                    <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#9a3412", margin: "0 0 10px 0" }}>
+                      Final Term Results Locked
+                    </h3>
+                    <p style={{ maxWidth: "560px", margin: "0 auto 22px", fontSize: "14.5px", color: "#c2410c", lineHeight: "1.6" }}>
+                      Semester registration payment for <strong>{selectedSemester}</strong> is currently pending.
+                      Final Term examination results, marks, and GPA grades are restricted until your registration fee payment is completed.
+                    </p>
+                    <button
+                      onClick={() => navigate("/student/registration-payments")}
+                      style={{
+                        padding: "12px 28px",
+                        borderRadius: "10px",
+                        border: "none",
+                        background: "linear-gradient(135deg, #ea580c, #c2410c)",
+                        color: "#ffffff",
+                        fontWeight: 700,
+                        fontSize: "14.5px",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        boxShadow: "0 4px 14px rgba(234,88,12,0.35)",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      <FiCreditCard size={18} />
+                      Pay Registration Fee to Unlock Results
+                    </button>
+                  </div>
+                ) : currentSemesterResults.length === 0 ? (
                   <div style={{ padding: "50px", textAlign: "center", color: "#94a3b8" }}>
                     <FiClock size={44} style={{ opacity: 0.3, marginBottom: "10px" }} />
                     <p style={{ margin: 0, fontSize: "14.5px" }}>
@@ -401,14 +486,16 @@ export default function StudentAcademicResultsPage() {
                           <th style={{ padding: "12px 14px" }}>Continuous Assmt</th>
                           <th style={{ padding: "12px 14px" }}>Total</th>
                           <th style={{ padding: "12px 14px" }}>GPA</th>
-                          <th style={{ padding: "12px 14px", textAlign: "center" }}>Actions</th>
+                          <th style={{ padding: "12px 14px", textAlign: "center" }}>Actions & Deadline</th>
                         </tr>
                       </thead>
                       <tbody>
                         {currentSemesterResults.map((r) => {
-                          const isExpired = Boolean(r.isCorrectionClosed || (r.correctionWindowEnd && new Date() > new Date(r.correctionWindowEnd)));
+                          const cDate = r.correctionWindowEnd ? new Date(r.correctionWindowEnd) : null;
+                          const isExpired = Boolean(r.isCorrectionClosed || (cDate && new Date() > cDate));
                           const existingReq = studentRequests.find((req) => req.resultId === r._id || (req.uploadId === r.uploadId && req.courseCode === r.courseCode));
                           const isBtnDisabled = isExpired && !existingReq;
+                          const deadlineFormatted = cDate ? cDate.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : null;
 
                           const renderVal = (v) => {
                             if (v === null || v === undefined || String(v).trim() === "" || String(v).trim() === "-") {
@@ -440,32 +527,39 @@ export default function StudentAcademicResultsPage() {
                                   {courseGPAVal}
                                 </td>
                                 <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                                  <button
-                                    disabled={isBtnDisabled}
-                                    onClick={() => {
-                                      if (isExpired && !existingReq) {
-                                        toast.error("The correction request window for this marksheet has expired.");
-                                        return;
-                                      }
-                                      setSelectedResultForIssue(r);
-                                    }}
-                                    style={{
-                                      padding: "6px 12px",
-                                      borderRadius: "6px",
-                                      border: "none",
-                                      background: isBtnDisabled ? "#e2e8f0" : existingReq ? "#0284c7" : "#3b8db3",
-                                      color: isBtnDisabled ? "#94a3b8" : "#ffffff",
-                                      fontWeight: 600,
-                                      fontSize: "11.5px",
-                                      cursor: isBtnDisabled ? "not-allowed" : "pointer",
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      gap: "5px",
-                                    }}
-                                  >
-                                    <FiMessageSquare size={13} />
-                                    {existingReq ? "View / Update Request" : isExpired ? "🔒 Correction Closed" : "Correction Request"}
-                                  </button>
+                                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                                    <button
+                                      disabled={isBtnDisabled}
+                                      onClick={() => {
+                                        if (isExpired && !existingReq) {
+                                          toast.error("The correction request window for this course has expired.");
+                                          return;
+                                        }
+                                        setSelectedResultForIssue(r);
+                                      }}
+                                      style={{
+                                        padding: "6px 12px",
+                                        borderRadius: "6px",
+                                        border: "none",
+                                        background: isBtnDisabled ? "#e2e8f0" : existingReq ? "#0284c7" : "#3b8db3",
+                                        color: isBtnDisabled ? "#94a3b8" : "#ffffff",
+                                        fontWeight: 600,
+                                        fontSize: "11.5px",
+                                        cursor: isBtnDisabled ? "not-allowed" : "pointer",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "5px",
+                                      }}
+                                    >
+                                      <FiMessageSquare size={13} />
+                                      {existingReq ? "View / Update Request" : isExpired ? <><FiLock size={12} /> Correction Closed</> : "Correction Request"}
+                                    </button>
+                                    {deadlineFormatted && (
+                                      <span style={{ fontSize: "10.5px", color: isExpired ? "#ef4444" : "#0284c7", fontWeight: 600, display: "flex", alignItems: "center", gap: "3px" }}>
+                                        <FiClock size={10} /> {isExpired ? `Closed (${deadlineFormatted})` : `Ends: ${deadlineFormatted}`}
+                                      </span>
+                                    )}
+                                  </div>
                                 </td>
                               </tr>
                               {existingReq && (
@@ -536,8 +630,8 @@ export default function StudentAcademicResultsPage() {
               </div>
 
               {selectedResultForIssue && (selectedResultForIssue.isCorrectionClosed || (selectedResultForIssue.correctionWindowEnd && new Date() > new Date(selectedResultForIssue.correctionWindowEnd))) && (
-                <div style={{ background: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", padding: "10px 14px", borderRadius: "8px", fontSize: "12.5px", marginBottom: "16px", fontWeight: 700 }}>
-                  🔒 Correction request window for this marksheet has expired. You cannot send new messages.
+                <div style={{ background: "#fee2e2", color: "#991b1b", border: "1px solid #fca5a5", padding: "10px 14px", borderRadius: "8px", fontSize: "12.5px", marginBottom: "16px", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
+                  <FiLock size={15} /> Correction request window for this marksheet has expired. You cannot send new messages.
                 </div>
               )}
 

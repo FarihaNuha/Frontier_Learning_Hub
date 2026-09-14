@@ -249,11 +249,11 @@ export default function StudentAssessmentPage() {
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}>
                       <span style={{ fontSize: "12px", opacity: 0.9 }}>
-                        {isLocked ? "Locked" : cardAssessments.length > 0 ? `${cardAssessments.length} Marksheets` : "No Marks Yet"}
+                        {isLocked ? "Upcoming Term" : cardAssessments.length > 0 ? `${cardAssessments.length} Marksheets` : "No Marks Yet"}
                       </span>
                       {isLocked && (
-                        <span style={{ fontSize: "11px", fontWeight: 700, background: "#e2e8f0", color: "#64748b", padding: "2px 7px", borderRadius: "10px" }}>
-                          🔒 Locked
+                        <span style={{ fontSize: "11px", fontWeight: 600, background: "#e2e8f0", color: "#64748b", padding: "2px 8px", borderRadius: "10px" }}>
+                          Locked
                         </span>
                       )}
                     </div>
@@ -416,9 +416,11 @@ export default function StudentAssessmentPage() {
                                     }}
                                     title={isExpired ? "Correction request window has expired." : "Submit correction request to teacher"}
                                   >
-                                    {isExpired ? (
-                                      <>🔒 Window Closed</>
-                                    ) : (
+                                     {isExpired ? (
+                                       <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                                         <FiLock size={12} /> Window Closed
+                                       </span>
+                                     ) : (
                                       <>
                                         <FiEdit3 size={14} /> {existingReq ? "View / Update Request" : "Correction Request"}
                                       </>
@@ -501,8 +503,9 @@ export default function StudentAssessmentPage() {
             </div>
 
             {Boolean(selectedRecordForIssue.isCorrectionClosed || (selectedRecordForIssue.correctionWindowEnd && new Date() > new Date(selectedRecordForIssue.correctionWindowEnd))) && (
-              <div style={{ background: "#fff1f2", border: "1.5px solid #fecdd3", borderRadius: "10px", padding: "12px 16px", color: "#be123c", fontSize: "13px", fontWeight: 700, marginBottom: "16px" }}>
-                🔒 Marksheet Correction Locked: The deadline for submitting correction requests for this assessment closed on {selectedRecordForIssue.correctionWindowEnd ? new Date(selectedRecordForIssue.correctionWindowEnd).toLocaleString() : "Deadline Expiry"}. No further requests can be submitted.
+              <div style={{ background: "#fff1f2", border: "1.5px solid #fecdd3", borderRadius: "10px", padding: "12px 16px", color: "#be123c", fontSize: "13px", fontWeight: 700, marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <FiLock size={16} style={{ flexShrink: 0 }} />
+                <span>Marksheet Correction Locked: The deadline for submitting correction requests for this assessment closed on {selectedRecordForIssue.correctionWindowEnd ? new Date(selectedRecordForIssue.correctionWindowEnd).toLocaleString() : "Deadline Expiry"}. No further requests can be submitted.</span>
               </div>
             )}
 

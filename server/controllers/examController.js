@@ -4,7 +4,6 @@ const User = require("../models/User");
 const Notification = require("../models/Notification");
 const { getIO } = require("../socket");
 const { sendEmail, emailTemplates, queueEmail } = require("../services/emailService");
-const { analyzeAnswers } = require("../services/aiDetector");
 
 // Create Exam (Teacher only)
 exports.createExam = async (req, res) => {
@@ -306,30 +305,11 @@ exports.submitExam = async (req, res) => {
   }
 };
 
-// AI Detection endpoint
+// AI Detection endpoint (disabled / returns 0)
 exports.analyzeAI = async (req, res) => {
   try {
-    const { answers, questions } = req.body;
-    if (!answers || !questions) {
-      return res
-        .status(400)
-        .json({ error: "Answers and questions are required" });
-    }
-    const results = await analyzeAnswers(answers, questions);
-    const writtenQuestions = results.filter((r) => {
-      const q = questions[r.questionIndex];
-      return q && q.type === "short";
-    });
-    const overallAI =
-      writtenQuestions.length > 0
-        ? Math.round(
-            writtenQuestions.reduce((sum, r) => sum + r.aiPercentage, 0) /
-              writtenQuestions.length,
-          )
-        : 0;
-    res.json({ overallAI, questionAnalysis: results });
+    res.json({ overallAI: 0, questionAnalysis: [] });
   } catch (error) {
-    console.error("AI analysis error:", error);
     res.status(500).json({ error: error.message });
   }
 };

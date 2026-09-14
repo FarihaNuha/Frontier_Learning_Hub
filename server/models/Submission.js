@@ -15,6 +15,10 @@ const submissionSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  fileData: {
+    type: String,
+    default: "",
+  },
   originalName: {
     type: String,
     default: "",
@@ -22,7 +26,8 @@ const submissionSchema = new mongoose.Schema({
   files: [
     {
       fileURL: { type: String, required: true },
-      originalName: { type: String, required: true }
+      originalName: { type: String, required: true },
+      fileData: { type: String, default: "" }
     }
   ],
   comment: {
@@ -52,6 +57,10 @@ const submissionSchema = new mongoose.Schema({
   similarityPercent: {
     type: Number,
     default: 0,
+  },
+  extractedText: {
+    type: String,
+    default: "",
   },
   similarityMatchedStudent: {
     type: mongoose.Schema.Types.ObjectId,

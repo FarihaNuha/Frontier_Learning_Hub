@@ -457,13 +457,13 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
     for (const item of assigned) {
       let code = (item.courseCode || "").trim().toUpperCase();
       const rawName = (item.courseName || "").replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim();
-      const targetSession = item.session || teacherDoc.assignedSession || "";
+      const targetSession = item.session || teacherDoc.assignedSession || "2022-23";
 
       if (!code && !rawName) continue;
 
       if (!code && rawName) {
         const importDoc = await CourseImport.findOne({
-          courseTitle: { $regex: new RegExp(rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") }
+          courseTitle: { $regex: new RegExp(`^${rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
         }).lean();
         if (importDoc?.courseCode) {
           code = importDoc.courseCode.toUpperCase();
@@ -471,15 +471,17 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
       }
 
       const baseConditions = [];
-      if (code) baseConditions.push({ displayCode: code });
-      if (rawName) baseConditions.push({ name: { $regex: new RegExp(rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } });
+      if (code && code !== "COURSE") baseConditions.push({ displayCode: code });
+      if (rawName) baseConditions.push({ name: { $regex: new RegExp(`^${rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
 
       // SESSION-STRICT MATCHING:
       let existingCourse = null;
-      if (targetSession) {
-        existingCourse = await Course.findOne({ $or: baseConditions, session: targetSession });
-      } else {
-        existingCourse = await Course.findOne({ $or: baseConditions });
+      if (baseConditions.length > 0) {
+        if (targetSession) {
+          existingCourse = await Course.findOne({ $or: baseConditions, session: targetSession });
+        } else {
+          existingCourse = await Course.findOne({ $or: baseConditions });
+        }
       }
 
       if (existingCourse) {
@@ -487,12 +489,12 @@ const syncTeacherCourseAssignments = async (teacherDoc) => {
         existingCourse.teacher = userDoc._id;
         if (targetSession && !existingCourse.session) existingCourse.session = targetSession;
         await existingCourse.save();
-      } else if (targetSession) {
+      } else {
         // Auto-create LMS Course document for this session if missing in Course collection
         const importMatch = await CourseImport.findOne({
           $or: [
-            ...(code ? [{ courseCode: code }] : []),
-            ...(rawName ? [{ courseTitle: { $regex: new RegExp(rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } }] : [])
+            ...(code && code !== "COURSE" ? [{ courseCode: code }] : []),
+            ...(rawName ? [{ courseTitle: { $regex: new RegExp(`^${rawName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }] : [])
           ]
         }).lean();
 

@@ -24,9 +24,10 @@ exports.register = async (req, res) => {
 
     const emailLower = email.toLowerCase().trim();
 
-    // Lookup email in Student and Teacher imported collections
+    // Lookup email in Student and Teacher imported collections (or Adviser alignment)
     const Student = require("../models/Student");
     const Teacher = require("../models/Teacher");
+    const Adviser = require("../models/Adviser");
 
     let matchedRecord = null;
     let assignedRole = "";
@@ -48,6 +49,18 @@ exports.register = async (req, res) => {
         assignedRole = "teacher";
         assignedDept = teacherRecord.department || "EDTE";
         assignedName = teacherRecord.name;
+      } else {
+        // Fallback: check if assigned as Adviser in Adviser Alignment
+        const adviserRecord = await Adviser.findOne({ teacherEmail: emailLower });
+        if (adviserRecord) {
+          matchedRecord = adviserRecord;
+          assignedRole = "teacher";
+          assignedDept = adviserRecord.department || "EDTE";
+          assignedName = adviserRecord.teacherName || "Teacher / Adviser";
+          if (adviserRecord.teacherId) {
+            studentId = String(adviserRecord.teacherId);
+          }
+        }
       }
     }
 
@@ -61,7 +74,7 @@ exports.register = async (req, res) => {
 
     if (!matchedRecord && !existingUser) {
       return res.status(400).json({
-        error: `Email '${email}' is not in the university student/teacher directory. Please contact the administrator.`,
+        error: `Email '${email}' is not in the university student/teacher directory or adviser directory. Please contact the administrator.`,
       });
     }
 
@@ -195,6 +208,7 @@ exports.login = async (req, res) => {
 
     const Student = require("../models/Student");
     const Teacher = require("../models/Teacher");
+    const Adviser = require("../models/Adviser");
 
     if (user.role === "student") {
       const studentProfile = await Student.findOne({
@@ -207,6 +221,11 @@ exports.login = async (req, res) => {
       const teacherProfile = await Teacher.findOne({ email: user.email }).lean();
       if (teacherProfile && teacherProfile.department) {
         user.department = teacherProfile.department;
+      } else {
+        const adviserProfile = await Adviser.findOne({ teacherEmail: (user.email || "").toLowerCase().trim() }).lean();
+        if (adviserProfile && adviserProfile.department) {
+          user.department = adviserProfile.department;
+        }
       }
     }
 
@@ -347,7 +366,7 @@ exports.forgotPassword = async (req, res) => {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #7EC8E3, #3B8DB3); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">UFTB Moodle Password Recovery</h2>
+          <h2 style="color: white; margin: 0;">UniCore Password Recovery</h2>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
           <h3 style="color: #2C4B66;">Hello ${user.name},</h3>

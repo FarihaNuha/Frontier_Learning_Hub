@@ -897,22 +897,25 @@ body.dark-theme .top-bar h1 {
   color: #f8fafc !important;
 }
 
-/* Custom scrollbar styling for sidebars (Light Theme) */
+/* Custom scrollbar styling for sidebars and main content (Light Theme) */
 .sidebar::-webkit-scrollbar,
 .community-sidebar::-webkit-scrollbar,
-.dashboard-sidebar::-webkit-scrollbar {
+.dashboard-sidebar::-webkit-scrollbar,
+.main-content::-webkit-scrollbar {
   width: 6px;
 }
 
 .sidebar::-webkit-scrollbar-track,
 .community-sidebar::-webkit-scrollbar-track,
-.dashboard-sidebar::-webkit-scrollbar-track {
+.dashboard-sidebar::-webkit-scrollbar-track,
+.main-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .sidebar::-webkit-scrollbar-thumb,
 .community-sidebar::-webkit-scrollbar-thumb,
-.dashboard-sidebar::-webkit-scrollbar-thumb {
+.dashboard-sidebar::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb {
   background: rgba(59, 141, 179, 0.25);
   border-radius: 3px;
   transition: background 0.3s ease;
@@ -920,39 +923,45 @@ body.dark-theme .top-bar h1 {
 
 .sidebar::-webkit-scrollbar-thumb:hover,
 .community-sidebar::-webkit-scrollbar-thumb:hover,
-.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 141, 179, 0.45);
 }
 
 .sidebar,
 .community-sidebar,
-.dashboard-sidebar {
+.dashboard-sidebar,
+.main-content {
   scrollbar-width: thin;
   scrollbar-color: rgba(59, 141, 179, 0.25) transparent;
 }
 
-/* Custom scrollbar styling for sidebars (Dark Theme Overrides) */
+/* Custom scrollbar styling for sidebars and main content (Dark Theme Overrides) */
 body.dark-theme .sidebar::-webkit-scrollbar-track,
 body.dark-theme .community-sidebar::-webkit-scrollbar-track,
-body.dark-theme .dashboard-sidebar::-webkit-scrollbar-track {
+body.dark-theme .dashboard-sidebar::-webkit-scrollbar-track,
+body.dark-theme .main-content::-webkit-scrollbar-track {
   background: rgba(14, 22, 40, 0.45) !important;
 }
 
 body.dark-theme .sidebar::-webkit-scrollbar-thumb,
 body.dark-theme .community-sidebar::-webkit-scrollbar-thumb,
-body.dark-theme .dashboard-sidebar::-webkit-scrollbar-thumb {
+body.dark-theme .dashboard-sidebar::-webkit-scrollbar-thumb,
+body.dark-theme .main-content::-webkit-scrollbar-thumb {
   background: rgba(59, 141, 179, 0.35) !important;
 }
 
 body.dark-theme .sidebar::-webkit-scrollbar-thumb:hover,
 body.dark-theme .community-sidebar::-webkit-scrollbar-thumb:hover,
-body.dark-theme .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+body.dark-theme .dashboard-sidebar::-webkit-scrollbar-thumb:hover,
+body.dark-theme .main-content::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 210, 255, 0.65) !important;
 }
 
 body.dark-theme .sidebar,
 body.dark-theme .community-sidebar,
-body.dark-theme .dashboard-sidebar {
+body.dark-theme .dashboard-sidebar,
+body.dark-theme .main-content {
   scrollbar-color: rgba(59, 141, 179, 0.35) rgba(14, 22, 40, 0.45) !important;
 }
 

@@ -844,11 +844,11 @@ export default function CourseListPage() {
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}>
                       <span style={{ fontSize: "12px", opacity: 0.9 }}>
-                        {isLocked ? "Locked" : `${cardCourses.length} Assigned Courses`}
+                        {isLocked ? "Upcoming Term" : `${cardCourses.length} Assigned Courses`}
                       </span>
                       {isLocked && (
-                        <span style={{ fontSize: "11px", fontWeight: 700, background: "#e2e8f0", color: "#64748b", padding: "2px 7px", borderRadius: "10px" }}>
-                          🔒 Locked
+                        <span style={{ fontSize: "11px", fontWeight: 600, background: "#e2e8f0", color: "#64748b", padding: "2px 8px", borderRadius: "10px" }}>
+                          Locked
                         </span>
                       )}
                     </div>

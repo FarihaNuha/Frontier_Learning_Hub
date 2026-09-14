@@ -48,6 +48,7 @@ const AdminRegistrationList = lazy(() => import("./pages/AdminRegistrationList")
 const TeacherResultManagementPage = lazy(() => import("./pages/TeacherResultManagementPage"));
 const AdminResultManagementPage = lazy(() => import("./pages/AdminResultManagementPage"));
 const StudentAcademicResultsPage = lazy(() => import("./pages/StudentAcademicResultsPage"));
+const UnderDevelopmentPage = lazy(() => import("./pages/UnderDevelopmentPage"));
 
 // Phase 5 Pages
 const StudentAcademicProfilePage = lazy(() => import("./pages/StudentAcademicProfilePage"));

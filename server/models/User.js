@@ -34,8 +34,19 @@ const userSchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    enum: ["EDTE", "IRE", "CySE", "DSE", "SWE", "Software", "Cyber", "DataScience", "General"],
-    required: [true, "Department is required"],
+    default: "EDTE",
+    set: function (val) {
+      if (!val) return "EDTE";
+      const s = String(val).trim();
+      const lower = s.toLowerCase();
+      if (lower.includes("gen")) return "General";
+      if (lower.includes("edte")) return "EDTE";
+      if (lower.includes("ire")) return "IRE";
+      if (lower.includes("cyse") || lower.includes("cyber")) return "CySE";
+      if (lower.includes("dse") || lower.includes("data")) return "DSE";
+      if (lower.includes("swe") || lower.includes("soft")) return "SWE";
+      return s.toUpperCase();
+    },
   },
   fcmToken: String,
   isBlocked: {

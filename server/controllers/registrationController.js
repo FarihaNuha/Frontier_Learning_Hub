@@ -42,7 +42,7 @@ const createNotification = async (userId, title, message) => {
               <p style="font-size: 15px; margin-top: 0;">Hello <strong>${recipient.name || "User"}</strong>,</p>
               <p style="font-size: 15px; line-height: 1.6; color: #4A5568;">${message}</p>
               <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;" />
-              <p style="font-size: 12px; color: #718096; margin: 0; text-align: center;">UFTB Moodle Academic Registration System</p>
+              <p style="font-size: 12px; color: #718096; margin: 0; text-align: center;">UniCore Academic Registration System</p>
             </div>
           </div>
           `
@@ -67,8 +67,11 @@ const isDepartmentAndProgramMatch = (courseDept, courseProg, studentDept, studen
     const clean = dStr.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
     if (!clean) return "";
     if (clean.includes("edte") || clean.includes("educationaltechnology")) return "edte";
-    if (clean.includes("cse") || clean.includes("computerscience")) return "cse";
+    if (clean.includes("ire") || clean.includes("robotics") || clean.includes("internetofthings")) return "ire";
+    if (clean.includes("cyse") || clean.includes("cyber") || clean.includes("security")) return "cyse";
+    if (clean.includes("dse") || clean.includes("datascience")) return "dse";
     if (clean.includes("swe") || clean.includes("softwareengineering")) return "swe";
+    if (clean.includes("cse") || clean.includes("computerscience")) return "cse";
     if (clean.includes("eee") || clean.includes("electrical")) return "eee";
     if (clean.includes("ce") || clean.includes("civil")) return "ce";
     if (clean.includes("bba") || clean.includes("business")) return "bba";
@@ -202,7 +205,7 @@ exports.getAvailableCourses = async (req, res) => {
       }
     } else {
       isCalendarOpen = false;
-      calendarMessage = `Registration is CLOSED. UMS Admin has not opened a registration window for Session ${student.session} (${levelStr} ${termStr}).`;
+      calendarMessage = `Registration is CLOSED. Admin has not opened a registration window for Session ${student.session} (${levelStr} ${termStr}).`;
     }
 
     res.json({
@@ -246,7 +249,7 @@ exports.submitRegistration = async (req, res) => {
 
     if (!calendarDoc) {
       return res.status(400).json({
-        error: `Registration Blocked: Registration is currently CLOSED for Session ${student.session} (${levelStr} ${termStr}). UMS Admin has only opened registration for active session rules.`
+        error: `Registration Blocked: Registration is currently CLOSED for Session ${student.session} (${levelStr} ${termStr}). Admin has only opened registration for active session rules.`
       });
     }
 
@@ -298,41 +301,46 @@ exports.submitRegistration = async (req, res) => {
       });
     }
 
-    // Find assigned adviser cleanly matching session & batch or department
+    // Find assigned adviser cleanly matching session & batch strictly first
     const Teacher = require("../models/Teacher");
     let adviserMatch = await Adviser.findOne({
-      $or: [
-        { session: student.session, assignedBatch: student.batch },
-        { session: student.session, department: student.department },
-        { session: student.session }
-      ]
+      session: student.session,
+      assignedBatch: student.batch
     }).lean();
 
-    let resolvedAdviserEmail = adviserMatch?.teacherEmail || "";
+    if (!adviserMatch) {
+      adviserMatch = await Adviser.findOne({
+        session: student.session,
+        department: student.department
+      }).lean();
+    }
+
+    if (!adviserMatch) {
+      adviserMatch = await Adviser.findOne({
+        session: student.session
+      }).lean();
+    }
+
+    let resolvedAdviserEmail = (adviserMatch?.teacherEmail || "").toLowerCase().trim();
 
     // Sync with real Teacher model email if available
     if (adviserMatch) {
-      const realTeacher = await Teacher.findOne({
-        $or: [
-          { email: adviserMatch.teacherEmail },
-          { teacherId: adviserMatch.teacherId },
-          ...(adviserMatch.teacherName ? [{ name: { $regex: new RegExp(adviserMatch.teacherName.trim(), "i") } }] : []),
-          { adviserSession: student.session },
-          { assignedSession: student.session }
-        ]
-      }).lean();
-      if (realTeacher?.email) {
-        resolvedAdviserEmail = realTeacher.email.toLowerCase().trim();
+      const teacherSearch = [];
+      if (adviserMatch.teacherEmail) {
+        teacherSearch.push({ email: { $regex: new RegExp(`^${adviserMatch.teacherEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
       }
-    } else {
-      const fallbackTeacher = await Teacher.findOne({
-        $or: [
-          { adviserSession: student.session },
-          { assignedSession: student.session }
-        ]
-      }).lean();
-      if (fallbackTeacher?.email) {
-        resolvedAdviserEmail = fallbackTeacher.email.toLowerCase().trim();
+      if (adviserMatch.teacherId) {
+        teacherSearch.push({ teacherId: String(adviserMatch.teacherId).trim() });
+      }
+      if (adviserMatch.teacherName) {
+        teacherSearch.push({ name: { $regex: new RegExp(adviserMatch.teacherName.trim(), "i") } });
+      }
+
+      if (teacherSearch.length > 0) {
+        const realTeacher = await Teacher.findOne({ $or: teacherSearch }).lean();
+        if (realTeacher?.email) {
+          resolvedAdviserEmail = realTeacher.email.toLowerCase().trim();
+        }
       }
     }
 
@@ -388,14 +396,17 @@ exports.submitRegistration = async (req, res) => {
       `Your registration request for ${levelStr} ${termStr} (${totalCredits} credits) has been submitted and is pending adviser approval.`
     );
 
-    // Notify Adviser Teacher
-    if (adviserMatch && adviserMatch.teacherEmail) {
-      const teacherUser = await User.findOne({ email: adviserMatch.teacherEmail });
+    // Notify only the specific Adviser Teacher assigned to this student's session
+    const notifyEmail = resolvedAdviserEmail || (adviserMatch ? adviserMatch.teacherEmail : "");
+    if (notifyEmail) {
+      const teacherUser = await User.findOne({
+        email: { $regex: new RegExp(`^${notifyEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
+      });
       if (teacherUser) {
         await createNotification(
           teacherUser._id,
           "New Registration Request 📋",
-          `Student ${student.name} (${student.studentId}) submitted course registration for ${levelStr} ${termStr} (${totalCredits} credits).`
+          `Student ${student.name} (${student.studentId}) submitted course registration for ${levelStr} ${termStr} (${totalCredits} credits). Session: ${student.session}.`
         );
       }
     }
@@ -513,50 +524,38 @@ exports.getPendingRegistrationsForAdviser = async (req, res) => {
 
     const adviserRecords = await Adviser.find({ $or: searchCriteria }).lean();
 
-    const batches = adviserRecords.map((a) => a.assignedBatch).filter(Boolean);
-    const sessions = adviserRecords.map((a) => a.session).filter(Boolean);
-
-    if (teacherDoc?.assignedSession && !sessions.includes(teacherDoc.assignedSession)) {
-      sessions.push(teacherDoc.assignedSession);
-    }
-    if (teacherDoc?.adviserSession && !sessions.includes(teacherDoc.adviserSession)) {
-      sessions.push(teacherDoc.adviserSession);
+    // If teacher is not assigned as an adviser for any batch, return empty array immediately
+    if (!adviserRecords || adviserRecords.length === 0) {
+      return res.json([]);
     }
 
-    // Find students matching batch & session assigned to this teacher
-    const studentQueryCriteria = [];
-    if (batches.length > 0) studentQueryCriteria.push({ batch: { $in: batches } });
-    if (sessions.length > 0) studentQueryCriteria.push({ session: { $in: sessions } });
+    // STRICT: find only students whose batch AND session BOTH belong to this adviser
+    const pairQueries = adviserRecords
+      .filter((a) => a.session && a.assignedBatch)
+      .map((a) => ({ session: a.session, batch: a.assignedBatch }));
 
-    const students = studentQueryCriteria.length > 0 ? await Student.find({ $or: studentQueryCriteria }).lean() : [];
-    const studentIds = students.map((s) => s.studentId);
-
-    // Ensure registrations match THIS teacher's adviserEmail OR match THIS teacher's assigned batch/session/department
-    const regOrCriteria = [
-      { adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
-    ];
-
-    if (studentIds.length > 0) {
-      regOrCriteria.push({ studentId: { $in: studentIds } });
-    }
-
-    if (sessions.length > 0) {
-      regOrCriteria.push({ session: { $in: sessions } });
-    }
-
-    if (teacherDoc?.department) {
-      const deptClean = String(teacherDoc.department || "").trim();
-      if (deptClean && deptClean.length >= 3) {
-        regOrCriteria.push({ department: { $regex: new RegExp(deptClean, "i") } });
-      }
+    let myStudentIds = [];
+    if (pairQueries.length > 0) {
+      const myStudents = await Student.find({ $or: pairQueries }).lean();
+      myStudentIds = myStudents.map((s) => s.studentId);
     }
 
     const RegistrationPayment = require("../models/RegistrationPayment");
 
-    const pendingRegs = await Registration.find({
-      status: "Pending Adviser Approval",
-      $or: regOrCriteria,
-    }).populate("user", "name email");
+    let pendingRegs = [];
+    if (myStudentIds.length > 0) {
+      // Primary path: strict student-based filter
+      pendingRegs = await Registration.find({
+        status: "Pending Adviser Approval",
+        studentId: { $in: myStudentIds },
+      }).populate("user", "name email");
+    } else {
+      // Fallback: match by adviserEmail when adviser record has no batch/session data
+      pendingRegs = await Registration.find({
+        status: "Pending Adviser Approval",
+        adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") },
+      }).populate("user", "name email");
+    }
 
     const { calculateRegistrationFee } = require("./registrationPaymentController");
 
@@ -758,17 +757,55 @@ exports.rejectRegistration = async (req, res) => {
 // ADVISER: Approve All pending
 exports.approveAllPendingRegistrations = async (req, res) => {
   try {
-    const adviserRecords = await Adviser.find({ teacherEmail: req.user.email }).lean();
-    const batches = adviserRecords.map((a) => a.assignedBatch);
-    const sessions = adviserRecords.map((a) => a.session);
+    const Teacher = require("../models/Teacher");
+    const teacherEmailClean = (req.user.email || "").toLowerCase().trim();
 
-    const students = await Student.find({ batch: { $in: batches }, session: { $in: sessions } }).lean();
-    const studentIds = students.map((s) => s.studentId);
+    const teacherDoc = await Teacher.findOne({
+      $or: [
+        { email: teacherEmailClean },
+        { email: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+      ]
+    }).lean();
 
-    const pendingRegs = await Registration.find({
-      studentId: { $in: studentIds },
-      status: "Pending Adviser Approval",
-    });
+    const searchCriteria = [
+      { teacherEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+    ];
+    if (teacherDoc?.teacherId) {
+      searchCriteria.push({ teacherId: String(teacherDoc.teacherId).trim() });
+    }
+    if (teacherDoc?.name) {
+      searchCriteria.push({ teacherName: { $regex: new RegExp(teacherDoc.name.trim(), "i") } });
+    }
+
+    const adviserRecords = await Adviser.find({ $or: searchCriteria }).lean();
+    if (!adviserRecords || adviserRecords.length === 0) {
+      return res.json({ message: "Successfully approved 0 registration requests." });
+    }
+
+    const pairQueries = adviserRecords
+      .filter((a) => a.session && a.assignedBatch)
+      .map((a) => ({ session: a.session, batch: a.assignedBatch }));
+
+    let studentIds = [];
+    if (pairQueries.length > 0) {
+      const students = await Student.find({ $or: pairQueries }).lean();
+      studentIds = students.map((s) => s.studentId);
+    }
+
+    let pendingRegs = [];
+    if (studentIds.length > 0) {
+      pendingRegs = await Registration.find({
+        studentId: { $in: studentIds },
+        status: "Pending Adviser Approval",
+      });
+    } else {
+      pendingRegs = await Registration.find({
+        adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") },
+        status: "Pending Adviser Approval",
+      });
+    }
+
+    const students = await Student.find({ studentId: { $in: pendingRegs.map(r => r.studentId) } }).lean();
 
     await Promise.all(
       pendingRegs.map(async (reg) => {

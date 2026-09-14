@@ -113,6 +113,10 @@ export default function AdminResultManagementPage() {
   };
 
   const handleOpenReminderModal = (batch) => {
+    if (!batch.teacherEmail || batch.teacherName === "Not Assigned") {
+      toast.error("No course teacher is currently assigned to this course.");
+      return;
+    }
     setReminderModalBatch(batch);
     setReminderMessage(
       `Dear ${batch.teacherName || "Course Teacher"},\n\nThis is an urgent reminder that your ${resultTypeTab} result marksheet for ${batch.courseCode} (${batch.courseTitle}) for ${batch.level} ${batch.term} (Session: ${batch.session}) has not been uploaded/submitted yet.\n\nPlease upload the marksheet as soon as possible.`
@@ -198,7 +202,7 @@ export default function AdminResultManagementPage() {
   const handleDeleteNotice = async (noticeId) => {
     if (!window.confirm("Remove this deadline / schedule record from calendar?")) return;
     try {
-      await api.delete(`/notices/${noticeId}`);
+      await api.delete(`/service/notices/${noticeId}`);
       toast.success("Deadline / Schedule record removed!");
       fetchAdminResults();
     } catch (err) {
@@ -838,7 +842,7 @@ export default function AdminResultManagementPage() {
 
                         <div style={{ marginTop: "8px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
                           <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: batch.status === "Pending" ? "#fef3c7" : "#f0f9ff", border: `1px solid ${batch.status === "Pending" ? "#fcd34d" : "#bae6fd"}`, borderRadius: "6px", padding: "3px 10px", fontSize: "12px", color: batch.status === "Pending" ? "#b45309" : "#0369a1", fontWeight: 600 }}>
-                            {batch.status === "Pending" ? `👤 Assigned: ${batch.teacherName || batch.teacherEmail || "Assigned Teacher"}` : `📋 Submitted by: ${batch.teacherEmail || "Teacher"}`}
+                            {batch.status === "Pending" ? `Assigned: ${batch.teacherName || batch.teacherEmail || "Assigned Teacher"}` : `Submitted by: ${batch.teacherEmail || "Teacher"}`}
                           </span>
 
                           {batch.status === "Pending" && (
@@ -1051,12 +1055,11 @@ export default function AdminResultManagementPage() {
               )}
             </div>
 
-            {/* Table 1: 📅 Result Submission Cutoff Deadlines Registry */}
+            {/* Table 1: Result Submission Cutoff Deadlines Registry */}
             <div style={{ background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #bbf7d0", marginBottom: "28px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#16a34a" }} />
-                  <h3 style={{ margin: 0, color: "#166534", fontSize: "16.5px", fontWeight: 800 }}>📅 Result Submission Cutoff Deadlines Table</h3>
+                  <h3 style={{ margin: 0, color: "#166534", fontSize: "16.5px", fontWeight: 800 }}>Result Submission Cutoff Deadlines Table</h3>
                 </div>
                 <span style={{ fontSize: "12px", color: "#166534", fontWeight: 700, background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "4px 10px", borderRadius: "8px" }}>
                   Active Cutoffs: {notices.filter(n => n.targetAudience === "Teachers" || (n.title && n.title.includes("Cutoff")) || n.resultDeadlineType === "Midterm" || n.resultDeadlineType === "Final").length}
@@ -1097,7 +1100,7 @@ export default function AdminResultManagementPage() {
                               <td style={{ padding: "10px 14px", fontWeight: 600 }}>{n.title}</td>
                               <td style={{ padding: "10px 14px" }}>
                                 <span style={{ background: "#fef3c7", color: "#b45309", fontWeight: 700, padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
-                                  Teachers 👤
+                                  Teachers
                                 </span>
                               </td>
                               <td style={{ padding: "10px 14px", fontWeight: 700, color: isExpired ? "#991b1b" : "#166534" }}>
@@ -1105,7 +1108,7 @@ export default function AdminResultManagementPage() {
                               </td>
                               <td style={{ padding: "10px 14px" }}>
                                 <span style={{ background: isExpired ? "#fee2e2" : "#dcfce7", color: isExpired ? "#991b1b" : "#166534", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
-                                  {isExpired ? "Cutoff Passed 🔴" : "Active 🟢"}
+                                  {isExpired ? "Cutoff Passed" : "Active"}
                                 </span>
                               </td>
                               <td style={{ padding: "10px 14px", textAlign: "center" }}>
@@ -1127,12 +1130,11 @@ export default function AdminResultManagementPage() {
               })()}
             </div>
 
-            {/* Table 2: ⏱️ Scheduled Automated Timed Releases Registry */}
+            {/* Table 2: Scheduled Automated Timed Releases Registry */}
             <div style={{ background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #bae6fd" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#0284c7" }} />
-                  <h3 style={{ margin: 0, color: "#0369a1", fontSize: "16.5px", fontWeight: 800 }}>⏱️ Scheduled Automated Timed Releases Table</h3>
+                  <h3 style={{ margin: 0, color: "#0369a1", fontSize: "16.5px", fontWeight: 800 }}>Scheduled Automated Timed Releases Table</h3>
                 </div>
                 <span style={{ fontSize: "12px", color: "#0369a1", fontWeight: 700, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "4px 10px", borderRadius: "8px" }}>
                   Active Timers: {notices.filter(n => n.targetAudience === "Students" || (n.title && (n.title.includes("Timed Release") || n.title.includes("Release Schedule")))).length}
@@ -1173,7 +1175,7 @@ export default function AdminResultManagementPage() {
                               <td style={{ padding: "10px 14px", fontWeight: 600 }}>{n.title}</td>
                               <td style={{ padding: "10px 14px" }}>
                                 <span style={{ background: "#e0f2fe", color: "#0369a1", fontWeight: 700, padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
-                                  Students 🎓
+                                  Students
                                 </span>
                               </td>
                               <td style={{ padding: "10px 14px", fontWeight: 700, color: isExpired ? "#166534" : "#0284c7" }}>
@@ -1181,7 +1183,7 @@ export default function AdminResultManagementPage() {
                               </td>
                               <td style={{ padding: "10px 14px" }}>
                                 <span style={{ background: isExpired ? "#dcfce7" : "#e0f2fe", color: isExpired ? "#166534" : "#0284c7", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
-                                  {isExpired ? "Released & Published 🟢" : "Scheduled Timer ⏳"}
+                                  {isExpired ? "Released & Published" : "Scheduled Timer"}
                                 </span>
                               </td>
                               <td style={{ padding: "10px 14px", textAlign: "center" }}>
@@ -1392,8 +1394,7 @@ export default function AdminResultManagementPage() {
             <div style={{ marginTop: "28px", background: "#ffffff", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid #cbd5e1" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#16a34a" }} />
-                  <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16.5px", fontWeight: 800 }}>📅 Department-Wise Calculated GPA & CGPA History Registry</h3>
+                  <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16.5px", fontWeight: 800 }}>Department-Wise Calculated GPA & CGPA History Registry</h3>
                 </div>
 
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -1463,7 +1464,7 @@ export default function AdminResultManagementPage() {
                             </td>
                             <td style={{ padding: "10px 14px" }}>
                               <span style={{ background: "#dcfce7", color: "#166534", fontWeight: 700, padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px" }}>
-                                Recorded 🟢
+                                Recorded
                               </span>
                             </td>
                           </tr>

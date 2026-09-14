@@ -95,7 +95,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           >
             {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
           </button>
-          <span className="mobile-brand-title">UFTB Moodle</span>
+          <span className="mobile-brand-title">UniCore</span>
           <span className="badge student">Student</span>
         </div>
 
@@ -109,7 +109,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
 
         <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`} onClick={() => setMobileOpen(false)}>
           <div className="sidebar-header">
-            <h2>UFTB Moodle</h2>
+            <h2>UniCore</h2>
             <span className="badge student">Student</span>
           </div>
         <div className="user-info">
@@ -223,16 +223,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             <span>Academic Transcript</span>
           </button>
 
-          {/* 7. Academic Calendar */}
-          <button
-            className={`nav-item ${currentPage === "calendar" || window.location.pathname.includes("/academic-calendar") ? "active" : ""}`}
-            onClick={() => navigate("/academic-calendar")}
-          >
-            <FiCalendar size={18} />
-            <span>Academic Calendar</span>
-          </button>
-
-          {/* 8. Community Hub Dropdown */}
+          {/* 7. Community Hub Dropdown */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <button
               className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
@@ -275,6 +266,15 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
             )}
           </div>
 
+          {/* 8. Academic Calendar */}
+          <button
+            className={`nav-item ${currentPage === "calendar" || window.location.pathname.includes("/academic-calendar") ? "active" : ""}`}
+            onClick={() => navigate("/academic-calendar")}
+          >
+            <FiCalendar size={18} />
+            <span>Academic Calendar</span>
+          </button>
+
           {/* 9. Notice Board (FiClipboard icon to prevent clash with FiBell) */}
           <button
             className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/student/notices") ? "active" : ""}`}
@@ -316,7 +316,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
         >
           {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
         </button>
-        <span className="mobile-brand-title">UFTB Moodle</span>
+        <span className="mobile-brand-title">UniCore</span>
         <span className="badge student">Student</span>
       </div>
 
@@ -330,7 +330,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
 
       <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`} onClick={() => setMobileOpen(false)}>
         <div className="sidebar-header">
-          <h2>UFTB Moodle</h2>
+          <h2>UniCore</h2>
           <span className="badge student">Student</span>
         </div>
       <div className="user-info">

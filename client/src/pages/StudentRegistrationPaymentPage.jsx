@@ -277,7 +277,7 @@ export default function StudentRegistrationPaymentPage() {
                         }}
                       >
                         {isPaid ? <FiPrinter size={16} /> : <FiFileText size={16} />}
-                        {isPaid ? "Official Money Receipt & Slip" : "Official Registration Invoice"}
+                        {isPaid ? "Money Receipt & Slip" : "Registration Invoice"}
                       </button>
 
                       {!isPaid && (

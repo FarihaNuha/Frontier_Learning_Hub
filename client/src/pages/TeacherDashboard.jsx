@@ -380,7 +380,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
   };
 
   return (
-    <div className="dashboard-container" style={courseId ? { display: "block" } : {}}>
+    <div className="dashboard-container" style={courseId ? { display: "block", minHeight: "auto", height: "auto" } : {}}>
       {/* SIDEBAR */}
       {!courseId && (
         <TeacherSidebar
@@ -390,7 +390,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
       )}
 
       {/* MAIN CONTENT */}
-      <div className="main-content" style={courseId ? { padding: 0 } : {}}>
+      <div className="main-content" style={courseId ? { padding: 0, overflow: "visible", maxHeight: "none", height: "auto" } : {}}>
         <div className="top-bar">
           <div>
             {viewMode === "weekDetail" && selectedWeek ? (

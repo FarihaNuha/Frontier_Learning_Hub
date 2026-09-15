@@ -149,7 +149,7 @@ export default function AdminNoticeManagementPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
 
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
@@ -196,7 +196,7 @@ export default function AdminNoticeManagementPage() {
                         {n.category || "General"}
                       </span>
                       <span style={{ background: "#fef3c7", color: "#b45309", fontWeight: 700, padding: "2px 8px", borderRadius: "6px", fontSize: "11.5px" }}>
-                        👥 Target: {n.targetAudience || "All"}
+                        Target: {n.targetAudience || "All"}
                       </span>
                       <h3 style={{ margin: 0, fontSize: "18px", color: "#0f172a" }}>{n.title}</h3>
                     </div>
@@ -222,7 +222,7 @@ export default function AdminNoticeManagementPage() {
 
                 {/* Attachments */}
                 {(n.pdfUrl || (n.imageUrls && n.imageUrls.length > 0)) && (
-                  <div style={{ background: "#f8fafc", padding: "12px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
+                  <div style={{ background: "#E8F4FD", padding: "12px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
                     {n.pdfUrl && (
                       <a href={n.pdfUrl} target="_blank" rel="noreferrer" style={{ color: "#3b8db3", fontWeight: 600, fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}>
                         <FiPaperclip size={14} /> Open PDF Attachment
@@ -268,7 +268,7 @@ export default function AdminNoticeManagementPage() {
                   </div>
 
                   <div>
-                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#334155", marginBottom: "4px" }}>Target Audience 👥</label>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#334155", marginBottom: "4px" }}>Target Audience</label>
                     <select value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1.5px solid #3b8db3", fontSize: "13.5px", fontWeight: 600, background: "#f0f9ff" }}>
                       <option value="All">All (Both Teachers & Students)</option>
                       <option value="Teachers">Teachers Only (Exam Marks Submission)</option>

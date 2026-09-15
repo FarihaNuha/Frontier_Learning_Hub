@@ -126,7 +126,7 @@ export default function TeacherNoticePage() {
   const activeNotices = courseIdParam ? courseNotices : filteredAdminNotices;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <TeacherSidebar currentPage="notices" courseId={courseIdParam} courseInfo={courseInfo} />
 
       <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
@@ -155,7 +155,7 @@ export default function TeacherNoticePage() {
                   : "Official Notice Board"}
               </h1>
             </div>
-            <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
+            <p style={{ margin: 0, color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px" }}>
               {courseIdParam
                 ? `Announcements & notice updates sent directly to students enrolled in ${courseInfo?.displayCode || "this course"}.`
                 : "Official announcements, administrative notices, and academic directives issued by University Administration."}
@@ -395,8 +395,8 @@ export default function TeacherNoticePage() {
                 </h2>
 
                 {/* Content Body */}
-                <p
-                  style={{
+                <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}
+                  style={{ color: "#3B8DB3", fontWeight: 600, 
                     margin: "0 0 16px 0",
                     color: "#334155",
                     fontSize: "14px",
@@ -411,7 +411,7 @@ export default function TeacherNoticePage() {
                 {(n.pdfUrl || (n.imageUrls && n.imageUrls.length > 0) || (n.attachments && n.attachments.length > 0)) && (
                   <div
                     style={{
-                      background: "#f8fafc",
+                      background: "#E8F4FD",
                       padding: "14px",
                       borderRadius: "10px",
                       border: "1px solid #e2e8f0",

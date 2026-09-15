@@ -26,7 +26,7 @@ export default function SkeletonLoader({ type = "page" }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8FAFC", padding: "32px 24px", display: "flex", gap: "24px" }}>
+    <div style={{ minHeight: "100vh", background: "#E8F4FD", padding: "32px 24px", display: "flex", gap: "24px" }}>
       <style>{shimmerStyle}</style>
       {/* Sidebar skeleton */}
       <div style={{ width: "260px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "16px" }}>

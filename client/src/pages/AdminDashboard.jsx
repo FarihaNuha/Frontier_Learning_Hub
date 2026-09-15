@@ -97,7 +97,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
         <div style={{ marginBottom: "32px" }}>
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
                           justifyContent: "space-between",
                           alignItems: "center",
                           padding: "10px 14px",
-                          background: "#f8fafc",
+                          background: "#E8F4FD",
                           borderRadius: "8px",
                           border: "1px solid #f1f5f9",
                         }}
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                           justifyContent: "space-between",
                           alignItems: "center",
                           padding: "10px 14px",
-                          background: "#f8fafc",
+                          background: "#E8F4FD",
                           borderRadius: "8px",
                           border: "1px solid #f1f5f9",
                         }}

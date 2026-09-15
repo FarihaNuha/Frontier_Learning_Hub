@@ -218,7 +218,7 @@ export default function CourseCommunity() {
         <div className="feed-header">
           <div>
             <h1>Course Discussions</h1>
-            <p>Ask questions, share resources, and connect with classmates</p>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>Ask questions, share resources, and connect with classmates</p>
           </div>
           {canCreateInCurrentTab && (
             <button

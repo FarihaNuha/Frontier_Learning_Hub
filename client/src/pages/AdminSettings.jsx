@@ -3,12 +3,12 @@ import AdminSidebar from "../components/AdminSidebar";
 
 export default function AdminSettings() {
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
         <div style={{ marginBottom: "32px" }}>
           <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Settings</h1>
-          <p style={{ margin: "4px 0 0 0", color: "#64748b" }}>Admin Profile and System settings</p>
+          <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600 }}>Admin Profile and System settings</p>
         </div>
 
         <div style={{

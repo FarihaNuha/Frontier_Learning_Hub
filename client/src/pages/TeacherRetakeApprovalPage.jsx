@@ -57,7 +57,7 @@ export default function TeacherRetakeApprovalPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <TeacherSidebar currentPage="retake-approval" />
 
       <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
@@ -71,7 +71,7 @@ export default function TeacherRetakeApprovalPage() {
               Retake Adviser Approvals
             </h1>
           </div>
-          <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+          <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
             Review and approve student retake registration requests. Approved students are automatically enrolled in the course roster.
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function TeacherRetakeApprovalPage() {
                 </div>
 
                 {r.comment && (
-                  <div style={{ fontSize: "12.5px", color: "#64748b", background: "#f8fafc", padding: "8px 12px", borderRadius: "6px", marginTop: "8px" }}>
+                  <div style={{ fontSize: "12.5px", color: "#64748b", background: "#E8F4FD", padding: "8px 12px", borderRadius: "6px", marginTop: "8px" }}>
                     <strong>Adviser Note:</strong> {r.comment}
                   </div>
                 )}
@@ -133,7 +133,7 @@ export default function TeacherRetakeApprovalPage() {
                 <FiX size={20} color="#64748b" cursor="pointer" onClick={() => setSelectedRequest(null)} />
               </div>
 
-              <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "16px", fontSize: "13.5px" }}>
+              <div style={{ background: "#E8F4FD", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "16px", fontSize: "13.5px" }}>
                 <div>Student: <strong>{selectedRequest.studentName} ({selectedRequest.studentId})</strong></div>
                 <div>Course: <strong>{selectedRequest.courseCode} - {selectedRequest.courseTitle}</strong></div>
                 <div>Target Session: <strong>{selectedRequest.targetSession}</strong></div>

@@ -69,7 +69,7 @@ export default function AdminRegistrationList() {
   });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
         {/* Header */}
@@ -190,7 +190,7 @@ export default function AdminRegistrationList() {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13.5px" }}>
                 <thead>
-                  <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "2px solid #e2e8f0", fontWeight: 700 }}>
+                  <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                     <th style={{ padding: "12px 14px" }}>STUDENT ID</th>
                     <th style={{ padding: "12px 14px" }}>DEPARTMENT</th>
                     <th style={{ padding: "12px 14px" }}>SESSION</th>

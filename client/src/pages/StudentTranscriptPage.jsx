@@ -37,7 +37,7 @@ export default function StudentTranscriptPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <div className="no-print">
         <StudentSidebar currentPage="transcript" />
       </div>
@@ -49,7 +49,7 @@ export default function StudentTranscriptPage() {
             <h1 style={{ color: "#1e293b", margin: 0, fontSize: "26px", fontWeight: 700 }}>
               Official Academic Transcript
             </h1>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
               Official university record of courses completed, letter grades, semester GPAs, and overall CGPA.
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function StudentTranscriptPage() {
               <h2 style={{ margin: 0, color: "#2C4B66", fontSize: "22px", letterSpacing: 0.5, textTransform: "uppercase" }}>
                 University of Frontier Technology, Bangladesh
               </h2>
-              <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: "13px", fontWeight: 600 }}>
+              <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", fontWeight: 600 }}>
                 OFFICIAL ACADEMIC TRANSCRIPT OF RECORD
               </p>
               <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
@@ -105,7 +105,7 @@ export default function StudentTranscriptPage() {
             </div>
 
             {/* Student Meta Table */}
-            <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "28px" }}>
+            <div style={{ background: "#E8F4FD", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "28px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "13.5px" }}>
                 <div><strong>Student Name:</strong> {studentInfo.name}</div>
                 <div><strong>Student ID:</strong> {studentInfo.studentId}</div>

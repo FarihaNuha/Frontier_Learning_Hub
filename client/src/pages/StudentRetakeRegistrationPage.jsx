@@ -69,7 +69,7 @@ export default function StudentRetakeRegistrationPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <StudentSidebar currentPage="retake-registration" />
 
       <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
@@ -83,7 +83,7 @@ export default function StudentRetakeRegistrationPage() {
               Retake Course Registration
             </h1>
           </div>
-          <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+          <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
             Register to retake failed courses in upcoming sessions. Submissions require Adviser approval.
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function StudentRetakeRegistrationPage() {
                   </div>
 
                   {selectedCourse && (
-                    <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0", marginTop: "12px" }}>
+                    <div style={{ background: "#E8F4FD", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0", marginTop: "12px" }}>
                       <h4 style={{ margin: "0 0 12px 0", color: "#0f172a", fontSize: "15px" }}>
                         Submit Retake Request: <strong>{selectedCourse.courseCode}</strong>
                       </h4>
@@ -179,7 +179,7 @@ export default function StudentRetakeRegistrationPage() {
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                     <thead>
-                      <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
+                      <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700 }}>
                         <th style={{ padding: "10px 14px" }}>Course Code</th>
                         <th style={{ padding: "10px 14px" }}>Course Title</th>
                         <th style={{ padding: "10px 14px" }}>Prev Grade</th>

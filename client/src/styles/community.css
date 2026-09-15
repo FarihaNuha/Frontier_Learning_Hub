@@ -374,12 +374,16 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: none;
-  border: none;
-  color: #3b8db3;
+  background: #ffffff;
+  border: 1.5px solid #3b8db3;
+  color: #1e293b;
   cursor: pointer;
-  font-size: 14px;
-  padding: 8px 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(59, 141, 179, 0.15);
+  transition: all 0.2s ease;
 }
 
 .back-btn:hover {
@@ -1316,7 +1320,7 @@
 
 .system-share-btn {
   width: 100%;
-  background: #f8fafc;
+  background: #E8F4FD;
   border: 1px solid #e2e8f0;
   color: #475569;
   font-weight: 600;
@@ -1340,7 +1344,7 @@
 .share-link-copy-section {
   display: flex;
   gap: 8px;
-  background: #f8fafc;
+  background: #E8F4FD;
   border: 1px solid #e2e8f0;
   padding: 6px 6px 6px 12px;
   border-radius: 12px;
@@ -1395,7 +1399,7 @@
 /* Inline Comments Section */
 .inline-comments-section {
   margin-top: 16px;
-  background: #f8fafc;
+  background: #E8F4FD;
   border-radius: 12px;
   padding: 16px;
   border: 1px solid #edf2f7;
@@ -1712,7 +1716,7 @@
 .shared-post-nested-card {
   margin: 14px 0;
   padding: 16px;
-  background: #f8fafc;
+  background: #E8F4FD;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   position: relative;
@@ -1882,7 +1886,7 @@
   color: #64748b;
   font-weight: 600;
   transition: all 0.2s ease;
-  background: #f8fafc;
+  background: #E8F4FD;
 }
 
 .file-upload-label:hover {
@@ -1956,7 +1960,7 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  background: #E8F4FD;
 }
 
 .attachment-image {
@@ -2016,7 +2020,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: #f8fafc;
+  background: #E8F4FD;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   transition: all 0.2s ease;
@@ -2175,7 +2179,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  background: #f8fafc;
+  background: #E8F4FD;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   transition: all 0.2s ease;
@@ -2400,7 +2404,7 @@
   display: flex;
   gap: 8px;
   padding: 10px 16px;
-  background: #f8fafc;
+  background: #E8F4FD;
   border-bottom: 1px solid #e2e8f0;
   overflow-x: auto;
 }
@@ -2496,7 +2500,7 @@
 }
 
 .message-bubble.received .msg-attachment-item {
-  background: #f8fafc;
+  background: #E8F4FD;
   border-color: #e2e8f0;
 }
 

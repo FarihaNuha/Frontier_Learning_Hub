@@ -408,7 +408,7 @@ export default function TeacherAssessmentPage() {
         <div className="top-bar">
           <div>
             <h1>Assessment Marksheet Management</h1>
-            <p style={{ color: "#6b89a0", marginTop: 4 }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, marginTop: 4 }}>
               Upload and manage student marks dynamically using Excel files
             </p>
           </div>
@@ -421,7 +421,7 @@ export default function TeacherAssessmentPage() {
               <h2 style={{ fontSize: 18, color: "#2c4b66", margin: 0 }}>
                 Upload Assessment Sheet
               </h2>
-              <p style={{ fontSize: 13, color: "#6b89a0", marginTop: 4, marginBottom: 0 }}>
+              <p style={{ fontSize: 13, color: "#3B8DB3", fontWeight: 600, marginTop: 4, marginBottom: 0 }}>
                 Upload an Excel (`.xlsx` or `.csv`) sheet. Course Code, Level, Term, Dept & student marks will be parsed automatically.
               </p>
             </div>
@@ -632,7 +632,7 @@ export default function TeacherAssessmentPage() {
                       fontSize: 13,
                       width: "100%",
                       outline: "none",
-                      background: "#f8fafc",
+                      background: "#E8F4FD",
                     }}
                   />
                   <FiSearch
@@ -709,7 +709,7 @@ export default function TeacherAssessmentPage() {
                                 <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "#ffffff", letterSpacing: "0.4px" }}>
                                   Session: {sessionName}
                                 </h2>
-                                <p style={{ margin: "2px 0 0 0", fontSize: "13px", color: "#e0f2fe", opacity: 0.9 }}>
+                                <p style={{ color: "#3B8DB3", fontWeight: 600,  margin: "2px 0 0 0", fontSize: "14.5px", color: "#e0f2fe", opacity: 0.9 }}>
                                   Assessment marksheets for academic session {sessionName}
                                 </p>
                               </div>
@@ -732,7 +732,7 @@ export default function TeacherAssessmentPage() {
                           {/* Departments & Level-Terms under this Session */}
                           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
                             {Object.entries(deptMap).map(([deptName, levelTermsMap]) => (
-                              <div key={deptName} style={{ background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "20px" }}>
+                              <div key={deptName} style={{ background: "#E8F4FD", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "20px" }}>
                                 {/* Department Header */}
                                 <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "12px", borderBottom: "2px solid #3b8db3", marginBottom: "20px" }}>
                                   <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "6px 14px", borderRadius: "8px", fontWeight: 700, fontSize: "14px" }}>
@@ -1167,7 +1167,7 @@ export default function TeacherAssessmentPage() {
                 </p>
               )}
             </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", padding: "16px 20px", borderTop: "1px solid #f1f5f9", background: "#f8fafc" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", padding: "16px 20px", borderTop: "1px solid #f1f5f9", background: "#E8F4FD" }}>
               <button
                 onClick={() => setDeleteTarget(null)}
                 className="btn-secondary"
@@ -1248,7 +1248,7 @@ export default function TeacherAssessmentPage() {
                       <div
                         key={req._id}
                         style={{
-                          background: "#f8fafc",
+                          background: "#E8F4FD",
                           border: "1px solid #e2e8f0",
                           borderRadius: "12px",
                           padding: "18px",

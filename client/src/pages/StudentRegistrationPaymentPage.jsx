@@ -84,7 +84,7 @@ export default function StudentRegistrationPaymentPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <StudentSidebar currentPage="payments" />
 
       <div style={{ flex: 1, padding: "36px 32px", overflowY: "auto" }}>
@@ -99,7 +99,7 @@ export default function StudentRegistrationPaymentPage() {
                 Semester Registration Payments
               </h1>
             </div>
-            <p style={{ margin: 0, color: "#64748b", fontSize: "14.5px" }}>
+            <p style={{ margin: 0, color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px" }}>
               Comprehensive payment portal for all registered level-term semesters, course fee breakdowns, and payment statuses.
             </p>
           </div>
@@ -121,7 +121,7 @@ export default function StudentRegistrationPaymentPage() {
         </div>
 
         {/* Formal Academic Payment Policy Banner */}
-        <div style={{ background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", color: "#334155", fontSize: "14px", marginBottom: "28px", border: "1px solid #cbd5e1", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+        <div style={{ background: "#E8F4FD", padding: "16px 20px", borderRadius: "12px", color: "#334155", fontSize: "14px", marginBottom: "28px", border: "1px solid #cbd5e1", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
           <FiAlertCircle size={22} style={{ color: "#0284c7" }} />
           <div>
             <strong style={{ color: "#0f172a" }}>Semester Registration Fee Notice:</strong>{" "}
@@ -138,7 +138,7 @@ export default function StudentRegistrationPaymentPage() {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
                 <thead>
-                  <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, borderBottom: "1.5px solid #cbd5e1" }}>
+                  <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700, borderBottom: "1.5px solid #cbd5e1" }}>
                     <th style={{ padding: "12px 16px" }}>Semester (Level & Term)</th>
                     <th style={{ padding: "12px 16px" }}>Session</th>
                     <th style={{ padding: "12px 16px" }}>Total Fee (BDT)</th>
@@ -332,7 +332,7 @@ export default function StudentRegistrationPaymentPage() {
                   <div style={{ overflowX: "auto", marginBottom: "20px", border: "1px solid #e2e8f0", borderRadius: "10px" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                       <thead>
-                        <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, borderBottom: "1px solid #e2e8f0" }}>
+                        <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700, borderBottom: "1px solid #e2e8f0" }}>
                           <th style={{ padding: "10px 14px" }}>Code</th>
                           <th style={{ padding: "10px 14px" }}>Course Title</th>
                           <th style={{ padding: "10px 14px" }}>Type</th>
@@ -382,7 +382,7 @@ export default function StudentRegistrationPaymentPage() {
                   <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", marginBottom: "20px" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left" }}>
                       <thead>
-                        <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1px solid #e2e8f0" }}>
+                        <tr style={{ background: "#e2e8f0", color: "#0f172a", borderBottom: "1px solid #e2e8f0" }}>
                           <th style={{ padding: "8px 12px", width: "40px" }}>#</th>
                           <th style={{ padding: "8px 12px" }}>Fee Item Description</th>
                           <th style={{ padding: "8px 12px", textAlign: "right" }}>Amount (BDT)</th>

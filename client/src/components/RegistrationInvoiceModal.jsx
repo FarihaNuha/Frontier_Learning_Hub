@@ -226,7 +226,7 @@ export default function RegistrationInvoiceModal({
               </div>
 
               {/* Student Information Box */}
-              <div style={{ background: "#f8fafc", borderRadius: "10px", padding: "12px 16px", border: "1px solid #e2e8f0", marginBottom: "16px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", fontSize: "12px" }}>
+              <div style={{ background: "#E8F4FD", borderRadius: "10px", padding: "12px 16px", border: "1px solid #e2e8f0", marginBottom: "16px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", fontSize: "12px" }}>
                 <div>
                   <span style={{ color: "#64748b", display: "block", fontSize: "10.5px", fontWeight: 700, textTransform: "uppercase" }}>Student Name</span>
                   <strong style={{ fontSize: "13px", color: "#0f172a" }}>{invoice.studentName}</strong>
@@ -265,7 +265,7 @@ export default function RegistrationInvoiceModal({
                       <td style={{ padding: "5px 10px", textAlign: "right", fontWeight: 600 }}>৳{c.fee} BDT</td>
                     </tr>
                   ))}
-                  <tr style={{ background: "#f8fafc", fontWeight: 700 }}>
+                  <tr style={{ background: "#E8F4FD", fontWeight: 700 }}>
                     <td colSpan={4} style={{ padding: "6px 10px", textAlign: "right", color: "#475569" }}>Course Subtotal:</td>
                     <td style={{ padding: "6px 10px", textAlign: "right", color: "#0284c7" }}>৳{invoice.courseSubtotal?.toLocaleString()} BDT</td>
                   </tr>

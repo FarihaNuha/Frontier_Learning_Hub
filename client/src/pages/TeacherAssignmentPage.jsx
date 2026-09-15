@@ -342,7 +342,7 @@ export default function TeacherAssignmentPage({
               style={{
                 fontSize: "16px",
                 fontWeight: 600,
-                color: "#3B8DB3",
+                color: "#3B8DB3", fontWeight: 600,
                 marginTop: 4,
                 display: "flex",
                 alignItems: "center",
@@ -961,7 +961,7 @@ export default function TeacherAssignmentPage({
                       width: "100%",
                       height: "100%",
                       overflow: "auto",
-                      background: "#f8fafc",
+                      background: "#E8F4FD",
                       borderRadius: "8px",
                       border: "1px solid #e2eef6",
                       padding: "20px",
@@ -976,7 +976,7 @@ export default function TeacherAssignmentPage({
                     {previewText}
                   </pre>
                 ) : previewType === "image" ? (
-                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%", overflow: "auto", background: "#f8fafc", borderRadius: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%", overflow: "auto", background: "#E8F4FD", borderRadius: "8px" }}>
                     <img 
                       src={previewBlobUrl} 
                       alt={previewFile.title} 

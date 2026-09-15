@@ -514,7 +514,7 @@ export default function StudentExamPage({
           <div className="exam-header-bar">
             <div>
               <h2>{activeExam.title}</h2>
-              <p>
+              <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>
                 {activeExam.course} | {activeExam.questions.length} Q |{" "}
                 {activeExam.totalMarks} Marks
               </p>
@@ -711,7 +711,7 @@ export default function StudentExamPage({
                   style={{
                     fontSize: "16px",
                     fontWeight: 600,
-                    color: "#3B8DB3",
+                    color: "#3B8DB3", fontWeight: 600,
                     marginTop: 4,
                     display: "flex",
                     alignItems: "center",
@@ -1037,7 +1037,7 @@ export default function StudentExamPage({
               <div className="empty-state">
                 <FiFileText size={48} color="#6B89A0" />
                 <h3>No submissions found</h3>
-                <p>
+                <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>
                   You haven't taken any exams for {courseInfo.displayCode} yet.
                 </p>
               </div>
@@ -1227,7 +1227,7 @@ export default function StudentExamPage({
               >
                 <div>
                   <h2 style={{ margin: 0, color: "#2C4B66" }}>{selectedSubmission.examId?.title}</h2>
-                  <p style={{ margin: "5px 0 0 0", color: "#6B89A0", fontSize: 14 }}>
+                  <p style={{ margin: "5px 0 0 0", color: "#3B8DB3", fontWeight: 600, fontSize: 14 }}>
                     {selectedSubmission.examId?.course} | {selectedSubmission.examId?.duration} min
                   </p>
                   <p style={{ margin: "5px 0 0 0", fontSize: 13, color: "#6B89A0" }}>

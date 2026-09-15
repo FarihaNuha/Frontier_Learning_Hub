@@ -22,7 +22,7 @@ export default function UnderDevelopmentPage({ moduleName = "Result Management &
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       {/* Sidebar based on user role */}
       {user?.role === "admin" && <AdminSidebar />}
       {user?.role === "teacher" && <TeacherSidebar />}

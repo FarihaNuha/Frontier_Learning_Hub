@@ -149,7 +149,7 @@ export default function OfficialAcademicCalendarCard({ customData, fileUrl, onUp
         <h3 style={{ margin: "0 0 4px 0", fontSize: "17px", fontWeight: 700 }}>
           {data.title || DEFAULT_CALENDAR_DATA.title}
         </h3>
-        <p style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: 600 }}>
+        <p style={{ color: "#3B8DB3", fontWeight: 600,  margin: "0 0 6px 0", fontSize: "14px", fontWeight: 600 }}>
           {data.session || DEFAULT_CALENDAR_DATA.session}
         </p>
         <div

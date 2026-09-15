@@ -46,7 +46,7 @@ export default function TeacherHomeDashboard() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <TeacherSidebar currentPage="dashboard" />
 
       <div
@@ -63,7 +63,7 @@ export default function TeacherHomeDashboard() {
             <h1 style={{ color: "#1e293b", margin: 0, fontSize: "28px", fontWeight: 800 }}>
               Teacher Overview Dashboard
             </h1>
-            <p style={{ color: "#64748b", margin: "4px 0 0 0", fontSize: "14.5px" }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, margin: "4px 0 0 0", fontSize: "14.5px" }}>
               Welcome back, <strong>{user?.name || "Faculty Member"}</strong>! Here is your academic overview, adviser portal, and quick management hub.
             </p>
           </div>

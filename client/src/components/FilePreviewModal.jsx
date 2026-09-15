@@ -199,7 +199,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
             alignItems: "center",
             padding: "16px 24px",
             borderBottom: "1px solid #f1f5f9",
-            background: "#f8fafc"
+            background: "#E8F4FD"
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px", overflow: "hidden" }}>
@@ -276,7 +276,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
                 </div>
               ) : (
                 pptxSlides.map((slide, idx) => (
-                  <div key={idx} style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "12px", padding: "20px", marginBottom: "16px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+                  <div key={idx} style={{ background: "#E8F4FD", border: "1px solid #cbd5e1", borderRadius: "12px", padding: "20px", marginBottom: "16px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
                     <h5 style={{ color: "#0284c7", margin: "0 0 10px 0", fontSize: "15px", borderBottom: "1px solid #e2e8f0", paddingBottom: "6px" }}>Slide {slide.slideNum}</h5>
                     <pre style={{ whiteSpace: "pre-wrap", fontFamily: "inherit", color: "#334155", margin: 0, fontSize: "14px", lineHeight: "1.6" }}>
                       {slide.text}

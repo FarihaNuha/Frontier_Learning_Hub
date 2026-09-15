@@ -279,7 +279,7 @@ export default function StudentAttendancePage({
               style={{
                 fontSize: "16px",
                 fontWeight: 600,
-                color: "#3B8DB3",
+                color: "#3B8DB3", fontWeight: 600,
                 marginTop: 4,
                 display: "flex",
                 alignItems: "center",
@@ -448,7 +448,7 @@ export default function StudentAttendancePage({
               <div className="empty-state">
                 <FiFile size={48} color="#6B89A0" />
                 <h3>No attendance records found</h3>
-                <p>
+                <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>
                   No attendance records available for {courseInfo.displayCode}.
                 </p>
                 <p style={{ fontSize: 12, color: "#6B89A0", marginTop: 8 }}>
@@ -499,7 +499,7 @@ export default function StudentAttendancePage({
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr style={{ background: "#E8F4FD" }}>
+                    <tr style={{ background: "#e2e8f0", color: "#0f172a" }}>
                       <td
                         colSpan="2"
                         style={{ textAlign: "right", padding: "12px 16px" }}

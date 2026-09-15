@@ -110,7 +110,7 @@ export default function AnnouncementModule({ courseId, isTeacher }) {
 
       {/* New Announcement Form */}
       {showForm && (
-        <form onSubmit={handleCreate} style={{ background: "#f8fafc", padding: "20px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "24px" }}>
+        <form onSubmit={handleCreate} style={{ background: "#E8F4FD", padding: "20px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "24px" }}>
           <h3 style={{ margin: "0 0 14px 0", fontSize: "15px", color: "#0f172a" }}>Post New Announcement</h3>
           <div style={{ marginBottom: "12px" }}>
             <input

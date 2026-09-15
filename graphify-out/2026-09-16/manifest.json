@@ -660,8 +660,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAcademicResultsPage.jsx": {
-    "mtime": 1789501619.3781407,
-    "ast_hash": "0eb9cd2e48d9a74a7c9a075646284f16",
+    "mtime": 1789486935.5629225,
+    "ast_hash": "e819f1899e174bd0f8db60b7e7d9cc16",
     "semantic_hash": ""
   },
   "client/src/pages/StudentLevelTermPage.jsx": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherResultManagementPage.jsx": {
-    "mtime": 1789500652.9460363,
-    "ast_hash": "38de67b81958ddb244d6d86b1efcd385",
+    "mtime": 1789483182.0993757,
+    "ast_hash": "0f4485d4149110183e199b9f75dffebe",
     "semantic_hash": ""
   },
   "server/controllers/announcementController.js": {
@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
-    "mtime": 1789500319.236735,
-    "ast_hash": "822952d3801323796fa777dcb079d534",
+    "mtime": 1789488049.3940918,
+    "ast_hash": "fe73803bb73e2ff7027c1dcf7b0c6a9b",
     "semantic_hash": ""
   },
   "server/models/Announcement.js": {

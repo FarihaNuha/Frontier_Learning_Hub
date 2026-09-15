@@ -185,7 +185,7 @@ export default function StudentAssessmentPage() {
             <h1>
               {courseInfo ? `${courseInfo.displayCode} Assessment Marksheet` : "Personal Assessment Marksheet"}
             </h1>
-            <p style={{ color: "#6b89a0", marginTop: 4 }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, marginTop: 4 }}>
               {courseInfo
                 ? `Viewing your assessment component scores for ${courseInfo.displayCode} - ${courseInfo.name}`
                 : "Securely view all your assessment component scores and total CA marks"}
@@ -432,7 +432,7 @@ export default function StudentAssessmentPage() {
                           </td>
                         </tr>
                         {existingReq && (
-                          <tr style={{ background: "#f8fafc" }}>
+                          <tr style={{ background: "#e2e8f0", color: "#0f172a" }}>
                             <td colSpan={7} style={{ padding: "12px 18px", fontSize: "13px" }}>
                               <div style={{
                                 background: "#ffffff",
@@ -509,7 +509,7 @@ export default function StudentAssessmentPage() {
               </div>
             )}
 
-            <div style={{ background: "#f8fafc", padding: "12px 16px", borderRadius: "10px", marginBottom: "16px", border: "1px solid #e2e8f0" }}>
+            <div style={{ background: "#E8F4FD", padding: "12px 16px", borderRadius: "10px", marginBottom: "16px", border: "1px solid #e2e8f0" }}>
               <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#1e293b" }}>Course Code: {selectedRecordForIssue.courseCode}</div>
               <div style={{ fontSize: "12.5px", color: "#64748b", marginTop: "4px" }}>
                 CA Total: {selectedRecordForIssue.totalMarks} Marks (Attendance: {selectedRecordForIssue.attendance}, Quiz: {selectedRecordForIssue.quiz}, Assignment: {selectedRecordForIssue.assignment}, Presentation: {selectedRecordForIssue.presentation})

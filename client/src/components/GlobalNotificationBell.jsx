@@ -306,7 +306,7 @@ export default function GlobalNotificationBell() {
           position: relative;
         }
         .notification-item:hover {
-          background: #F8FAFC;
+          background: #E8F4FD;
         }
         .notification-item.unread {
           background: #F0F9FF;

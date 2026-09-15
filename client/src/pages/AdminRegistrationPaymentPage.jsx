@@ -77,7 +77,7 @@ export default function AdminRegistrationPaymentPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
 
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
@@ -134,7 +134,7 @@ export default function AdminRegistrationPaymentPage() {
           <div style={{ background: "#ffffff", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
               <thead>
-                <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
+                <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                   <th style={{ padding: "10px 14px" }}>Student ID</th>
                   <th style={{ padding: "10px 14px" }}>Student Name</th>
                   <th style={{ padding: "10px 14px" }}>Level-Term</th>
@@ -227,13 +227,13 @@ export default function AdminRegistrationPaymentPage() {
                   )}
 
                   {selectedPayment.previousDuesInfo.historyList?.length > 0 && (
-                    <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px", marginBottom: "16px" }}>
+                    <div style={{ background: "#E8F4FD", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px", marginBottom: "16px" }}>
                       <h4 style={{ margin: "0 0 10px 0", color: "#334155", fontSize: "13.5px" }}>
                         Student Academic Payment History (Prior Semesters):
                       </h4>
                       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px" }}>
                         <thead>
-                          <tr style={{ background: "#e2e8f0", color: "#334155" }}>
+                          <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                             <th style={{ padding: "6px 10px", textAlign: "left" }}>Semester</th>
                             <th style={{ padding: "6px 10px", textAlign: "center" }}>Payment Status</th>
                             <th style={{ padding: "6px 10px", textAlign: "right" }}>Previous Dues (BDT)</th>
@@ -272,7 +272,7 @@ export default function AdminRegistrationPaymentPage() {
               <h4 style={{ margin: "16px 0 8px 0", color: "#334155" }}>1. Courses Included in Registration Fee:</h4>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left", marginBottom: "16px" }}>
                 <thead>
-                  <tr style={{ background: "#f8fafc", color: "#475569" }}>
+                  <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                     <th style={{ padding: "8px" }}>Course Code</th>
                     <th style={{ padding: "8px" }}>Course Title</th>
                     <th style={{ padding: "8px" }}>Type</th>
@@ -300,7 +300,7 @@ export default function AdminRegistrationPaymentPage() {
               <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflow: "hidden", marginBottom: "16px" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
                   <thead>
-                    <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1px solid #e2e8f0" }}>
+                    <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                       <th style={{ padding: "6px 10px", width: "40px" }}>#</th>
                       <th style={{ padding: "6px 10px" }}>Fee Item</th>
                       <th style={{ padding: "6px 10px", textAlign: "right" }}>Amount (BDT)</th>

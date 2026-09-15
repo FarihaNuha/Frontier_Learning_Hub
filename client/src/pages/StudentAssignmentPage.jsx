@@ -384,7 +384,7 @@ export default function StudentAssignmentPage({
               style={{
                 fontSize: "16px",
                 fontWeight: 600,
-                color: "#3B8DB3",
+                color: "#3B8DB3", fontWeight: 600,
                 marginTop: 4,
                 display: "flex",
                 alignItems: "center",
@@ -682,7 +682,7 @@ export default function StudentAssignmentPage({
               <h3 style={{ color: "#2C4B66", marginTop: 8 }}>
                 {selectedAssignment.title}
               </h3>
-              <p style={{ color: "#6B89A0", marginBottom: 8 }}>
+              <p style={{ color: "#3B8DB3", fontWeight: 600, marginBottom: 8 }}>
                 Course: {selectedAssignment.course}
               </p>
               <p style={{ color: "#6B89A0", marginBottom: 8 }}>
@@ -783,7 +783,7 @@ export default function StudentAssignmentPage({
                     </p>
                   )}
                   {isEditMode && (
-                    <div style={{ marginBottom: "16px", background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ marginBottom: "16px", background: "#E8F4FD", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: "#2c4b66", marginBottom: "8px" }}>Currently submitted files:</p>
                       {remainingFiles.length > 0 ? (
                         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
@@ -869,7 +869,7 @@ export default function StudentAssignmentPage({
                       <p style={{ fontSize: 13, fontWeight: 600, color: "#2c4b66", marginBottom: 6 }}>Selected file(s) to upload:</p>
                       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                         {files.map((f, idx) => (
-                          <li key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px", background: "#f8fafc", borderRadius: 6, border: "1px solid #e2eef6", marginBottom: 4, fontSize: 13 }}>
+                          <li key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px", background: "#E8F4FD", borderRadius: 6, border: "1px solid #e2eef6", marginBottom: 4, fontSize: 13 }}>
                             <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <FiFile size={14} color="#6b89a0" /> {f.name}
                             </span>
@@ -1040,7 +1040,7 @@ export default function StudentAssignmentPage({
                       width: "100%",
                       height: "100%",
                       overflow: "auto",
-                      background: "#f8fafc",
+                      background: "#E8F4FD",
                       borderRadius: "8px",
                       border: "1px solid #e2eef6",
                       padding: "20px",
@@ -1055,7 +1055,7 @@ export default function StudentAssignmentPage({
                     {previewText}
                   </pre>
                 ) : previewType === "image" ? (
-                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%", overflow: "auto", background: "#f8fafc", borderRadius: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%", overflow: "auto", background: "#E8F4FD", borderRadius: "8px" }}>
                     <img
                       src={previewBlobUrl}
                       alt={previewFile.title}

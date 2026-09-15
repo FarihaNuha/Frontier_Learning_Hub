@@ -432,7 +432,7 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
-                  background: "#f8fafc",
+                  background: "#E8F4FD",
                   padding: "6px 8px",
                   borderRadius: "12px",
                   border: "1px solid #e2e8f0"

@@ -581,46 +581,75 @@ export default function TeacherResultManagementPage() {
     }
   };
 
-  const normalizeCode = (c) => String(c || "").replace(/\s+/g, "").toUpperCase();
+  const cleanCodeStr = (c) => String(c || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+  const normSessStr = (s) => {
+    if (!s) return "";
+    const str = String(s).trim();
+    const match = str.match(/\d{4}[-\s]?\d{2,4}/);
+    if (match) {
+      const raw = match[0].replace(/\s+/g, "-");
+      const parts = raw.split("-");
+      if (parts.length === 2 && parts[1].length === 4) {
+        return `${parts[0]}-${parts[1].substring(2)}`;
+      }
+      return raw;
+    }
+    return str.toLowerCase().replace(/\s+/g, "-");
+  };
   const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
 
-  // Combine active (non-deleted) uploads with assignedCourses to automatically generate cards for unuploaded assigned courses
-  const activeUploads = uploads.filter((u) => u.status !== "Deleted" && u.isDeleted !== true);
-
-  const existingUploadKeys = new Set();
-  activeUploads.forEach((u) => {
-    const code = normalizeCode(u.courseCode);
-    const sess = String(u.session || "").trim();
-    const ldig = extractDigit(u.level);
-    const tdig = extractDigit(u.term);
-    if (code) {
-      existingUploadKeys.add(`${code}_${sess}_${ldig}_${tdig}`);
-    }
-  });
+  // Combine active (non-deleted) uploads for the selected resultTypeTab with assignedCourses
+  const activeUploads = uploads.filter(
+    (u) => u.status !== "Deleted" && u.isDeleted !== true && (u.resultType || "Final") === resultTypeTab
+  );
 
   const combinedBatches = [...activeUploads];
   assignedCourses.forEach((ac) => {
-    const rawCode = ac.displayCode || ac.courseCode || ac.name || ac.courseTitle || "";
-    const code = normalizeCode(rawCode);
-    const sess = String(ac.session || "2023-24").trim();
-
+    const acSess = normSessStr(ac.session || "2023-24");
     const ltParts = (ac.levelTerm || "").split(/\s*-\s*/);
     const rawLevel = ac.level || ltParts[0] || "Level 1";
     const rawTerm = ac.term || ltParts[1] || "Term 1";
+    const acLdig = extractDigit(rawLevel);
+    const acTdig = extractDigit(rawTerm);
 
-    const ldig = extractDigit(rawLevel);
-    const tdig = extractDigit(rawTerm);
-    const key = `${code}_${sess}_${ldig}_${tdig}`;
+    const acCode = cleanCodeStr(ac.displayCode || ac.courseCode);
+    const acTitle = cleanCodeStr(ac.name || ac.courseTitle);
 
-    if (code && !existingUploadKeys.has(key)) {
-      existingUploadKeys.add(key);
+    // Check if any activeUpload for this resultTypeTab matches this assigned course
+    const isAlreadyUploaded = activeUploads.some((u) => {
+      const uSess = normSessStr(u.session);
+      if (acSess && uSess && acSess !== uSess) return false;
+
+      const uLdig = extractDigit(u.level);
+      const uTdig = extractDigit(u.term);
+      if (acLdig && uLdig && acLdig !== uLdig) return false;
+      if (acTdig && uTdig && acTdig !== uTdig) return false;
+
+      const uCode = cleanCodeStr(u.courseCode);
+      const uTitle = cleanCodeStr(u.courseTitle);
+
+      // Strict matching logic to prevent cross-course false positives (e.g. Theory vs Sessional)
+      if (acCode && uCode) {
+        return acCode === uCode;
+      }
+      if (acTitle && uTitle) {
+        return acTitle === uTitle;
+      }
+      if (acCode && uTitle) return acCode === uTitle;
+      if (acTitle && uCode) return acTitle === uCode;
+
+      return false;
+    });
+
+    if (!isAlreadyUploaded) {
+      const displayCodeVal = ac.displayCode || ac.courseCode || ac.name || ac.courseTitle || "Course";
       combinedBatches.push({
-        _id: `auto_${code}_${sess}_${ldig}_${tdig}`,
+        _id: `auto_${cleanCodeStr(displayCodeVal)}_${acSess}_${acLdig}_${acTdig}_${resultTypeTab}`,
         isAutoCard: true,
-        courseCode: ac.displayCode || ac.courseCode || code,
+        courseCode: displayCodeVal,
         courseTitle: ac.name || ac.courseTitle || ac.displayCode || "Course",
         department: ac.department || "EDTE",
-        session: sess,
+        session: ac.session || "2023-24",
         level: rawLevel,
         term: rawTerm,
         totalRecords: 0,
@@ -755,7 +784,7 @@ export default function TeacherResultManagementPage() {
   const isAdminDeadlinePassed = Boolean(dlDate && dlDate < new Date());
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <TeacherSidebar currentPage="results" />
 
       <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
@@ -770,7 +799,7 @@ export default function TeacherResultManagementPage() {
                 Result Portal
               </h1>
             </div>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
               Upload course results via fixed Excel format for Mid Term & Final examinations, grouped automatically by Dept, Session, and Level-Term.
             </p>
           </div>
@@ -1144,7 +1173,7 @@ export default function TeacherResultManagementPage() {
                       <div
                         key={batch._id}
                         style={{
-                          background: "#f8fafc",
+                          background: "#E8F4FD",
                           borderRadius: "12px",
                           padding: "20px",
                           border: batch.status === "Correction Requested" ? "1.5px solid #f87171" : "1px solid #e2e8f0",
@@ -1392,7 +1421,7 @@ export default function TeacherResultManagementPage() {
               {/* Marksheet Table with Inline Direct Editing */}
               <div style={{ overflowY: "auto", flex: 1, paddingRight: "4px" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
-                  <thead style={{ position: "sticky", top: 0, background: "#f8fafc", zIndex: 10 }}>
+                  <thead style={{ position: "sticky", top: 0, background: "#E8F4FD", zIndex: 10 }}>
                     <tr style={{ color: "#334155", fontWeight: 700, borderBottom: "2px solid #cbd5e1" }}>
                       <th style={{ padding: "12px" }}>Student ID</th>
                       <th style={{ padding: "12px" }}>Student Name</th>
@@ -1491,12 +1520,12 @@ export default function TeacherResultManagementPage() {
               </div>
 
               {/* Modal Footer */}
-              <div style={{ marginTop: "20px", paddingTop: "14px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "12.5px", color: isViewBatchDeadlinePassed ? "#dc2626" : "#64748b", fontWeight: isViewBatchDeadlinePassed ? 600 : 400 }}>
-                  {isViewBatchDeadlinePassed
-                    ? <><FiLock size={13} style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px" }} /> Deadline passed. Marksheet is locked for editing.</>
-                    : <>💡 Tip: You can edit scores directly in the cells above and click <strong>Save Marksheet Changes</strong> to publish updates.</>}
-                </span>
+              <div style={{ marginTop: "20px", paddingTop: "14px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: isViewBatchDeadlinePassed ? "space-between" : "flex-end", alignItems: "center" }}>
+                {isViewBatchDeadlinePassed && (
+                  <span style={{ fontSize: "12.5px", color: "#dc2626", fontWeight: 600 }}>
+                    <FiLock size={13} style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px" }} /> Deadline passed. Marksheet is locked for editing.
+                  </span>
+                )}
                 <div style={{ display: "flex", gap: "10px" }}>
                   <button
                     onClick={() => setViewBatch(null)}
@@ -1673,7 +1702,7 @@ export default function TeacherResultManagementPage() {
                             )?.studentId || "Student";
 
                       return (
-                        <div key={req._id} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "18px" }}>
+                        <div key={req._id} style={{ background: "#E8F4FD", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "18px" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                             <div>
                               <strong style={{ color: "#0f172a", fontSize: "14.5px" }}>{req.studentName}</strong>

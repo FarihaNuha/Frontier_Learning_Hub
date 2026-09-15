@@ -262,7 +262,7 @@ export default function AdminRegistrationCalendar() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
         <div style={{ marginBottom: "32px" }}>
@@ -273,7 +273,7 @@ export default function AdminRegistrationCalendar() {
         <div style={{ background: "#ffffff", padding: "24px", borderRadius: "14px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)", marginBottom: "32px", border: "1px solid #e2e8f0" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
             <h3 style={{ margin: 0, color: "#0f172a" }}>
-              {editingId ? "✏️ Edit Registration Window Rule" : "Configure Registration Window Rule"}
+              {editingId ? "Edit Registration Window Rule" : "Configure Registration Window Rule"}
             </h3>
             {editingId && (
               <button
@@ -401,7 +401,7 @@ export default function AdminRegistrationCalendar() {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13.5px" }}>
                 <thead>
-                  <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
+                  <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                     <th style={{ padding: "12px 14px" }}>PROGRAM</th>
                     <th style={{ padding: "12px 14px" }}>DEPARTMENT</th>
                     <th style={{ padding: "12px 14px" }}>SESSION</th>

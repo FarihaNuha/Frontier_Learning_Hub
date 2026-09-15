@@ -764,7 +764,7 @@ export default function MessagePage() {
   const courseIdParam = searchParams.get("courseId");
 
   return (
-    <div className="dashboard-container" style={{ minHeight: "100vh", background: "#f8fafc" }}>
+    <div className="dashboard-container" style={{ minHeight: "100vh", background: "#E8F4FD" }}>
       {user?.role === "teacher" ? (
         <TeacherSidebar currentPage="community" courseId={courseIdParam} />
       ) : (
@@ -776,7 +776,7 @@ export default function MessagePage() {
         <button className="back-btn" onClick={() => navigate("/community")}>
           <FiArrowLeft size={20} /> Back to Community
         </button>
-        <h1>💬 Messages</h1>
+        <h1>Messages</h1>
       </div>
 
       {/* ===== Tab bar ===== */}
@@ -1392,7 +1392,7 @@ export default function MessagePage() {
                         </div>
                       </div>
                       <span style={{ fontSize: "12px", background: "rgba(245,158,11,0.12)", color: "#d97706", border: "1px solid rgba(245,158,11,0.25)", padding: "4px 14px", borderRadius: "20px", fontWeight: 700 }}>
-                        🕐 Pending Approval
+                        Pending Approval
                       </span>
                     </div>
 
@@ -1409,7 +1409,7 @@ export default function MessagePage() {
 
                     {respondingId === req._id ? (
                       <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "16px", background: "rgba(59,141,179,0.06)", borderRadius: "12px", border: "1px solid rgba(59,141,179,0.2)" }}>
-                        <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "14px", color: "var(--text-primary)" }}>📅 Set Schedule Window</p>
+                        <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "14px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}><FiCalendar size={16} color="#3B8DB3" /> Set Schedule Window</p>
                         <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
                           <div style={{ flex: 1, minWidth: 200 }}>
                             <label style={{ display: "block", fontSize: "12px", marginBottom: "4px", color: "var(--text-secondary)", fontWeight: 600 }}>Start Time</label>
@@ -1474,7 +1474,7 @@ export default function MessagePage() {
               .filter((r) => user?.role === "teacher" ? r.status !== "pending" : true)
               .map((req) => {
                 const statusColor = { pending: "#f59e0b", accepted: "#10b981", rejected: "#ef4444" };
-                const statusLabel = { pending: "🕐 Pending", accepted: "✅ Accepted", rejected: "❌ Declined" };
+                const statusLabel = { pending: "Pending", accepted: "Accepted", rejected: "Declined" };
                 const statusBg = { pending: "rgba(245,158,11,0.12)", accepted: "rgba(16,185,129,0.12)", rejected: "rgba(239,68,68,0.12)" };
                 const otherPerson = user?.role === "student" ? req.teacher : req.student;
                 return (
@@ -1520,7 +1520,7 @@ export default function MessagePage() {
                       {req.status === "accepted" && req.scheduleStart && (
                         <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(16,185,129,0.08)", borderRadius: "8px", border: "1px solid rgba(16,185,129,0.2)" }}>
                           <p style={{ margin: 0, fontSize: "12px", color: "#10b981", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
-                            🗓️ Scheduled Window: {new Date(req.scheduleStart).toLocaleString()} – {new Date(req.scheduleEnd).toLocaleTimeString()}
+                            <FiCalendar size={14} color="#10b981" /> Scheduled Window: {new Date(req.scheduleStart).toLocaleString()} – {new Date(req.scheduleEnd).toLocaleTimeString()}
                           </p>
                         </div>
                       )}
@@ -1629,7 +1629,7 @@ export default function MessagePage() {
                     {callPartner?.name?.charAt(0).toUpperCase() || "?"}
                   </div>
                   <h2 style={{ margin: "0 0 8px" }}>{callPartner?.name}</h2>
-                  <p style={{ margin: 0, opacity: 0.7, fontSize: "14px" }}>Calling...</p>
+                  <p style={{ color: "#3B8DB3", fontWeight: 600,  margin: 0, opacity: 0.7, fontSize: "14px" }}>Calling...</p>
                 </div>
               )}
             </div>
@@ -1641,7 +1641,7 @@ export default function MessagePage() {
                 {callPartner?.name?.charAt(0).toUpperCase() || "?"}
               </div>
               <h2 style={{ margin: "0 0 8px", fontSize: "24px" }}>{callPartner?.name}</h2>
-              <p style={{ margin: 0, opacity: 0.6, fontSize: "15px" }}>{callState === "calling" ? "Calling..." : "Call in progress"}</p>
+              <p style={{ color: "#3B8DB3", fontWeight: 600,  margin: 0, opacity: 0.6, fontSize: "15px" }}>{callState === "calling" ? "Calling..." : "Call in progress"}</p>
             </div>
           )}
 

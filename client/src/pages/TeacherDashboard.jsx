@@ -587,7 +587,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                             alignItems: "center",
                             justifyContent: "space-between",
                             padding: "12px 16px",
-                            background: "#f8fafc",
+                            background: "#E8F4FD",
                             border: "1px solid #e2e8f0",
                             borderRadius: 10,
                           }}
@@ -715,7 +715,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                   <div className="empty-state">
                     <FiFile size={48} />
                     <h3>No lectures</h3>
-                    <p>No lectures uploaded for Week {selectedWeek} yet.</p>
+                    <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>No lectures uploaded for Week {selectedWeek} yet.</p>
                     <button
                       className="btn-primary"
                       onClick={() => {
@@ -766,7 +766,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                   <div className="empty-state">
                     <FiFile size={48} />
                     <h3>No files</h3>
-                    <p>No {categoryConfig[selectedCategory]?.label?.toLowerCase()} in Week {selectedWeek}.</p>
+                    <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>No {categoryConfig[selectedCategory]?.label?.toLowerCase()} in Week {selectedWeek}.</p>
                   </div>
                 ) : (
                   <div className="table-container">
@@ -1109,7 +1109,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                     width: "100%", 
                     maxHeight: "70vh", 
                     overflowY: "auto", 
-                    background: "#f8fafc", 
+                    background: "#E8F4FD", 
                     padding: "20px",
                     borderRadius: "8px",
                     fontFamily: "monospace",

@@ -1119,7 +1119,7 @@ export default function TeacherAttendancePage({
               style={{
                 fontSize: "18px",
                 fontWeight: 700,
-                color: "#3B8DB3",
+                color: "#3B8DB3", fontWeight: 600,
                 marginTop: "8px",
                 display: "flex",
                 alignItems: "center",
@@ -1310,7 +1310,7 @@ export default function TeacherAttendancePage({
             </div>
 
             {/* Academic Profile Filter Control Bar (Department, Session, Level, Term) */}
-            <div style={{ background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", border: "1px solid #cbd5e1", marginBottom: "20px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)", display: "flex", flexWrap: "wrap", gap: "16px", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ background: "#E8F4FD", padding: "16px 20px", borderRadius: "12px", border: "1px solid #cbd5e1", marginBottom: "20px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)", display: "flex", flexWrap: "wrap", gap: "16px", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "4px" }}>Department</label>

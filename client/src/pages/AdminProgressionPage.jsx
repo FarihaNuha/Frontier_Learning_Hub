@@ -188,7 +188,7 @@ export default function AdminProgressionPage() {
       : Object.entries(groupedBySession).filter(([sessKey]) => sessKey === selectedSessionFilter);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
 
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
@@ -506,8 +506,8 @@ export default function AdminProgressionPage() {
                       }}
                     >
                       <thead>
-                        <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
-                          <th style={{ padding: "10px 14px", minWidth: "65px" }}>
+                        <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
+                          <th style={{ padding: "12px 14px", minWidth: "65px", color: "#0369a1" }}>
                             <label style={{ display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", userSelect: "none" }} title="Select all students in this session">
                               <input
                                 type="checkbox"
@@ -515,7 +515,7 @@ export default function AdminProgressionPage() {
                                 onChange={(e) => handleSelectAllForSession(sessKey, e.target.checked)}
                                 style={{ cursor: "pointer" }}
                               />
-                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569" }}>All</span>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0f172a" }}>All</span>
                             </label>
                           </th>
                           <th style={{ padding: "10px 14px" }}>Student ID</th>

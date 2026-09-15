@@ -49,11 +49,11 @@ export default function AdminPaymentManagement() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
         <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Payment Records & Accounts</h1>
-        <p style={{ color: "#64748b", margin: "4px 0 32px 0" }}>View student registration tuition fees, due amounts and edit payment status</p>
+        <p style={{ color: "#3B8DB3", fontWeight: 600, margin: "4px 0 32px 0" }}>View student registration tuition fees, due amounts and edit payment status</p>
 
         <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
           {loading ? (
@@ -63,7 +63,7 @@ export default function AdminPaymentManagement() {
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
               <thead>
-                <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b" }}>
+                <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                   <th style={{ padding: "12px" }}>Student ID</th>
                   <th style={{ padding: "12px" }}>Level & Term</th>
                   <th style={{ padding: "12px" }}>Total Amount</th>

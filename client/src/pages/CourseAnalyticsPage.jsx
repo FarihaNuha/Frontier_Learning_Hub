@@ -831,7 +831,7 @@ export default function CourseAnalyticsPage() {
             <h1 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-dark)" }}>
               Performance Analytics
             </h1>
-            <p style={{ color: "var(--text-gray)" }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600 }}>
               Real-time activity measures & performance trends
             </p>
           </div>

@@ -260,7 +260,7 @@ export default function AdminTeachers() {
 
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
         {/* Top Sub Navigation Bar for Teachers & Adviser Alignment */}
@@ -405,15 +405,14 @@ export default function AdminTeachers() {
         </div>
 
         <div style={{
-          background: "#e0f2fe",
-          border: "1px solid #bae6fd",
+          background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", border: "1.5px solid #3B8DB3", boxShadow: "0 2px 8px rgba(59,141,179,0.12)",
           borderRadius: "10px",
           padding: "16px 20px",
           marginBottom: "24px",
           color: "#0369a1"
         }}>
           <div style={{ fontWeight: "600", marginBottom: "6px", display: "flex", alignItems: "center", gap: "8px" }}>
-            📋 Required Excel Column Format (Row 1: Academic Year Header, Row 2: Table Columns):
+            Required Excel Column Format (Row 1: Academic Year Header, Row 2: Table Columns):
           </div>
           <div style={{ fontSize: "13px", fontFamily: "monospace", background: "#ffffff", padding: "8px 12px", borderRadius: "6px", color: "#0f172a" }}>
             [Row 1 Cell E1]: Academic Year: July, 2026 | [Row 2]: Teacher ID | Name | Email | Department | Program | Assigned Courses | Assigned Level Term | Assigned Session
@@ -469,7 +468,7 @@ export default function AdminTeachers() {
               <option value="all">All Academic Year Sections</option>
               {academicYears.map((ay) => (
                 <option key={ay} value={ay}>
-                  📅 Section: {ay}
+                  Section: {ay}
                 </option>
               ))}
             </select>
@@ -531,7 +530,7 @@ export default function AdminTeachers() {
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
               <thead>
-                <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b", fontWeight: "600" }}>
+                <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                   <th style={{ padding: "12px" }}>Teacher ID</th>
                   <th style={{ padding: "12px" }}>Name</th>
                   <th style={{ padding: "12px" }}>Email</th>
@@ -640,7 +639,7 @@ export default function AdminTeachers() {
                         {isEditing ? (
                           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             {(editFormData.assignedCourses || []).map((c, cIdx) => (
-                              <div key={cIdx} style={{ display: "flex", flexDirection: "column", gap: "4px", background: "#f8fafc", padding: "6px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                              <div key={cIdx} style={{ display: "flex", flexDirection: "column", gap: "4px", background: "#E8F4FD", padding: "6px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
                                 <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
                                   <input
                                     type="text"
@@ -716,7 +715,7 @@ export default function AdminTeachers() {
                         ) : teacher.assignedCourses && teacher.assignedCourses.length > 0 ? (
                           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                             {teacher.assignedCourses.map((c, idx) => (
-                              <div key={idx} style={{ padding: "4px 8px", background: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0", fontSize: "12.5px", fontWeight: "600", color: "#1e293b" }}>
+                              <div key={idx} style={{ padding: "4px 8px", background: "#E8F4FD", borderRadius: "6px", border: "1px solid #e2e8f0", fontSize: "12.5px", fontWeight: "600", color: "#1e293b" }}>
                                 {typeof c === "object" ? (c.courseName || c.courseTitle || c.name || "New Course") : String(c)}
                               </div>
                             ))}
@@ -730,7 +729,7 @@ export default function AdminTeachers() {
                           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                             {teacher.assignedCourses.map((c, idx) => (
                               <div key={idx} style={{ padding: "4px 0" }}>
-                                <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px", fontWeight: "700" }}>
+                                <span style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", padding: "3px 8px", borderRadius: "6px", fontSize: "11.5px", fontWeight: "700" }}>
                                   {typeof c === "object" && c.levelTerm ? c.levelTerm : (teacher.assignedLevelTerm || "-")}
                                 </span>
                               </div>
@@ -789,7 +788,7 @@ export default function AdminTeachers() {
                           <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                             <button
                               onClick={() => startEdit(teacher)}
-                              style={{ background: "#e0f2fe", color: "#0284c7", border: "none", borderRadius: "6px", padding: "6px", cursor: "pointer" }}
+                              style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0284c7", border: "none", borderRadius: "6px", padding: "6px", cursor: "pointer" }}
                               title="Edit"
                             >
                               <FiEdit2 size={16} />

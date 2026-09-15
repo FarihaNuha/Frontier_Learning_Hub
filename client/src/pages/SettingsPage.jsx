@@ -306,7 +306,7 @@ export default function SettingsPage() {
             <h3 style={{ marginBottom: "16px", color: "var(--text-dark)", display: "flex", alignItems: "center", gap: "8px" }}>
               <FiSun size={18} /> Appearance & Theme
             </h3>
-            <p style={{ color: "var(--text-gray)", fontSize: "14px", marginBottom: "20px" }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14px", marginBottom: "20px" }}>
               Choose how you want the website interface to look on your device.
             </p>
 

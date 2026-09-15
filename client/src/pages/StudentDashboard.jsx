@@ -459,9 +459,9 @@ export default function StudentDashboard({
         {viewMode === "weekDetail" && selectedWeek && !selectedCategory && (
           <div>
             <h2 style={{ marginBottom: 8 }}>Week {selectedWeek} - Materials</h2>
-            <p
+            <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}
               className="subtitle"
-              style={{ marginBottom: 20, fontSize: "14px", color: "#6B89A0" }}
+              style={{ marginBottom: 20, fontSize: "14px", color: "#3B8DB3", fontWeight: 600 }}
             >
               {courseInfo.displayCode} - {courseInfo.name}
             </p>
@@ -514,9 +514,9 @@ export default function StudentDashboard({
               {categoryConfig[selectedCategory]?.icon}
               <span>{categoryConfig[selectedCategory]?.label} - Week {selectedWeek}</span>
             </h2>
-            <p
+            <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}
               className="subtitle"
-              style={{ marginBottom: 20, fontSize: "14px", color: "#6B89A0" }}
+              style={{ marginBottom: 20, fontSize: "14px", color: "#3B8DB3", fontWeight: 600 }}
             >
               {courseInfo.displayCode} - {courseInfo.name}
             </p>
@@ -872,7 +872,7 @@ export default function StudentDashboard({
                     width: "100%", 
                     maxHeight: "70vh", 
                     overflowY: "auto", 
-                    background: "#f8fafc", 
+                    background: "#E8F4FD", 
                     padding: "20px",
                     borderRadius: "8px",
                     fontFamily: "monospace",

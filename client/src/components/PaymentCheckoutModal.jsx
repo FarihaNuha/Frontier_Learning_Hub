@@ -415,11 +415,11 @@ export default function PaymentCheckoutModal({
             </div>
 
             <h2 style={{ margin: "0 0 6px 0", color: "#0f172a", fontSize: "22px" }}>Payment Successful!</h2>
-            <p style={{ margin: "0 0 20px 0", fontSize: "13.5px", color: "#64748b" }}>
+            <p style={{ margin: "0 0 20px 0", fontSize: "13.5px", color: "#3B8DB3", fontWeight: 600 }}>
               Your course registration fee has been received and verified online.
             </p>
 
-            <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "12px", border: "1px solid #e2e8f0", textAlign: "left", fontSize: "13px", marginBottom: "24px" }}>
+            <div style={{ background: "#E8F4FD", padding: "16px", borderRadius: "12px", border: "1px solid #e2e8f0", textAlign: "left", fontSize: "13px", marginBottom: "24px" }}>
               <div style={{ marginBottom: "6px" }}>Transaction ID: <strong style={{ fontFamily: "monospace", color: "#3b8db3" }}>{txnResult.transactionId}</strong></div>
               <div style={{ marginBottom: "6px" }}>Amount Paid: <strong>৳{txnResult.totalAmount} BDT</strong></div>
               <div style={{ marginBottom: "6px" }}>Payment Gateway: <strong>{txnResult.gatewayName}</strong></div>

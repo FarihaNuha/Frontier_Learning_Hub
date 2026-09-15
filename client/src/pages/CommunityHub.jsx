@@ -186,7 +186,7 @@ export default function CommunityHub() {
             <div className="feed-header">
               <div>
                 <h1>Community Feed</h1>
-                <p>Join discussions with all students and teachers</p>
+                <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>Join discussions with all students and teachers</p>
               </div>
               {canCreateInCurrentTab && (
                 <button

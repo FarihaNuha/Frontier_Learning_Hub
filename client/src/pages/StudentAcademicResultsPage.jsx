@@ -189,7 +189,7 @@ export default function StudentAcademicResultsPage() {
   const currentSemesterGPA = calculateGPA(resultsByLevelTerm[selectedSemester]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <StudentSidebar currentPage="results" />
 
       <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
@@ -203,7 +203,7 @@ export default function StudentAcademicResultsPage() {
               Result Portal
             </h1>
           </div>
-          <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+          <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
             View published Mid Term and Final course results arranged by Level-Term cards, with complete GPA calculations.
           </p>
         </div>
@@ -322,7 +322,7 @@ export default function StudentAcademicResultsPage() {
                           </span>
                         ) : resultTypeTab === "Final" && !isPaid ? (
                           <span style={{ fontSize: "11px", fontWeight: 700, background: isSelected ? "rgba(255,255,255,0.25)" : "#ffedd5", color: isSelected ? "#fff" : "#c2410c", padding: "3px 8px", borderRadius: "10px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                            <FiLock size={10} /> Payment Due
+                            Payment Due
                           </span>
                         ) : count > 0 && semGPA !== "N/A" ? (
                           <span style={{ fontSize: "11px", fontWeight: 800, background: isSelected ? "rgba(255,255,255,0.25)" : "#dcfce7", color: isSelected ? "#fff" : "#166534", padding: "3px 8px", borderRadius: "10px" }}>
@@ -350,7 +350,7 @@ export default function StudentAcademicResultsPage() {
                     <h3 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>
                       Published Results: <strong>{selectedSemester}</strong>
                     </h3>
-                    <p style={{ margin: "2px 0 0 0", fontSize: "13px", color: "#64748b" }}>
+                    <p style={{ margin: "2px 0 0 0", fontSize: "14.5px", color: "#3B8DB3", fontWeight: 600 }}>
                       Official grade breakdown for {selectedSemester}
                     </p>
                   </div>
@@ -408,7 +408,6 @@ export default function StudentAcademicResultsPage() {
                         transition: "all 0.2s ease",
                       }}
                     >
-                      <FiCreditCard size={18} />
                       Pay Registration Fee to Unlock Results
                     </button>
                   </div>
@@ -423,7 +422,7 @@ export default function StudentAcademicResultsPage() {
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
                       <thead>
-                        <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
+                        <tr style={{ background: "#e2e8f0", borderBottom: "2px solid #cbd5e1", color: "#0f172a", fontWeight: 700 }}>
                           <th style={{ padding: "12px 14px" }}>Course Code</th>
                           <th style={{ padding: "12px 14px" }}>Course Title</th>
                           <th style={{ padding: "12px 14px" }}>Course Type</th>
@@ -513,7 +512,7 @@ export default function StudentAcademicResultsPage() {
                                 </td>
                               </tr>
                               {existingReq && (
-                                <tr style={{ background: "#f8fafc" }}>
+                                <tr style={{ background: "#e2e8f0", color: "#0f172a" }}>
                                   <td colSpan={13} style={{ padding: "10px 18px", fontSize: "12px" }}>
                                     <div style={{ background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "10px 14px" }}>
                                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
@@ -574,7 +573,7 @@ export default function StudentAcademicResultsPage() {
                 </button>
               </div>
 
-              <div style={{ background: "#f8fafc", padding: "12px 16px", borderRadius: "10px", marginBottom: "16px", border: "1px solid #e2e8f0", fontSize: "13px" }}>
+              <div style={{ background: "#E8F4FD", padding: "12px 16px", borderRadius: "10px", marginBottom: "16px", border: "1px solid #e2e8f0", fontSize: "13px" }}>
                 <div><strong>Course:</strong> {selectedResultForIssue.courseCode} - {selectedResultForIssue.courseTitle}</div>
                 <div style={{ marginTop: "4px", color: "#64748b" }}>Teacher Email: {selectedResultForIssue.teacherEmail}</div>
               </div>

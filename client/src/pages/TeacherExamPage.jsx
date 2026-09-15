@@ -331,7 +331,7 @@ export default function TeacherExamPage({
               style={{
                 fontSize: "16px",
                 fontWeight: 600,
-                color: "#3B8DB3",
+                color: "#3B8DB3", fontWeight: 600,
                 marginTop: 4,
                 display: "flex",
                 alignItems: "center",
@@ -633,7 +633,7 @@ export default function TeacherExamPage({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
               <div>
                 <h2 style={{ margin: 0 }}>Submissions: {selectedExam.title}</h2>
-                <p style={{ color: "#6B89A0", margin: 0, marginTop: 4 }}>
+                <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, marginTop: 4 }}>
                   {selectedExam.course} | {selectedExam.totalMarks} Marks |{" "}
                   {selectedExam.questions.length} Questions
                 </p>

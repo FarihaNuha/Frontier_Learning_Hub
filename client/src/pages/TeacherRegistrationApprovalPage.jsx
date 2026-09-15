@@ -67,13 +67,13 @@ export default function TeacherRegistrationApprovalPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <TeacherSidebar />
       <div style={{ flex: 1, padding: "40px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
           <div>
             <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Registration Approval</h1>
-            <p style={{ margin: "4px 0 0 0", color: "#64748b" }}>
+            <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600 }}>
               Review and approve academic course registrations for your assigned advising batch
             </p>
           </div>
@@ -196,7 +196,7 @@ export default function TeacherRegistrationApprovalPage() {
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
             <div style={{ background: "#ffffff", padding: "32px", borderRadius: "16px", width: "560px", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
               <h2 style={{ margin: "0 0 16px 0", color: "#0f172a" }}>Registration Details</h2>
-              <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "13.5px" }}>
+              <div style={{ background: "#E8F4FD", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "13.5px" }}>
                 <div><strong>Student ID:</strong> {selectedReg.studentId}</div>
                 <div><strong>Department:</strong> {selectedReg.department}</div>
                 <div><strong>Total Credits:</strong> {selectedReg.totalCredits} Credits</div>

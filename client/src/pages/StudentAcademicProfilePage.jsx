@@ -74,7 +74,7 @@ export default function StudentAcademicProfilePage() {
   }, [incompleteCourses]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <StudentSidebar currentPage="academic-profile" />
 
       <div style={{ flex: 1, padding: "36px 32px", overflowY: "auto" }}>
@@ -88,7 +88,7 @@ export default function StudentAcademicProfilePage() {
               Student Academic Profile
             </h1>
           </div>
-          <p style={{ color: "#64748b", margin: 0, fontSize: "14.5px" }}>
+          <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
             Official academic standing, cumulative CGPA, earned credits, completed courses, and department curriculum roster.
           </p>
         </div>
@@ -228,14 +228,14 @@ export default function StudentAcademicProfilePage() {
               </div>
 
               {completedCourses.length === 0 ? (
-                <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8", background: "#E8F4FD", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
                   No published course results recorded yet. Completed course grades will appear here as soon as teachers publish results.
                 </div>
               ) : (
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
                     <thead>
-                      <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, borderBottom: "1.5px solid #cbd5e1" }}>
+                      <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700, borderBottom: "1.5px solid #cbd5e1" }}>
                         <th style={{ padding: "12px 16px" }}>Course Code</th>
                         <th style={{ padding: "12px 16px" }}>Course Title</th>
                         <th style={{ padding: "12px 16px" }}>Credits</th>
@@ -290,7 +290,7 @@ export default function StudentAcademicProfilePage() {
                     <div
                       key={semKey}
                       style={{
-                        background: "#f8fafc",
+                        background: "#E8F4FD",
                         borderRadius: "14px",
                         border: "1px solid #e2e8f0",
                         padding: "18px 20px",
@@ -450,7 +450,7 @@ export default function StudentAcademicProfilePage() {
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                     <thead>
-                      <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
+                      <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700 }}>
                         <th style={{ padding: "10px 14px" }}>Course Code</th>
                         <th style={{ padding: "10px 14px" }}>Course Title</th>
                         <th style={{ padding: "10px 14px" }}>Request Type</th>

@@ -30,7 +30,7 @@ export default function AcademicCalendarViewPage() {
   }, []);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       {user?.role === "teacher" ? (
         <TeacherSidebar currentPage="calendar" />
       ) : (
@@ -48,7 +48,7 @@ export default function AcademicCalendarViewPage() {
               Official Academic Calendar
             </h1>
           </div>
-          <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+          <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
             Official university schedule for Semester Classes, Examinations, Important Dates, and Holidays.
           </p>
         </div>

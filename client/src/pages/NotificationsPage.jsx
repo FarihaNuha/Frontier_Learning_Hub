@@ -111,7 +111,7 @@ export default function NotificationsPage() {
             </div>
             <div>
               <h1 style={{ fontSize: "26px", color: "var(--text-dark)", margin: 0, fontWeight: 700 }}>Notifications</h1>
-              <p style={{ margin: "2px 0 0", fontSize: "13px", color: "var(--text-secondary)" }}>
+              <p style={{ margin: "2px 0 0", fontSize: "14.5px", color: "#3B8DB3", fontWeight: 600 }}>
                 Stay updated with course announcements, assignments, messages and events.
               </p>
             </div>

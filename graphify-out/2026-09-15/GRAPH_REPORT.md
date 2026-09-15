@@ -1,7 +1,7 @@
 # Graph Report - UFTB_Moodle  (2026-09-15)
 
 ## Corpus Check
-- 251 files · ~227,631 words
+- 251 files · ~227,686 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `40499e43`
+- Built from commit: `c7e53e9f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -239,7 +239,7 @@ Nodes (18): concurrently, author, dependencies, concurrently, nodemon, descripti
 
 ### Community 12 - "dependencies"
 Cohesion: 0.11
-Nodes (19): dependencies, axios, jspdf-autotable, react-dom, react-icons, react-scripts, socket.io-client, @testing-library/jest-dom (+11 more)
+Nodes (19): dependencies, axios, jspdf, jspdf-autotable, react-dom, react-scripts, socket.io-client, @testing-library/jest-dom (+11 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.12
@@ -611,7 +611,7 @@ Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 145 - "umsAdminRoutes.js"
 Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
+Nodes (3): payCtrl, router, { verifyToken, checkRole }
 
 ## Knowledge Gaps
 - **778 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+773 more)

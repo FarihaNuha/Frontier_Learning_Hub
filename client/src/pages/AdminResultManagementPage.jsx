@@ -449,7 +449,7 @@ export default function AdminResultManagementPage() {
   const uniqueSessions = Array.from(new Set(uploads.map((u) => u.session).filter(Boolean)));
   const uniqueLevels = Array.from(new Set(uploads.map((u) => u.level).filter(Boolean)));
   const uniqueTerms = Array.from(new Set(uploads.map((u) => u.term).filter(Boolean)));  return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
 
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
@@ -920,7 +920,7 @@ export default function AdminResultManagementPage() {
                         <div style={{ overflowX: "auto" }}>
                           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px" }}>
                             <thead>
-                              <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, textAlign: "left" }}>
+                              <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                                 <th style={{ padding: "8px 12px" }}>Student ID</th>
                                 <th style={{ padding: "8px 12px" }}>Student Name</th>
                                 <th style={{ padding: "8px 12px" }}>MT Part A</th>
@@ -1079,7 +1079,7 @@ export default function AdminResultManagementPage() {
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                       <thead>
-                        <tr style={{ background: "#f0fdf4", color: "#166534", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #bbf7d0" }}>
+                        <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                           <th style={{ padding: "10px 14px" }}>Session</th>
                           <th style={{ padding: "10px 14px" }}>Level-Term</th>
                           <th style={{ padding: "10px 14px" }}>Notice / Exam Title</th>
@@ -1154,7 +1154,7 @@ export default function AdminResultManagementPage() {
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                       <thead>
-                        <tr style={{ background: "#f0f9ff", color: "#0369a1", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #bae6fd" }}>
+                        <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                           <th style={{ padding: "10px 14px" }}>Session</th>
                           <th style={{ padding: "10px 14px" }}>Level-Term</th>
                           <th style={{ padding: "10px 14px" }}>Announcement Title</th>
@@ -1435,7 +1435,7 @@ export default function AdminResultManagementPage() {
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                       <thead>
-                        <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700, textAlign: "left", borderBottom: "2px solid #e2e8f0" }}>
+                        <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                           <th style={{ padding: "10px 14px" }}>Dept</th>
                           <th style={{ padding: "10px 14px" }}>Session</th>
                           <th style={{ padding: "10px 14px" }}>Level-Term</th>

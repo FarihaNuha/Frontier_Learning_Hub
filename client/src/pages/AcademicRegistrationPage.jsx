@@ -58,7 +58,7 @@ export default function AcademicRegistrationPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <StudentSidebar currentPage="course-registration" />
       <div
         style={{
@@ -88,7 +88,7 @@ export default function AcademicRegistrationPage() {
               <h1 style={{ color: "#1e293b", margin: 0, fontSize: "26px", fontWeight: 700 }}>
                 Course Registration
               </h1>
-              <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+              <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
                 {studentData
                   ? `${studentData.name} (${studentData.studentId}) | ${studentData.department}`
                   : "Select your Level-Term to register courses"}

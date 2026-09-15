@@ -284,7 +284,23 @@ exports.getMyCourses = async (req, res) => {
         })
       );
 
-      return res.json({ courses: finalCourses });
+      // Deduplicate courses by displayCode to guarantee student never sees duplicate cards for the same course code
+      const uniqueStudentCoursesMap = new Map();
+      finalCourses.forEach((c) => {
+        const codeKey = (c.displayCode || c.code || "").toUpperCase().trim();
+        if (!codeKey) return;
+        if (!uniqueStudentCoursesMap.has(codeKey)) {
+          uniqueStudentCoursesMap.set(codeKey, c);
+        } else {
+          const existing = uniqueStudentCoursesMap.get(codeKey);
+          if (!existing.teacher && c.teacher) {
+            uniqueStudentCoursesMap.set(codeKey, c);
+          }
+        }
+      });
+      const uniqueFinalCourses = Array.from(uniqueStudentCoursesMap.values());
+
+      return res.json({ courses: uniqueFinalCourses });
     } else {
       const Teacher = require("../models/Teacher");
       const CourseImport = require("../models/CourseImport");
@@ -808,19 +824,18 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
     const codeRegex = new RegExp(`^${courseCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i");
     const cleanSession = courseSession.trim();
 
-    // 2. Gather student IDs / User IDs from all enrollment sources
-    const enrolledUserIdsSet = new Set((course.students || []).map((id) => id.toString()));
+    // 2. Gather student IDs / User IDs ONLY from confirmed Approved Registrations and Enrollments
+    const enrolledUserIdsSet = new Set();
     const enrolledStudentIdsSet = new Set();
     const enrolledEmailsSet = new Set();
 
-    // Source A: Enrollment Collection
+    // Source A: Enrollment Collection across all sessions
     const enrollQuery = {
       $or: [
         { courseCode: { $regex: codeRegex } },
         { courseTitle: { $regex: new RegExp(courseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } }
       ]
     };
-    if (cleanSession) enrollQuery.session = cleanSession;
 
     const enrollments = await Enrollment.find(enrollQuery).lean();
     enrollments.forEach((e) => {
@@ -828,47 +843,30 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
       if (e.studentId) enrolledStudentIdsSet.add(String(e.studentId).trim());
     });
 
-    // Source B: Approved Registration Collection
+    // Source B: Approved Registration Collection ONLY (all sessions/batches)
+    const normTitle = (courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
     const regQuery = { status: "Approved" };
-    if (cleanSession) regQuery.session = cleanSession;
-    const approvedRegs = await Registration.find(regQuery).lean();
+    const approvedSessionRegs = await Registration.find(regQuery).lean();
 
-    approvedRegs.forEach((r) => {
+    const studentRegStatusMap = new Map(); // studentId -> status ("Approved")
+    const studentRegSessionMap = new Map(); // studentId -> session ("2022-23", "2023-24", etc.)
+
+    approvedSessionRegs.forEach((r) => {
       const hasCourse = (r.selectedCourses || []).some((c) => {
-        const cCode = (c.courseCode || c.code || c.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-        return cCode === normCode || (normCode.length >= 4 && cCode.includes(normCode)) || (cCode.length >= 4 && normCode.includes(cCode));
+        const cCode = (c.courseCode || c.code || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        const cTitle = (c.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return (cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle);
       });
       if (hasCourse) {
         if (r.user) enrolledUserIdsSet.add(r.user.toString());
-        if (r.studentId) enrolledStudentIdsSet.add(String(r.studentId).trim());
+        if (r.studentId) {
+          const sid = String(r.studentId).trim();
+          enrolledStudentIdsSet.add(sid);
+          studentRegStatusMap.set(sid, "Approved");
+          if (r.session) studentRegSessionMap.set(sid, r.session);
+        }
       }
     });
-
-    // Source C: ResultUpload / Result Collection
-    const uploadQuery = {
-      $or: [
-        { courseCode: { $regex: codeRegex } },
-        { courseTitle: { $regex: new RegExp(courseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } }
-      ]
-    };
-    if (cleanSession) uploadQuery.session = cleanSession;
-    const resultUploads = await ResultUpload.find(uploadQuery).lean();
-    if (resultUploads.length > 0) {
-      const uploadIds = resultUploads.map((u) => u._id);
-      const results = await Result.find({ uploadId: { $in: uploadIds } }).lean();
-      results.forEach((resItem) => {
-        if (resItem.studentId) enrolledStudentIdsSet.add(String(resItem.studentId).trim());
-      });
-    }
-
-    // Source D: Student model for this course's session
-    if (cleanSession) {
-      const sessionStudents = await Student.find({ session: cleanSession }).lean();
-      sessionStudents.forEach((s) => {
-        if (s.studentId) enrolledStudentIdsSet.add(String(s.studentId).trim());
-        if (s.universityEmail) enrolledEmailsSet.add(s.universityEmail.toLowerCase().trim());
-      });
-    }
 
     // 3. Consolidate Student Profiles & User Accounts
     const studentProfiles = await Student.find({
@@ -904,6 +902,9 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
       );
 
       const key = String(profile.studentId || emailClean).trim();
+      const regStatus = studentRegStatusMap.get(key) || (profile.studentId ? studentRegStatusMap.get(String(profile.studentId).trim()) : null) || "Approved";
+      const studentSess = studentRegSessionMap.get(key) || profile.session || cleanSession || "N/A";
+
       if (!studentMap.has(key)) {
         studentMap.set(key, {
           _id: uDoc ? uDoc._id : profile._id,
@@ -914,9 +915,9 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
           profilePicture: uDoc?.profilePicture || "",
           department: profile.department || uDoc?.department || courseDept || "EDTE",
           batch: profile.batch || "N/A",
-          session: profile.session || cleanSession || "N/A",
-          academicStatus: profile.accountStatus || "Active",
-          registrationStatus: "Approved",
+          session: studentSess,
+          academicStatus: (profile.accountStatus && profile.accountStatus.toLowerCase() === "active") || uDoc || regStatus === "Approved" ? "Active" : "Active",
+          registrationStatus: regStatus,
           currentLevel: profile.currentLevel || 1,
           currentTerm: profile.currentTerm || 1,
           level: profile.currentLevel ? `Level-${profile.currentLevel}` : (courseLevel || "Level-1"),
@@ -929,6 +930,9 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
     userDocs.forEach((uDoc) => {
       const emailClean = (uDoc.email || "").toLowerCase().trim();
       const sid = uDoc.studentId ? String(uDoc.studentId).trim() : emailClean;
+      const regStatus = studentRegStatusMap.get(sid) || "Approved";
+      const studentSess = studentRegSessionMap.get(sid) || cleanSession || "N/A";
+
       if (sid && !studentMap.has(sid)) {
         studentMap.set(sid, {
           _id: uDoc._id,
@@ -939,9 +943,9 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
           profilePicture: uDoc.profilePicture || "",
           department: uDoc.department || courseDept || "EDTE",
           batch: "N/A",
-          session: cleanSession || "N/A",
+          session: studentSess,
           academicStatus: "Active",
-          registrationStatus: "Approved",
+          registrationStatus: regStatus,
           currentLevel: 1,
           currentTerm: 1,
           level: courseLevel || "Level-1",

@@ -91,7 +91,7 @@ export default function StudentNoticePage() {
   const activeNotices = courseIdParam ? courseNotices : filteredAdminNotices;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <StudentSidebar currentPage="notices" courseId={courseIdParam} courseInfo={courseInfo} />
       <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
         
@@ -118,7 +118,7 @@ export default function StudentNoticePage() {
                   ? `Course Notice Board ${courseInfo ? `— ${courseInfo.displayCode}` : ""}`
                   : "Official Notice Board"}
               </h1>
-              <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>
+              <p style={{ margin: 0, fontSize: "14.5px", color: "#3B8DB3", fontWeight: 600 }}>
                 {courseIdParam
                   ? `Course notices published by your course instructor for ${courseInfo?.displayCode || "this course"}.`
                   : "Official announcements, exam schedules, and university updates from Registrar & Administration."}
@@ -414,7 +414,7 @@ export default function StudentNoticePage() {
               </div>
 
               {selectedNoticeModal.pdfUrl && (
-                <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                <div style={{ background: "#E8F4FD", padding: "16px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
                   <a
                     href={selectedNoticeModal.pdfUrl}
                     target="_blank"

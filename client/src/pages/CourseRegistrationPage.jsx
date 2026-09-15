@@ -135,7 +135,7 @@ export default function CourseRegistrationPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <StudentSidebar currentPage="course-registration" />
 
       <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
@@ -190,7 +190,7 @@ export default function CourseRegistrationPage() {
                 <h1 style={{ margin: 0, color: "#0f172a", fontSize: "24px", fontWeight: 800 }}>
                   Course Registration - Level {level} Term {term}
                 </h1>
-                <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: "13.5px" }}>
+                <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600, fontSize: "13.5px" }}>
                   Select courses for your level & term. Total selected credits must be between <strong>{minCred}</strong> and <strong>{maxCred}</strong>.
                 </p>
               </div>
@@ -227,7 +227,7 @@ export default function CourseRegistrationPage() {
             <div style={{ borderRadius: "14px", border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.03)", marginBottom: "24px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
                 <thead>
-                  <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0", color: "#475569", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  <tr style={{ background: "#e2e8f0", borderBottom: "2px solid #cbd5e1", color: "#0f172a", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     <th style={{ padding: "14px 16px" }}>
                       <div
                         onClick={handleToggleSelectAll}
@@ -294,7 +294,7 @@ export default function CourseRegistrationPage() {
             </div>
 
             {/* Total Credits Summary */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", background: "#E8F4FD", padding: "16px 20px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
               <span style={{ fontSize: "15px", color: "#475569", fontWeight: 600 }}>
                 Total Selected Credits: <strong style={{ color: "#0f172a", fontSize: "17px" }}>{totalSelectedCredits}</strong> / {maxCred}
               </span>
@@ -346,14 +346,14 @@ export default function CourseRegistrationPage() {
                 <h1 style={{ margin: 0, color: "#0f172a", fontSize: "24px", fontWeight: 800 }}>
                   Registration Summary & Academic Slip
                 </h1>
-                <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: "13.5px" }}>
+                <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600, fontSize: "13.5px" }}>
                   Review your selected courses and institutional fee breakdown before submitting to your Adviser.
                 </p>
               </div>
             </div>
 
             {/* Student Profile Overview Card */}
-            <div style={{ background: "#f8fafc", padding: "20px 24px", borderRadius: "14px", border: "1px solid #e2e8f0", marginBottom: "28px" }}>
+            <div style={{ background: "#E8F4FD", padding: "20px 24px", borderRadius: "14px", border: "1px solid #e2e8f0", marginBottom: "28px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", fontSize: "13.5px", color: "#334155" }}>
                 <div><strong>Student Name:</strong> {data?.student?.name}</div>
                 <div><strong>Student ID:</strong> {data?.student?.studentId}</div>
@@ -372,7 +372,7 @@ export default function CourseRegistrationPage() {
               <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
                   <thead>
-                    <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <tr style={{ background: "#e2e8f0", color: "#0f172a", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       <th style={{ padding: "12px 16px", fontWeight: 700 }}>Course Code</th>
                       <th style={{ padding: "12px 16px", fontWeight: 700 }}>Course Title</th>
                       <th style={{ padding: "12px 16px", fontWeight: 700 }}>Credits</th>
@@ -432,7 +432,7 @@ export default function CourseRegistrationPage() {
                   <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden", marginBottom: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                       <thead>
-                        <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                        <tr style={{ background: "#e2e8f0", color: "#0f172a", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                           <th style={{ padding: "12px 16px", width: "50px", fontWeight: 700 }}>#</th>
                           <th style={{ padding: "12px 16px", fontWeight: 700 }}>Fee Item Description</th>
                           <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700 }}>Amount (BDT)</th>

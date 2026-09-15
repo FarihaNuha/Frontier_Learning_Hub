@@ -135,7 +135,7 @@ export default function TeacherEnrolledStudentsPage() {
                 Enrolled Students Roster
               </h1>
             </div>
-            <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
               View and manage active enrolled students for your assigned course.
             </p>
           </div>
@@ -164,7 +164,7 @@ export default function TeacherEnrolledStudentsPage() {
                 </option>
                 {courses.map((c) => (
                   <option key={c._id} value={c._id}>
-                    {c.displayCode || c.courseCode} - {c.name || c.courseTitle}
+                    {c.displayCode || c.courseCode} - {c.name || c.courseTitle} {c.session ? `(${c.session})` : ""}
                   </option>
                 ))}
               </select>
@@ -317,7 +317,7 @@ export default function TeacherEnrolledStudentsPage() {
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
               <thead>
-                <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0", color: "#475569", fontSize: "13px", fontWeight: 700 }}>
+                <tr style={{ background: "#e2e8f0", borderBottom: "2px solid #cbd5e1", color: "#0f172a", fontSize: "13px", fontWeight: 700 }}>
                   <th style={{ padding: "14px 20px" }}>Student ID</th>
                   <th style={{ padding: "14px 20px" }}>Student Name</th>
                   <th style={{ padding: "14px 20px" }}>Department</th>

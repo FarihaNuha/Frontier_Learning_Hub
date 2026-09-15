@@ -29,7 +29,7 @@ export default function AdminAuditLogsPage() {
   });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
 
       <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
@@ -41,7 +41,7 @@ export default function AdminAuditLogsPage() {
             </div>
             <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>System Audit Trail Logs</h1>
           </div>
-          <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
+          <p style={{ margin: 0, color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px" }}>
             Audit log tracking every registration, result publication, CGPA calculation, transcript download, promotion, and graduation.
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function AdminAuditLogsPage() {
           <div style={{ background: "#ffffff", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
               <thead>
-                <tr style={{ background: "#f8fafc", color: "#475569", fontWeight: 700 }}>
+                <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", color: "#0369a1", fontWeight: 700, borderBottom: "2px solid #3B8DB3" }}>
                   <th style={{ padding: "10px 14px" }}>Timestamp</th>
                   <th style={{ padding: "10px 14px" }}>Action</th>
                   <th style={{ padding: "10px 14px" }}>Performed By</th>

@@ -686,7 +686,7 @@ tbody tr:hover {
   }
 
   body.dark-theme .hamburger-line {
-    background-color: #f8fafc;
+    background-color: #E8F4FD;
   }
 
   /* Hamburger to X Transformation */
@@ -1499,7 +1499,7 @@ tbody tr:hover {
 
 .preview-modal-header {
   padding: 16px 24px;
-  background: #f8fafc;
+  background: #E8F4FD;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;

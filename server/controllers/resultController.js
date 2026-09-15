@@ -430,6 +430,26 @@ exports.uploadResultExcel = async (req, res) => {
     const teacherProfile = await Teacher.findOne({ email: req.user.email }).lean();
     const initialStatus = activeResultType === "Midterm" ? "Published" : "Submitted";
 
+    const cleanCodeStr = (c) => String(c || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const normSessStr = (s) => {
+      if (!s) return "";
+      const str = String(s).trim();
+      const match = str.match(/\d{4}[-\s]?\d{2,4}/);
+      if (match) {
+        const raw = match[0].replace(/\s+/g, "-");
+        const parts = raw.split("-");
+        if (parts.length === 2 && parts[1].length === 4) {
+          return `${parts[0]}-${parts[1].substring(2)}`;
+        }
+        return raw;
+      }
+      return str.toLowerCase().replace(/\s+/g, "-");
+    };
+    const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
+
+    const normalizedSessionVal = normSessStr(session) || session;
+    const cleanUploadCode = cleanCodeStr(courseCode);
+
     const targetUploadId = req.body.uploadId;
     let uploadBatch = null;
 
@@ -438,38 +458,57 @@ exports.uploadResultExcel = async (req, res) => {
     }
 
     if (!uploadBatch) {
-      const cleanCode = courseCode.replace(/\s+/g, "").toUpperCase();
       const teacherEmail = req.user.email.toLowerCase();
       const existingUploads = await ResultUpload.find({
         teacherEmail,
         resultType: activeResultType,
+        isDeleted: { $ne: true },
+        status: { $ne: "Deleted" },
       });
 
-      uploadBatch = existingUploads.find(u =>
-        u.courseCode.replace(/\s+/g, "").toUpperCase() === cleanCode &&
-        u.session === session &&
-        (u.level || "") === level &&
-        (u.term || "") === term
-      );
+      uploadBatch = existingUploads.find((u) => {
+        const uCodeClean = cleanCodeStr(u.courseCode);
+        const uSessNorm = normSessStr(u.session);
+        const uLdig = extractDigit(u.level);
+        const uTdig = extractDigit(u.term);
+
+        const codeMatch = uCodeClean === cleanUploadCode || uCodeClean.includes(cleanUploadCode) || cleanUploadCode.includes(uCodeClean);
+        const sessMatch = !uSessNorm || !normalizedSessionVal || uSessNorm === normalizedSessionVal;
+        const levelMatch = !uLdig || !levelDigit || uLdig === levelDigit;
+        const termMatch = !uTdig || !termDigit || uTdig === termDigit;
+
+        return codeMatch && sessMatch && levelMatch && termMatch;
+      });
     }
 
     // Preserve existing MT Part A & B marks when uploading Final results
     const existingMtMarksMap = {};
     if (activeResultType === "Final") {
+      const cleanCode = courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const codeRegex = new RegExp(`^${courseCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/([a-zA-Z]+)(\d+)/, '$1[\\s-_]?$2')}$`, "i");
+      const cleanSessRegex = new RegExp(String(session).trim().replace("-", "[- ]?"), "i");
+
       const dbExistingResults = await Result.find({
-        courseCode,
-        session: { $regex: new RegExp(String(session).replace("-", "[- ]?"), "i") }
+        $or: [
+          { courseCode: { $regex: codeRegex } },
+          { courseCode: cleanCode },
+          { courseCode: courseCode }
+        ],
+        session: cleanSessRegex
       }).lean();
 
       for (const resDoc of dbExistingResults) {
-        if (!existingMtMarksMap[resDoc.studentId]) {
-          existingMtMarksMap[resDoc.studentId] = {};
-        }
-        if (resDoc.midPartA !== undefined && resDoc.midPartA !== null) {
-          existingMtMarksMap[resDoc.studentId].midPartA = resDoc.midPartA;
-        }
-        if (resDoc.midPartB !== undefined && resDoc.midPartB !== null) {
-          existingMtMarksMap[resDoc.studentId].midPartB = resDoc.midPartB;
+        const sIdKey = String(resDoc.studentId || "").trim().toUpperCase();
+        if (sIdKey) {
+          if (!existingMtMarksMap[sIdKey]) {
+            existingMtMarksMap[sIdKey] = {};
+          }
+          if (resDoc.midPartA !== undefined && resDoc.midPartA !== null) {
+            existingMtMarksMap[sIdKey].midPartA = resDoc.midPartA;
+          }
+          if (resDoc.midPartB !== undefined && resDoc.midPartB !== null) {
+            existingMtMarksMap[sIdKey].midPartB = resDoc.midPartB;
+          }
         }
       }
     }
@@ -479,13 +518,16 @@ exports.uploadResultExcel = async (req, res) => {
 
       uploadBatch.courseCode = courseCode;
       uploadBatch.courseTitle = courseTitle;
-      uploadBatch.session = session;
+      uploadBatch.session = normalizedSessionVal;
       uploadBatch.level = level;
       uploadBatch.term = term;
       uploadBatch.totalRecords = results.length;
       if (activeResultType === "Midterm") {
         uploadBatch.status = "Published";
+      } else {
+        uploadBatch.status = initialStatus;
       }
+      uploadBatch.isDeleted = false;
       uploadBatch.updatedAt = new Date();
       await uploadBatch.save();
     } else {
@@ -496,7 +538,7 @@ exports.uploadResultExcel = async (req, res) => {
         department: teacherProfile?.department || req.user.department || "EDTE",
         courseCode,
         courseTitle,
-        session,
+        session: normalizedSessionVal,
         level,
         term,
         totalRecords: results.length,
@@ -511,6 +553,7 @@ exports.uploadResultExcel = async (req, res) => {
     const createdResults = [];
     for (const row of results) {
       const sId = String(row.studentId || row["Student ID"] || row["ID"] || row["student_id"]).trim();
+      const normStudentId = sId.toUpperCase();
       const sProfile = allStudents.find(s => s.studentId === sId);
       const sUser = allUsers.find(u => u.studentId === sId || (sProfile && u.email === sProfile.universityEmail));
 
@@ -528,13 +571,27 @@ exports.uploadResultExcel = async (req, res) => {
       let parsedMidA = parseOptionalNumber(row.midPartA ?? row["MT Part A Marks"] ?? row["MT Part A"] ?? row["MT part A Marks"]);
       let parsedMidB = parseOptionalNumber(row.midPartB ?? row["MT Part B Marks"] ?? row["MT Part B"] ?? row["MT part B Marks"]);
 
-      if (activeResultType === "Final" && existingMtMarksMap[sId]) {
-        if (existingMtMarksMap[sId].midPartA !== undefined && existingMtMarksMap[sId].midPartA !== null) {
-          parsedMidA = existingMtMarksMap[sId].midPartA;
+      if (activeResultType === "Final") {
+        const mapEntry = existingMtMarksMap[normStudentId] || existingMtMarksMap[sId];
+        if (mapEntry) {
+          if (mapEntry.midPartA !== undefined && mapEntry.midPartA !== null) {
+            parsedMidA = mapEntry.midPartA;
+          }
+          if (mapEntry.midPartB !== undefined && mapEntry.midPartB !== null) {
+            parsedMidB = mapEntry.midPartB;
+          }
         }
-        if (existingMtMarksMap[sId].midPartB !== undefined && existingMtMarksMap[sId].midPartB !== null) {
-          parsedMidB = existingMtMarksMap[sId].midPartB;
-        }
+      }
+
+      const parsedFtA = parseOptionalNumber(row.finalPartA ?? row["FT Part A Marks"] ?? row["FT Part A"] ?? row["FT part A Marks"]);
+      const parsedFtB = parseOptionalNumber(row.finalPartB ?? row["FT Part B Marks"] ?? row["FT Part B"] ?? row["FT part B Marks"]);
+      const parsedAtt = parseOptionalNumber(row.attendance ?? row["Attendance Marks"] ?? row["Attendance"] ?? row["Attendanc"]);
+      const parsedCont = parseOptionalNumber(row.continuousAssessment ?? row["Continuous Assessment Marks"] ?? row["Continous Assessment Marks"] ?? row["Continuous Assessment"] ?? row["Continous Assessment"] ?? row["Continuous"] ?? row["Continous"]);
+
+      let calcTotal = (parsedMidA || 0) + (parsedMidB || 0) + (parsedFtA || 0) + (parsedFtB || 0) + (parsedAtt || 0) + (parsedCont || 0);
+      let totalMarksVal = parseOptionalNumber(row.totalMarks ?? row["Total Marks"] ?? row["Total"]);
+      if (!totalMarksVal || (activeResultType === "Final" && (parsedMidA !== null || parsedFtA !== null))) {
+        totalMarksVal = calcTotal > 0 ? calcTotal : totalMarksVal;
       }
 
       const rDoc = await Result.create({
@@ -561,7 +618,7 @@ exports.uploadResultExcel = async (req, res) => {
         attendance: parseOptionalNumber(row.attendance ?? row["Attendance Marks"] ?? row["Attendance"] ?? row["Attendanc"]),
         continuousAssessment: parseOptionalNumber(row.continuousAssessment ?? row["Continuous Assessment Marks"] ?? row["Continous Assessment Marks"] ?? row["Continuous Assessment"] ?? row["Continous Assessment"] ?? row["Continuous"] ?? row["Continous"]),
         finalExam: parseOptionalNumber(row.finalExam ?? row["Final Exam Marks"] ?? row["Final Exam"] ?? ((parseOptionalNumber(row.finalPartA ?? row["FT Part A Marks"] ?? row["FT Part A"]) || 0) + (parseOptionalNumber(row.finalPartB ?? row["FT Part B Marks"] ?? row["FT Part B"]) || 0))),
-        totalMarks: parseOptionalNumber(row.totalMarks ?? row["Total Marks"] ?? row["Total"]),
+        totalMarks: totalMarksVal,
         letterGrade: String(row.letterGrade || row["GPA"] || row["CGPA"] || row["Letter Grade"] || "").trim().toUpperCase(),
         gradePoint: parseOptionalNumber(row.gradePoint ?? row["GPA"] ?? row["CGPA"] ?? row["Grade Point"]),
         status: initialStatus,

@@ -24,85 +24,72 @@ import TeacherSidebar from "../components/TeacherSidebar";
 import StudentSidebar from "../components/StudentSidebar";
 
 const getCourseBanner = (course) => {
-  const name = (course.name || "").toLowerCase();
-  const code = (course.displayCode || "").toLowerCase();
-  
-  // 1. Keyword-based matching for colors and accents
-  if (name.includes("code") || name.includes("programming") || name.includes("computer") || name.includes("cse") || name.includes("software") || name.includes("web") || name.includes("compiler") || name.includes("system") || code.includes("cse")) {
-    return {
-      gradient: "linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #115e59 100%)", // Teal-Green
-      accent: "#14b8a6"
-    };
+  const name = (course.name || "").trim();
+  const code = (course.displayCode || course.courseCode || "").trim();
+
+  const colorPalettes = [
+    { gradient: "linear-gradient(135deg, #c2410c 0%, #d97706 50%, #9a3412 100%)", accent: "#f97316" }, // 0. Amber Sunset
+    { gradient: "linear-gradient(135deg, #4338ca 0%, #6366f1 50%, #312e81 100%)", accent: "#818cf8" }, // 1. Indigo Royal
+    { gradient: "linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #115e59 100%)", accent: "#14b8a6" }, // 2. Oceanic Teal
+    { gradient: "linear-gradient(135deg, #be185d 0%, #e11d48 50%, #881337 100%)", accent: "#f43f5e" }, // 3. Crimson Rose
+    { gradient: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #1e3a8a 100%)", accent: "#3b82f6" }, // 4. Sapphire Blue
+    { gradient: "linear-gradient(135deg, #15803d 0%, #16a34a 50%, #14532d 100%)", accent: "#22c55e" }, // 5. Emerald Forest
+    { gradient: "linear-gradient(135deg, #7e22ce 0%, #9333ea 50%, #581c87 100%)", accent: "#a855f7" }, // 6. Plum Violet
+    { gradient: "linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #075985 100%)", accent: "#38bdf8" }, // 7. Sky Cyan
+    { gradient: "linear-gradient(135deg, #b45309 0%, #d97706 50%, #78350f 100%)", accent: "#fb923c" }, // 8. Terracotta Gold
+    { gradient: "linear-gradient(135deg, #047857 0%, #10b981 50%, #064e3b 100%)", accent: "#34d399" }  // 9. Mint Green
+  ];
+
+  const knownSubjectMap = {
+    "ET_117": 0, "ET_118": 0, "INSTRUCTIONAL": 0,
+    "MATH_209": 1, "ENGINEERING MATHEMATICS": 1,
+    "CSE_113": 2, "CSE_114": 2, "DATA STRUCTURE": 2,
+    "CSE_115": 3, "DISCRETE MATHEMATICS": 3,
+    "PROG_111": 4, "PROG_112": 4, "OBJECT ORIENTED": 4,
+    "PROG_101": 5, "PROG_102": 5, "STRUCTURED PROGRAMMING": 5,
+    "ENG_105": 6, "ENG_106": 6, "COMMUNICATIVE ENGLISH": 6,
+    "DS_107": 7, "PROBABILITY": 7,
+    "HIS_109": 8, "HISTORY": 8,
+    "ET_103": 9, "INTRODUCTION TO EDUCATION": 9
+  };
+
+  const normCode = code.toUpperCase().replace(/\s+/g, "_");
+  const normTitle = name.toUpperCase();
+
+  // 1. Explicit Subject Lookup (Ensures Theory & Sessional pair get identical palette)
+  for (const [key, paletteIdx] of Object.entries(knownSubjectMap)) {
+    if (normCode.includes(key)) return colorPalettes[paletteIdx];
   }
-  if (name.includes("lab") || name.includes("practical")) {
-    return {
-      gradient: "linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #4c1d95 100%)", // Rich Violet
-      accent: "#8b5cf6"
-    };
-  }
-  if (name.includes("math") || name.includes("stat") || name.includes("algorithm") || name.includes("numerical") || name.includes("calculus") || name.includes("algebra")) {
-    return {
-      gradient: "linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #312e81 100%)", // Indigo
-      accent: "#6366f1"
-    };
-  }
-  if (name.includes("english") || name.includes("bangla") || name.includes("literature") || name.includes("writing") || name.includes("history") || name.includes("society") || name.includes("humanities")) {
-    return {
-      gradient: "linear-gradient(135deg, #047857 0%, #10b981 50%, #064e3b 100%)", // Forest Green
-      accent: "#10b981"
-    };
-  }
-  if (name.includes("physics") || name.includes("chemistry") || name.includes("biology") || name.includes("science") || name.includes("circuit") || name.includes("electronics") || name.includes("electrical")) {
-    return {
-      gradient: "linear-gradient(135deg, #be185d 0%, #db2777 50%, #831843 100%)", // Hot Pink
-      accent: "#ec4899"
-    };
-  }
-  if (name.includes("art") || name.includes("design") || name.includes("drawing") || name.includes("paint") || name.includes("creative")) {
-    return {
-      gradient: "linear-gradient(135deg, #b45309 0%, #d97706 50%, #78350f 100%)", // Amber Glow
-      accent: "#f59e0b"
-    };
-  }
-  if (name.includes("business") || name.includes("finance") || name.includes("accounting") || name.includes("management") || name.includes("economy") || name.includes("marketing")) {
-    return {
-      gradient: "linear-gradient(135deg, #0369a1 0%, #0ea5e9 50%, #075985 100%)", // Sky Blue
-      accent: "#0ea5e9"
-    };
-  }
-  if (name.includes("game") || name.includes("graphics") || name.includes("media") || name.includes("animation")) {
-    return {
-      gradient: "linear-gradient(135deg, #db2777 0%, #f43f5e 50%, #9d174d 100%)", // Rose Red
-      accent: "#f43f5e"
-    };
-  }
-  if (name.includes("network") || name.includes("security") || name.includes("cloud") || name.includes("database") || name.includes("dbms")) {
-    return {
-      gradient: "linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e3a8a 100%)", // Neon Sapphire
-      accent: "#3b82f6"
-    };
-  }
-  if (name.includes("project") || name.includes("thesis") || name.includes("seminar") || name.includes("presentation")) {
-    return {
-      gradient: "linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #7c2d12 100%)", // Sunset Orange
-      accent: "#f97316"
-    };
+  for (const [key, paletteIdx] of Object.entries(knownSubjectMap)) {
+    if (normTitle.includes(key)) return colorPalettes[paletteIdx];
   }
 
-  // 2. Fallback: Multi-stop 3-color premium gradients
-  const fallbackBanners = [
-    { gradient: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c084fc 100%)", accent: "#7c3aed" }, // Electric Violet
-    { gradient: "linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #fda4af 100%)", accent: "#fb7185" }, // Neon Coral
-    { gradient: "linear-gradient(135deg, #059669 0%, #10b981 50%, #6ee7b7 100%)", accent: "#10b981" }, // Aurora Green
-    { gradient: "linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1d4ed8 100%)", accent: "#2563eb" }, // Oceanic Breeze
-    { gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fde047 100%)", accent: "#f97316" }, // Sunset Glow
-    { gradient: "linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #67e8f9 100%)", accent: "#06b6d4" }, // Magic Cyan
-    { gradient: "linear-gradient(135deg, #6d28d9 0%, #db2777 50%, #9d174d 100%)", accent: "#db2777" }, // Deep Nebula
-    { gradient: "linear-gradient(135deg, #15803d 0%, #84cc16 50%, #a3e635 100%)", accent: "#84cc16" }  // Forest Gold
-  ];
-  
-  const index = course._id ? parseInt(course._id.slice(-4), 16) % fallbackBanners.length : 0;
-  return fallbackBanners[index];
+  // 2. Dynamic Course Code Pairing (Groups adjacent numbers e.g. 101/102, 111/112, 113/114)
+  const codeMatch = code.match(/^([A-Z]+)\s*(\d+)/i);
+  if (codeMatch) {
+    const prefix = codeMatch[1].toUpperCase();
+    const num = parseInt(codeMatch[2], 10);
+    const basePairIndex = Math.floor((num - 1) / 2);
+    let strKey = `${prefix}_${basePairIndex}`;
+    let hash = 0;
+    for (let i = 0; i < strKey.length; i++) {
+      hash = (hash * 31 + strKey.charCodeAt(i)) & 0x7fffffff;
+    }
+    return colorPalettes[hash % colorPalettes.length];
+  }
+
+  // 3. Clean Name Hashing Fallback
+  const cleanName = name
+    .toLowerCase()
+    .replace(/\b(sessional|lab|practical|theory)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  let hash = 0;
+  for (let i = 0; i < cleanName.length; i++) {
+    hash = (hash * 31 + cleanName.charCodeAt(i)) & 0x7fffffff;
+  }
+  return colorPalettes[hash % colorPalettes.length];
 };
 
 export default function CourseListPage() {
@@ -472,7 +459,7 @@ export default function CourseListPage() {
         <div className="top-bar">
           <div>
             <h1>My Courses</h1>
-            <p className="subtitle">{user?.department} Department</p>
+            <p className="subtitle" style={{ fontSize: "15px", fontWeight: 600, color: "#3B8DB3", marginTop: 4 }}>{user?.department} Department</p>
           </div>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             {/* Exact Shape Search Bar - SVG socket notch pill */}
@@ -750,7 +737,7 @@ export default function CourseListPage() {
         {showJoin && (
           <div className="card" style={{ marginBottom: 24 }}>
             <h2 style={{ marginBottom: 20 }}>Join Course</h2>
-            <p style={{ color: "#6B89A0", marginBottom: 16 }}>
+            <p style={{ color: "#3B8DB3", fontWeight: 600, marginBottom: 16 }}>
               Enter the 6-digit join code shared by your teacher.
             </p>
             <form onSubmit={handleJoin}>
@@ -1020,7 +1007,7 @@ export default function CourseListPage() {
 
         {/* Assigned Level & Term Quick Filter Bar */}
         {user?.role === "teacher" && assignedGroups.length > 0 && (
-          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", padding: "12px 18px", borderRadius: "12px", marginBottom: "24px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", border: "1.5px solid #3B8DB3", boxShadow: "0 2px 8px rgba(59,141,179,0.12)", padding: "12px 18px", borderRadius: "12px", marginBottom: "24px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "13px", fontWeight: 700, color: "#334155", display: "flex", alignItems: "center", gap: "6px" }}>
               <FiBookOpen size={16} color="#0284c7" /> Assigned Level & Term Classes:
             </span>
@@ -1044,7 +1031,7 @@ export default function CourseListPage() {
                 transition: "all 0.2s ease",
               }}
             >
-              ✨ All Courses ({courses.length})
+              All Courses ({courses.length})
             </button>
 
             {assignedGroups.map((g) => {
@@ -1077,7 +1064,7 @@ export default function CourseListPage() {
                     gap: "6px",
                   }}
                 >
-                  <span>🎓 Level {g.levelNum} • Term {g.termNum}</span>
+                  <span>Level {g.levelNum} • Term {g.termNum}</span>
                   {g.session && <span style={{ opacity: 0.75, fontSize: "11px" }}>({g.session})</span>}
                   <span
                     style={{
@@ -1263,15 +1250,15 @@ export default function CourseListPage() {
               width: "56px",
               height: "56px",
               borderRadius: "50%",
-              background: "rgba(59, 141, 179, 0.12)",
-              color: "var(--pastel-blue-deep, #3B8DB3)",
+              background: "#E8F4FD",
+              color: "#3B8DB3",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               margin: "0 auto 16px",
-              fontSize: "26px"
+              fontSize: "24px"
             }}>
-              📋
+              <FiBookOpen size={26} color="#3B8DB3" />
             </div>
             <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 700, color: "var(--text-primary)" }}>
               Notice

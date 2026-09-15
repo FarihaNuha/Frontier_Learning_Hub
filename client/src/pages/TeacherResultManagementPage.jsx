@@ -1107,36 +1107,33 @@ export default function TeacherResultManagementPage() {
 
                     return (
                       <div style={{
-                        background: isExpired ? "linear-gradient(135deg, #fee2e2, #fecaca)" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "linear-gradient(135deg, #fef3c7, #fde68a)" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
-                        border: `1.5px solid ${isExpired ? "#fca5a5" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#f59e0b" : "#3b8db3"}`,
-                        borderRadius: "12px",
-                        padding: "16px 20px",
+                        background: isExpired ? "#fef2f2" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#fffbeb" : "#f0f9ff",
+                        border: `1px solid ${isExpired ? "#fca5a5" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#fde68a" : "#bae6fd"}`,
+                        borderRadius: "10px",
+                        padding: "12px 18px",
                         marginBottom: "20px",
                         display: "flex",
-                        alignItems: "flex-start",
-                        gap: "14px",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexWrap: "wrap",
+                        gap: "10px",
                       }}>
-                        <div style={{ fontSize: "28px", lineHeight: 1 }}>📋</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                            <strong style={{ fontSize: "14.5px", color: isExpired ? "#991b1b" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#92400e" : "#0369a1" }}>
-                              {sectionDl.title}
-                            </strong>
-                            <span style={{
-                              padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px",
-                              background: isExpired ? "#dc2626" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#f59e0b" : "#3b8db3",
-                              color: "#fff"
-                            }}>
-                              {timeLabel}
-                            </span>
-                          </div>
-                          <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#475569" }}>{sectionDl.content}</p>
-                          {secDlDate && (
-                            <p style={{ margin: "6px 0 0 0", fontSize: "12.5px", fontWeight: 700, color: isExpired ? "#dc2626" : "#0369a1" }}>
-                              🗓️ Deadline: {secDlDate.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })}
-                            </p>
-                          )}
+                        <div style={{ fontSize: "13.5px", fontWeight: 700, color: isExpired ? "#991b1b" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#92400e" : "#0369a1" }}>
+                          {isExpired
+                            ? `Submission Window Closed (${secDlDate ? secDlDate.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "Deadline Passed"})`
+                            : `Result Submission Deadline: ${secDlDate ? secDlDate.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "Active"}`}
                         </div>
+
+                        <span style={{
+                          padding: "4px 12px",
+                          borderRadius: "20px",
+                          fontWeight: 700,
+                          fontSize: "12px",
+                          background: isExpired ? "#dc2626" : (!isExpired && (daysLeft <= 2 || msLeft < 24 * 3600 * 1000)) ? "#f59e0b" : "#0284c7",
+                          color: "#ffffff"
+                        }}>
+                          {timeLabel}
+                        </span>
                       </div>
                     );
                   })()}

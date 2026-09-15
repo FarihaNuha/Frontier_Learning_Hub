@@ -139,7 +139,12 @@
   "137": "RegistrationCalendar.js",
   "138": "react-dom",
   "139": "@testing-library/dom",
+  "140": "examRoutes.js",
   "141": "authMiddleware.js",
   "142": "sync_active_status.js",
-  "146": "react-hot-toast"
+  "143": "registrationPaymentRoutes.js",
+  "144": "react-scripts",
+  "145": "umsAdminRoutes.js",
+  "146": "react-hot-toast",
+  "147": "jspdf-autotable"
 }

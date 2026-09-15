@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-09-15)
 
 ## Corpus Check
-- 251 files · ~226,606 words
+- 251 files · ~227,719 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1541 nodes · 2410 edges · 145 communities (108 shown, 37 thin omitted)
+- 1541 nodes · 2414 edges · 148 communities (109 shown, 39 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a588b615`
+- Built from commit: `40499e43`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -155,14 +155,17 @@
 - authMiddleware.js
 - sync_active_status.js
 - registrationPaymentRoutes.js
+- react-scripts
+- umsAdminRoutes.js
 - react-hot-toast
+- jspdf-autotable
 
 ## God Nodes (most connected - your core abstractions)
 1. `useAuth()` - 67 edges
 2. `api` - 63 edges
 3. `getIO()` - 44 edges
-4. `queueEmail()` - 25 edges
-5. `StudentSidebar()` - 24 edges
+4. `StudentSidebar()` - 26 edges
+5. `queueEmail()` - 25 edges
 6. `TeacherSidebar()` - 23 edges
 7. `AdminSidebar()` - 18 edges
 8. `CommunityPost` - 18 edges
@@ -184,7 +187,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (145 total, 37 thin omitted)
+## Communities (148 total, 39 thin omitted)
 
 ### Community 0 - "App.jsx"
 Cohesion: 0.16
@@ -323,12 +326,12 @@ Cohesion: 0.40
 Nodes (4): ctrl, router, upload, { verifyToken, checkRole }
 
 ### Community 41 - "examRoutes.js"
-Cohesion: 0.30
-Nodes (4): PaymentCheckoutModal(), RegistrationInvoiceModal(), FIXED_REGISTRATION_FEES, FIXED_REGISTRATION_FEES
+Cohesion: 0.25
+Nodes (5): mongoose, teacherSchema, Adviser, mongoose, Teacher
 
 ### Community 42 - "ShareModal.jsx"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.30
+Nodes (4): PaymentCheckoutModal(), RegistrationInvoiceModal(), FIXED_REGISTRATION_FEES, FIXED_REGISTRATION_FEES
 
 ### Community 47 - "deadlineReminder.js"
 Cohesion: 0.14
@@ -355,8 +358,8 @@ Cohesion: 0.27
 Nodes (11): CourseListPage(), getCourseBanner(), TeacherAssignmentPage(), TeacherDashboard(), fetchWithCache(), getCachedData(), getUserScopedKey(), invalidateCache() (+3 more)
 
 ### Community 53 - "test_phase2_flow.js"
-Cohesion: 0.11
-Nodes (14): mongoose, paymentSchema, mongoose, registrationCalendarSchema, Adviser, bcrypt, CourseImport, Enrollment (+6 more)
+Cohesion: 0.13
+Nodes (12): mongoose, paymentSchema, Adviser, bcrypt, CourseImport, Enrollment, mongoose, Payment (+4 more)
 
 ### Community 54 - "announcementController.js"
 Cohesion: 0.21
@@ -371,8 +374,8 @@ Cohesion: 0.22
 Nodes (7): Adviser, bcrypt, CourseImport, mongoose, Student, Teacher, User
 
 ### Community 57 - "CommunityHub.jsx"
-Cohesion: 0.15
-Nodes (8): adviserSchema, mongoose, Adviser, dns, mongoose, Adviser, mongoose, Teacher
+Cohesion: 0.25
+Nodes (5): adviserSchema, mongoose, Adviser, dns, mongoose
 
 ### Community 58 - "recalculate_all_plagiarism.js"
 Cohesion: 0.40
@@ -399,8 +402,8 @@ Cohesion: 0.33
 Nodes (4): dns, fs, mongoose, path
 
 ### Community 64 - "Adviser.js"
-Cohesion: 0.19
-Nodes (13): similarityService, calculateSimilarity(), cleanExtractedText(), computeLevenshtein(), extractTextFromFile(), fs, getSentenceSimilarity(), getTrigrams() (+5 more)
+Cohesion: 0.26
+Nodes (12): calculateSimilarity(), cleanExtractedText(), computeLevenshtein(), extractTextFromFile(), fs, getSentenceSimilarity(), getTrigrams(), mammoth (+4 more)
 
 ### Community 65 - "clean_courses_programs.js"
 Cohesion: 0.29
@@ -547,16 +550,12 @@ Cohesion: 0.33
 Nodes (4): fs, mongoose, path, similarityService
 
 ### Community 109 - "reset_db.js"
-Cohesion: 0.22
-Nodes (6): mongoose, teacherSchema, dns, mongoose, path, Teacher
+Cohesion: 0.33
+Nodes (4): dns, mongoose, path, Teacher
 
 ### Community 110 - "Submission.js"
 Cohesion: 0.22
 Nodes (6): Course, mongoose, Student, User, courseSchema, mongoose
-
-### Community 111 - "docx-preview"
-Cohesion: 0.33
-Nodes (9): FilePreviewModal(), CommentItem(), CourseCommunity(), CoursePostCard(), EditPostModal(), getFileUrl(), renderAttachments(), renderContentWithLinks() (+1 more)
 
 ### Community 112 - "courseController.js"
 Cohesion: 0.33
@@ -603,21 +602,29 @@ Cohesion: 0.33
 Nodes (4): mongoose, Student, Teacher, User
 
 ### Community 143 - "registrationPaymentRoutes.js"
+Cohesion: 0.33
+Nodes (9): FilePreviewModal(), CommentItem(), CourseCommunity(), CoursePostCard(), EditPostModal(), getFileUrl(), renderAttachments(), renderContentWithLinks() (+1 more)
+
+### Community 144 - "react-scripts"
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
+
+### Community 145 - "umsAdminRoutes.js"
 Cohesion: 0.50
 Nodes (3): payCtrl, router, { verifyToken, checkRole }
 
 ## Knowledge Gaps
 - **778 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+773 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **39 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `StudentRegistrationPaymentPage()` connect `test_assignment_controller.js` to `examRoutes.js`?**
-  _High betweenness centrality (0.169) - this node is a cross-community bridge._
-- **Why does `api` connect `emailService.js` to `App.jsx`, `User.js`, `docx-preview`, `examRoutes.js`, `react`, `docx-preview`, `apiCache.js`, `upload.js`, `courseRoutes.js`?**
-  _High betweenness centrality (0.115) - this node is a cross-community bridge._
+- **Why does `CourseRegistrationPage()` connect `test_assignment_controller.js` to `ShareModal.jsx`?**
+  _High betweenness centrality (0.140) - this node is a cross-community bridge._
+- **Why does `StudentRegistrationPaymentPage()` connect `test_assignment_controller.js` to `ShareModal.jsx`?**
+  _High betweenness centrality (0.140) - this node is a cross-community bridge._
 - **What connects `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin` to the rest of the system?**
   _780 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `dependencies` be split into smaller, more focused modules?**

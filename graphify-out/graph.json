@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 132,
+      "community": 126,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 132,
+      "community": 126,
       "norm_label": "docx-preview"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "client_package_dependencies_react_router_dom",
-      "community": 119,
+      "community": 132,
       "norm_label": "react-router-dom"
     },
     {
@@ -450,7 +450,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "react_router_dom",
-      "community": 119,
+      "community": 132,
       "norm_label": "react-router-dom"
     },
     {
@@ -520,7 +520,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_package_dependencies_xlsx",
-      "community": 126,
+      "community": 147,
       "norm_label": "xlsx"
     },
     {
@@ -530,7 +530,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_package_json_xlsx",
-      "community": 126,
+      "community": 147,
       "norm_label": "xlsx"
     },
     {
@@ -1347,7 +1347,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "client/src/App.jsx",
-      "source_location": "L727",
+      "source_location": "L743",
       "_origin": "ast",
       "id": "client_src_app_app",
       "community": 69,
@@ -1400,7 +1400,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal",
-      "community": 111,
+      "community": 143,
       "norm_label": "filepreviewmodal.jsx"
     },
     {
@@ -1410,7 +1410,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal_filepreviewmodal",
-      "community": 111,
+      "community": 143,
       "norm_label": "filepreviewmodal()"
     },
     {
@@ -1510,7 +1510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_paymentcheckoutmodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "paymentcheckoutmodal.jsx"
     },
     {
@@ -1520,7 +1520,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "client_src_components_paymentcheckoutmodal_paymentcheckoutmodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "paymentcheckoutmodal()"
     },
     {
@@ -1530,7 +1530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_registrationinvoicemodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "registrationinvoicemodal.jsx"
     },
     {
@@ -1540,7 +1540,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_src_components_registrationinvoicemodal_registrationinvoicemodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "registrationinvoicemodal()"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity",
-      "community": 111,
+      "community": 143,
       "norm_label": "coursecommunity.jsx"
     },
     {
@@ -2270,7 +2270,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_rendercontentwithlinks",
-      "community": 111,
+      "community": 143,
       "norm_label": "rendercontentwithlinks()"
     },
     {
@@ -2280,7 +2280,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursecommunity",
-      "community": 111,
+      "community": 143,
       "norm_label": "coursecommunity()"
     },
     {
@@ -2290,7 +2290,7 @@
       "source_location": "L460",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_getfileurl",
-      "community": 111,
+      "community": 143,
       "norm_label": "getfileurl()"
     },
     {
@@ -2300,7 +2300,7 @@
       "source_location": "L472",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderattachments",
-      "community": 111,
+      "community": 143,
       "norm_label": "renderattachments()"
     },
     {
@@ -2310,7 +2310,7 @@
       "source_location": "L581",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderlectureattachment",
-      "community": 111,
+      "community": 143,
       "norm_label": "renderlectureattachment()"
     },
     {
@@ -2320,7 +2320,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_commentitem",
-      "community": 111,
+      "community": 143,
       "norm_label": "commentitem()"
     },
     {
@@ -2330,7 +2330,7 @@
       "source_location": "L859",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursepostcard",
-      "community": 111,
+      "community": 143,
       "norm_label": "coursepostcard()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_location": "L1286",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_editpostmodal",
-      "community": 111,
+      "community": 143,
       "norm_label": "editpostmodal()"
     },
     {
@@ -2450,24 +2450,24 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "courseregistrationpage.jsx"
     },
     {
       "label": "FIXED_REGISTRATION_FEES",
       "file_type": "code",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L9",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage_fixed_registration_fees",
-      "community": 41,
+      "community": 42,
       "norm_label": "fixed_registration_fees"
     },
     {
       "label": "CourseRegistrationPage()",
       "file_type": "code",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L26",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage_courseregistrationpage",
       "community": 55,
@@ -2760,17 +2760,17 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentleveltermpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "studentleveltermpage.jsx"
     },
     {
       "label": "StudentLevelTermPage()",
       "file_type": "code",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L9",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "client_src_pages_studentleveltermpage_studentleveltermpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "studentleveltermpage()"
     },
     {
@@ -2800,7 +2800,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentregistrationpaymentpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "studentregistrationpaymentpage.jsx"
     },
     {
@@ -2810,7 +2810,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_src_pages_studentregistrationpaymentpage_fixed_registration_fees",
-      "community": 41,
+      "community": 42,
       "norm_label": "fixed_registration_fees"
     },
     {
@@ -3020,7 +3020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_teacherregistrationapprovalpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "teacherregistrationapprovalpage.jsx"
     },
     {
@@ -3030,7 +3030,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "client_src_pages_teacherregistrationapprovalpage_teacherregistrationapprovalpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "teacherregistrationapprovalpage()"
     },
     {
@@ -5397,7 +5397,7 @@
       "label": "getTeacherDashboardSummary()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L476",
+      "source_location": "L505",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getteacherdashboardsummary",
       "community": 7,
@@ -5407,7 +5407,7 @@
       "label": "getEnrolledStudentsForCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L713",
+      "source_location": "L742",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getenrolledstudentsforcourse",
       "community": 7,
@@ -5417,7 +5417,7 @@
       "label": "joinCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L945",
+      "source_location": "L974",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_joincourse",
       "community": 7,
@@ -5427,7 +5427,7 @@
       "label": "getCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1073",
+      "source_location": "L1102",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getcourse",
       "community": 7,
@@ -5437,7 +5437,7 @@
       "label": "leaveCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1103",
+      "source_location": "L1132",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_leavecourse",
       "community": 7,
@@ -5447,7 +5447,7 @@
       "label": "deleteCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1123",
+      "source_location": "L1152",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_deletecourse",
       "community": 7,
@@ -5457,7 +5457,7 @@
       "label": "getJoinRequests()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1146",
+      "source_location": "L1175",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getjoinrequests",
       "community": 7,
@@ -5467,7 +5467,7 @@
       "label": "handleJoinRequest()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1171",
+      "source_location": "L1200",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_handlejoinrequest",
       "community": 7,
@@ -5477,7 +5477,7 @@
       "label": "findAssessmentRecord()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1265",
+      "source_location": "L1294",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_findassessmentrecord",
       "community": 7,
@@ -5487,7 +5487,7 @@
       "label": "getCourseStudentsAnalytics()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1306",
+      "source_location": "L1335",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "community": 7,
@@ -5497,7 +5497,7 @@
       "label": "getStudentAnalytics()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1441",
+      "source_location": "L1470",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getstudentanalytics",
       "community": 7,
@@ -8590,7 +8590,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar",
-      "community": 53,
+      "community": 111,
       "norm_label": "registrationcalendar.js"
     },
     {
@@ -8600,7 +8600,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_mongoose",
-      "community": 53,
+      "community": 111,
       "norm_label": "mongoose"
     },
     {
@@ -8610,7 +8610,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_registrationcalendarschema",
-      "community": 53,
+      "community": 111,
       "norm_label": "registrationcalendarschema"
     },
     {
@@ -8860,7 +8860,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher",
-      "community": 109,
+      "community": 41,
       "norm_label": "teacher.js"
     },
     {
@@ -8870,7 +8870,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher_mongoose",
-      "community": 109,
+      "community": 41,
       "norm_label": "mongoose"
     },
     {
@@ -8880,7 +8880,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_teacher_teacherschema",
-      "community": 109,
+      "community": 41,
       "norm_label": "teacherschema"
     },
     {
@@ -9610,7 +9610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 42,
+      "community": 144,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -9620,7 +9620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 42,
+      "community": 144,
       "norm_label": "router"
     },
     {
@@ -9630,7 +9630,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 42,
+      "community": 144,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9640,7 +9640,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 42,
+      "community": 144,
       "norm_label": "ctrl"
     },
     {
@@ -10050,7 +10050,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes",
-      "community": 143,
+      "community": 145,
       "norm_label": "registrationpaymentroutes.js"
     },
     {
@@ -10060,7 +10060,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_router",
-      "community": 143,
+      "community": 145,
       "norm_label": "router"
     },
     {
@@ -10070,7 +10070,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_verifytoken_checkrole",
-      "community": 143,
+      "community": 145,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10080,7 +10080,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_payctrl",
-      "community": 143,
+      "community": 145,
       "norm_label": "payctrl"
     },
     {
@@ -11950,7 +11950,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix",
-      "community": 57,
+      "community": 41,
       "norm_label": "sync_advisers_fix.js"
     },
     {
@@ -11960,7 +11960,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_mongoose",
-      "community": 57,
+      "community": 41,
       "norm_label": "mongoose"
     },
     {
@@ -11970,7 +11970,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_teacher",
-      "community": 57,
+      "community": 41,
       "norm_label": "teacher"
     },
     {
@@ -11980,7 +11980,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_adviser",
-      "community": 57,
+      "community": 41,
       "norm_label": "adviser"
     },
     {
@@ -11990,7 +11990,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_run",
-      "community": 57,
+      "community": 41,
       "norm_label": "run()"
     },
     {
@@ -13470,7 +13470,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism",
-      "community": 64,
+      "community": 119,
       "norm_label": "test_plagiarism.js"
     },
     {
@@ -13480,7 +13480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_similarityservice",
-      "community": 64,
+      "community": 119,
       "norm_label": "similarityservice"
     },
     {
@@ -13490,7 +13490,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_runplagiarismtests",
-      "community": 64,
+      "community": 119,
       "norm_label": "runplagiarismtests()"
     },
     {
@@ -16370,7 +16370,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
-      "source_location": "L727",
+      "source_location": "L743",
       "weight": 1.0,
       "source": "client_src_app",
       "target": "client_src_app_app",
@@ -17610,7 +17610,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L6",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_paymentcheckoutmodal",
@@ -17621,7 +17621,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L7",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_paymentcheckoutmodal",
@@ -17643,7 +17643,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L6",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_paymentcheckoutmodal_paymentcheckoutmodal",
@@ -17654,7 +17654,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L7",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_paymentcheckoutmodal_paymentcheckoutmodal",
@@ -17708,7 +17708,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L7",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_registrationinvoicemodal",
@@ -17719,7 +17719,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L6",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_registrationinvoicemodal",
@@ -17752,7 +17752,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L7",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_registrationinvoicemodal_registrationinvoicemodal",
@@ -17763,7 +17763,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L6",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_registrationinvoicemodal_registrationinvoicemodal",
@@ -18144,6 +18144,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/CourseRegistrationPage.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "client_src_pages_courseregistrationpage",
+      "target": "client_src_components_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
       "source_location": "L9",
       "weight": 1.0,
@@ -18247,6 +18258,17 @@
       "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_pages_studentexampage",
+      "target": "client_src_components_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentLevelTermPage.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_studentsidebar",
       "confidence_score": 1.0
     },
@@ -18397,6 +18419,17 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/CourseRegistrationPage.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "client_src_pages_courseregistrationpage",
+      "target": "client_src_components_studentsidebar_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
       "source_location": "L9",
       "weight": 1.0,
@@ -18500,6 +18533,17 @@
       "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_pages_studentexampage",
+      "target": "client_src_components_studentsidebar_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentLevelTermPage.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_studentsidebar_studentsidebar",
       "confidence_score": 1.0
     },
@@ -21578,7 +21622,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L26",
+      "source_location": "L37",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_pages_courseregistrationpage_courseregistrationpage",
@@ -21588,7 +21632,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L9",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_pages_courseregistrationpage_fixed_registration_fees",
@@ -21622,7 +21666,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L358",
+      "source_location": "L462",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage_courseregistrationpage",
       "target": "server_controllers_registrationpaymentcontroller_fixed_fees_total"
@@ -22198,7 +22242,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L9",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_pages_studentleveltermpage_studentleveltermpage",
@@ -25955,7 +25999,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1336",
+      "source_location": "L1365",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -25966,7 +26010,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1478",
+      "source_location": "L1507",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getstudentanalytics",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -25977,7 +26021,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L648",
+      "source_location": "L677",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getteacherdashboardsummary",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -27310,7 +27354,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1123",
+      "source_location": "L1152",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_deletecourse",
@@ -27320,7 +27364,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1265",
+      "source_location": "L1294",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -27330,7 +27374,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1073",
+      "source_location": "L1102",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getcourse",
@@ -27340,7 +27384,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1306",
+      "source_location": "L1335",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getcoursestudentsanalytics",
@@ -27350,7 +27394,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L713",
+      "source_location": "L742",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getenrolledstudentsforcourse",
@@ -27360,7 +27404,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1146",
+      "source_location": "L1175",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getjoinrequests",
@@ -27380,7 +27424,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1441",
+      "source_location": "L1470",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getstudentanalytics",
@@ -27390,7 +27434,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L476",
+      "source_location": "L505",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getteacherdashboardsummary",
@@ -27400,7 +27444,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1171",
+      "source_location": "L1200",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_handlejoinrequest",
@@ -27410,7 +27454,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L945",
+      "source_location": "L974",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_joincourse",
@@ -27420,7 +27464,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1103",
+      "source_location": "L1132",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_leavecourse",
@@ -27517,7 +27561,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1382",
+      "source_location": "L1411",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -27528,7 +27572,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1585",
+      "source_location": "L1614",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getstudentanalytics",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -40697,5 +40741,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a588b615cb84dc2a6bf6a58fe1e9d3ca482a40a2"
+  "built_at_commit": "40499e43db26175101ebc5bb2715f33df1ad5ad2"
 }

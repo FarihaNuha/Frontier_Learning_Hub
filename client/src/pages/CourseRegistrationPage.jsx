@@ -2,7 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import toast from "react-hot-toast";
-import { FiCheckSquare, FiSquare, FiArrowLeft, FiAlertCircle, FiCreditCard, FiFileText } from "react-icons/fi";
+import {
+  FiCheckSquare,
+  FiSquare,
+  FiArrowLeft,
+  FiAlertCircle,
+  FiCreditCard,
+  FiFileText,
+  FiBookOpen,
+  FiLayers,
+  FiCheckCircle,
+} from "react-icons/fi";
+import StudentSidebar from "../components/StudentSidebar";
 import PaymentCheckoutModal from "../components/PaymentCheckoutModal";
 import RegistrationInvoiceModal from "../components/RegistrationInvoiceModal";
 
@@ -124,329 +135,425 @@ export default function CourseRegistrationPage() {
   };
 
   return (
-    <div style={{ padding: "40px", maxWidth: "900px", margin: "0 auto" }}>
-      <button
-        onClick={() => (step === 2 ? setStep(1) : navigate(-1))}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          background: "none",
-          border: "none",
-          color: "#64748b",
-          fontSize: "14px",
-          fontWeight: "600",
-          cursor: "pointer",
-          marginBottom: "24px",
-        }}
-      >
-        <FiArrowLeft size={16} /> Back
-      </button>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+      <StudentSidebar currentPage="course-registration" />
 
-      {loading ? (
-        <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading courses...</div>
-      ) : step === 1 ? (
-        /* Step 1: Course Selection Page */
-        <div style={{ background: "#ffffff", borderRadius: "12px", padding: "32px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
-          <h1 style={{ margin: 0, color: "#1e293b", fontSize: "26px" }}>
-            Course Registration - Level {level} Term {term}
-          </h1>
-          <p style={{ margin: "4px 0 20px 0", color: "#64748b" }}>
-            Select courses for your level & term. Total selected credits must be between {minCred} and {maxCred}.
-          </p>
+      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+        {/* Navigation Back Button */}
+        <div style={{ marginBottom: "24px" }}>
+          <button
+            onClick={() => (step === 2 ? setStep(1) : navigate(-1))}
+            style={{
+              background: "#ffffff",
+              border: "1px solid #cbd5e1",
+              color: "#3b8db3",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "9px 18px",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontWeight: "700",
+              fontSize: "13.5px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
+              transition: "all 0.18s ease",
+            }}
+          >
+            <FiArrowLeft size={16} /> {step === 2 ? "Back to Course Selection" : "Back"}
+          </button>
+        </div>
 
-          {data?.calendar && !data.calendar.isOpen && (
-            <div
-              style={{
-                background: "#fff1f2",
-                border: "1.5px solid #fecdd3",
-                borderRadius: "12px",
-                padding: "16px 20px",
-                marginBottom: "20px",
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "14px",
-              }}
-            >
-              <FiAlertCircle size={24} color="#e11d48" style={{ marginTop: "2px", flexShrink: 0 }} />
+        {loading ? (
+          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading courses...</div>
+        ) : step === 1 ? (
+          /* Step 1: Course Selection Page */
+          <div style={{ background: "#ffffff", borderRadius: "18px", padding: "32px", boxShadow: "0 4px 24px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" }}>
+            
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "24px", borderBottom: "2px solid #f1f5f9", paddingBottom: "20px" }}>
+              <div
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "14px",
+                  background: "linear-gradient(135deg, #3b8db3, #2C4B66)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#ffffff",
+                  boxShadow: "0 4px 12px rgba(59, 141, 179, 0.25)",
+                }}
+              >
+                <FiBookOpen size={24} />
+              </div>
               <div>
-                <h4 style={{ margin: "0 0 4px 0", color: "#be123c", fontSize: "15px", fontWeight: 700 }}>
-                  Registration Period Closed
-                </h4>
-                <p style={{ margin: 0, color: "#9f1239", fontSize: "13.5px", lineHeight: "1.5" }}>
-                  {data.calendar.message || `Registration for Session ${data.student?.session} (${level} ${term}) is currently CLOSED by Admin.`}
+                <h1 style={{ margin: 0, color: "#0f172a", fontSize: "24px", fontWeight: 800 }}>
+                  Course Registration - Level {level} Term {term}
+                </h1>
+                <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: "13.5px" }}>
+                  Select courses for your level & term. Total selected credits must be between <strong>{minCred}</strong> and <strong>{maxCred}</strong>.
                 </p>
               </div>
             </div>
-          )}
 
-          <div style={{ overflowX: "auto", marginBottom: "24px" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-              <thead>
-                <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b" }}>
-                  <th style={{ padding: "12px 10px" }}>
-                    <div
-                      onClick={handleToggleSelectAll}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
-                        userSelect: "none",
-                      }}
-                      title={isAllSelected ? "Deselect All Courses" : "Select All Courses"}
-                    >
-                      {isAllSelected ? (
-                        <FiCheckSquare size={18} color="#3b8db3" />
-                      ) : (
-                        <FiSquare size={18} color="#94a3b8" />
-                      )}
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>Select All</span>
-                    </div>
-                  </th>
-                  <th style={{ padding: "12px 10px" }}>Code</th>
-                  <th style={{ padding: "12px 10px" }}>Title</th>
-                  <th style={{ padding: "12px 10px" }}>Credits</th>
-                  <th style={{ padding: "12px 10px" }}>Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(data?.courses || []).map((c) => {
-                  const isSelected = selectedIds.includes(c._id);
-                  return (
-                    <tr
-                      key={c._id}
-                      onClick={() => data?.calendar?.isOpen !== false && toggleCourse(c._id)}
-                      style={{
-                        borderBottom: "1px solid #f1f5f9",
-                        cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
-                        background: isSelected ? "#f0f9ff" : "transparent",
-                        opacity: data?.calendar?.isOpen === false ? 0.7 : 1,
-                      }}
-                    >
-                      <td style={{ padding: "12px 10px" }}>
-                        {isSelected ? <FiCheckSquare size={18} color="#3b8db3" /> : <FiSquare size={18} color="#94a3b8" />}
-                      </td>
-                      <td style={{ padding: "12px 10px", fontWeight: "600", color: "#0f172a" }}>{c.courseCode}</td>
-                      <td style={{ padding: "12px 10px" }}>{c.courseTitle}</td>
-                      <td style={{ padding: "12px 10px" }}>{c.creditHours}</td>
-                      <td style={{ padding: "12px 10px" }}>
-                        <span style={{ padding: "2px 8px", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", background: c.creditHours === 1 ? "#fef3c7" : "#e0f2fe", color: c.creditHours === 1 ? "#b45309" : "#0369a1" }}>
-                          {c.creditHours === 1 ? "Sessional" : "Theory"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <span style={{ fontSize: "15px", color: "#475569" }}>
-              Total Selected Credits: <strong>{totalSelectedCredits}</strong> / {maxCred}
-            </span>
-          </div>
-
-          <button
-            onClick={handleProceedSummary}
-            disabled={data?.calendar?.isOpen === false}
-            style={{
-              width: "100%",
-              background: data?.calendar?.isOpen === false ? "#94a3b8" : "#3b8db3",
-              color: "#ffffff",
-              border: "none",
-              padding: "14px",
-              borderRadius: "8px",
-              fontWeight: "600",
-              fontSize: "16px",
-              cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
-            }}
-          >
-            {data?.calendar?.isOpen === false ? "Registration Closed by Admin" : "Proceed to Registration Summary"}
-          </button>
-        </div>
-      ) : (
-        /* Step 2: Registration Summary Page */
-        <div style={{ background: "#ffffff", borderRadius: "12px", padding: "32px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
-          <h1 style={{ margin: 0, color: "#1e293b", fontSize: "26px" }}>Registration Summary & Academic Slip</h1>
-          <p style={{ margin: "4px 0 24px 0", color: "#64748b" }}>
-            Review your selected courses (with individual course fees) and institutional fees before submitting to your Adviser.
-          </p>
-
-          {/* Selected Courses Table with Individual Fees Side-by-Side */}
-          <h3 style={{ margin: "0 0 12px 0", color: "#0f172a", fontSize: "16px" }}>1. Selected Academic Courses</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", marginBottom: "24px", fontSize: "13.5px" }}>
-            <thead>
-              <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b", background: "#f8fafc" }}>
-                <th style={{ padding: "10px" }}>Code</th>
-                <th style={{ padding: "10px" }}>Course Title</th>
-                <th style={{ padding: "10px" }}>Type</th>
-                <th style={{ padding: "10px" }}>Credits</th>
-                <th style={{ padding: "10px", textAlign: "right" }}>Course Fee (BDT)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {selectedCourses.map((c) => {
-                const isLab = Number(c.creditHours) === 1 || (c.courseType || "").toLowerCase().includes("sessional") || (c.courseType || "").toLowerCase().includes("lab");
-                const courseFee = isLab ? 100 : 300;
-                return (
-                  <tr key={c._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                    <td style={{ padding: "10px", fontWeight: "600", color: "#0f172a" }}>{c.courseCode}</td>
-                    <td style={{ padding: "10px" }}>{c.courseTitle}</td>
-                    <td style={{ padding: "10px" }}>
-                      <span style={{ padding: "2px 8px", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", background: isLab ? "#fef3c7" : "#e0f2fe", color: isLab ? "#b45309" : "#0369a1" }}>
-                        {isLab ? "Sessional" : "Theory"}
-                      </span>
-                    </td>
-                    <td style={{ padding: "10px" }}>{c.creditHours}</td>
-                    <td style={{ padding: "10px", textAlign: "right", fontWeight: "600", color: "#3b8db3" }}>৳{courseFee} BDT</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {/* Payment Fee Breakdown */}
-          {(() => {
-            let theoryCount = 0;
-            let labCount = 0;
-            selectedCourses.forEach((c) => {
-              if (Number(c.creditHours) === 1 || (c.courseType || "").toLowerCase().includes("sessional") || (c.courseType || "").toLowerCase().includes("lab")) {
-                labCount++;
-              } else {
-                theoryCount++;
-              }
-            });
-            const courseSubtotal = theoryCount * 300 + labCount * 100;
-            const grandTotalFee = courseSubtotal + FIXED_FEES_TOTAL;
-
-            return (
-              <div>
-                {/* Fixed Fees Serial Table */}
-                <h3 style={{ margin: "0 0 12px 0", color: "#0f172a", fontSize: "16px" }}>2. Fixed Institutional & Administrative Fees</h3>
-                <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", marginBottom: "24px" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
-                    <thead>
-                      <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1.5px solid #e2e8f0" }}>
-                        <th style={{ padding: "10px 14px", width: "50px" }}>#</th>
-                        <th style={{ padding: "10px 14px" }}>Fee Item Description</th>
-                        <th style={{ padding: "10px 14px", textAlign: "right" }}>Amount (BDT)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {FIXED_REGISTRATION_FEES.map((item, idx) => (
-                        <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9", background: idx % 2 === 0 ? "#ffffff" : "#f8fafc" }}>
-                          <td style={{ padding: "8px 14px", color: "#64748b", fontWeight: 600 }}>{idx + 1}</td>
-                          <td style={{ padding: "8px 14px", color: "#1e293b", fontWeight: 500 }}>{item.name}</td>
-                          <td style={{ padding: "8px 14px", textAlign: "right", fontWeight: 600, color: "#0f172a" }}>৳{item.amount.toLocaleString()} BDT</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Grand Total Calculation Summary */}
-                <div style={{ background: "#f0fdf4", padding: "20px", borderRadius: "12px", border: "1.5px solid #86efac", marginBottom: "24px" }}>
-                  <h3 style={{ margin: "0 0 14px 0", color: "#166534", fontSize: "16px" }}>Total Registration Fee Summary</h3>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "14px", color: "#334155" }}>
-                    <span>Selected Academic Courses Subtotal ({theoryCount} Theory × ৳300 + {labCount} Lab × ৳100):</span>
-                    <strong>৳{courseSubtotal.toLocaleString()} BDT</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "14px", color: "#334155" }}>
-                    <span>Fixed Institutional Fees Subtotal (13 Items):</span>
-                    <strong>৳{FIXED_FEES_TOTAL.toLocaleString()} BDT</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px dashed #86efac", paddingTop: "12px", marginTop: "10px", fontSize: "18px", color: "#0f172a", fontWeight: 800 }}>
-                    <span>Grand Total Course Registration Fee:</span>
-                    <span style={{ color: "#16a34a" }}>৳{grandTotalFee.toLocaleString()} BDT</span>
-                  </div>
+            {data?.calendar && !data.calendar.isOpen && (
+              <div
+                style={{
+                  background: "#fff1f2",
+                  border: "1px solid #fecdd3",
+                  borderLeft: "5px solid #e11d48",
+                  borderRadius: "14px",
+                  padding: "18px 22px",
+                  marginBottom: "24px",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "14px",
+                  boxShadow: "0 2px 10px rgba(225, 29, 72, 0.05)",
+                }}
+              >
+                <FiAlertCircle size={22} color="#e11d48" style={{ marginTop: "2px", flexShrink: 0 }} />
+                <div>
+                  <h4 style={{ margin: "0 0 4px 0", color: "#be123c", fontSize: "15px", fontWeight: 800 }}>
+                    Registration Period Closed
+                  </h4>
+                  <p style={{ margin: 0, color: "#9f1239", fontSize: "13.5px", lineHeight: "1.5" }}>
+                    {data.calendar.message || `Registration for Session ${data.student?.session} (${level} ${term}) is currently CLOSED by Admin.`}
+                  </p>
                 </div>
               </div>
-            );
-          })()}
+            )}
 
-          {/* Optional Payment Banner */}
-          <div style={{ background: "#e0f2fe", padding: "14px 18px", borderRadius: "10px", color: "#0369a1", fontSize: "13.5px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
-            <FiAlertCircle size={20} />
-            <span>
-              <strong>Note:</strong> Online payment is optional. Submitting registration will send it to your adviser immediately without requiring payment. You can pay online anytime.
-            </span>
-          </div>
+            {/* Courses Table */}
+            <div style={{ borderRadius: "14px", border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.03)", marginBottom: "24px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0", color: "#475569", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <th style={{ padding: "14px 16px" }}>
+                      <div
+                        onClick={handleToggleSelectAll}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
+                          userSelect: "none",
+                        }}
+                        title={isAllSelected ? "Deselect All Courses" : "Select All Courses"}
+                      >
+                        {isAllSelected ? (
+                          <FiCheckSquare size={18} color="#3b8db3" />
+                        ) : (
+                          <FiSquare size={18} color="#94a3b8" />
+                        )}
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>Select All</span>
+                      </div>
+                    </th>
+                    <th style={{ padding: "14px 16px", fontWeight: 700 }}>Course Code</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 700 }}>Course Title</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 700 }}>Credits</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 700 }}>Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(data?.courses || []).map((c, idx) => {
+                    const isSelected = selectedIds.includes(c._id);
+                    const isLab = Number(c.creditHours) === 1 || (c.courseType || "").toLowerCase().includes("sessional") || (c.courseType || "").toLowerCase().includes("lab");
+                    return (
+                      <tr
+                        key={c._id}
+                        onClick={() => data?.calendar?.isOpen !== false && toggleCourse(c._id)}
+                        style={{
+                          borderBottom: idx === (data?.courses?.length - 1) ? "none" : "1px solid #f1f5f9",
+                          cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
+                          background: isSelected ? "#f0f9ff" : idx % 2 === 0 ? "#ffffff" : "#fafafa",
+                          opacity: data?.calendar?.isOpen === false ? 0.7 : 1,
+                          fontSize: "13.5px",
+                          transition: "background 0.15s ease",
+                        }}
+                      >
+                        <td style={{ padding: "14px 16px" }}>
+                          {isSelected ? <FiCheckSquare size={18} color="#3b8db3" /> : <FiSquare size={18} color="#94a3b8" />}
+                        </td>
+                        <td style={{ padding: "14px 16px", fontWeight: 700 }}>
+                          <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "4px 10px", borderRadius: "6px", fontSize: "12.5px" }}>
+                            {c.courseCode}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#1e293b" }}>{c.courseTitle}</td>
+                        <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{c.creditHours} Credits</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{ padding: "3px 10px", borderRadius: "12px", fontSize: "11.5px", fontWeight: "700", background: isLab ? "#ccfbf1" : "#e0f2fe", color: isLab ? "#0f766e" : "#0369a1" }}>
+                            {isLab ? "Sessional / Lab" : "Theory"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-          <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
+            {/* Total Credits Summary */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: "15px", color: "#475569", fontWeight: 600 }}>
+                Total Selected Credits: <strong style={{ color: "#0f172a", fontSize: "17px" }}>{totalSelectedCredits}</strong> / {maxCred}
+              </span>
+              <span style={{ fontSize: "13px", color: totalSelectedCredits >= minCred && totalSelectedCredits <= maxCred ? "#0f766e" : "#dc2626", fontWeight: 700 }}>
+                {totalSelectedCredits < minCred ? `(Minimum ${minCred} credits required)` : totalSelectedCredits > maxCred ? `(Maximum ${maxCred} credits allowed)` : "✓ Within Credit Limits"}
+              </span>
+            </div>
+
             <button
-              onClick={async () => {
-                const reg = await handleSubmitRegistration();
-                if (reg) {
-                  toast.success("Registration submitted!");
+              onClick={handleProceedSummary}
+              disabled={data?.calendar?.isOpen === false}
+              style={{
+                width: "100%",
+                background: data?.calendar?.isOpen === false ? "#94a3b8" : "linear-gradient(135deg, #0284c7, #0369a1)",
+                color: "#ffffff",
+                border: "none",
+                padding: "14px",
+                borderRadius: "12px",
+                fontWeight: "700",
+                fontSize: "15px",
+                cursor: data?.calendar?.isOpen === false ? "not-allowed" : "pointer",
+                boxShadow: data?.calendar?.isOpen === false ? "none" : "0 4px 16px rgba(2, 132, 199, 0.25)",
+                transition: "all 0.18s ease",
+              }}
+            >
+              {data?.calendar?.isOpen === false ? "Registration Closed by Admin" : "Proceed to Registration Summary"}
+            </button>
+          </div>
+        ) : (
+          /* Step 2: Registration Summary Page */
+          <div style={{ background: "#ffffff", borderRadius: "18px", padding: "32px", boxShadow: "0 4px 24px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "24px", borderBottom: "2px solid #f1f5f9", paddingBottom: "20px" }}>
+              <div
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "14px",
+                  background: "linear-gradient(135deg, #0284c7, #0369a1)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#ffffff",
+                  boxShadow: "0 4px 12px rgba(2, 132, 199, 0.25)",
+                }}
+              >
+                <FiFileText size={24} />
+              </div>
+              <div>
+                <h1 style={{ margin: 0, color: "#0f172a", fontSize: "24px", fontWeight: 800 }}>
+                  Registration Summary & Academic Slip
+                </h1>
+                <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: "13.5px" }}>
+                  Review your selected courses and institutional fee breakdown before submitting to your Adviser.
+                </p>
+              </div>
+            </div>
+
+            {/* Student Profile Overview Card */}
+            <div style={{ background: "#f8fafc", padding: "20px 24px", borderRadius: "14px", border: "1px solid #e2e8f0", marginBottom: "28px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", fontSize: "13.5px", color: "#334155" }}>
+                <div><strong>Student Name:</strong> {data?.student?.name}</div>
+                <div><strong>Student ID:</strong> {data?.student?.studentId}</div>
+                <div><strong>Department:</strong> {data?.student?.department}</div>
+                <div><strong>Target Level-Term:</strong> Level {level} Term {term}</div>
+              </div>
+            </div>
+
+            {/* Selected Courses Table */}
+            <div style={{ marginBottom: "28px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                <FiBookOpen size={18} color="#0284c7" />
+                <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16px", fontWeight: 800 }}>1. Selected Curriculum Courses</h3>
+              </div>
+
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      <th style={{ padding: "12px 16px", fontWeight: 700 }}>Course Code</th>
+                      <th style={{ padding: "12px 16px", fontWeight: 700 }}>Course Title</th>
+                      <th style={{ padding: "12px 16px", fontWeight: 700 }}>Credits</th>
+                      <th style={{ padding: "12px 16px", fontWeight: 700 }}>Type</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700 }}>Fee (BDT)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCourses.map((c, idx) => {
+                      const isLab = Number(c.creditHours) === 1 || (c.courseType || "").toLowerCase().includes("sessional") || (c.courseType || "").toLowerCase().includes("lab");
+                      const fee = isLab ? 100 : 300;
+                      return (
+                        <tr key={c._id} style={{ borderBottom: idx === selectedCourses.length - 1 ? "none" : "1px solid #f1f5f9", background: idx % 2 === 0 ? "#ffffff" : "#fafafa" }}>
+                          <td style={{ padding: "12px 16px", fontWeight: 700 }}>
+                            <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "3px 8px", borderRadius: "6px", fontSize: "12px" }}>
+                              {c.courseCode}
+                            </span>
+                          </td>
+                          <td style={{ padding: "12px 16px", color: "#1e293b", fontWeight: 600 }}>{c.courseTitle}</td>
+                          <td style={{ padding: "12px 16px", fontWeight: 700, color: "#0f172a" }}>{c.creditHours} Credits</td>
+                          <td style={{ padding: "12px 16px" }}>
+                            <span style={{ padding: "2px 8px", borderRadius: "10px", fontSize: "11px", fontWeight: "700", background: isLab ? "#ccfbf1" : "#e0f2fe", color: isLab ? "#0f766e" : "#0369a1" }}>
+                              {isLab ? "Lab (৳100)" : "Theory (৳300)"}
+                            </span>
+                          </td>
+                          <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>৳{fee} BDT</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Payment Fee Breakdown */}
+            {(() => {
+              let theoryCount = 0;
+              let labCount = 0;
+              selectedCourses.forEach((c) => {
+                if (Number(c.creditHours) === 1 || (c.courseType || "").toLowerCase().includes("sessional") || (c.courseType || "").toLowerCase().includes("lab")) {
+                  labCount++;
+                } else {
+                  theoryCount++;
                 }
-              }}
-              disabled={submitting}
-              style={{
-                flex: 1,
-                background: "#16a34a",
-                color: "#ffffff",
-                border: "none",
-                padding: "14px",
-                borderRadius: "8px",
-                fontWeight: "600",
-                fontSize: "15px",
-                cursor: submitting ? "not-allowed" : "pointer",
-              }}
-            >
-              {submitting ? "Submitting..." : "Submit Registration (Payment Later)"}
-            </button>
+              });
+              const courseSubtotal = theoryCount * 300 + labCount * 100;
+              const grandTotalFee = courseSubtotal + FIXED_FEES_TOTAL;
 
-            <button
-              onClick={async () => {
-                const reg = await handleSubmitRegistration();
-                if (reg) setShowInvoiceModal(true);
-              }}
-              disabled={submitting}
-              style={{
-                flex: 1,
-                background: "#0284c7",
-                color: "#ffffff",
-                border: "none",
-                padding: "14px",
-                borderRadius: "8px",
-                fontWeight: "600",
-                fontSize: "14.5px",
-                cursor: submitting ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-            >
-              <FiFileText size={18} /> View Official Invoice
-            </button>
+              return (
+                <div>
+                  {/* Fixed Fees Serial Table */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                    <FiLayers size={18} color="#0284c7" />
+                    <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16px", fontWeight: 800 }}>2. Fixed Institutional & Administrative Fees</h3>
+                  </div>
 
-            <button
-              onClick={handleOpenOnlinePayment}
-              disabled={submitting}
-              style={{
-                flex: 1,
-                background: "linear-gradient(135deg, #0ea5e9, #0284c7)",
-                color: "#ffffff",
-                border: "none",
-                padding: "14px",
-                borderRadius: "8px",
-                fontWeight: "600",
-                fontSize: "15px",
-                cursor: submitting ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-            >
-              <FiCreditCard size={18} /> Pay Online Now
-            </button>
+                  <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden", marginBottom: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc", color: "#475569", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                          <th style={{ padding: "12px 16px", width: "50px", fontWeight: 700 }}>#</th>
+                          <th style={{ padding: "12px 16px", fontWeight: 700 }}>Fee Item Description</th>
+                          <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700 }}>Amount (BDT)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {FIXED_REGISTRATION_FEES.map((item, idx) => (
+                          <tr key={idx} style={{ borderBottom: idx === FIXED_REGISTRATION_FEES.length - 1 ? "none" : "1px solid #f1f5f9", background: idx % 2 === 0 ? "#ffffff" : "#fafafa" }}>
+                            <td style={{ padding: "10px 16px", color: "#64748b", fontWeight: 600 }}>{idx + 1}</td>
+                            <td style={{ padding: "10px 16px", color: "#1e293b", fontWeight: 600 }}>{item.name}</td>
+                            <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>৳{item.amount.toLocaleString()} BDT</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Grand Total Calculation Summary */}
+                  <div style={{ background: "#f0f9ff", padding: "24px", borderRadius: "16px", border: "1.5px solid #bae6fd", marginBottom: "28px", boxShadow: "0 4px 16px rgba(2, 132, 199, 0.06)" }}>
+                    <h3 style={{ margin: "0 0 16px 0", color: "#0369a1", fontSize: "17px", fontWeight: 800 }}>Total Registration Fee Summary</h3>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", fontSize: "14px", color: "#334155" }}>
+                      <span>Selected Academic Courses Subtotal ({theoryCount} Theory × ৳300 + {labCount} Lab × ৳100):</span>
+                      <strong style={{ color: "#0f172a" }}>৳{courseSubtotal.toLocaleString()} BDT</strong>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", fontSize: "14px", color: "#334155" }}>
+                      <span>Fixed Institutional Fees Subtotal (13 Items):</span>
+                      <strong style={{ color: "#0f172a" }}>৳{FIXED_FEES_TOTAL.toLocaleString()} BDT</strong>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px dashed #bae6fd", paddingTop: "14px", marginTop: "12px", fontSize: "18px", color: "#0f172a", fontWeight: 800 }}>
+                      <span>Grand Total Course Registration Fee:</span>
+                      <span style={{ color: "#0284c7", fontSize: "20px" }}>৳{grandTotalFee.toLocaleString()} BDT</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Optional Payment Banner */}
+            <div style={{ background: "#f0f9ff", border: "1px solid #bae6fd", borderLeft: "5px solid #0284c7", padding: "16px 20px", borderRadius: "12px", color: "#0369a1", fontSize: "13.5px", marginBottom: "28px", display: "flex", alignItems: "center", gap: "12px" }}>
+              <FiAlertCircle size={22} color="#0284c7" style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Note:</strong> Online payment is optional. Submitting registration will send it to your adviser immediately without requiring payment. You can pay online anytime.
+              </span>
+            </div>
+
+            <div style={{ display: "flex", gap: "12px", marginTop: "24px", flexWrap: "wrap" }}>
+              <button
+                onClick={async () => {
+                  const reg = await handleSubmitRegistration();
+                  if (reg) {
+                    toast.success("Registration submitted!");
+                  }
+                }}
+                disabled={submitting}
+                style={{
+                  flex: 1,
+                  background: "linear-gradient(135deg, #0284c7, #0369a1)",
+                  color: "#ffffff",
+                  border: "none",
+                  padding: "14px",
+                  borderRadius: "10px",
+                  fontWeight: "700",
+                  fontSize: "14.5px",
+                  cursor: submitting ? "not-allowed" : "pointer",
+                  boxShadow: "0 4px 14px rgba(2, 132, 199, 0.25)",
+                }}
+              >
+                {submitting ? "Submitting..." : "Submit Registration (Payment Later)"}
+              </button>
+
+              <button
+                onClick={async () => {
+                  const reg = await handleSubmitRegistration();
+                  if (reg) setShowInvoiceModal(true);
+                }}
+                disabled={submitting}
+                style={{
+                  flex: 1,
+                  background: "#ffffff",
+                  color: "#0369a1",
+                  border: "1.5px solid #0284c7",
+                  padding: "14px",
+                  borderRadius: "10px",
+                  fontWeight: "700",
+                  fontSize: "14.5px",
+                  cursor: submitting ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
+                <FiFileText size={18} /> View Official Invoice
+              </button>
+
+              <button
+                onClick={handleOpenOnlinePayment}
+                disabled={submitting}
+                style={{
+                  flex: 1,
+                  background: "linear-gradient(135deg, #3b8db3, #2C4B66)",
+                  color: "#ffffff",
+                  border: "none",
+                  padding: "14px",
+                  borderRadius: "10px",
+                  fontWeight: "700",
+                  fontSize: "14.5px",
+                  cursor: submitting ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  boxShadow: "0 4px 14px rgba(59, 141, 179, 0.25)",
+                }}
+              >
+                <FiCreditCard size={18} /> Pay Online Now
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Online Payment Gateway Checkout Modal */}
       <PaymentCheckoutModal

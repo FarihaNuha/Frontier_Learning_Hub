@@ -196,9 +196,26 @@ exports.getMyCourses = async (req, res) => {
               const acName = (ac.courseName || "").trim().toLowerCase();
               const acSess = (ac.session || t.assignedSession || "").trim().toLowerCase();
 
-              const codeOrNameMatch =
-                (acCode && acCode === courseCode) ||
-                (acName && (c.name || "").trim().toLowerCase() === acName);
+              const cleanCName = (c.name || "").trim().toLowerCase().replace(/\btheory\b/g, "").replace(/\s+/g, " ").trim();
+              const cleanAcName = acName.replace(/\btheory\b/g, "").replace(/\s+/g, " ").trim();
+
+              const codeMatch = Boolean(
+                acCode && (
+                  acCode === courseCode ||
+                  acCode.replace(/\s+/g, "") === courseCode.replace(/\s+/g, "")
+                )
+              );
+
+              const nameMatch = Boolean(
+                acName && (
+                  (c.name || "").trim().toLowerCase() === acName ||
+                  (cleanAcName && cleanCName && cleanAcName === cleanCName) ||
+                  acName.includes((c.name || "").trim().toLowerCase()) ||
+                  (c.name || "").trim().toLowerCase().includes(acName)
+                )
+              );
+
+              const codeOrNameMatch = codeMatch || nameMatch;
 
               if (!codeOrNameMatch) return false;
 
@@ -211,9 +228,16 @@ exports.getMyCourses = async (req, res) => {
           );
 
           if (matchedTeacherDoc) {
-            const teacherUserDoc = teacherUsers.find(
-              (u) => u.email.toLowerCase() === matchedTeacherDoc.email.toLowerCase()
+            let teacherUserDoc = teacherUsers.find(
+              (u) => u.email && u.email.toLowerCase() === matchedTeacherDoc.email?.toLowerCase()
             );
+
+            if (!teacherUserDoc && matchedTeacherDoc.name) {
+              teacherUserDoc = teacherUsers.find(
+                (u) => u.name && u.name.toLowerCase().trim() === matchedTeacherDoc.name.toLowerCase().trim()
+              );
+            }
+
             if (teacherUserDoc) {
               assignedTeacherObj = {
                 _id: teacherUserDoc._id,
@@ -228,12 +252,17 @@ exports.getMyCourses = async (req, res) => {
                 await Course.findByIdAndUpdate(c._id, { teacher: teacherUserDoc._id }).catch(() => {});
               }
             }
-          } else {
-            // Unassign teacher if no master assignment exists for THIS session
-            assignedTeacherObj = null;
-            if (c.teacher) {
-              await Course.findByIdAndUpdate(c._id, { teacher: null }).catch(() => {});
-            }
+          }
+
+          // Fallback: If Course object already has a populated teacher from DB, use it!
+          if (!assignedTeacherObj && c.teacher && c.teacher.name) {
+            assignedTeacherObj = {
+              _id: c.teacher._id || c.teacher,
+              name: c.teacher.name,
+              email: c.teacher.email || "",
+              profilePicture: c.teacher.profilePicture || "",
+              department: c.teacher.department || "",
+            };
           }
 
           const CourseImport = require("../models/CourseImport");

@@ -143,5 +143,8 @@
   "141": "authMiddleware.js",
   "142": "sync_active_status.js",
   "143": "registrationPaymentRoutes.js",
-  "146": "react-hot-toast"
+  "144": "react-scripts",
+  "145": "umsAdminRoutes.js",
+  "146": "react-hot-toast",
+  "147": "jspdf-autotable"
 }

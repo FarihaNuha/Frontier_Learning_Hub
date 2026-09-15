@@ -273,6 +273,14 @@ function AppContent() {
             }
           />
           <Route
+            path="/student/level_term/:level/:term"
+            element={
+              <ProtectedRoute>
+                <StudentLevelTermPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/student/registration/:level/:term"
             element={
               <ProtectedRoute>
@@ -380,6 +388,14 @@ function AppContent() {
           />
           <Route
             path="/student/course-registration"
+            element={
+              <ProtectedRoute>
+                <AcademicRegistrationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/registration"
             element={
               <ProtectedRoute>
                 <AcademicRegistrationPage />

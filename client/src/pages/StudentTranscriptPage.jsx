@@ -114,7 +114,7 @@ export default function StudentTranscriptPage() {
                 <div><strong>Batch & Session:</strong> {studentInfo.batch} ({studentInfo.session})</div>
                 <div><strong>Academic Status:</strong> <span style={{ fontWeight: 700, color: "#3b8db3" }}>{studentInfo.academicStatus}</span></div>
                 <div><strong>Total Credits Earned:</strong> {data?.totalCreditsEarned || 0}</div>
-                <div><strong>Overall Cumulative CGPA:</strong> <span style={{ fontWeight: 800, color: "#16a34a", fontSize: "16px" }}>{(data?.cgpa || 0).toFixed(2)}</span></div>
+                <div><strong>Overall Cumulative GPA:</strong> <span style={{ fontWeight: 800, color: "#16a34a", fontSize: "16px" }}>{(data?.cgpa || 0).toFixed(2)}</span></div>
               </div>
             </div>
 
@@ -132,7 +132,7 @@ export default function StudentTranscriptPage() {
                         {sem.semesterName} (Session: {sem.session})
                       </span>
                       <span style={{ fontSize: "13px", fontWeight: 700, color: "#15803d" }}>
-                        Semester GPA: {sem.semesterGPA.toFixed(2)}
+                        Term GPA: {sem.semesterGPA.toFixed(2)}
                       </span>
                     </div>
 

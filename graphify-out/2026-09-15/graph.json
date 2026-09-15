@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 132,
+      "community": 126,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 132,
+      "community": 126,
       "norm_label": "docx-preview"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "client_package_dependencies_react_router_dom",
-      "community": 119,
+      "community": 132,
       "norm_label": "react-router-dom"
     },
     {
@@ -450,7 +450,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "react_router_dom",
-      "community": 119,
+      "community": 132,
       "norm_label": "react-router-dom"
     },
     {
@@ -520,7 +520,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_package_dependencies_xlsx",
-      "community": 126,
+      "community": 147,
       "norm_label": "xlsx"
     },
     {
@@ -530,7 +530,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_package_json_xlsx",
-      "community": 126,
+      "community": 147,
       "norm_label": "xlsx"
     },
     {
@@ -1347,7 +1347,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "client/src/App.jsx",
-      "source_location": "L727",
+      "source_location": "L743",
       "_origin": "ast",
       "id": "client_src_app_app",
       "community": 69,
@@ -1400,7 +1400,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal",
-      "community": 111,
+      "community": 143,
       "norm_label": "filepreviewmodal.jsx"
     },
     {
@@ -1410,7 +1410,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal_filepreviewmodal",
-      "community": 111,
+      "community": 143,
       "norm_label": "filepreviewmodal()"
     },
     {
@@ -1510,7 +1510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_paymentcheckoutmodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "paymentcheckoutmodal.jsx"
     },
     {
@@ -1520,7 +1520,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "client_src_components_paymentcheckoutmodal_paymentcheckoutmodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "paymentcheckoutmodal()"
     },
     {
@@ -1530,7 +1530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_registrationinvoicemodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "registrationinvoicemodal.jsx"
     },
     {
@@ -1540,7 +1540,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_src_components_registrationinvoicemodal_registrationinvoicemodal",
-      "community": 41,
+      "community": 42,
       "norm_label": "registrationinvoicemodal()"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity",
-      "community": 111,
+      "community": 143,
       "norm_label": "coursecommunity.jsx"
     },
     {
@@ -2270,7 +2270,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_rendercontentwithlinks",
-      "community": 111,
+      "community": 143,
       "norm_label": "rendercontentwithlinks()"
     },
     {
@@ -2280,7 +2280,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursecommunity",
-      "community": 111,
+      "community": 143,
       "norm_label": "coursecommunity()"
     },
     {
@@ -2290,7 +2290,7 @@
       "source_location": "L460",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_getfileurl",
-      "community": 111,
+      "community": 143,
       "norm_label": "getfileurl()"
     },
     {
@@ -2300,7 +2300,7 @@
       "source_location": "L472",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderattachments",
-      "community": 111,
+      "community": 143,
       "norm_label": "renderattachments()"
     },
     {
@@ -2310,7 +2310,7 @@
       "source_location": "L581",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderlectureattachment",
-      "community": 111,
+      "community": 143,
       "norm_label": "renderlectureattachment()"
     },
     {
@@ -2320,7 +2320,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_commentitem",
-      "community": 111,
+      "community": 143,
       "norm_label": "commentitem()"
     },
     {
@@ -2330,7 +2330,7 @@
       "source_location": "L859",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursepostcard",
-      "community": 111,
+      "community": 143,
       "norm_label": "coursepostcard()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_location": "L1286",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_editpostmodal",
-      "community": 111,
+      "community": 143,
       "norm_label": "editpostmodal()"
     },
     {
@@ -2450,24 +2450,24 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "courseregistrationpage.jsx"
     },
     {
       "label": "FIXED_REGISTRATION_FEES",
       "file_type": "code",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L9",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage_fixed_registration_fees",
-      "community": 41,
+      "community": 42,
       "norm_label": "fixed_registration_fees"
     },
     {
       "label": "CourseRegistrationPage()",
       "file_type": "code",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L26",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage_courseregistrationpage",
       "community": 55,
@@ -2760,17 +2760,17 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentleveltermpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "studentleveltermpage.jsx"
     },
     {
       "label": "StudentLevelTermPage()",
       "file_type": "code",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L9",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "client_src_pages_studentleveltermpage_studentleveltermpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "studentleveltermpage()"
     },
     {
@@ -2800,7 +2800,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentregistrationpaymentpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "studentregistrationpaymentpage.jsx"
     },
     {
@@ -2810,7 +2810,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_src_pages_studentregistrationpaymentpage_fixed_registration_fees",
-      "community": 41,
+      "community": 42,
       "norm_label": "fixed_registration_fees"
     },
     {
@@ -3020,7 +3020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_teacherregistrationapprovalpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "teacherregistrationapprovalpage.jsx"
     },
     {
@@ -3030,7 +3030,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "client_src_pages_teacherregistrationapprovalpage_teacherregistrationapprovalpage",
-      "community": 41,
+      "community": 42,
       "norm_label": "teacherregistrationapprovalpage()"
     },
     {
@@ -6720,7 +6720,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_parseoptionalnumber",
-      "community": 101,
+      "community": 80,
       "norm_label": "parseoptionalnumber()"
     },
     {
@@ -6730,7 +6730,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_validateresultrows",
-      "community": 101,
+      "community": 80,
       "norm_label": "validateresultrows()"
     },
     {
@@ -6740,7 +6740,7 @@
       "source_location": "L357",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_uploadresultexcel",
-      "community": 101,
+      "community": 80,
       "norm_label": "uploadresultexcel()"
     },
     {
@@ -6800,14 +6800,14 @@
       "source_location": "L858",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getadminresults",
-      "community": 37,
+      "community": 101,
       "norm_label": "getadminresults()"
     },
     {
       "label": "sendTeacherReminder()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1196",
+      "source_location": "L1036",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_sendteacherreminder",
       "community": 81,
@@ -6817,7 +6817,7 @@
       "label": "verifyResultBatch()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1244",
+      "source_location": "L1084",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_verifyresultbatch",
       "community": 101,
@@ -6827,7 +6827,7 @@
       "label": "requestCorrectionBatch()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1289",
+      "source_location": "L1129",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_requestcorrectionbatch",
       "community": 101,
@@ -6837,7 +6837,7 @@
       "label": "publishResultBatch()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1340",
+      "source_location": "L1180",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_publishresultbatch",
       "community": 101,
@@ -6847,7 +6847,7 @@
       "label": "calculateSemesterGPA()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1390",
+      "source_location": "L1230",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_calculatesemestergpa",
       "community": 37,
@@ -6857,7 +6857,7 @@
       "label": "setDeadlineAndNotice()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1581",
+      "source_location": "L1421",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_setdeadlineandnotice",
       "community": 81,
@@ -6867,7 +6867,7 @@
       "label": "schedulePublicationBySession()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1711",
+      "source_location": "L1551",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_schedulepublicationbysession",
       "community": 37,
@@ -6877,7 +6877,7 @@
       "label": "setMidtermCorrectionDeadline()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1770",
+      "source_location": "L1610",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_setmidtermcorrectiondeadline",
       "community": 37,
@@ -6887,7 +6887,7 @@
       "label": "getStudentPublishedResults()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1810",
+      "source_location": "L1650",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getstudentpublishedresults",
       "community": 37,
@@ -6897,7 +6897,7 @@
       "label": "createCorrectionRequest()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2081",
+      "source_location": "L1921",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_createcorrectionrequest",
       "community": 37,
@@ -6907,7 +6907,7 @@
       "label": "getStudentCorrectionRequests()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2180",
+      "source_location": "L2020",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getstudentcorrectionrequests",
       "community": 37,
@@ -6917,7 +6917,7 @@
       "label": "getTeacherCorrectionRequests()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2193",
+      "source_location": "L2033",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getteachercorrectionrequests",
       "community": 37,
@@ -6927,7 +6927,7 @@
       "label": "replyToCorrectionRequest()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2233",
+      "source_location": "L2073",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_replytocorrectionrequest",
       "community": 37,
@@ -6937,10 +6937,10 @@
       "label": "batchUpdateMarks()",
       "file_type": "code",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2269",
+      "source_location": "L2109",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_batchupdatemarks",
-      "community": 101,
+      "community": 80,
       "norm_label": "batchupdatemarks()"
     },
     {
@@ -7150,7 +7150,7 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_importteachers",
-      "community": 68,
+      "community": 114,
       "norm_label": "importteachers()"
     },
     {
@@ -8590,7 +8590,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar",
-      "community": 53,
+      "community": 111,
       "norm_label": "registrationcalendar.js"
     },
     {
@@ -8600,7 +8600,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_mongoose",
-      "community": 53,
+      "community": 111,
       "norm_label": "mongoose"
     },
     {
@@ -8610,7 +8610,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_registrationcalendarschema",
-      "community": 53,
+      "community": 111,
       "norm_label": "registrationcalendarschema"
     },
     {
@@ -8860,7 +8860,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher",
-      "community": 142,
+      "community": 41,
       "norm_label": "teacher.js"
     },
     {
@@ -8870,7 +8870,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher_mongoose",
-      "community": 142,
+      "community": 41,
       "norm_label": "mongoose"
     },
     {
@@ -8880,7 +8880,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_teacher_teacherschema",
-      "community": 142,
+      "community": 41,
       "norm_label": "teacherschema"
     },
     {
@@ -9610,7 +9610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 42,
+      "community": 99,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -9620,7 +9620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 42,
+      "community": 99,
       "norm_label": "router"
     },
     {
@@ -9630,7 +9630,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 42,
+      "community": 99,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9640,7 +9640,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 42,
+      "community": 99,
       "norm_label": "ctrl"
     },
     {
@@ -9880,7 +9880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_courseroutes",
-      "community": 99,
+      "community": 144,
       "norm_label": "courseroutes.js"
     },
     {
@@ -9890,7 +9890,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_courseroutes_router",
-      "community": 99,
+      "community": 144,
       "norm_label": "router"
     },
     {
@@ -9900,7 +9900,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_courseroutes_verifytoken_checkrole",
-      "community": 99,
+      "community": 144,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9910,7 +9910,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_courseroutes_ctrl",
-      "community": 99,
+      "community": 144,
       "norm_label": "ctrl"
     },
     {
@@ -9920,7 +9920,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes",
-      "community": 99,
+      "community": 140,
       "norm_label": "examroutes.js"
     },
     {
@@ -9930,7 +9930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes_router",
-      "community": 99,
+      "community": 140,
       "norm_label": "router"
     },
     {
@@ -9940,7 +9940,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_examroutes_verifytoken_checkrole",
-      "community": 99,
+      "community": 140,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -9950,7 +9950,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_examroutes_ctrl",
-      "community": 99,
+      "community": 140,
       "norm_label": "ctrl"
     },
     {
@@ -10250,7 +10250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes",
-      "community": 80,
+      "community": 145,
       "norm_label": "umsadminroutes.js"
     },
     {
@@ -10260,7 +10260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_router",
-      "community": 80,
+      "community": 145,
       "norm_label": "router"
     },
     {
@@ -10270,7 +10270,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_verifytoken_checkrole",
-      "community": 80,
+      "community": 145,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10280,7 +10280,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_ctrl",
-      "community": 80,
+      "community": 145,
       "norm_label": "ctrl"
     },
     {
@@ -11950,7 +11950,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix",
-      "community": 57,
+      "community": 41,
       "norm_label": "sync_advisers_fix.js"
     },
     {
@@ -11960,7 +11960,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_mongoose",
-      "community": 57,
+      "community": 41,
       "norm_label": "mongoose"
     },
     {
@@ -11970,7 +11970,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_teacher",
-      "community": 57,
+      "community": 41,
       "norm_label": "teacher"
     },
     {
@@ -11980,7 +11980,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_adviser",
-      "community": 57,
+      "community": 41,
       "norm_label": "adviser"
     },
     {
@@ -11990,7 +11990,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_sync_advisers_fix_run",
-      "community": 57,
+      "community": 41,
       "norm_label": "run()"
     },
     {
@@ -12940,7 +12940,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_full_import_teachers_testfullimportteachers",
-      "community": 68,
+      "community": 114,
       "norm_label": "testfullimportteachers()"
     },
     {
@@ -13470,7 +13470,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism",
-      "community": 64,
+      "community": 119,
       "norm_label": "test_plagiarism.js"
     },
     {
@@ -13480,7 +13480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_similarityservice",
-      "community": 64,
+      "community": 119,
       "norm_label": "similarityservice"
     },
     {
@@ -13490,7 +13490,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_runplagiarismtests",
-      "community": 64,
+      "community": 119,
       "norm_label": "runplagiarismtests()"
     },
     {
@@ -16370,7 +16370,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
-      "source_location": "L727",
+      "source_location": "L743",
       "weight": 1.0,
       "source": "client_src_app",
       "target": "client_src_app_app",
@@ -17610,7 +17610,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L6",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_paymentcheckoutmodal",
@@ -17621,7 +17621,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L7",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_paymentcheckoutmodal",
@@ -17643,7 +17643,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L6",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_paymentcheckoutmodal_paymentcheckoutmodal",
@@ -17654,7 +17654,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L7",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_paymentcheckoutmodal_paymentcheckoutmodal",
@@ -17708,7 +17708,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L7",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_registrationinvoicemodal",
@@ -17719,7 +17719,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L6",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_registrationinvoicemodal",
@@ -17752,7 +17752,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L7",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_components_registrationinvoicemodal_registrationinvoicemodal",
@@ -17763,7 +17763,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L6",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_registrationinvoicemodal_registrationinvoicemodal",
@@ -18144,6 +18144,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/CourseRegistrationPage.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "client_src_pages_courseregistrationpage",
+      "target": "client_src_components_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
       "source_location": "L9",
       "weight": 1.0,
@@ -18247,6 +18258,17 @@
       "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_pages_studentexampage",
+      "target": "client_src_components_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentLevelTermPage.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_studentsidebar",
       "confidence_score": 1.0
     },
@@ -18397,6 +18419,17 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/CourseRegistrationPage.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "client_src_pages_courseregistrationpage",
+      "target": "client_src_components_studentsidebar_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
       "source_location": "L9",
       "weight": 1.0,
@@ -18500,6 +18533,17 @@
       "source_location": "L22",
       "weight": 1.0,
       "source": "client_src_pages_studentexampage",
+      "target": "client_src_components_studentsidebar_studentsidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/pages/StudentLevelTermPage.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_components_studentsidebar_studentsidebar",
       "confidence_score": 1.0
     },
@@ -21578,7 +21622,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L26",
+      "source_location": "L37",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_pages_courseregistrationpage_courseregistrationpage",
@@ -21588,7 +21632,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L9",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage",
       "target": "client_src_pages_courseregistrationpage_fixed_registration_fees",
@@ -21622,7 +21666,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/CourseRegistrationPage.jsx",
-      "source_location": "L358",
+      "source_location": "L462",
       "weight": 1.0,
       "source": "client_src_pages_courseregistrationpage_courseregistrationpage",
       "target": "server_controllers_registrationpaymentcontroller_fixed_fees_total"
@@ -22198,7 +22242,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/StudentLevelTermPage.jsx",
-      "source_location": "L9",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "client_src_pages_studentleveltermpage",
       "target": "client_src_pages_studentleveltermpage_studentleveltermpage",
@@ -29838,7 +29882,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2269",
+      "source_location": "L2109",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_batchupdatemarks",
@@ -29848,7 +29892,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1390",
+      "source_location": "L1230",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_calculatesemestergpa",
@@ -29888,7 +29932,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2081",
+      "source_location": "L1921",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_createcorrectionrequest",
@@ -29938,7 +29982,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2180",
+      "source_location": "L2020",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_getstudentcorrectionrequests",
@@ -29948,7 +29992,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1810",
+      "source_location": "L1650",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_getstudentpublishedresults",
@@ -29958,7 +30002,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2193",
+      "source_location": "L2033",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_getteachercorrectionrequests",
@@ -30008,7 +30052,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1340",
+      "source_location": "L1180",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_publishresultbatch",
@@ -30018,7 +30062,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2233",
+      "source_location": "L2073",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_replytocorrectionrequest",
@@ -30028,7 +30072,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1289",
+      "source_location": "L1129",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_requestcorrectionbatch",
@@ -30088,7 +30132,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1711",
+      "source_location": "L1551",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_schedulepublicationbysession",
@@ -30108,7 +30152,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1196",
+      "source_location": "L1036",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_sendteacherreminder",
@@ -30118,7 +30162,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1581",
+      "source_location": "L1421",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_setdeadlineandnotice",
@@ -30128,7 +30172,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1770",
+      "source_location": "L1610",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_setmidtermcorrectiondeadline",
@@ -30218,7 +30262,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1244",
+      "source_location": "L1084",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller",
       "target": "server_controllers_resultcontroller_verifyresultbatch",
@@ -30483,7 +30527,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1358",
+      "source_location": "L1198",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_publishresultbatch",
       "target": "server_controllers_resultcontroller_resultlog"
@@ -30494,7 +30538,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1312",
+      "source_location": "L1152",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_requestcorrectionbatch",
       "target": "server_controllers_resultcontroller_resultlog"
@@ -30527,7 +30571,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1261",
+      "source_location": "L1101",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_verifyresultbatch",
       "target": "server_controllers_resultcontroller_resultlog"
@@ -30604,7 +30648,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2144",
+      "source_location": "L1984",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_createcorrectionrequest",
       "target": "server_controllers_resultcontroller_resultcorrectionrequest"
@@ -30615,7 +30659,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2182",
+      "source_location": "L2022",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_getstudentcorrectionrequests",
       "target": "server_controllers_resultcontroller_resultcorrectionrequest"
@@ -30626,7 +30670,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2222",
+      "source_location": "L2062",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_getteachercorrectionrequests",
       "target": "server_controllers_resultcontroller_resultcorrectionrequest"
@@ -30637,7 +30681,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2238",
+      "source_location": "L2078",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_replytocorrectionrequest",
       "target": "server_controllers_resultcontroller_resultcorrectionrequest"
@@ -30647,7 +30691,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2308",
+      "source_location": "L2148",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_batchupdatemarks",
       "target": "server_controllers_resultcontroller_parseoptionalnumber",
@@ -30692,18 +30736,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L992",
-      "weight": 1.0,
-      "source": "server_controllers_resultcontroller_getadminresults",
-      "target": "server_utils_courseutils_resolvecoursecode"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/controllers/resultController.js",
-      "source_location": "L1223",
+      "source_location": "L1063",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_sendteacherreminder",
       "target": "server_services_emailservice_sendemail"
@@ -30714,7 +30747,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1219",
+      "source_location": "L1059",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_sendteacherreminder",
       "target": "server_socket_getio"
@@ -30725,7 +30758,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1278",
+      "source_location": "L1118",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_verifyresultbatch",
       "target": "server_socket_getio"
@@ -30736,7 +30769,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1329",
+      "source_location": "L1169",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_requestcorrectionbatch",
       "target": "server_socket_getio"
@@ -30747,7 +30780,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1377",
+      "source_location": "L1217",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_publishresultbatch",
       "target": "server_socket_getio"
@@ -30758,7 +30791,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1700",
+      "source_location": "L1540",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_setdeadlineandnotice",
       "target": "server_services_emailservice_sendemail"
@@ -30769,7 +30802,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1659",
+      "source_location": "L1499",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_setdeadlineandnotice",
       "target": "server_socket_getio"
@@ -30780,7 +30813,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L1757",
+      "source_location": "L1597",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_schedulepublicationbysession",
       "target": "server_socket_getio"
@@ -30791,7 +30824,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2167",
+      "source_location": "L2007",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_createcorrectionrequest",
       "target": "server_socket_getio"
@@ -30802,7 +30835,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2257",
+      "source_location": "L2097",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_replytocorrectionrequest",
       "target": "server_socket_getio"
@@ -40708,5 +40741,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a588b615cb84dc2a6bf6a58fe1e9d3ca482a40a2"
+  "built_at_commit": "40499e43db26175101ebc5bb2715f33df1ad5ad2"
 }

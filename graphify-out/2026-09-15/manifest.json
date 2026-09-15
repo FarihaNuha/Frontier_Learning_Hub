@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "client/src/App.jsx": {
-    "mtime": 1789305864.845194,
-    "ast_hash": "ae96050262bea61c91e018ab2484aca3",
+    "mtime": 1789460237.0687628,
+    "ast_hash": "c727271653e337fc6cc3b038ec08c8de",
     "semantic_hash": ""
   },
   "client/src/components/GlobalNotificationBell.jsx": {
@@ -655,18 +655,18 @@
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
-    "mtime": 1789375979.2274752,
-    "ast_hash": "84063a21bb4ee6a668c623824cd33904",
+    "mtime": 1789458794.4996228,
+    "ast_hash": "ff94b517b842bdc1fa8930add85fd793",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAcademicResultsPage.jsx": {
-    "mtime": 1789416863.8133032,
-    "ast_hash": "37454094513f038af08944b365ac3673",
+    "mtime": 1789458948.126861,
+    "ast_hash": "236cc8f274d5fd0fc1e18c817b3424eb",
     "semantic_hash": ""
   },
   "client/src/pages/StudentLevelTermPage.jsx": {
-    "mtime": 1789375337.3000698,
-    "ast_hash": "b1c2b4819b7e02a10f8036356977428f",
+    "mtime": 1789460225.7540998,
+    "ast_hash": "f0cce37937e5f19e58400eb083d8c7ab",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherEnrolledStudentsPage.jsx": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherResultManagementPage.jsx": {
-    "mtime": 1789397555.258692,
-    "ast_hash": "88dab20d1621c65a4dbdc161cf7b20b9",
+    "mtime": 1789459684.469704,
+    "ast_hash": "7cc966755d7790276aec8b5d253deec7",
     "semantic_hash": ""
   },
   "server/controllers/announcementController.js": {
@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
-    "mtime": 1789416539.2949524,
-    "ast_hash": "8aae017859e9332037df6021e59c8429",
+    "mtime": 1789417518.0307488,
+    "ast_hash": "72160eb26ffe9f44ebb4a5301effed30",
     "semantic_hash": ""
   },
   "server/models/Announcement.js": {
@@ -780,8 +780,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentTranscriptPage.jsx": {
-    "mtime": 1785273595.5853727,
-    "ast_hash": "b9bf49bf3d3e4a5c9013018cfd2616ed",
+    "mtime": 1789458275.3887398,
+    "ast_hash": "e027865354e089c63172b8bca2c59cea",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherRetakeApprovalPage.jsx": {

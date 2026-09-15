@@ -354,57 +354,7 @@ export default function StudentAcademicResultsPage() {
                       Official grade breakdown for {selectedSemester}
                     </p>
                   </div>
-
-                  {/* GPA badge: only show if Midterm or (Final and Paid) */}
-                  {(resultTypeTab === "Midterm" || isSelectedSemesterPaid) && (
-                    <div style={{ background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "12px", padding: "10px 20px", display: "flex", alignItems: "center", gap: "10px" }}>
-                      <span style={{ fontSize: "13.5px", color: "#166534", fontWeight: 700 }}>Semester GPA:</span>
-                      <span style={{ fontSize: "22px", fontWeight: 800, color: "#15803d" }}>
-                        {currentSemesterGPA}
-                      </span>
-                    </div>
-                  )}
                 </div>
-
-                {/* Lock Timer Banner for Active Semester */}
-                {currentSemesterResults.length > 0 && (() => {
-                  const openCount = currentSemesterResults.filter(r => !r.isCorrectionClosed && (!r.correctionWindowEnd || new Date() <= new Date(r.correctionWindowEnd))).length;
-                  const closedCount = currentSemesterResults.length - openCount;
-
-                  return (
-                    <div
-                      style={{
-                        marginBottom: "20px",
-                        padding: "14px 20px",
-                        borderRadius: "12px",
-                        background: openCount > 0 ? "linear-gradient(135deg, #e0f2fe, #bae6fd)" : "linear-gradient(135deg, #fee2e2, #fecaca)",
-                        border: `1.5px solid ${openCount > 0 ? "#0284c7" : "#dc2626"}`,
-                        color: openCount > 0 ? "#0369a1" : "#991b1b",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "14px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.04)"
-                      }}
-                    >
-                      <div style={{ fontSize: "24px", lineHeight: 1 }}>{openCount > 0 ? "⏳" : "🚨"}</div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                          <strong style={{ fontSize: "14.5px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                            {openCount > 0 ? <><FiUnlock size={15} /> Course Correction Windows Active</> : <><FiLock size={15} /> All Correction Windows Closed</>}
-                          </strong>
-                          <span style={{ background: openCount > 0 ? "#0284c7" : "#dc2626", color: "#ffffff", padding: "3px 10px", borderRadius: "8px", fontWeight: 700, fontSize: "12px" }}>
-                            {openCount > 0 ? `${openCount} Course(s) Open` : "All Closed"}
-                          </span>
-                        </div>
-                        <div style={{ fontSize: "13px", marginTop: "3px", opacity: 0.9 }}>
-                          {openCount > 0
-                            ? "Each course teacher sets their individual correction deadline. Check the action column below for specific course deadlines."
-                            : "The correction request windows for all courses in this semester have ended."}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
 
                 {resultTypeTab === "Final" && !isSelectedSemesterPaid ? (
                   <div
@@ -586,7 +536,7 @@ export default function StudentAcademicResultsPage() {
                           );
                         })}
                       </tbody>
-                      {/* Bottom Row showing Total Calculated CGPA */}
+                      {/* Bottom Row showing Total Calculated Term GPA */}
                       <tfoot>
                         <tr style={{ background: "#f0f9ff", borderTop: "2px solid #bae6fd", fontWeight: 800, fontSize: "14px", color: "#0369a1" }}>
                           <td colSpan={3} style={{ padding: "14px" }}>
@@ -596,7 +546,7 @@ export default function StudentAcademicResultsPage() {
                             {currentSemesterResults.reduce((acc, c) => acc + (Number(c.creditHours) || 0), 0)} Credits
                           </td>
                           <td colSpan={8} style={{ padding: "14px", textAlign: "right" }}>
-                            Total Calculated Semester GPA / CGPA:
+                            Term GPA:
                           </td>
                           <td style={{ padding: "14px", fontSize: "16px", color: "#15803d" }}>
                             {currentSemesterGPA}

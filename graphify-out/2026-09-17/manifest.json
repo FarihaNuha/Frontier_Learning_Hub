@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "server/controllers/resultController.js": {
-    "mtime": 1789644207.6284928,
-    "ast_hash": "e8110bfd12520757e73632b737a36b88",
+    "mtime": 1789643578.1472805,
+    "ast_hash": "ea935f7479e46be16d9d118c85b048bd",
     "semantic_hash": ""
   },
   "server/models/Announcement.js": {
@@ -1292,11 +1292,6 @@
   "scratch/test_passed_deadlines_logic.js": {
     "mtime": 1789643556.6192634,
     "ast_hash": "72db3319ad14617dc660e8d9e887194e",
-    "semantic_hash": ""
-  },
-  "scratch/test_teacher_submission_flow.js": {
-    "mtime": 1789644173.062487,
-    "ast_hash": "816891fd9760ebffa9a8755dc76bd0f9",
     "semantic_hash": ""
   }
 }

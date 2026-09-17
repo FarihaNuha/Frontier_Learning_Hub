@@ -966,15 +966,33 @@ exports.getAdminResults = async (req, res) => {
         isDeleted: { $ne: true }
       }).lean();
 
+      const cleanCodeStr = (c) => String(c || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const normSessStr = (s) => {
+        if (!s) return "";
+        const str = String(s).trim();
+        const match = str.match(/\d{4}[-\s]?\d{2,4}/);
+        if (match) {
+          const raw = match[0].replace(/\s+/g, "-");
+          const parts = raw.split("-");
+          if (parts.length === 2 && parts[1].length === 4) {
+            return `${parts[0]}-${parts[1].substring(2)}`;
+          }
+          return raw;
+        }
+        return str.toLowerCase().replace(/\s+/g, "-");
+      };
+      const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
+
       allUploadsForKeys.forEach((u) => {
-        const code = (u.courseCode || "").trim().toUpperCase();
-        const sess = (u.session || "").trim();
-        const ldig = (String(u.level || "").match(/\d+/) || [])[0] || "1";
-        const tdig = (String(u.term || "").match(/\d+/) || [])[0] || "1";
-        if (code) {
-          existingUploadKeys.add(`${code}_${sess}_${ldig}_${tdig}`);
-          existingUploadKeys.add(`${code}_${sess}`);
-          existingUploadKeys.add(`${code}`);
+        const cleanCode = cleanCodeStr(u.courseCode);
+        const normSess = normSessStr(u.session);
+        const ldig = extractDigit(u.level) || "1";
+        const tdig = extractDigit(u.term) || "1";
+        if (cleanCode) {
+          existingUploadKeys.add(`${cleanCode}_${normSess}_${ldig}_${tdig}`);
+          existingUploadKeys.add(`${cleanCode}_${ldig}_${tdig}`);
+          existingUploadKeys.add(`${cleanCode}_${normSess}`);
+          existingUploadKeys.add(cleanCode);
         }
       });
 
@@ -1037,11 +1055,125 @@ exports.getAdminResults = async (req, res) => {
           return { name: lmsMatch.teacher.name, email: lmsMatch.teacher.email };
         }
 
-        return { name: "Not Assigned", email: "" };
+        return { name: "Assigned Teacher", email: "" };
       };
 
-      // Pending auto cards generation removed per user request to remove all pending courses from the admin pending tab
       const pendingAutoCards = [];
+      const seenAutoKeys = new Set();
+
+      // Build map of notices with cutoff deadlines that HAVE ALREADY PASSED
+      const passedNoticeMap = new Map();
+      const now = new Date();
+
+      activeNotices.forEach((n) => {
+        if (!n.deadlineDate) return;
+        const isPassed = now > new Date(n.deadlineDate);
+        const rMatch = !n.resultDeadlineType || n.resultDeadlineType === activeResultType;
+        if (isPassed && rMatch) {
+          const sess = normSessStr(n.session);
+          const ldig = extractDigit(n.level) || "1";
+          const tdig = extractDigit(n.term) || "1";
+          if (sess) passedNoticeMap.set(`${sess}_${ldig}_${tdig}`, n);
+          passedNoticeMap.set(`${ldig}_${tdig}`, n);
+        }
+      });
+
+      // ONLY generate pending auto cards for Level-Terms that have a PASSED deadline!
+      passedNoticeMap.forEach((notice, targetKey) => {
+        const sessVal = notice.session || "2022-23";
+        const normSess = normSessStr(sessVal);
+        const ldig = extractDigit(notice.level) || "1";
+        const tdig = extractDigit(notice.term) || "1";
+
+        // 1. Check teacher assigned courses matching this level-term
+        allTeachers.forEach((t) => {
+          if (!Array.isArray(t.assignedCourses)) return;
+          t.assignedCourses.forEach((ac) => {
+            const ltParts = (ac.levelTerm || "").split(/\s*-\s*/);
+            const acLdig = extractDigit(ac.level || ltParts[0]);
+            const acTdig = extractDigit(ac.term || ltParts[1]);
+
+            if (acLdig !== ldig || acTdig !== tdig) return;
+
+            const cleanCode = cleanCodeStr(ac.courseCode || ac.displayCode);
+            const cleanName = String(ac.courseName || ac.courseTitle || "").trim().toLowerCase();
+            const ci = allCourseImports.find(c => {
+              const ciCode = cleanCodeStr(c.courseCode);
+              const ciTitle = String(c.courseTitle || "").trim().toLowerCase();
+              return (cleanCode && ciCode === cleanCode) || (cleanName && (ciTitle === cleanName || ciTitle.includes(cleanName) || cleanName.includes(ciTitle)));
+            });
+
+            const codeVal = ac.courseCode || ac.displayCode || ci?.courseCode || "COURSE";
+            const titleVal = ac.courseName || ac.courseTitle || ci?.courseTitle || codeVal;
+
+            const key = `${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}`;
+            const shortKey = `${cleanCodeStr(codeVal)}_${ldig}_${tdig}`;
+
+            if (existingUploadKeys.has(key) || existingUploadKeys.has(shortKey) || seenAutoKeys.has(key)) return;
+
+            seenAutoKeys.add(key);
+
+            pendingAutoCards.push({
+              _id: `pending_${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}_${activeResultType}`,
+              isPendingAutoCard: true,
+              isAutoCard: true,
+              resultType: activeResultType,
+              department: t.department || ci?.department || "EDTE",
+              courseCode: codeVal,
+              courseTitle: titleVal,
+              session: sessVal,
+              level: `Level-${ldig}`,
+              term: `Term-${tdig}`,
+              totalRecords: 0,
+              status: "Pending",
+              teacherName: t.name || "Assigned Teacher",
+              teacherEmail: t.email || "",
+              cutoffDeadline: notice.deadlineDate,
+              results: [],
+              logs: [],
+            });
+          });
+        });
+
+        // 2. Check CourseImport entries for this level-term
+        allCourseImports.forEach((ci) => {
+          const ciLdig = extractDigit(ci.level);
+          const ciTdig = extractDigit(ci.term);
+
+          if (ciLdig !== ldig || ciTdig !== tdig) return;
+
+          const codeVal = ci.courseCode;
+          const titleVal = ci.courseTitle;
+
+          const key = `${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}`;
+          const shortKey = `${cleanCodeStr(codeVal)}_${ldig}_${tdig}`;
+
+          if (existingUploadKeys.has(key) || existingUploadKeys.has(shortKey) || seenAutoKeys.has(key)) return;
+
+          seenAutoKeys.add(key);
+          const teacherInfo = findTeacherForCourse(codeVal, titleVal, sessVal);
+
+          pendingAutoCards.push({
+            _id: `pending_${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}_${activeResultType}`,
+            isPendingAutoCard: true,
+            isAutoCard: true,
+            resultType: activeResultType,
+            department: ci.department || "EDTE",
+            courseCode: codeVal,
+            courseTitle: titleVal,
+            session: sessVal,
+            level: `Level-${ldig}`,
+            term: `Term-${tdig}`,
+            totalRecords: 0,
+            status: "Pending",
+            teacherName: teacherInfo.name || "Assigned Teacher",
+            teacherEmail: teacherInfo.email || "",
+            cutoffDeadline: notice.deadlineDate,
+            results: [],
+            logs: [],
+          });
+        });
+      });
 
       const pendingWithDeadlines = pendingAutoCards;
 
@@ -1240,6 +1372,26 @@ exports.publishResultBatch = async (req, res) => {
     const upload = await ResultUpload.findById(uploadId);
     if (!upload) {
       return res.status(404).json({ error: "Upload batch not found." });
+    }
+
+    if ((upload.resultType || "Final") === "Final") {
+      const levelDigit = String(upload.level || "").replace(/\D/g, "");
+      const termDigit = String(upload.term || "").replace(/\D/g, "");
+      const levelRegex = levelDigit ? new RegExp(`(Level\\s*[-_]?\\s*${levelDigit}|\\b${levelDigit}\\b)`, "i") : new RegExp(upload.level, "i");
+      const termRegex = termDigit ? new RegExp(`(Term\\s*[-_]?\\s*${termDigit}|\\b${termDigit}\\b)`, "i") : new RegExp(upload.term, "i");
+      const sessionRegex = new RegExp(String(upload.session || "").replace("-", "[- ]?"), "i");
+
+      const cgpaExists = await CGPARecord.findOne({
+        session: sessionRegex,
+        level: levelRegex,
+        term: termRegex,
+      }).lean();
+
+      if (!cgpaExists) {
+        return res.status(400).json({
+          error: "⛔ PUBLISH BLOCKED: CGPA has not been calculated for this Level-Term yet. Please calculate CGPA in the 'CGPA Calculator' tab before publishing results.",
+        });
+      }
     }
 
     upload.status = "Published";
@@ -1612,17 +1764,29 @@ exports.schedulePublicationBySession = async (req, res) => {
       return res.status(400).json({ error: "Session, Level, Term, and Scheduled Publish Date are required." });
     }
 
-    const pubDate = new Date(scheduledPublishDate);
-    if (isNaN(pubDate.getTime())) {
-      return res.status(400).json({ error: "Invalid date format for publication schedule." });
-    }
-
     const levelDigit = String(level).replace(/\D/g, "");
     const termDigit = String(term).replace(/\D/g, "");
 
     const levelRegex = levelDigit ? new RegExp(`(Level\\s*[-_]?\\s*${levelDigit}|\\b${levelDigit}\\b)`, "i") : new RegExp(level, "i");
     const termRegex = termDigit ? new RegExp(`(Term\\s*[-_]?\\s*${termDigit}|\\b${termDigit}\\b)`, "i") : new RegExp(term, "i");
     const sessionRegex = new RegExp(String(session).replace("-", "[- ]?"), "i");
+
+    const cgpaExists = await CGPARecord.findOne({
+      session: sessionRegex,
+      level: levelRegex,
+      term: termRegex,
+    }).lean();
+
+    if (!cgpaExists) {
+      return res.status(400).json({
+        error: `⛔ SCHEDULING BLOCKED: CGPA has not been calculated for ${level} ${term} (${session}) yet. Please calculate CGPA in the 'CGPA Calculator' tab before scheduling a publication date.`,
+      });
+    }
+
+    const pubDate = new Date(scheduledPublishDate);
+    if (isNaN(pubDate.getTime())) {
+      return res.status(400).json({ error: "Invalid date format for publication schedule." });
+    }
 
     // Update all Final result uploads for this session/level/term
     const updatedUploads = await ResultUpload.updateMany(
@@ -1721,6 +1885,15 @@ exports.getStudentPublishedResults = async (req, res) => {
     });
 
     for (const batch of scheduledUploads) {
+      const lDigit = String(batch.level || "").replace(/\D/g, "");
+      const tDigit = String(batch.term || "").replace(/\D/g, "");
+      const lRegex = lDigit ? new RegExp(`(Level\\s*[-_]?\\s*${lDigit}|\\b${lDigit}\\b)`, "i") : new RegExp(batch.level, "i");
+      const tRegex = tDigit ? new RegExp(`(Term\\s*[-_]?\\s*${tDigit}|\\b${tDigit}\\b)`, "i") : new RegExp(batch.term, "i");
+      const sRegex = new RegExp(String(batch.session || "").replace("-", "[- ]?"), "i");
+
+      const hasCGPA = await CGPARecord.findOne({ session: sRegex, level: lRegex, term: tRegex }).lean();
+      if (!hasCGPA) continue; // Skip auto-publishing if CGPA has not been calculated yet
+
       batch.status = "Published";
       batch.updatedAt = now;
       await batch.save();

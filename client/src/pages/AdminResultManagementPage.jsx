@@ -36,10 +36,17 @@ const formatTerm = (trm) => {
 };
 
 export default function AdminResultManagementPage() {
+  const location = useLocation();
+  const getInitialResultType = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const type = searchParams.get("type");
+    return type === "final" ? "Final" : "Midterm";
+  };
+
   const [uploads, setUploads] = useState([]);
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [resultTypeTab, setResultTypeTab] = useState("Midterm"); // "Midterm" or "Final"
+  const [resultTypeTab, setResultTypeTab] = useState(getInitialResultType); // "Midterm" or "Final"
   const [viewTab, setViewTab] = useState("batches"); // "batches", "schedules", "cgpa"
   const [activeTab, setActiveTab] = useState("all");
 
@@ -47,32 +54,46 @@ export default function AdminResultManagementPage() {
   const [levelFilter, setLevelFilter] = useState("all");
   const [termFilter, setTermFilter] = useState("all");
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const [selectedBatchIds, setSelectedBatchIds] = useState([]);
   const [viewBatch, setViewBatch] = useState(null);
   const [correctionModalBatch, setCorrectionModalBatch] = useState(null);
   const [correctionComment, setCorrectionComment] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  // Notice & Deadline Modal State
   const [showNoticeModal, setShowNoticeModal] = useState(false);
-  const [noticeTarget, setNoticeTarget] = useState("Teachers"); // "Teachers" or "Students"
   const [noticeTitle, setNoticeTitle] = useState("");
   const [noticeContent, setNoticeContent] = useState("");
+  const [noticeTarget, setNoticeTarget] = useState("Teachers");
 
-  // Teacher Reminder Modal State
   const [reminderModalBatch, setReminderModalBatch] = useState(null);
   const [reminderMessage, setReminderMessage] = useState("");
   const [sendingReminder, setSendingReminder] = useState(false);
 
-  // Editable CGPA Formula State
-  const [cgpaFormulaInput, setCgpaFormulaInput] = useState("=SUM(GradePoint * CreditHours) / SUM(CreditHours)");
-  const [cgpaScaleInput, setCgpaScaleInput] = useState("4.0");
+  const [calcSession, setCalcSession] = useState("2023-2024");
+  const [calcLevel, setCalcLevel] = useState("Level 1");
+  const [calcTerm, setCalcTerm] = useState("Term 1");
+  const [calculating, setCalculating] = useState(false);
+  const [calcSummary, setCalcSummary] = useState(null);
 
-  // Live Search State
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [schedSession, setSchedSession] = useState("2023-2024");
+  const [schedLevel, setSchedLevel] = useState("Level 1");
+  const [schedTerm, setSchedTerm] = useState("Term 1");
+  const [scheduledDateTime, setScheduledDateTime] = useState("");
+  const [scheduling, setScheduling] = useState(false);
 
-  // Bulk Selection State
-  const [selectedBatchIds, setSelectedBatchIds] = useState([]);
+  const [cutoffInput, setCutoffInput] = useState("");
+  const [dlSession, setDlSession] = useState("2023-2024");
+  const [dlLevel, setDlLevel] = useState("Level 1");
+  const [dlTerm, setDlTerm] = useState("Term 1");
+  const [savingDeadline, setSavingDeadline] = useState(false);
+
+  const [cgpaRecords, setCgpaRecords] = useState([]);
+  const [cgpaDeptFilter, setCgpaDeptFilter] = useState("all");
+  const [cgpaSessionFilter, setCgpaSessionFilter] = useState("all");
+  const [cgpaLevelFilter, setCgpaLevelFilter] = useState("all");
 
   const toggleSelectBatch = (id) => {
     setSelectedBatchIds((prev) =>
@@ -151,25 +172,6 @@ export default function AdminResultManagementPage() {
     }
   };
 
-  // CGPA Calculation State
-  const [calcSession, setCalcSession] = useState("2023-24");
-  const [calcLevel, setCalcLevel] = useState("Level-1");
-  const [calcTerm, setCalcTerm] = useState("Term-1");
-  const [calcSummary, setCalcSummary] = useState(null);
-  const [calculating, setCalculating] = useState(false);
-
-  // Automated Publication Schedule State
-  const [schedSession, setSchedSession] = useState("2023-24");
-  const [schedLevel, setSchedLevel] = useState("Level-1");
-  const [schedTerm, setSchedTerm] = useState("Term-1");
-  const [scheduledDateTime, setScheduledDateTime] = useState("");
-  const [scheduling, setScheduling] = useState(false);
-  const [cutoffInput, setCutoffInput] = useState("");
-  const [dlSession, setDlSession] = useState("2023-24");
-  const [dlLevel, setDlLevel] = useState("Level-1");
-  const [dlTerm, setDlTerm] = useState("Term-1");
-  const [savingDeadline, setSavingDeadline] = useState(false);
-
   const handleSaveCutoffDeadline = async () => {
     if (!cutoffInput) {
       toast.error("Please select a valid deadline date and time.");
@@ -234,36 +236,35 @@ export default function AdminResultManagementPage() {
     }
   };
 
-  const [cgpaRecords, setCgpaRecords] = useState([]);
-  const [cgpaDeptFilter, setCgpaDeptFilter] = useState("all");
-  const [cgpaSessionFilter, setCgpaSessionFilter] = useState("all");
-  const [cgpaLevelFilter, setCgpaLevelFilter] = useState("all");
+  const currentFetchIdRef = React.useRef(0);
 
   const fetchAdminResults = async () => {
+    const fetchId = ++currentFetchIdRef.current;
     setLoading(true);
     try {
       const params = new URLSearchParams({ resultType: resultTypeTab });
       const res = await api.get(`/results/admin?${params.toString()}`);
+      if (fetchId !== currentFetchIdRef.current) return;
       setUploads(res.data.uploads || []);
       setNotices(res.data.notices || []);
       setCgpaRecords(res.data.cgpaRecords || []);
     } catch (err) {
+      if (fetchId !== currentFetchIdRef.current) return;
       toast.error("Failed to load admin result management data.");
     } finally {
-      setLoading(false);
+      if (fetchId === currentFetchIdRef.current) {
+        setLoading(false);
+      }
     }
   };
-
-  const location = useLocation();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const type = searchParams.get("type");
-    if (type === "final" && resultTypeTab !== "Final") {
-      setResultTypeTab("Final");
-    } else if (type === "midterm" && resultTypeTab !== "Midterm") {
-      setResultTypeTab("Midterm");
-      if (viewTab === "cgpa") {
+    const targetType = type === "final" ? "Final" : "Midterm";
+    if (targetType !== resultTypeTab) {
+      setResultTypeTab(targetType);
+      if (targetType === "Midterm" && viewTab === "cgpa") {
         setViewTab("batches");
       }
     }

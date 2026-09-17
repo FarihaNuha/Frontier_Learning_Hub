@@ -138,10 +138,16 @@
   "136": "ResultLog.js",
   "137": "RegistrationCalendar.js",
   "138": "react-dom",
+  "139": "@testing-library/dom",
   "140": "examRoutes.js",
+  "141": "authMiddleware.js",
+  "142": "sync_active_status.js",
   "143": "registrationPaymentRoutes.js",
   "144": "react-scripts",
   "145": "umsAdminRoutes.js",
+  "146": "AcademicProfile.js",
   "147": "jspdf-autotable",
-  "149": "Notification.js"
+  "148": "CommunityPost.js",
+  "149": "Notification.js",
+  "150": "PrivateMessage.js"
 }

@@ -4,7 +4,7 @@ import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
-import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX, FiUsers, FiTrendingUp, FiSearch, FiFilter, FiPlus } from "react-icons/fi";
+import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX, FiUsers, FiTrendingUp, FiSearch, FiFilter, FiPlus, FiDownload } from "react-icons/fi";
 
 export default function AdminStudents() {
   const [students, setStudents] = useState([]);
@@ -233,6 +233,47 @@ export default function AdminStudents() {
     reader.readAsArrayBuffer(file);
   };
 
+  const exportStudentsExcel = () => {
+    if (filteredStudents.length === 0) {
+      toast.error("No student records to export.");
+      return;
+    }
+
+    const sorted = [...filteredStudents].sort((a, b) => {
+      const isNewA = a.isNewRow || String(a.studentId || "").startsWith("STD-");
+      const isNewB = b.isNewRow || String(b.studentId || "").startsWith("STD-");
+      if (isNewA && !isNewB) return 1;
+      if (!isNewA && isNewB) return -1;
+
+      const sessA = String(a.session || "");
+      const sessB = String(b.session || "");
+      const sessCompare = sessA.localeCompare(sessB, undefined, { numeric: true, sensitivity: "base" });
+      if (sessCompare !== 0) return sessCompare;
+
+      const idA = String(a.studentId || "");
+      const idB = String(b.studentId || "");
+      return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: "base" });
+    });
+
+    const exportData = sorted.map((s) => ({
+      "Student ID": s.studentId || "",
+      "Name": s.name || "",
+      "University Email": s.universityEmail || "",
+      "Department": s.department || "",
+      "Program": s.program || "BSc. Eng in EDTE",
+      "Batch": s.batch || "",
+      "Session": s.session || "",
+      "Current Level-Term": `Level ${s.currentLevel || 1}- Term ${s.currentTerm || 1}`,
+      "Account Status": s.accountStatus || "inactive",
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Students");
+    XLSX.writeFile(wb, `Students_Export_${new Date().toISOString().split("T")[0]}.xlsx`);
+    toast.success("Student directory exported to Excel successfully!");
+  };
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
@@ -331,6 +372,26 @@ export default function AdminStudents() {
             >
               <FiUpload style={{ transform: "rotate(180deg)" }} size={18} />
               <span>Download Template</span>
+            </button>
+
+            <button
+              onClick={exportStudentsExcel}
+              style={{
+                background: "#0284c7",
+                color: "#ffffff",
+                border: "none",
+                padding: "12px 18px",
+                borderRadius: "8px",
+                fontWeight: "600",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(2, 132, 199, 0.2)",
+              }}
+            >
+              <FiDownload size={18} />
+              <span>Export Excel</span>
             </button>
 
             <button

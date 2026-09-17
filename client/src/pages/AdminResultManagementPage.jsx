@@ -18,6 +18,7 @@ import {
   FiCheck,
   FiFileText,
   FiTrash2,
+  FiEdit,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 
@@ -77,6 +78,8 @@ export default function AdminResultManagementPage() {
   const [calcTerm, setCalcTerm] = useState("Term 1");
   const [calculating, setCalculating] = useState(false);
   const [calcSummary, setCalcSummary] = useState(null);
+  const [cgpaScaleInput, setCgpaScaleInput] = useState("4.00");
+  const [cgpaFormulaInput, setCgpaFormulaInput] = useState("=SUM(GradePoint * CreditHours) / SUM(CreditHours)");
 
   const [schedSession, setSchedSession] = useState("2023-2024");
   const [schedLevel, setSchedLevel] = useState("Level 1");
@@ -94,6 +97,8 @@ export default function AdminResultManagementPage() {
   const [cgpaDeptFilter, setCgpaDeptFilter] = useState("all");
   const [cgpaSessionFilter, setCgpaSessionFilter] = useState("all");
   const [cgpaLevelFilter, setCgpaLevelFilter] = useState("all");
+  const [cgpaTermFilter, setCgpaTermFilter] = useState("all");
+  const [cgpaSearchQuery, setCgpaSearchQuery] = useState("");
 
   const toggleSelectBatch = (id) => {
     setSelectedBatchIds((prev) =>
@@ -200,6 +205,40 @@ export default function AdminResultManagementPage() {
       setSavingDeadline(false);
     }
   };
+
+  const formatForDateTimeInput = (dateObj) => {
+    if (!dateObj) return "";
+    const d = new Date(dateObj);
+    if (isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  useEffect(() => {
+    if (!notices || notices.length === 0) return;
+    const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
+    const targetLdig = extractDigit(dlLevel);
+    const targetTdig = extractDigit(dlTerm);
+    const targetSess = (dlSession || "").trim();
+
+    const matchedNotice = notices.find((n) => {
+      if (!n.deadlineDate) return false;
+      const nLdig = extractDigit(n.level);
+      const nTdig = extractDigit(n.term);
+      const nSess = (n.session || "").trim();
+      const sMatch = !targetSess || !nSess || nSess.toLowerCase().includes(targetSess.toLowerCase()) || targetSess.toLowerCase().includes(nSess.toLowerCase());
+      const rMatch = !n.resultDeadlineType || n.resultDeadlineType === resultTypeTab;
+      return sMatch && nLdig === targetLdig && nTdig === targetTdig && rMatch;
+    });
+
+    if (matchedNotice && matchedNotice.deadlineDate) {
+      setCutoffInput(formatForDateTimeInput(matchedNotice.deadlineDate));
+    }
+  }, [dlSession, dlLevel, dlTerm, notices, resultTypeTab]);
 
   const handleDeleteNotice = async (noticeId) => {
     if (!window.confirm("Remove this deadline / schedule record from calendar?")) return;
@@ -346,6 +385,7 @@ export default function AdminResultManagementPage() {
       });
       toast.success(res.data.message);
       setCalcSummary(res.data.summary);
+      fetchAdminResults();
     } catch (err) {
       toast.error(err.response?.data?.error || "CGPA calculation failed.");
     } finally {
@@ -397,6 +437,21 @@ export default function AdminResultManagementPage() {
     toast.success("Result report exported to Excel!");
   };
 
+  const normSessStr = (s) => {
+    if (!s) return "";
+    const str = String(s).trim();
+    const match = str.match(/\d{4}[-\s]?\d{2,4}/);
+    if (match) {
+      const raw = match[0].replace(/\s+/g, "-");
+      const parts = raw.split("-");
+      if (parts.length === 2 && parts[1].length === 4) {
+        return `${parts[0]}-${parts[1].substring(2)}`;
+      }
+      return raw;
+    }
+    return str.toLowerCase().replace(/\s+/g, "-");
+  };
+
   const isStatusMatch = (statusVal, tabVal, uploadObj) => {
     if (tabVal === "all") return true;
     const s = String(statusVal || "").toLowerCase();
@@ -407,27 +462,53 @@ export default function AdminResultManagementPage() {
     return s === t;
   };
 
-  const filteredUploads = uploads.filter((u) => {
-    if (!isStatusMatch(u.status, activeTab, u)) return false;
-    if (sessionFilter !== "all" && u.session !== sessionFilter) return false;
-    if (levelFilter !== "all" && u.level !== levelFilter) return false;
-    if (termFilter !== "all" && u.term !== termFilter) return false;
+  const filteredUploads = uploads
+    .filter((u) => {
+      if (!isStatusMatch(u.status, activeTab, u)) return false;
+      if (sessionFilter !== "all" && normSessStr(u.session) !== normSessStr(sessionFilter)) return false;
 
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      const matchCode = (u.courseCode || "").toLowerCase().includes(q);
-      const matchTitle = (u.courseTitle || "").toLowerCase().includes(q);
-      const tName = u.teacherName || u.teacherId?.name || "";
-      const matchTeacher = tName.toLowerCase().includes(q);
-      const matchDept = (u.department || "").toLowerCase().includes(q);
-      const matchLevel = (u.level || "").toLowerCase().includes(q);
-      const matchTerm = (u.term || "").toLowerCase().includes(q);
-      const matchSession = (u.session || "").toLowerCase().includes(q);
-      const matchStatus = (u.status || "").toLowerCase().includes(q);
-      return matchCode || matchTitle || matchTeacher || matchDept || matchLevel || matchTerm || matchSession || matchStatus;
-    }
-    return true;
-  });
+      if (levelFilter !== "all") {
+        const targetLdig = (String(levelFilter).match(/\d+/) || [])[0];
+        const uLdig = (String(u.level || "").match(/\d+/) || [])[0];
+        if (targetLdig && uLdig && targetLdig !== uLdig) return false;
+      }
+
+      if (termFilter !== "all") {
+        const targetTdig = (String(termFilter).match(/\d+/) || [])[0];
+        const uTdig = (String(u.term || "").match(/\d+/) || [])[0];
+        if (targetTdig && uTdig && targetTdig !== uTdig) return false;
+      }
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchCode = (u.courseCode || "").toLowerCase().includes(q);
+        const matchTitle = (u.courseTitle || "").toLowerCase().includes(q);
+        const tName = u.teacherName || u.teacherId?.name || "";
+        const matchTeacher = tName.toLowerCase().includes(q);
+        const matchDept = (u.department || "").toLowerCase().includes(q);
+        const matchLevel = (u.level || "").toLowerCase().includes(q);
+        const matchTerm = (u.term || "").toLowerCase().includes(q);
+        const matchSession = (u.session || "").toLowerCase().includes(q);
+        const matchStatus = (u.status || "").toLowerCase().includes(q);
+        return matchCode || matchTitle || matchTeacher || matchDept || matchLevel || matchTerm || matchSession || matchStatus;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      const sessA = normSessStr(a.session);
+      const sessB = normSessStr(b.session);
+      if (sessA !== sessB) return sessB.localeCompare(sessA);
+
+      const lA = (String(a.level || "").match(/\d+/) || [])[0] || "0";
+      const lB = (String(b.level || "").match(/\d+/) || [])[0] || "0";
+      if (lA !== lB) return Number(lA) - Number(lB);
+
+      const tA = (String(a.term || "").match(/\d+/) || [])[0] || "0";
+      const tB = (String(b.term || "").match(/\d+/) || [])[0] || "0";
+      if (tA !== tB) return Number(tA) - Number(tB);
+
+      return (a.courseCode || "").localeCompare(b.courseCode || "");
+    });
 
   const searchSuggestions = React.useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -728,7 +809,10 @@ export default function AdminResultManagementPage() {
             {/* Filter Bar */}
             <div style={{ background: "#ffffff", padding: "16px 20px", borderRadius: "14px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", marginBottom: "24px", display: "flex", flexWrap: "wrap", gap: "14px", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                {["all", "Pending", "Submitted", "Correction Requested", "Published"].map((tab) => (
+                {(resultTypeTab === "Midterm"
+                  ? ["all", "Pending", "Correction Requested", "Published"]
+                  : ["all", "Pending", "Submitted", "Correction Requested", "Published"]
+                ).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -859,7 +943,7 @@ export default function AdminResultManagementPage() {
                           background: batch.status === "Published" ? "#dcfce7" : batch.status === "Submitted" ? "#fef3c7" : batch.status === "Correction Requested" ? "#fee2e2" : "#fef3c7",
                           color: batch.status === "Published" ? "#166534" : batch.status === "Submitted" ? "#b45309" : batch.status === "Correction Requested" ? "#991b1b" : "#b45309"
                         }}>
-                          {batch.status === "Pending" ? "⚠️ Pending Upload" : batch.status}
+                          {batch.status === "Pending" ? "Pending Upload" : batch.status}
                         </span>
 
                         {batch.status === "Pending" && (
@@ -1114,6 +1198,19 @@ export default function AdminResultManagementPage() {
                               </td>
                               <td style={{ padding: "10px 14px", textAlign: "center" }}>
                                 <button
+                                  onClick={() => {
+                                    if (n.session) setDlSession(n.session);
+                                    if (n.level) setDlLevel(formatLevel(n.level));
+                                    if (n.term) setDlTerm(formatTerm(n.term));
+                                    if (n.deadlineDate) setCutoffInput(formatForDateTimeInput(n.deadlineDate));
+                                    window.scrollTo({ top: 150, behavior: "smooth" });
+                                  }}
+                                  style={{ background: "#e0f2fe", color: "#0369a1", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", marginRight: "6px" }}
+                                  title="Edit Cutoff Deadline"
+                                >
+                                  <FiEdit size={15} />
+                                </button>
+                                <button
                                   onClick={() => handleDeleteNotice(n._id)}
                                   style={{ background: "#fee2e2", color: "#ef4444", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
                                   title="Remove deadline record"
@@ -1216,13 +1313,7 @@ export default function AdminResultManagementPage() {
               <h3 style={{ margin: 0, fontSize: "18px", color: "#0369a1", fontWeight: 800 }}>Automatic Semester CGPA Calculator</h3>
             </div>
 
-            {/* Informative Banner */}
-            <div style={{ background: "#e0f2fe", border: "1px solid #bae6fd", borderRadius: "10px", padding: "12px 16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px", color: "#0369a1", fontSize: "13px", fontWeight: 600 }}>
-              <FiAlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>
-                <strong>Final Term Result Policy:</strong> Semester GPA & Cumulative CGPA calculations apply exclusively to <strong>Final Term Examination Results</strong>. Mid-Term examinations only track raw assessment marks.
-              </span>
-            </div>
+
 
             {/* Editable CGPA Formula Box */}
             <div
@@ -1398,7 +1489,37 @@ export default function AdminResultManagementPage() {
                   <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16.5px", fontWeight: 800 }}>Department-Wise Calculated GPA & CGPA History Registry</h3>
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <input
+                      type="text"
+                      placeholder="Search Student ID or Name..."
+                      value={cgpaSearchQuery}
+                      onChange={(e) => setCgpaSearchQuery(e.target.value)}
+                      style={{
+                        padding: "6.5px 30px 6.5px 12px",
+                        borderRadius: "8px",
+                        border: "1px solid #cbd5e1",
+                        fontSize: "12.5px",
+                        outline: "none",
+                        width: "210px",
+                        background: "#ffffff",
+                      }}
+                    />
+                    {cgpaSearchQuery ? (
+                      <FiX
+                        onClick={() => setCgpaSearchQuery("")}
+                        style={{ position: "absolute", right: "10px", color: "#94a3b8", cursor: "pointer" }}
+                        size={14}
+                      />
+                    ) : (
+                      <FiSearch
+                        style={{ position: "absolute", right: "10px", color: "#94a3b8", pointerEvents: "none" }}
+                        size={14}
+                      />
+                    )}
+                  </div>
+
                   <select value={cgpaDeptFilter} onChange={(e) => setCgpaDeptFilter(e.target.value)} style={{ padding: "6.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
                     <option value="all">All Departments</option>
                     <option value="EDTE">EDTE</option>
@@ -1413,16 +1534,42 @@ export default function AdminResultManagementPage() {
                     <option value="all">All Levels</option>
                     {["Level-1", "Level-2", "Level-3", "Level-4"].map(l => <option key={l} value={l}>{formatLevel(l)}</option>)}
                   </select>
+
+                  <select value={cgpaTermFilter} onChange={(e) => setCgpaTermFilter(e.target.value)} style={{ padding: "6.5px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "12.5px" }}>
+                    <option value="all">All Terms</option>
+                    {["Term-1", "Term-2"].map(t => <option key={t} value={t}>{formatTerm(t)}</option>)}
+                  </select>
                 </div>
               </div>
 
               {(() => {
-                const filteredCgpa = cgpaRecords.filter((r) => {
-                  if (cgpaDeptFilter !== "all" && (r.department || "EDTE") !== cgpaDeptFilter) return false;
-                  if (cgpaSessionFilter !== "all" && r.session !== cgpaSessionFilter) return false;
-                  if (cgpaLevelFilter !== "all" && !String(r.level).toLowerCase().includes(cgpaLevelFilter.toLowerCase().replace("level-", ""))) return false;
-                  return true;
-                });
+                const filteredCgpa = cgpaRecords
+                  .filter((r) => {
+                    if (cgpaDeptFilter !== "all" && (r.department || "EDTE") !== cgpaDeptFilter) return false;
+                    if (cgpaSessionFilter !== "all" && r.session !== cgpaSessionFilter) return false;
+                    if (cgpaLevelFilter !== "all") {
+                      const targetL = cgpaLevelFilter.toLowerCase().replace(/level-?/, "").trim();
+                      const itemL = String(r.level || "").toLowerCase().replace(/level-?/, "").trim();
+                      if (targetL && itemL !== targetL && !itemL.includes(targetL)) return false;
+                    }
+                    if (cgpaTermFilter !== "all") {
+                      const targetT = cgpaTermFilter.toLowerCase().replace(/term-?/, "").trim();
+                      const itemT = String(r.term || "").toLowerCase().replace(/term-?/, "").trim();
+                      if (targetT && itemT !== targetT && !itemT.includes(targetT)) return false;
+                    }
+                    if (cgpaSearchQuery.trim()) {
+                      const q = cgpaSearchQuery.toLowerCase().trim();
+                      const matchId = String(r.studentId || "").toLowerCase().includes(q);
+                      const matchName = String(r.studentName || "").toLowerCase().includes(q);
+                      if (!matchId && !matchName) return false;
+                    }
+                    return true;
+                  })
+                  .sort((a, b) => {
+                    const idA = String(a.studentId || "");
+                    const idB = String(b.studentId || "");
+                    return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: "base" });
+                  });
 
                 if (filteredCgpa.length === 0) {
                   return (

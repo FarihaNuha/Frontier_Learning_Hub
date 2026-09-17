@@ -65,6 +65,23 @@ const retakeRequestSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  paymentStatus: {
+    type: String,
+    enum: ["Unpaid", "Paid"],
+    default: "Unpaid",
+  },
+  amount: {
+    type: Number,
+    default: 0,
+  },
+  transactionId: {
+    type: String,
+    default: "",
+  },
+  paidAt: {
+    type: Date,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

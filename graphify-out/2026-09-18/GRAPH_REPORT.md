@@ -1,7 +1,7 @@
 # Graph Report - UFTB_Moodle  (2026-09-18)
 
 ## Corpus Check
-- 277 files · ~239,498 words
+- 277 files · ~239,497 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

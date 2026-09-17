@@ -37,6 +37,24 @@ export default function TeacherResultManagementPage() {
   const [uploadError, setUploadError] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [updatingBatch, setUpdatingBatch] = useState(null);
+  const [targetCard, setTargetCard] = useState(null);
+
+  const cleanCodeStr = (c) => String(c || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+  const normSessStr = (s) => {
+    if (!s) return "";
+    const str = String(s).trim();
+    const match = str.match(/\d{4}[-\s]?\d{2,4}/);
+    if (match) {
+      const raw = match[0].replace(/\s+/g, "-");
+      const parts = raw.split("-");
+      if (parts.length === 2 && parts[1].length === 4) {
+        return `${parts[0]}-${parts[1].substring(2)}`;
+      }
+      return raw;
+    }
+    return str.toLowerCase().replace(/\s+/g, "-");
+  };
+  const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
 
   const [activeStatusTab, setActiveStatusTab] = useState("all");
   const [viewBatch, setViewBatch] = useState(null);
@@ -321,7 +339,7 @@ export default function TeacherResultManagementPage() {
             if (!metaCourseTitle && lower.includes("course title")) {
               if (lower.includes("course title:")) {
                 const after = cellVal.split(/course title:\s*/i)[1] || "";
-                const clean = after.split(/course type|credit|level|term|dept|[\n,;]/i)[0]?.trim();
+                const clean = after.split(/course type|credit|level|term|dept|[\n;]/i)[0]?.trim();
                 if (clean) metaCourseTitle = clean;
               }
               if (!metaCourseTitle && row[c + 1] !== undefined && row[c + 1] !== null) {
@@ -388,10 +406,10 @@ export default function TeacherResultManagementPage() {
               });
 
               const studentId = String(rowObj["ID"] || rowObj["Student ID"] || rowObj["studentId"] || "").trim();
-              const courseCode = String(rowObj["Course Code"] || rowObj["courseCode"] || metaCourseCode || "ET 117").trim().toUpperCase();
-              const courseTitle = String(rowObj["Course Title"] || rowObj["courseTitle"] || metaCourseTitle || "Instructional Design, Methodologies and Technologies").trim();
+              const courseCode = String(rowObj["Course Code"] || rowObj["courseCode"] || metaCourseCode || (targetCard?.courseCode || "")).trim().toUpperCase();
+              const courseTitle = String(rowObj["Course Title"] || rowObj["courseTitle"] || metaCourseTitle || (targetCard?.courseTitle || "")).trim();
               const courseType = String(rowObj["Course Type"] || rowObj["courseType"] || metaCourseType || (isLabMeta ? "Lab" : "Theory")).trim();
-              const session = String(rowObj["Session"] || rowObj["session"] || metaSession || "2025-26").trim();
+              const session = String(rowObj["Session"] || rowObj["session"] || metaSession || (targetCard?.session || "")).trim();
               
               let rowLevel = String(rowObj["Level"] || rowObj["level"] || metaLevel || "").replace(/\D/g, "");
               let rowTerm = String(rowObj["Term"] || rowObj["term"] || metaTerm || "").replace(/\D/g, "");
@@ -471,6 +489,49 @@ export default function TeacherResultManagementPage() {
           });
         }
 
+        const fileErrors = [];
+        if (!mappedData || mappedData.length === 0) {
+          fileErrors.push("Excel file contains no student result records.");
+        } else {
+          mappedData.forEach((row, idx) => {
+            if (!row.studentId) {
+              fileErrors.push(`Row ${idx + 1}: Missing required Student ID.`);
+            }
+          });
+
+          if (targetCard) {
+            const parsedCourseCode = metaCourseCode || mappedData[0]?.courseCode || "";
+            const cleanTargetCode = cleanCodeStr(targetCard.courseCode);
+            const cleanExcelCode = cleanCodeStr(parsedCourseCode);
+
+            if (cleanTargetCode && cleanExcelCode && cleanTargetCode !== cleanExcelCode) {
+              fileErrors.push(`Course Code doesn't match: Expected ${targetCard.courseCode}, but file contains ${parsedCourseCode || "N/A"}.`);
+            }
+
+            const parsedSess = metaSession || mappedData[0]?.session || "";
+            const targetSessNorm = normSessStr(targetCard.session);
+            const excelSessNorm = normSessStr(parsedSess);
+            if (targetSessNorm && excelSessNorm && targetSessNorm !== excelSessNorm) {
+              fileErrors.push(`Session doesn't match: Expected ${targetCard.session}, but file contains ${parsedSess || "N/A"}.`);
+            }
+
+            const parsedLvl = metaLevel || (mappedData[0]?.levelTerm ? extractDigit(mappedData[0]?.levelTerm) : "");
+            const targetLdig = extractDigit(targetCard.level);
+            const excelLdig = extractDigit(parsedLvl);
+            if (targetLdig && excelLdig && targetLdig !== excelLdig) {
+              fileErrors.push(`Level doesn't match: Expected Level ${targetLdig}, but file contains Level ${excelLdig}.`);
+            }
+
+            const parsedTrm = metaTerm || (mappedData[0]?.levelTerm ? extractDigit(mappedData[0]?.levelTerm.split("-")[1] || "") : "");
+            const targetTdig = extractDigit(targetCard.term);
+            const excelTdig = extractDigit(parsedTrm);
+            if (targetTdig && excelTdig && targetTdig !== excelTdig) {
+              fileErrors.push(`Term doesn't match: Expected Term ${targetTdig}, but file contains Term ${excelTdig}.`);
+            }
+          }
+        }
+
+        setValidationErrors(fileErrors);
         setParsedData(mappedData);
       } catch (err) {
         toast.error("Failed to parse Excel file. Please ensure it is a valid spreadsheet.");
@@ -481,6 +542,10 @@ export default function TeacherResultManagementPage() {
 
   // Upload Draft to Backend
   const handleUploadSubmit = async () => {
+    if (validationErrors.length > 0) {
+      toast.error("Upload Blocked: Marksheet parameters do not match target course!");
+      return;
+    }
     if (parsedData.length === 0) {
       toast.error("No valid data parsed from Excel file.");
       return;
@@ -494,13 +559,18 @@ export default function TeacherResultManagementPage() {
       await api.post("/results/upload", {
         results: parsedData,
         resultType: resultTypeTab,
-        uploadId: updatingBatch?._id || undefined,
+        uploadId: updatingBatch?._id && !updatingBatch?.isAutoCard ? updatingBatch._id : undefined,
+        targetCourseCode: targetCard?.courseCode,
+        targetSession: targetCard?.session,
+        targetLevel: targetCard?.level,
+        targetTerm: targetCard?.term,
       });
       toast.success(`${resultTypeTab} Result Excel ${updatingBatch ? "updated" : "uploaded"} successfully as Draft!`);
       setShowUploadModal(false);
       setSelectedFile(null);
       setParsedData([]);
       setUpdatingBatch(null);
+      setTargetCard(null);
       setUploadError(null);
       fetchResults();
     } catch (err) {
@@ -509,7 +579,7 @@ export default function TeacherResultManagementPage() {
       if (err.response?.data?.validationErrors) {
         setValidationErrors(err.response.data.validationErrors);
       }
-      toast.error("Upload Blocked: Marksheet parameters do not match your assignment!");
+      toast.error("Upload Blocked: Marksheet parameters do not match target course!");
     } finally {
       setUploading(false);
     }
@@ -580,23 +650,6 @@ export default function TeacherResultManagementPage() {
       toast.error(err.response?.data?.error || "Failed to set deadline.");
     }
   };
-
-  const cleanCodeStr = (c) => String(c || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-  const normSessStr = (s) => {
-    if (!s) return "";
-    const str = String(s).trim();
-    const match = str.match(/\d{4}[-\s]?\d{2,4}/);
-    if (match) {
-      const raw = match[0].replace(/\s+/g, "-");
-      const parts = raw.split("-");
-      if (parts.length === 2 && parts[1].length === 4) {
-        return `${parts[0]}-${parts[1].substring(2)}`;
-      }
-      return raw;
-    }
-    return str.toLowerCase().replace(/\s+/g, "-");
-  };
-  const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
 
   // Combine active (non-deleted) uploads for the selected resultTypeTab with assignedCourses
   const activeUploads = uploads.filter(
@@ -765,14 +818,39 @@ export default function TeacherResultManagementPage() {
     return null;
   };
 
-  // Group uploads into sections by Department, Session, and Level-Term (like Assessment Marksheet)
-  const groupedSections = {};
+  // Helper to normalize department names
+  const normDeptName = (d) => {
+    if (!d) return "";
+    const s = String(d).trim().toUpperCase();
+    if (s === "GENRAL" || s === "GEN" || s === "GENERAL") return "GENERAL";
+    return s;
+  };
+
+  // Determine canonical department for each (session, level, term) tuple across all uploads/assigned courses
+  const sessionDeptMap = {};
   filteredUploads.forEach((up) => {
-    const dept = (up.department || "EDTE").toUpperCase();
     const sess = formatSession(up.session);
     const lvl = formatLevel(up.level);
     const trm = formatTerm(up.term);
-    const key = `${dept} • Session ${sess} • ${lvl} ${trm}`;
+    const sltKey = `Session ${sess} • ${lvl} ${trm}`;
+
+    const rawDept = normDeptName(up.department);
+    if (!sessionDeptMap[sltKey]) {
+      sessionDeptMap[sltKey] = rawDept || "EDTE";
+    } else if (rawDept && rawDept !== "GENERAL" && sessionDeptMap[sltKey] === "GENERAL") {
+      sessionDeptMap[sltKey] = rawDept;
+    }
+  });
+
+  // Group uploads into sections by canonical Department, Session, and Level-Term
+  const groupedSections = {};
+  filteredUploads.forEach((up) => {
+    const sess = formatSession(up.session);
+    const lvl = formatLevel(up.level);
+    const trm = formatTerm(up.term);
+    const sltKey = `Session ${sess} • ${lvl} ${trm}`;
+    const dept = sessionDeptMap[sltKey] || normDeptName(up.department) || "EDTE";
+    const key = `${dept} • ${sltKey}`;
     if (!groupedSections[key]) {
       groupedSections[key] = [];
     }
@@ -1111,7 +1189,7 @@ export default function TeacherResultManagementPage() {
                     const isExpired = secDlDate && secDlDate < now;
                     const msLeft = secDlDate ? secDlDate - now : null;
 
-                    let timeLabel = "⛔ Deadline Passed";
+                    let timeLabel = "Deadline Passed";
                     let daysLeft = 0;
 
                     if (!isExpired && msLeft > 0) {
@@ -1122,15 +1200,15 @@ export default function TeacherResultManagementPage() {
                       const seconds = totalSeconds % 60;
 
                       if (daysLeft > 1) {
-                        timeLabel = `⏳ ${daysLeft} days remaining`;
+                        timeLabel = `${daysLeft} days remaining`;
                       } else if (daysLeft === 1) {
-                        timeLabel = `⏳ 1 day ${hours}h ${minutes}m left`;
+                        timeLabel = `1 day ${hours}h ${minutes}m left`;
                       } else if (hours > 0) {
-                        timeLabel = `🔴 Only ${hours}h ${minutes}m ${seconds}s left!`;
+                        timeLabel = `Only ${hours}h ${minutes}m ${seconds}s left!`;
                       } else if (minutes > 0) {
-                        timeLabel = `🔴 Only ${minutes}m ${seconds}s left!`;
+                        timeLabel = `Only ${minutes}m ${seconds}s left!`;
                       } else {
-                        timeLabel = `🔴 Only ${seconds}s left!`;
+                        timeLabel = `Only ${seconds}s left!`;
                       }
                     }
 
@@ -1302,6 +1380,11 @@ export default function TeacherResultManagementPage() {
                                 return;
                               }
                               setUpdatingBatch(batch.isAutoCard ? null : batch);
+                              setTargetCard(batch);
+                              setSelectedFile(null);
+                              setParsedData([]);
+                              setValidationErrors([]);
+                              setUploadError(null);
                               setShowUploadModal(true);
                             }}
                             disabled={isSecDlPassed}
@@ -1552,10 +1635,18 @@ export default function TeacherResultManagementPage() {
         {showUploadModal && (
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
             <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", maxWidth: "600px", width: "100%", boxShadow: "0 20px 40px rgba(0,0,0,0.15)", maxHeight: "90vh", overflowY: "auto" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h3 style={{ margin: 0, color: "#0f172a", fontSize: "18px" }}>Upload {resultTypeTab} Course Results (Excel)</h3>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: targetCard ? "12px" : "20px" }}>
+                <h3 style={{ margin: 0, color: "#0f172a", fontSize: "18px" }}>
+                  Upload {resultTypeTab} Course Results {targetCard ? `— ${targetCard.courseCode}` : "(Excel)"}
+                </h3>
                 <FiX size={20} color="#64748b" cursor="pointer" onClick={() => setShowUploadModal(false)} />
               </div>
+
+              {targetCard && (
+                <div style={{ background: "#e0f2fe", border: "1px solid #bae6fd", padding: "8px 14px", borderRadius: "8px", fontSize: "12.5px", color: "#0369a1", fontWeight: 600, marginBottom: "20px" }}>
+                  Target Course: <strong>{targetCard.courseCode}</strong> ({targetCard.courseTitle}){targetCard.session ? ` • Session: ${targetCard.session}` : ""}{targetCard.level ? ` • ${targetCard.level}` : ""}{targetCard.term ? ` • ${targetCard.term}` : ""}
+                </div>
+              )}
 
               {/* PARAMETER MISMATCH WARNING BANNER */}
               {uploadError && (
@@ -1563,15 +1654,14 @@ export default function TeacherResultManagementPage() {
                   style={{
                     marginBottom: "20px",
                     background: "#fff1f2",
-                    border: "2px solid #f43f5e",
-                    borderRadius: "14px",
-                    padding: "16px 20px",
-                    boxShadow: "0 4px 20px rgba(244, 63, 94, 0.12)",
+                    border: "1.5px solid #fca5a5",
+                    borderRadius: "12px",
+                    padding: "14px 18px",
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#9f1239", fontWeight: 800, fontSize: "15px" }}>
-                      <FiAlertTriangle size={20} color="#e11d48" />
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#9f1239", fontWeight: 800, fontSize: "14.5px" }}>
+                      <FiAlertTriangle size={18} color="#e11d48" />
                       <span>Upload Blocked — Parameter Mismatch</span>
                     </div>
                     <button
@@ -1585,15 +1675,10 @@ export default function TeacherResultManagementPage() {
                   </div>
                   <div
                     style={{
-                      fontFamily: "monospace",
                       fontSize: "12.5px",
-                      background: "#ffffff",
-                      padding: "12px 14px",
-                      borderRadius: "8px",
-                      border: "1px solid #ffe4e6",
                       color: "#881337",
                       whiteSpace: "pre-wrap",
-                      lineHeight: "1.6"
+                      lineHeight: "1.5"
                     }}
                   >
                     {uploadError}
@@ -1615,15 +1700,18 @@ export default function TeacherResultManagementPage() {
 
               {/* Validation Errors Box */}
               {validationErrors.length > 0 && (
-                <div style={{ background: "#fef2f2", border: "1.5px solid #fca5a5", borderRadius: "10px", padding: "16px", marginBottom: "20px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#991b1b", fontWeight: 700, marginBottom: "8px" }}>
-                    <FiAlertCircle size={18} /> Validation Failed ({validationErrors.length} errors)
+                <div style={{ background: "#fff1f2", border: "1.5px solid #fca5a5", borderRadius: "10px", padding: "14px 16px", marginBottom: "20px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#991b1b", fontWeight: 700, fontSize: "13.5px", marginBottom: "6px" }}>
+                    <FiAlertCircle size={16} /> Upload Blocked — Mismatch Warning
                   </div>
-                  <ul style={{ margin: 0, paddingLeft: "20px", color: "#b91c1c", fontSize: "13px", maxHeight: "160px", overflowY: "auto" }}>
+                  <div style={{ color: "#b91c1c", fontSize: "13px", lineHeight: "1.5" }}>
                     {validationErrors.map((err, i) => (
-                      <li key={i} style={{ marginBottom: "4px" }}>{err}</li>
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginTop: i > 0 ? "4px" : "0" }}>
+                        <span style={{ fontWeight: 700 }}>•</span>
+                        <span>{err}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
 
@@ -1650,8 +1738,17 @@ export default function TeacherResultManagementPage() {
                 <button
                   type="button"
                   onClick={handleUploadSubmit}
-                  disabled={uploading || parsedData.length === 0}
-                  style={{ padding: "10px 20px", background: "#16a34a", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "13.5px", cursor: uploading ? "not-allowed" : "pointer" }}
+                  disabled={uploading || parsedData.length === 0 || validationErrors.length > 0}
+                  style={{
+                    padding: "10px 20px",
+                    background: (uploading || parsedData.length === 0 || validationErrors.length > 0) ? "#cbd5e1" : "#16a34a",
+                    color: (uploading || parsedData.length === 0 || validationErrors.length > 0) ? "#94a3b8" : "#ffffff",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "13.5px",
+                    cursor: (uploading || parsedData.length === 0 || validationErrors.length > 0) ? "not-allowed" : "pointer"
+                  }}
                 >
                   {uploading ? "Importing..." : `Import ${resultTypeTab} Draft`}
                 </button>

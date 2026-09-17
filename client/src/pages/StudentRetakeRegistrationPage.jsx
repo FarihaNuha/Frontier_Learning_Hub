@@ -21,6 +21,16 @@ export default function StudentRetakeRegistrationPage() {
   const [targetSession, setTargetSession] = useState("2023-24");
   const [submitting, setSubmitting] = useState(false);
 
+  // Retake Payment Modal State
+  const [payingRetake, setPayingRetake] = useState(null);
+  const [selectedGateway, setSelectedGateway] = useState("bKash");
+  const [processingPayment, setProcessingPayment] = useState(false);
+
+  const calcRetakeFee = (credits) => {
+    const c = Number(credits) || 3;
+    return c <= 1 ? 100 : (c >= 3 ? 300 : Math.round(c * 100));
+  };
+
   const fetchRetakeData = async () => {
     setLoading(true);
     try {
@@ -62,9 +72,24 @@ export default function StudentRetakeRegistrationPage() {
       setSelectedCourse(null);
       fetchRetakeData();
     } catch (err) {
-      toast.error("Submission failed.");
+      toast.error(err.response?.data?.error || err.message || "Submission failed.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handlePayRetakeFee = async () => {
+    if (!payingRetake) return;
+    setProcessingPayment(true);
+    try {
+      const res = await api.post(`/academic/student/retake-pay/${payingRetake._id}`);
+      toast.success(res.data.message || "Retake fee paid successfully! Course card enabled.");
+      setPayingRetake(null);
+      fetchRetakeData();
+    } catch (err) {
+      toast.error(err.response?.data?.error || err.message || "Payment failed.");
+    } finally {
+      setProcessingPayment(false);
     }
   };
 
@@ -84,7 +109,7 @@ export default function StudentRetakeRegistrationPage() {
             </h1>
           </div>
           <p style={{ color: "#3B8DB3", fontWeight: 600, margin: 0, fontSize: "14.5px" }}>
-            Register to retake failed courses in upcoming sessions. Submissions require Adviser approval.
+            Register to retake failed courses in upcoming sessions. Adviser approval and online fee payment are required for target session course card access.
           </p>
         </div>
 
@@ -100,7 +125,7 @@ export default function StudentRetakeRegistrationPage() {
 
               {failedCourses.length === 0 ? (
                 <div style={{ padding: "30px", textAlign: "center", color: "#166534", background: "#f0fdf4", borderRadius: "10px", fontWeight: 600 }}>
-                  ✓ Great news! You have no failed courses pending retake.
+                  Great news! You have no failed courses pending retake.
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -184,31 +209,166 @@ export default function StudentRetakeRegistrationPage() {
                         <th style={{ padding: "10px 14px" }}>Course Title</th>
                         <th style={{ padding: "10px 14px" }}>Prev Grade</th>
                         <th style={{ padding: "10px 14px" }}>Target Session</th>
-                        <th style={{ padding: "10px 14px" }}>Status</th>
+                        <th style={{ padding: "10px 14px" }}>Adviser Status</th>
+                        <th style={{ padding: "10px 14px" }}>Payment Status</th>
+                        <th style={{ padding: "10px 14px" }}>Action</th>
                         <th style={{ padding: "10px 14px" }}>Adviser Comment</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {existingRetakes.map((r) => (
-                        <tr key={r._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                          <td style={{ padding: "10px 14px", fontWeight: 700, color: "#3b8db3" }}>{r.courseCode}</td>
-                          <td style={{ padding: "10px 14px", fontWeight: 600 }}>{r.courseTitle}</td>
-                          <td style={{ padding: "10px 14px", fontWeight: 700, color: "#ef4444" }}>{r.previousGrade}</td>
-                          <td style={{ padding: "10px 14px" }}>{r.targetSession}</td>
-                          <td style={{ padding: "10px 14px" }}>
-                            <span style={{ padding: "4px 10px", borderRadius: "12px", fontWeight: 700, fontSize: "11.5px", background: r.status === "Approved" ? "#dcfce7" : r.status === "Rejected" ? "#fee2e2" : "#fef3c7", color: r.status === "Approved" ? "#166534" : r.status === "Rejected" ? "#991b1b" : "#b45309" }}>
-                              {r.status}
-                            </span>
-                          </td>
-                          <td style={{ padding: "10px 14px", color: "#64748b" }}>{r.comment || "—"}</td>
-                        </tr>
-                      ))}
+                      {existingRetakes.map((r) => {
+                        const isApproved = r.status === "Approved";
+                        const isPaid = r.paymentStatus === "Paid";
+                        const feeAmount = r.amount || calcRetakeFee(r.creditHours);
+
+                        return (
+                          <tr key={r._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "10px 14px", fontWeight: 700, color: "#3b8db3" }}>{r.courseCode}</td>
+                            <td style={{ padding: "10px 14px", fontWeight: 600 }}>{r.courseTitle}</td>
+                            <td style={{ padding: "10px 14px", fontWeight: 700, color: "#ef4444" }}>{r.previousGrade}</td>
+                            <td style={{ padding: "10px 14px" }}>{r.targetSession}</td>
+                            
+                            {/* Adviser Status */}
+                            <td style={{ padding: "10px 14px" }}>
+                              <span style={{ padding: "4px 10px", borderRadius: "12px", fontWeight: 700, fontSize: "11.5px", background: isApproved ? "#dcfce7" : r.status === "Rejected" ? "#fee2e2" : "#fef3c7", color: isApproved ? "#166534" : r.status === "Rejected" ? "#991b1b" : "#b45309" }}>
+                                {r.status}
+                              </span>
+                            </td>
+
+                            {/* Payment Status */}
+                            <td style={{ padding: "10px 14px" }}>
+                              {isApproved ? (
+                                isPaid ? (
+                                  <span style={{ padding: "4px 10px", borderRadius: "12px", fontWeight: 700, fontSize: "11.5px", background: "#dcfce7", color: "#166534" }}>
+                                    Paid ({r.amount || feeAmount} BDT)
+                                  </span>
+                                ) : (
+                                  <span style={{ padding: "4px 10px", borderRadius: "12px", fontWeight: 700, fontSize: "11.5px", background: "#fef3c7", color: "#b45309" }}>
+                                    Payment Due ({feeAmount} BDT)
+                                  </span>
+                                )
+                              ) : (
+                                <span style={{ color: "#94a3b8", fontSize: "12px" }}>N/A (Pending Approval)</span>
+                              )}
+                            </td>
+
+                            {/* Action / Pay Online Button */}
+                            <td style={{ padding: "10px 14px" }}>
+                              {isApproved ? (
+                                isPaid ? (
+                                  <span style={{ color: "#166534", fontWeight: 600, fontSize: "12.5px" }}>
+                                    Course Card Enabled
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => setPayingRetake(r)}
+                                    style={{
+                                      padding: "6px 14px",
+                                      borderRadius: "8px",
+                                      background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+                                      color: "#ffffff",
+                                      border: "none",
+                                      fontWeight: 600,
+                                      fontSize: "12.5px",
+                                      cursor: "pointer",
+                                      boxShadow: "0 2px 6px rgba(37,99,235,0.25)"
+                                    }}
+                                  >
+                                    Pay Retake Fee ({feeAmount} BDT)
+                                  </button>
+                                )
+                              ) : (
+                                <span style={{ color: "#94a3b8", fontSize: "12.5px" }}>Awaiting Approval</span>
+                              )}
+                            </td>
+
+                            <td style={{ padding: "10px 14px", color: "#64748b" }}>{r.comment || "—"}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
               )}
             </div>
           </>
+        )}
+
+        {/* Retake Payment Checkout Modal */}
+        {payingRetake && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", maxWidth: "480px", width: "100%", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+              <h2 style={{ margin: "0 0 16px 0", color: "#0f172a", fontSize: "20px", fontWeight: 700 }}>
+                Retake Course Online Fee Payment
+              </h2>
+              <p style={{ color: "#475569", fontSize: "14px", marginBottom: "20px", lineHeight: "1.5" }}>
+                Complete the online fee payment for <strong>{payingRetake.courseCode} ({payingRetake.courseTitle})</strong> to unlock the <strong>{payingRetake.targetSession}</strong> session course card on your dashboard.
+              </p>
+
+              <div style={{ background: "#f8fafc", borderRadius: "12px", padding: "16px", border: "1px solid #e2e8f0", marginBottom: "20px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "13.5px" }}>
+                  <span style={{ color: "#64748b" }}>Course Code:</span>
+                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{payingRetake.courseCode}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "13.5px" }}>
+                  <span style={{ color: "#64748b" }}>Target Session:</span>
+                  <span style={{ fontWeight: 700, color: "#2563eb" }}>{payingRetake.targetSession}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "13.5px" }}>
+                  <span style={{ color: "#64748b" }}>Credit Hours:</span>
+                  <span>{payingRetake.creditHours || 3} Credits</span>
+                </div>
+                <hr style={{ border: "none", borderTop: "1px solid #cbd5e1", margin: "12px 0" }} />
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "16px", fontWeight: 700 }}>
+                  <span style={{ color: "#0f172a" }}>Total Payable Fee:</span>
+                  <span style={{ color: "#16a34a" }}>{payingRetake.amount || calcRetakeFee(payingRetake.creditHours)} BDT</span>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#334155", marginBottom: "8px" }}>
+                  Select Payment Gateway:
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  {["bKash Mobile Banking", "SSLCommerz / Cards"].map((gw) => (
+                    <div
+                      key={gw}
+                      onClick={() => setSelectedGateway(gw)}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: selectedGateway === gw ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                        background: selectedGateway === gw ? "rgba(37,99,235,0.08)" : "#fff",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        textAlign: "center"
+                      }}
+                    >
+                      {gw}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+                <button
+                  onClick={() => setPayingRetake(null)}
+                  disabled={processingPayment}
+                  style={{ padding: "10px 18px", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#fff", color: "#475569", fontWeight: 600, fontSize: "13.5px", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePayRetakeFee}
+                  disabled={processingPayment}
+                  style={{ padding: "10px 20px", borderRadius: "8px", border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: "13.5px", cursor: processingPayment ? "not-allowed" : "pointer" }}
+                >
+                  {processingPayment ? "Processing..." : `Confirm & Pay ${payingRetake.amount || calcRetakeFee(payingRetake.creditHours)} BDT`}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

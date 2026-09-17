@@ -584,37 +584,64 @@ exports.getFailedCoursesForRetake = async (req, res) => {
     const studentUser = req.user;
     const studentProfile = await Student.findOne({ universityEmail: studentUser.email }).lean();
     const studentIdStr = studentProfile?.studentId || studentUser.studentId || "";
+    const studentUserEmail = studentUser.email ? studentUser.email.toLowerCase().trim() : "";
+    const emailPrefix = studentUser.email ? studentUser.email.split("@")[0] : "";
+
+    const rawConditions = [
+      { student: studentUser._id || studentUser.id },
+      studentIdStr ? { studentId: studentIdStr } : null,
+      studentUser.studentId ? { studentId: studentUser.studentId } : null,
+      emailPrefix ? { studentId: emailPrefix } : null,
+      studentUserEmail ? { studentEmail: studentUserEmail } : null,
+      studentUserEmail ? { email: studentUserEmail } : null,
+    ].filter(Boolean);
 
     const publishedResults = await Result.find({
       status: "Published",
-      $or: [{ student: studentUser._id }, ...(studentIdStr ? [{ studentId: studentIdStr }] : [])],
+      $or: rawConditions,
     }).lean();
 
-    // Find courses with F or 0 grade point
+    // Find courses with F or 0 grade point on FINAL term results
     const failedMap = new Map();
     publishedResults.forEach((r) => {
-      const code = r.courseCode.toUpperCase();
-      if (r.letterGrade === "F" || r.gradePoint === 0) {
+      if (r.resultType === "Midterm") return;
+
+      const code = String(r.courseCode || "").toUpperCase().trim();
+      const lg = String(r.letterGrade || "").trim().toUpperCase();
+      const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
+
+      const isFailed = lg === "F" || (gp !== null && gp === 0);
+      if (isFailed) {
         failedMap.set(code, r);
       }
     });
 
-    // Remove courses if passed in a later published result
+    // Remove courses if passed in a later published Final result
     publishedResults.forEach((r) => {
-      const code = r.courseCode.toUpperCase();
-      if (r.letterGrade !== "F" && r.gradePoint > 0) {
+      if (r.resultType === "Midterm") return;
+
+      const code = String(r.courseCode || "").toUpperCase().trim();
+      const lg = String(r.letterGrade || "").trim().toUpperCase();
+      const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
+
+      const isPassed = lg !== "F" && gp !== null && gp > 0;
+      if (isPassed) {
         failedMap.delete(code);
       }
     });
 
     // Remove courses already requested for retake
     const existingRetakes = await RetakeRequest.find({
-      student: studentUser._id,
+      $or: [
+        { student: studentUser._id },
+        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+        ...(studentUser.studentId ? [{ studentId: studentUser.studentId }] : [])
+      ],
       status: { $in: ["Pending Adviser Approval", "Approved"] },
     }).lean();
 
     existingRetakes.forEach((rr) => {
-      failedMap.delete(rr.courseCode.toUpperCase());
+      failedMap.delete(String(rr.courseCode || "").toUpperCase().trim());
     });
 
     res.json({ failedCourses: Array.from(failedMap.values()) });
@@ -628,49 +655,207 @@ exports.submitRetakeRequest = async (req, res) => {
   try {
     const { courseCode, courseTitle, creditHours, previousGrade, previousGradePoint, targetSession } = req.body;
     const studentUser = req.user;
-    const studentProfile = await Student.findOne({ universityEmail: studentUser.email }).lean();
-    const studentIdStr = studentProfile?.studentId || studentUser.studentId || "";
 
-    const adviserDoc = await require("../models/Adviser").findOne({ session: studentProfile?.session || "2022-23" }).lean();
-    const adviserEmail = adviserDoc?.email || "";
+    const userEmailClean = (studentUser?.email || "").trim().toLowerCase();
+    const emailPrefix = userEmailClean ? userEmailClean.split("@")[0].toUpperCase() : "";
+
+    let studentProfile = await Student.findOne({
+      $or: [
+        ...(userEmailClean ? [{ universityEmail: { $regex: new RegExp(`^${userEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }] : []),
+        ...(studentUser?.studentId ? [{ studentId: studentUser.studentId }] : []),
+        ...(emailPrefix ? [{ studentId: emailPrefix }] : [])
+      ]
+    }).lean();
+
+    const studentIdStr = studentProfile?.studentId || studentUser?.studentId || emailPrefix || "STUDENT";
+    const studentNameStr = studentProfile?.name || studentUser?.name || "Student";
+    const courseTitleStr = courseTitle || courseCode || "Course";
+
+    const Adviser = require("../models/Adviser");
+    const adviserDoc = await Adviser.findOne({
+      $or: [
+        { session: studentProfile?.session || "2022-23" },
+        { department: studentProfile?.department || studentUser?.department || "EDTE" }
+      ]
+    }).lean();
+    const adviserEmail = adviserDoc?.teacherEmail || adviserDoc?.email || "";
+
+    const studentUserId = studentUser._id || studentUser.id || studentUser.uid;
+    const creditsNum = Number(creditHours) || 3;
+    const retakeAmount = creditsNum <= 1 ? 100 : (creditsNum >= 3 ? 300 : Math.round(creditsNum * 100));
 
     const retake = await RetakeRequest.create({
-      student: studentUser._id,
+      student: studentUserId,
       studentId: studentIdStr,
-      studentName: studentUser.name,
-      department: studentProfile?.department || studentUser.department || "",
-      courseCode: String(courseCode).toUpperCase(),
-      courseTitle,
-      creditHours: Number(creditHours) || 3,
+      studentName: studentNameStr,
+      department: studentProfile?.department || studentUser?.department || "EDTE",
+      courseCode: String(courseCode || "").toUpperCase(),
+      courseTitle: courseTitleStr,
+      creditHours: creditsNum,
       previousGrade: previousGrade || "F",
       previousGradePoint: Number(previousGradePoint) || 0.0,
-      targetSession,
+      targetSession: targetSession || "2023-24",
       level: `Level ${studentProfile?.currentLevel || 1}`,
       term: `Term ${studentProfile?.currentTerm || 1}`,
       adviserEmail,
       status: "Pending Adviser Approval",
+      paymentStatus: "Unpaid",
+      amount: retakeAmount,
     });
 
     await createAuditLog(req, studentUser, "Retake Request", `Submitted retake request for ${courseCode} (${targetSession})`);
 
     // Notify Adviser
     if (adviserEmail) {
-      const adviserUser = await User.findOne({ email: adviserEmail });
+      const adviserUser = await User.findOne({ email: { $regex: new RegExp(`^${adviserEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } });
       if (adviserUser) {
         const notif = await Notification.create({
           userId: adviserUser._id,
           title: `Retake Request: ${studentIdStr}`,
-          message: `Student ${studentUser.name} (${studentIdStr}) requested retake for ${courseCode}.`,
+          message: `Student ${studentNameStr} (${studentIdStr}) requested retake for ${courseCode}.`,
           type: "general",
         });
 
-        const io = getIO();
-        if (io) io.emit("new_notification", { userId: adviserUser._id.toString(), notif });
+        try {
+          const io = getIO();
+          if (io) io.emit("new_notification", { userId: adviserUser._id.toString(), notif });
+        } catch (ioErr) {
+          // Socket emit skipped if socket server is not connected or in standalone test mode
+        }
       }
     }
 
     res.status(201).json({ message: "Retake request submitted to Adviser successfully.", retake });
   } catch (error) {
+    console.error("Error in submitRetakeRequest:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// 5.5 Pay Online Retake Fee (Post-Approval)
+exports.payRetakeFee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const studentUser = req.user;
+    const userId = studentUser._id || studentUser.id || studentUser.uid;
+
+    const retake = await RetakeRequest.findById(id);
+    if (!retake) {
+      return res.status(404).json({ error: "Retake request not found." });
+    }
+
+    if (retake.student.toString() !== userId.toString()) {
+      return res.status(403).json({ error: "Unauthorized to pay for this retake request." });
+    }
+
+    if (retake.status !== "Approved") {
+      return res.status(400).json({ error: "Retake request must be approved by Adviser before payment." });
+    }
+
+    if (retake.paymentStatus === "Paid") {
+      return res.status(400).json({ error: "Payment for this retake request has already been completed." });
+    }
+
+    const transactionId = `TXN_RETAKE_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+    const creditsNum = Number(retake.creditHours) || 3;
+    const calculatedFee = creditsNum <= 1 ? 100 : (creditsNum >= 3 ? 300 : Math.round(creditsNum * 100));
+    const retakeAmount = retake.amount || calculatedFee;
+
+    retake.paymentStatus = "Paid";
+    retake.amount = retakeAmount;
+    retake.transactionId = transactionId;
+    retake.paidAt = new Date();
+    await retake.save();
+
+    // Auto-sync Enrollment & LMS Course Card into Target Session
+    const Enrollment = require("../models/Enrollment");
+    const Course = require("../models/Course");
+    const Student = require("../models/Student");
+
+    const studentProfile = await Student.findOne({
+      $or: [
+        { universityEmail: { $regex: new RegExp(`^${(studentUser.email || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+        ...(studentUser.studentId ? [{ studentId: studentUser.studentId }] : [])
+      ]
+    }).lean();
+
+    const studentIdStr = studentProfile?.studentId || studentUser.studentId || retake.studentId;
+    const codeStr = String(retake.courseCode || "").toUpperCase().trim();
+    const targetSession = retake.targetSession || "2023-24";
+
+    // Find LMS Course matching displayCode and target session
+    let lmsCourse = await Course.findOne({
+      displayCode: codeStr,
+      session: targetSession
+    });
+
+    if (!lmsCourse) {
+      // Resolve valid teacher for Course model required field
+      let defaultTeacherId = null;
+      if (retake.adviserEmail) {
+        const advTeacher = await User.findOne({
+          email: { $regex: new RegExp(`^${retake.adviserEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
+        });
+        if (advTeacher) defaultTeacherId = advTeacher._id;
+      }
+
+      if (!defaultTeacherId) {
+        const existingCourse = await Course.findOne({ displayCode: codeStr }).lean();
+        if (existingCourse?.teacher) defaultTeacherId = existingCourse.teacher;
+      }
+
+      if (!defaultTeacherId) {
+        const anyTeacher = await User.findOne({ role: "teacher" }).lean();
+        if (anyTeacher) defaultTeacherId = anyTeacher._id;
+      }
+
+      const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
+      lmsCourse = await Course.create({
+        name: retake.courseTitle || codeStr,
+        displayCode: codeStr,
+        session: targetSession,
+        department: studentProfile?.department || studentUser.department || "EDTE",
+        teacher: defaultTeacherId,
+        joinCode,
+        students: [userId]
+      });
+    } else {
+      await Course.updateOne(
+        { _id: lmsCourse._id },
+        { $addToSet: { students: userId } }
+      );
+    }
+
+    // Create / Update Enrollment record for target session
+    await Enrollment.findOneAndUpdate(
+      {
+        $or: [
+          { student: userId, courseCode: codeStr, session: targetSession },
+          ...(studentIdStr ? [{ studentId: studentIdStr, courseCode: codeStr, session: targetSession }] : [])
+        ]
+      },
+      {
+        student: userId,
+        studentId: studentIdStr || retake.studentId,
+        course: lmsCourse._id,
+        courseCode: codeStr,
+        courseTitle: retake.courseTitle,
+        session: targetSession,
+        level: retake.level,
+        term: retake.term,
+      },
+      { upsert: true, returnDocument: "after" }
+    );
+
+    await createAuditLog(req, studentUser, "Retake Fee Payment", `Paid ${retakeAmount} BDT retake fee for ${codeStr} (${targetSession}). Txn: ${transactionId}`);
+
+    res.json({
+      message: `Retake fee payment of ${retakeAmount} BDT completed successfully! Target session course card enabled.`,
+      retake,
+      transactionId,
+    });
+  } catch (error) {
+    console.error("Error in payRetakeFee:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -679,9 +864,27 @@ exports.submitRetakeRequest = async (req, res) => {
 exports.getTeacherRetakeRequests = async (req, res) => {
   try {
     const teacherEmailClean = (req.user.email || "").toLowerCase().trim();
+    const Adviser = require("../models/Adviser");
+
+    const adviserDocs = await Adviser.find({
+      $or: [
+        { teacherEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+        { email: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+      ]
+    }).lean();
+
+    const adviserSessions = adviserDocs.map(a => a.session).filter(Boolean);
+    const adviserDepts = adviserDocs.map(a => a.department).filter(Boolean);
+
     const requests = await RetakeRequest.find({
       status: "Pending Adviser Approval",
-      adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") },
+      $or: [
+        { adviserEmail: { $regex: new RegExp(`^${teacherEmailClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+        ...(adviserSessions.length ? [{ targetSession: { $in: adviserSessions } }] : []),
+        ...(adviserDepts.length ? [{ department: { $in: adviserDepts } }] : []),
+        { adviserEmail: "" },
+        { adviserEmail: null }
+      ]
     })
       .sort({ createdAt: -1 })
       .lean();

@@ -7,6 +7,7 @@ router.get("/student/profile", verifyToken, checkRole("student"), ctrl.getStuden
 router.get("/student/transcript", verifyToken, ctrl.getStudentTranscript); // Allowed for Student & Admin
 router.get("/student/failed-courses", verifyToken, checkRole("student"), ctrl.getFailedCoursesForRetake);
 router.post("/student/retake-request", verifyToken, checkRole("student"), ctrl.submitRetakeRequest);
+router.post("/student/retake-pay/:id", verifyToken, checkRole("student"), ctrl.payRetakeFee);
 router.get("/student/dashboard-stats", verifyToken, checkRole("student"), ctrl.getStudentDashboardStats);
 
 // Teacher / Adviser Retake Endpoints

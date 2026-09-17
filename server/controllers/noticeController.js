@@ -1,6 +1,9 @@
 const Notice = require("../models/Notice");
 const User = require("../models/User");
 const Notification = require("../models/Notification");
+const ResultUpload = require("../models/ResultUpload");
+const Result = require("../models/Result");
+const CGPARecord = require("../models/CGPARecord");
 const { queueEmail, emailTemplates } = require("../services/emailService");
 const { getIO } = require("../socket");
 const { createAuditLog } = require("./academicController");
@@ -232,9 +235,63 @@ exports.deleteNotice = async (req, res) => {
       return res.status(404).json({ error: "Notice not found." });
     }
 
-    await createAuditLog(req, req.user, "Notice Deletion", `Deleted notice '${notice.title}'`);
+    const hasSessionInfo = notice.session || notice.level || notice.term || (notice.title && (notice.title.includes("Schedule") || notice.title.includes("Cutoff") || notice.title.includes("Release")));
 
-    res.json({ message: "Notice deleted successfully." });
+    if (hasSessionInfo) {
+      const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
+      const levelDigit = extractDigit(notice.level) || extractDigit(notice.title);
+      const termDigit = extractDigit(notice.term) || extractDigit((notice.title || "").split("Term")[1]);
+
+      const levelRegex = levelDigit ? new RegExp(`(Level\\s*[-_]?\\s*${levelDigit}|\\b${levelDigit}\\b)`, "i") : null;
+      const termRegex = termDigit ? new RegExp(`(Term\\s*[-_]?\\s*${termDigit}|\\b${termDigit}\\b)`, "i") : null;
+      const sessionRegex = notice.session ? new RegExp(String(notice.session).replace("-", "[- ]?"), "i") : null;
+
+      const resType = notice.resultDeadlineType || (notice.title && notice.title.includes("Midterm") ? "Midterm" : "Final");
+
+      const uploadQuery = { isDeleted: { $ne: true } };
+      if (sessionRegex) uploadQuery.session = sessionRegex;
+      if (levelRegex) uploadQuery.level = levelRegex;
+      if (termRegex) uploadQuery.term = termRegex;
+      if (resType) uploadQuery.resultType = resType;
+
+      const matchingUploads = await ResultUpload.find(uploadQuery);
+      const uploadIds = matchingUploads.map((u) => u._id);
+
+      if (uploadIds.length > 0) {
+        const revertStatus = resType === "Midterm" ? "Draft" : "Submitted";
+
+        await ResultUpload.updateMany(
+          { _id: { $in: uploadIds } },
+          {
+            status: revertStatus,
+            scheduledPublishDate: null,
+            publishedAt: null,
+            updatedAt: new Date(),
+          }
+        );
+
+        await Result.updateMany(
+          { uploadId: { $in: uploadIds } },
+          {
+            status: revertStatus,
+            publishedAt: null,
+            scheduledPublishDate: null,
+          }
+        );
+
+        if (resType === "Final" && sessionRegex && levelRegex && termRegex) {
+          await CGPARecord.deleteMany({
+            session: sessionRegex,
+            level: levelRegex,
+            term: termRegex,
+          });
+        }
+      }
+    }
+
+    await createAuditLog(req, req.user, "Notice Deletion", `Deleted notice '${notice.title}' and unpublished associated result batches.`);
+
+    res.json({ message: "Notice and schedule removed. Results unpublished from student panel." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

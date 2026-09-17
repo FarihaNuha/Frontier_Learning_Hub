@@ -4,7 +4,7 @@ import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
-import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX, FiSearch, FiFilter, FiUsers, FiBookmark, FiPlus } from "react-icons/fi";
+import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX, FiSearch, FiFilter, FiUsers, FiBookmark, FiPlus, FiDownload } from "react-icons/fi";
 
 export default function AdminTeachers() {
   const [teachers, setTeachers] = useState([]);
@@ -258,6 +258,79 @@ export default function AdminTeachers() {
     e.target.value = "";
   };
 
+  const exportTeachersExcel = () => {
+    if (filteredTeachers.length === 0) {
+      toast.error("No teacher records to export.");
+      return;
+    }
+
+    const sorted = [...filteredTeachers].sort((a, b) => {
+      const isNewA = a.isNewRow || String(a.teacherId || "").startsWith("T-");
+      const isNewB = b.isNewRow || String(b.teacherId || "").startsWith("T-");
+      if (isNewA && !isNewB) return 1;
+      if (!isNewA && isNewB) return -1;
+
+      const getMinSession = (t) => {
+        if (t.assignedCourses && t.assignedCourses.length > 0) {
+          const sessList = t.assignedCourses.map(c => c.session).filter(Boolean);
+          if (sessList.length > 0) return sessList.sort()[0];
+        }
+        return t.assignedSession || "";
+      };
+      const sessA = getMinSession(a);
+      const sessB = getMinSession(b);
+      const sessCompare = sessA.localeCompare(sessB, undefined, { numeric: true, sensitivity: "base" });
+      if (sessCompare !== 0) return sessCompare;
+
+      const idA = String(a.teacherId || "");
+      const idB = String(b.teacherId || "");
+      return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: "base" });
+    });
+
+    const wsData = [
+      ["Teacher ID", "Name", "Email", "Department", "Program", "Assigned Courses", "Assigned Level-Term", "Assigned Session", "Account Status"]
+    ];
+
+    sorted.forEach((t) => {
+      const courses = (t.assignedCourses && t.assignedCourses.length > 0)
+        ? t.assignedCourses
+        : [{ courseName: "", levelTerm: t.assignedLevelTerm || "", session: t.assignedSession || "" }];
+
+      courses.forEach((c, idx) => {
+        if (idx === 0) {
+          wsData.push([
+            t.teacherId || "",
+            t.name || "",
+            t.email || "",
+            t.department || "",
+            t.program || "BSc. Eng in EDTE",
+            c.courseName || "",
+            c.levelTerm || t.assignedLevelTerm || "",
+            c.session || t.assignedSession || "",
+            t.accountStatus || "inactive"
+          ]);
+        } else {
+          wsData.push([
+            "",
+            "",
+            "",
+            "",
+            "",
+            c.courseName || "",
+            c.levelTerm || "",
+            c.session || "",
+            ""
+          ]);
+        }
+      });
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Teachers");
+    XLSX.writeFile(wb, `Teachers_Export_${new Date().toISOString().split("T")[0]}.xlsx`);
+    toast.success("Teacher directory exported to Excel successfully!");
+  };
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
@@ -363,6 +436,26 @@ export default function AdminTeachers() {
             >
               <FiUpload style={{ transform: "rotate(180deg)" }} size={18} />
               <span>Download Template</span>
+            </button>
+
+            <button
+              onClick={exportTeachersExcel}
+              style={{
+                background: "#0284c7",
+                color: "#ffffff",
+                border: "none",
+                padding: "12px 18px",
+                borderRadius: "8px",
+                fontWeight: "600",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(2, 132, 199, 0.2)",
+              }}
+            >
+              <FiDownload size={18} />
+              <span>Export Excel</span>
             </button>
 
             <button

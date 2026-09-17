@@ -134,13 +134,92 @@ exports.getMyCourses = async (req, res) => {
         }
       }
 
-      // Collect all course codes strictly from APPROVED registrations
+      // Auto-sync APPROVED AND PAID retake courses
+      const RetakeRequest = require("../models/RetakeRequest");
+      const approvedPaidRetakes = await RetakeRequest.find({
+        $or: [
+          { student: userId },
+          ...(studentIdStr ? [{ studentId: studentIdStr }] : [])
+        ],
+        status: "Approved",
+        paymentStatus: "Paid"
+      }).lean();
+
+      for (const retake of approvedPaidRetakes) {
+        const codeStr = (retake.courseCode || "").toUpperCase().trim();
+        if (!codeStr) continue;
+
+        const targetSession = retake.targetSession || "2023-24";
+        let lmsCourse = await Course.findOne({ displayCode: codeStr, session: targetSession });
+        if (!lmsCourse) {
+          let defaultTeacherId = null;
+          if (retake.adviserEmail) {
+            const advTeacher = await User.findOne({
+              email: { $regex: new RegExp(`^${retake.adviserEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
+            });
+            if (advTeacher) defaultTeacherId = advTeacher._id;
+          }
+
+          if (!defaultTeacherId) {
+            const existingCourse = await Course.findOne({ displayCode: codeStr }).lean();
+            if (existingCourse?.teacher) defaultTeacherId = existingCourse.teacher;
+          }
+
+          if (!defaultTeacherId) {
+            const anyTeacher = await User.findOne({ role: "teacher" }).lean();
+            if (anyTeacher) defaultTeacherId = anyTeacher._id;
+          }
+
+          const joinCode = Math.floor(100000 + Math.random() * 900000).toString();
+          lmsCourse = await Course.create({
+            name: retake.courseTitle || codeStr,
+            displayCode: codeStr,
+            session: targetSession,
+            department: studentProfile?.department || req.user.department || "EDTE",
+            teacher: defaultTeacherId,
+            joinCode,
+            students: [userId]
+          });
+        } else {
+          await Course.updateOne(
+            { _id: lmsCourse._id },
+            { $addToSet: { students: userId } }
+          );
+        }
+
+        await Enrollment.findOneAndUpdate(
+          {
+            $or: [
+              { student: userId, courseCode: codeStr, session: targetSession },
+              ...(studentIdStr ? [{ studentId: studentIdStr, courseCode: codeStr, session: targetSession }] : [])
+            ]
+          },
+          {
+            student: userId,
+            studentId: studentIdStr || retake.studentId,
+            course: lmsCourse._id,
+            courseCode: codeStr,
+            courseTitle: retake.courseTitle,
+            session: targetSession,
+            level: retake.level,
+            term: retake.term,
+          },
+          { upsert: true, returnDocument: "after" }
+        );
+      }
+
+      // Collect all course codes strictly from APPROVED registrations AND APPROVED+PAID retakes
       const approvedCourseCodes = new Set();
       approvedRegs.forEach((r) => {
         (r.selectedCourses || []).forEach((c) => {
           const code = (c.courseCode || c.code || "").toUpperCase().trim();
           if (code) approvedCourseCodes.add(code);
         });
+      });
+
+      approvedPaidRetakes.forEach((r) => {
+        const code = (r.courseCode || "").toUpperCase().trim();
+        if (code) approvedCourseCodes.add(code);
       });
 
       const enrollments = await Enrollment.find({
@@ -173,6 +252,26 @@ exports.getMyCourses = async (req, res) => {
         .sort({ createdAt: -1 })
         .lean();
 
+      // STRICT SESSION FILTERING FOR STUDENT:
+      // A course from another session (e.g. 2023-24 for a 2022-23 student) MUST ONLY BE SHOWN if the student has an approved and paid RetakeRequest for that specific displayCode + targetSession!
+      lmsCourses = lmsCourses.filter((c) => {
+        const cSession = (c.session || "").trim().toLowerCase();
+        const studentSess = (studentProfile?.session || "").trim().toLowerCase();
+
+        if (!cSession || !studentSess || cSession === studentSess) {
+          return true;
+        }
+
+        const cCodeClean = (c.displayCode || c.code || "").trim().toUpperCase();
+        const hasApprovedPaidRetake = approvedPaidRetakes.some((retake) => {
+          const retakeCode = (retake.courseCode || "").trim().toUpperCase();
+          const retakeSess = (retake.targetSession || "2023-24").trim().toLowerCase();
+          return retakeCode === cCodeClean && retakeSess === cSession;
+        });
+
+        return hasApprovedPaidRetake;
+      });
+
       // Fetch all Teacher master records and User teacher accounts to ensure fresh teacher assignment mapping
       const Teacher = require("../models/Teacher");
       const teachersList = await Teacher.find().lean();
@@ -182,6 +281,9 @@ exports.getMyCourses = async (req, res) => {
       const finalCourses = await Promise.all(
         lmsCourses.map(async (c) => {
           const matchingEnrollment = enrollments.find(
+            (e) => (e.courseCode || "").toUpperCase() === (c.displayCode || "").toUpperCase()
+              && (e.session || "").trim().toLowerCase() === (c.session || "").trim().toLowerCase()
+          ) || enrollments.find(
             (e) => (e.courseCode || "").toUpperCase() === (c.displayCode || "").toUpperCase()
           );
 
@@ -284,17 +386,19 @@ exports.getMyCourses = async (req, res) => {
         })
       );
 
-      // Deduplicate courses by displayCode to guarantee student never sees duplicate cards for the same course code
+      // Deduplicate courses by displayCode AND session to guarantee student never sees duplicate cards for the exact same course+session, but preserves retake cards from different target sessions
       const uniqueStudentCoursesMap = new Map();
       finalCourses.forEach((c) => {
         const codeKey = (c.displayCode || c.code || "").toUpperCase().trim();
+        const sessionKey = (c.session || "").toLowerCase().trim();
         if (!codeKey) return;
-        if (!uniqueStudentCoursesMap.has(codeKey)) {
-          uniqueStudentCoursesMap.set(codeKey, c);
+        const fullKey = `${codeKey}_${sessionKey}`;
+        if (!uniqueStudentCoursesMap.has(fullKey)) {
+          uniqueStudentCoursesMap.set(fullKey, c);
         } else {
-          const existing = uniqueStudentCoursesMap.get(codeKey);
+          const existing = uniqueStudentCoursesMap.get(fullKey);
           if (!existing.teacher && c.teacher) {
-            uniqueStudentCoursesMap.set(codeKey, c);
+            uniqueStudentCoursesMap.set(fullKey, c);
           }
         }
       });

@@ -25,11 +25,13 @@ const parseOptionalNumber = (val) => {
 
 // Helper to validate Excel columns and row data
 // Helper to validate Excel columns and row data
-const validateResultRows = async (teacherUser, rows, resultType = "Final") => {
+const validateResultRows = async (teacherUser, rows, resultType = "Final", targetParams = {}) => {
   const errors = [];
   if (!Array.isArray(rows) || rows.length === 0) {
     return { isValid: false, errors: ["Excel file contains no data rows."] };
   }
+
+  const { targetCourseCode, targetSession, targetLevel, targetTerm } = targetParams;
 
   const normalizeCode = (c) => String(c || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
   const normalizeSession = (s) => String(s || "").trim().toLowerCase().replace(/\s+/g, "-").replace(/[^0-9-]/g, "");
@@ -168,9 +170,42 @@ const validateResultRows = async (teacherUser, rows, resultType = "Final") => {
   const cleanExcelCode = normalizeCode(excelCourseCodeRaw);
   const department     = String(firstRow.department || firstRow["Department"] || "").trim().toUpperCase();
 
+  // Validate Target Card Parameters if provided
+  if (targetCourseCode) {
+    const cleanTargetCode = normalizeCode(targetCourseCode);
+    if (cleanTargetCode && cleanExcelCode && cleanTargetCode !== cleanExcelCode) {
+      errors.push(`Course Code doesn't match: Expected ${targetCourseCode}, but file contains ${excelCourseCodeRaw || "N/A"}.`);
+    }
+  }
+
+  if (targetSession) {
+    const targetSessNorm = normalizeSession(targetSession);
+    if (targetSessNorm && excelSession && targetSessNorm !== excelSession) {
+      errors.push(`Session doesn't match: Expected ${targetSession}, but file contains ${excelSessionRaw || "N/A"}.`);
+    }
+  }
+
+  if (targetLevel) {
+    const targetLdig = normalizeLvl(targetLevel);
+    if (targetLdig && excelLdig && targetLdig !== excelLdig) {
+      errors.push(`Level doesn't match: Expected Level ${targetLdig}, but file contains Level ${excelLdig}.`);
+    }
+  }
+
+  if (targetTerm) {
+    const targetTdig = normalizeLvl(targetTerm);
+    if (targetTdig && excelTdig && targetTdig !== excelTdig) {
+      errors.push(`Term doesn't match: Expected Term ${targetTdig}, but file contains Term ${excelTdig}.`);
+    }
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
   if (teacherUser.role !== "admin") {
     if (validAssignments.length === 0) {
-      errors.push("⛔ UPLOAD BLOCKED: No course assignments found for your teacher account. Please contact system admin.");
+      errors.push("No course assignments found for your teacher account. Please contact system admin.");
       return { isValid: false, errors };
     }
 
@@ -180,26 +215,8 @@ const validateResultRows = async (teacherUser, rows, resultType = "Final") => {
     });
 
     if (matchingCodeAssignments.length === 0) {
-      const uniqueAssignmentsMap = new Map();
-      validAssignments.forEach((a) => {
-        const key = `${a.rawCode || a.code}_${a.session}_${a.levelTerm}_${a.department}`;
-        if (!uniqueAssignmentsMap.has(key)) {
-          uniqueAssignmentsMap.set(key, a);
-        }
-      });
-      const uniqueAssignments = Array.from(uniqueAssignmentsMap.values());
-
-      const warningLines = [
-        `⛔ UPLOAD BLOCKED: Unassigned Course Code!`,
-        ``,
-        `Uploaded Course Code: "${excelCourseCodeRaw}"`,
-        ``,
-        `Your Assigned Courses:`,
-        ...uniqueAssignments.map((a) =>
-          `  • ${a.rawCode || a.code}${a.title ? ` (${a.title})` : ""}${a.session ? ` — Session: ${a.session}` : ""}${a.levelTerm ? `, ${a.levelTerm}` : ""}${a.department ? `, Dept: ${a.department}` : ""}`
-        ),
-      ];
-      return { isValid: false, errors: [warningLines.join("\n")] };
+      errors.push(`Course Code doesn't match your assignments: ${excelCourseCodeRaw || "Unspecified"} is not assigned to your teacher account.`);
+      return { isValid: false, errors };
     }
 
     let isStrictMatch = false;
@@ -242,49 +259,38 @@ const validateResultRows = async (teacherUser, rows, resultType = "Final") => {
       if (authSession && excelSession) {
         if (authSession !== excelSession) {
           reasons.push(
-            `Session mismatch: Excel header specifies "${excelSessionRaw || "N/A"}" but this course (${assignment.rawCode || assignment.code}) requires Session "${assignment.session || authSession}"`
+            `Session mismatch: Expected ${assignment.session || authSession}, but file contains ${excelSessionRaw || "N/A"}.`
           );
         }
       } else if (authSession && !excelSession) {
         reasons.push(
-          `Session not found in Excel header: This course requires Session "${assignment.session || authSession}". Please add "Session: XXXX-XX" in your Excel header.`
-        );
-      } else if (!authSession && excelSession) {
-        reasons.push(
-          `Session not configured for this assignment in the system. Please ask admin to set the session for course "${assignment.rawCode || assignment.code}".`
+          `Session missing in Excel header: Expected ${assignment.session || authSession}.`
         );
       }
 
       const assLT = assignment.levelTerm || "";
       const assLvlMatch = assLT.match(/level\s*:?\s*(\d+)/i) || assLT.match(/L(\d+)/i);
       const assTrmMatch = assLT.match(/term\s*:?\s*(\d+)/i) || assLT.match(/T(\d+)/i);
+
       const assLvl = assLvlMatch ? assLvlMatch[1] : "";
       const assTrm = assTrmMatch ? assTrmMatch[1] : "";
 
       if (assLvl && excelLdig && assLvl !== excelLdig) {
         reasons.push(
-          `Level mismatch: Excel header specifies "Level ${excelLdig}" but this course requires "Level ${assLvl}"`
-        );
-      } else if (assLvl && !excelLdig) {
-        reasons.push(
-          `Level missing in Excel header: This course requires "Level ${assLvl}". Please specify "Level: ${assLvl}" in your Excel header.`
+          `Level mismatch: Expected Level ${assLvl}, but file contains Level ${excelLdig}.`
         );
       }
 
       if (assTrm && excelTdig && assTrm !== excelTdig) {
         reasons.push(
-          `Term mismatch: Excel header specifies "Term ${excelTdig}" but this course requires "Term ${assTrm}"`
-        );
-      } else if (assTrm && !excelTdig) {
-        reasons.push(
-          `Term missing in Excel header: This course requires "Term ${assTrm}". Please specify "Term: ${assTrm}" in your Excel header.`
+          `Term mismatch: Expected Term ${assTrm}, but file contains Term ${excelTdig}.`
         );
       }
 
       if (assignment.department && department) {
         if (assignment.department.toUpperCase() !== department.toUpperCase()) {
           reasons.push(
-            `Department mismatch: Excel header specifies "${department}" but this course requires "${assignment.department}"`
+            `Department mismatch: Expected ${assignment.department}, but file contains ${department}.`
           );
         }
       }
@@ -293,34 +299,12 @@ const validateResultRows = async (teacherUser, rows, resultType = "Final") => {
         isStrictMatch = true;
         break;
       } else {
-        mismatchReasons.push(
-          `  [Course: ${assignment.rawCode || assignment.code} | Section: Session ${assignment.session || authSession || "?"}, ${assignment.levelTerm || "Level/Term unspecified"}]\n` +
-          reasons.map((r) => `    ❌ ${r}`).join("\n")
-        );
+        mismatchReasons.push(...reasons);
       }
     }
 
     if (!isStrictMatch) {
-      const warningLines = [
-        `⛔ UPLOAD BLOCKED: Marksheet Parameters Do Not Match Your Assignment!`,
-        ``,
-        `You uploaded an Excel file for Course "${excelCourseCodeRaw}" with these parameters:`,
-        excelSessionRaw ? `  • Session      : ${excelSessionRaw}` : `  • Session      : Not specified in Excel`,
-        (excelLdig || excelTdig) ? `  • Level & Term : Level ${excelLdig || "?"} - Term ${excelTdig || "?"}` : `  • Level & Term : Not specified in Excel`,
-        department ? `  • Department   : ${department}` : null,
-        ``,
-        `But this course is assigned to you ONLY for these specific section(s):`,
-        ...matchingCodeAssignments.map((a) =>
-          `  ✅ Session: ${a.session || "Any"} | ${a.levelTerm || "Level/Term unspecified"}${a.department ? ` | Dept: ${a.department}` : ""}`
-        ),
-        ``,
-        `Detected Mismatch Reasons:`,
-        ...mismatchReasons,
-        ``,
-        `Please correct Session / Level / Term in your Excel file header to match your assigned section and re-upload.`,
-      ].filter((l) => l !== null);
-
-      return { isValid: false, errors: [warningLines.join("\n")] };
+      return { isValid: false, errors: mismatchReasons.length > 0 ? Array.from(new Set(mismatchReasons)) : ["Marksheet parameters do not match your assignment."] };
     }
   }
 
@@ -356,7 +340,7 @@ const validateResultRows = async (teacherUser, rows, resultType = "Final") => {
 // 1. Teacher Result Upload (Excel JSON)
 exports.uploadResultExcel = async (req, res) => {
   try {
-    const { results, resultType } = req.body;
+    const { results, resultType, targetCourseCode, targetSession, targetLevel, targetTerm } = req.body;
     const activeResultType = resultType === "Midterm" ? "Midterm" : "Final";
 
     if (!Array.isArray(results) || results.length === 0) {
@@ -364,7 +348,12 @@ exports.uploadResultExcel = async (req, res) => {
     }
 
     // Validate rows before import
-    const validation = await validateResultRows(req.user, results, activeResultType);
+    const validation = await validateResultRows(req.user, results, activeResultType, {
+      targetCourseCode,
+      targetSession,
+      targetLevel,
+      targetTerm,
+    });
     if (!validation.isValid) {
       return res.status(400).json({
         error: "Excel validation failed. Please correct errors and re-upload.",
@@ -513,14 +502,20 @@ exports.uploadResultExcel = async (req, res) => {
       }
     }
 
+    const CourseImport = require("../models/CourseImport");
+    const allCourseImports = await CourseImport.find().lean();
+    const matchImport = allCourseImports.find((ci) => cleanCodeStr(ci.courseCode) === cleanUploadCode);
+    const resolvedTitle = matchImport?.courseTitle || courseTitle;
+
     if (uploadBatch) {
       await Result.deleteMany({ uploadId: uploadBatch._id });
 
       uploadBatch.courseCode = courseCode;
-      uploadBatch.courseTitle = courseTitle;
+      uploadBatch.courseTitle = resolvedTitle;
       uploadBatch.session = normalizedSessionVal;
       uploadBatch.level = level;
       uploadBatch.term = term;
+      uploadBatch.department = teacherProfile?.department || req.user.department || uploadBatch.department || "EDTE";
       uploadBatch.totalRecords = results.length;
       if (activeResultType === "Midterm") {
         uploadBatch.status = "Published";
@@ -537,7 +532,7 @@ exports.uploadResultExcel = async (req, res) => {
         resultType: activeResultType,
         department: teacherProfile?.department || req.user.department || "EDTE",
         courseCode,
-        courseTitle,
+        courseTitle: resolvedTitle,
         session: normalizedSessionVal,
         level,
         term,
@@ -929,6 +924,9 @@ exports.getAdminResults = async (req, res) => {
     if (department && department !== "all") query.department = department;
 
     const uploads = await ResultUpload.find(query).sort({ updatedAt: -1 }).lean();
+    const CourseImport = require("../models/CourseImport");
+    const allCourseImports = await CourseImport.find({}).lean();
+    const cleanCodeStr = (c) => String(c || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
 
     const uploadsWithResults = await Promise.all(
       uploads.map(async (up) => {
@@ -944,8 +942,13 @@ exports.getAdminResults = async (req, res) => {
 
         const isPendingStatus = !up.status || up.status === "Draft" || up.status === "Pending Upload" || up.status === "Pending";
 
+        const cleanUpCode = cleanCodeStr(up.courseCode);
+        const matchImport = allCourseImports.find(c => cleanCodeStr(c.courseCode) === cleanUpCode);
+        const resolvedTitle = matchImport?.courseTitle || up.courseTitle || up.courseCode;
+
         return {
           ...up,
+          courseTitle: resolvedTitle,
           status: isPendingStatus ? "Pending" : up.status,
           teacherName: teacherUser?.name || up.teacherName || "Assigned Teacher",
           teacherEmail: teacherUser?.email || up.teacherEmail || "",
@@ -992,7 +995,6 @@ exports.getAdminResults = async (req, res) => {
           existingUploadKeys.add(`${cleanCode}_${normSess}_${ldig}_${tdig}`);
           existingUploadKeys.add(`${cleanCode}_${ldig}_${tdig}`);
           existingUploadKeys.add(`${cleanCode}_${normSess}`);
-          existingUploadKeys.add(cleanCode);
         }
       });
 
@@ -1041,8 +1043,8 @@ exports.getAdminResults = async (req, res) => {
         for (const u of allTeacherUsers) {
           const match = (u.assignedCourses || []).some((ac) => {
             const acCode = (ac.courseCode || "").trim().toUpperCase();
-            const acName = (ac.courseName || ac.name || "").trim().toLowerCase();
-            return (acCode && acCode === cleanCode) || (acName && (acName === cleanTitle || cleanTitle.includes(acName) || acName.includes(cleanTitle)));
+            const acName = (ac.courseName || u.name || "").trim().toLowerCase();
+            return (acCode && acCode === cleanCode) || (acName && (acName === cleanTitle || cleanTitle.includes(cleanName) || acName.includes(cleanTitle)));
           });
           if (match) return { name: u.name, email: u.email };
         }
@@ -1061,29 +1063,38 @@ exports.getAdminResults = async (req, res) => {
       const pendingAutoCards = [];
       const seenAutoKeys = new Set();
 
-      // Build map of notices with cutoff deadlines that HAVE ALREADY PASSED
-      const passedNoticeMap = new Map();
-      const now = new Date();
+      // Determine target active session (from query parameter or latest notice session, default "2023-24")
+      const sessionSet = new Set();
+      activeNotices.forEach((n) => {
+        if (n.session) sessionSet.add(normSessStr(n.session));
+      });
+      if (sessionSet.size === 0) sessionSet.add("2023-24");
+
+      const querySessNorm = req.query.session ? normSessStr(req.query.session) : null;
+      const latestSession = querySessNorm || Array.from(sessionSet).sort().pop() || "2023-24";
+
+      // Collect target level-terms for active session:
+      const targetLevelTerms = [];
 
       activeNotices.forEach((n) => {
-        if (!n.deadlineDate) return;
-        const isPassed = now > new Date(n.deadlineDate);
         const rMatch = !n.resultDeadlineType || n.resultDeadlineType === activeResultType;
-        if (isPassed && rMatch) {
-          const sess = normSessStr(n.session);
+        const nSessNorm = normSessStr(n.session);
+        const sMatch = !nSessNorm || nSessNorm === latestSession;
+        if (rMatch && sMatch) {
+          const sess = n.session || latestSession;
           const ldig = extractDigit(n.level) || "1";
           const tdig = extractDigit(n.term) || "1";
-          if (sess) passedNoticeMap.set(`${sess}_${ldig}_${tdig}`, n);
-          passedNoticeMap.set(`${ldig}_${tdig}`, n);
+          targetLevelTerms.push({ session: sess, levelDigit: ldig, termDigit: tdig, deadlineDate: n.deadlineDate });
         }
       });
 
-      // ONLY generate pending auto cards for Level-Terms that have a PASSED deadline!
-      passedNoticeMap.forEach((notice, targetKey) => {
-        const sessVal = notice.session || "2022-23";
+      // Fallback: If no notice exists for latest active session, evaluate Level 1 Term 1 for latest session
+      if (targetLevelTerms.length === 0) {
+        targetLevelTerms.push({ session: latestSession, levelDigit: "1", termDigit: "1", deadlineDate: null });
+      }
+
+      targetLevelTerms.forEach(({ session: sessVal, levelDigit: ldig, termDigit: tdig, deadlineDate }) => {
         const normSess = normSessStr(sessVal);
-        const ldig = extractDigit(notice.level) || "1";
-        const tdig = extractDigit(notice.term) || "1";
 
         // 1. Check teacher assigned courses matching this level-term
         allTeachers.forEach((t) => {
@@ -1100,16 +1111,17 @@ exports.getAdminResults = async (req, res) => {
             const ci = allCourseImports.find(c => {
               const ciCode = cleanCodeStr(c.courseCode);
               const ciTitle = String(c.courseTitle || "").trim().toLowerCase();
-              return (cleanCode && ciCode === cleanCode) || (cleanName && (ciTitle === cleanName || ciTitle.includes(cleanName) || cleanName.includes(ciTitle)));
+              return (cleanCode && ciCode === cleanCode) || (cleanName && (ciTitle === cleanName || ciTitle.includes(cleanName) || ciTitle.includes(cleanName)));
             });
 
-            const codeVal = ac.courseCode || ac.displayCode || ci?.courseCode || "COURSE";
+            const rawCode = ac.courseCode || ac.displayCode || ci?.courseCode;
+            if (!rawCode || rawCode.trim().toUpperCase() === "COURSE") return;
+            const codeVal = rawCode.trim().toUpperCase();
             const titleVal = ac.courseName || ac.courseTitle || ci?.courseTitle || codeVal;
 
             const key = `${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}`;
-            const shortKey = `${cleanCodeStr(codeVal)}_${ldig}_${tdig}`;
 
-            if (existingUploadKeys.has(key) || existingUploadKeys.has(shortKey) || seenAutoKeys.has(key)) return;
+            if (existingUploadKeys.has(key) || seenAutoKeys.has(key)) return;
 
             seenAutoKeys.add(key);
 
@@ -1128,27 +1140,71 @@ exports.getAdminResults = async (req, res) => {
               status: "Pending",
               teacherName: t.name || "Assigned Teacher",
               teacherEmail: t.email || "",
-              cutoffDeadline: notice.deadlineDate,
+              cutoffDeadline: deadlineDate || findCutoffDeadline(sessVal, ldig, tdig),
               results: [],
               logs: [],
             });
           });
         });
 
-        // 2. Check CourseImport entries for this level-term
+        // 2. Check LMS Courses matching this level-term
+        allLmsCourses.forEach((c) => {
+          const cLdig = extractDigit(c.level) || extractDigit(c.levelTerm);
+          const cTdig = extractDigit(c.term) || extractDigit((c.levelTerm || "").split("-")[1]);
+          const cSess = normSessStr(c.session);
+
+          if (cLdig !== ldig || cTdig !== tdig) return;
+          if (cSess && normSess && cSess !== normSess) return;
+
+          const rawCode = c.displayCode || c.courseCode;
+          if (!rawCode || rawCode.trim().toUpperCase() === "COURSE") return;
+          const codeVal = rawCode.trim().toUpperCase();
+          const titleVal = c.name || c.courseTitle || codeVal;
+
+          const key = `${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}`;
+
+          if (existingUploadKeys.has(key) || seenAutoKeys.has(key)) return;
+
+          seenAutoKeys.add(key);
+          const teacherInfo = c.teacher ? { name: c.teacher.name, email: c.teacher.email } : findTeacherForCourse(codeVal, titleVal, sessVal);
+
+          pendingAutoCards.push({
+            _id: `pending_${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}_${activeResultType}`,
+            isPendingAutoCard: true,
+            isAutoCard: true,
+            resultType: activeResultType,
+            department: c.department || c.teacher?.department || "EDTE",
+            courseCode: codeVal,
+            courseTitle: titleVal,
+            session: sessVal,
+            level: `Level-${ldig}`,
+            term: `Term-${tdig}`,
+            totalRecords: 0,
+            status: "Pending",
+            teacherName: teacherInfo.name || "Assigned Teacher",
+            teacherEmail: teacherInfo.email || "",
+            cutoffDeadline: deadlineDate || findCutoffDeadline(sessVal, ldig, tdig),
+            results: [],
+            logs: [],
+          });
+        });
+
+        // 3. Check CourseImport entries for this level-term
         allCourseImports.forEach((ci) => {
-          const ciLdig = extractDigit(ci.level);
-          const ciTdig = extractDigit(ci.term);
+          const ltParts = (ci.levelTerm || "").split(/\s*-\s*/);
+          const ciLdig = extractDigit(ci.level || ltParts[0]);
+          const ciTdig = extractDigit(ci.term || ltParts[1]);
 
           if (ciLdig !== ldig || ciTdig !== tdig) return;
 
-          const codeVal = ci.courseCode;
-          const titleVal = ci.courseTitle;
+          const rawCode = ci.courseCode;
+          if (!rawCode || rawCode.trim().toUpperCase() === "COURSE") return;
+          const codeVal = rawCode.trim().toUpperCase();
+          const titleVal = ci.courseTitle || codeVal;
 
           const key = `${cleanCodeStr(codeVal)}_${normSess}_${ldig}_${tdig}`;
-          const shortKey = `${cleanCodeStr(codeVal)}_${ldig}_${tdig}`;
 
-          if (existingUploadKeys.has(key) || existingUploadKeys.has(shortKey) || seenAutoKeys.has(key)) return;
+          if (existingUploadKeys.has(key) || seenAutoKeys.has(key)) return;
 
           seenAutoKeys.add(key);
           const teacherInfo = findTeacherForCourse(codeVal, titleVal, sessVal);
@@ -1168,7 +1224,7 @@ exports.getAdminResults = async (req, res) => {
             status: "Pending",
             teacherName: teacherInfo.name || "Assigned Teacher",
             teacherEmail: teacherInfo.email || "",
-            cutoffDeadline: notice.deadlineDate,
+            cutoffDeadline: deadlineDate || findCutoffDeadline(sessVal, ldig, tdig),
             results: [],
             logs: [],
           });
@@ -1539,15 +1595,41 @@ exports.calculateSemesterGPA = async (req, res) => {
     const calculatedSummary = [];
 
     for (const sId of studentIds) {
-      // Filter target Level-Term course results for this student (excluding Midterm duplicate rows)
-      const studentTermResults = termResults.filter((r) => String(r.studentId) === String(sId) && r.resultType !== "Midterm");
+      // Query all published Final course results for this student in target Level & Term across all sessions (including retakes)
+      const allStudentTermResults = await Result.find({
+        studentId: sId,
+        level: levelRegex,
+        term: termRegex,
+        status: "Published",
+        resultType: { $ne: "Midterm" }
+      }).lean();
 
-      // Deduplicate by courseCode (keep latest upload per course)
+      const studentTermResults = allStudentTermResults.length > 0
+        ? allStudentTermResults
+        : termResults.filter((r) => String(r.studentId) === String(sId) && r.resultType !== "Midterm");
+
+      // Deduplicate by courseCode (prefer newer session retake grade / higher GP / latest update)
       const courseMap = {};
       studentTermResults.forEach((r) => {
-        const cCode = String(r.courseCode || r._id).trim().toUpperCase();
-        if (!courseMap[cCode] || new Date(r.updatedAt || r.createdAt) > new Date(courseMap[cCode].updatedAt || courseMap[cCode].createdAt)) {
+        const cCode = String(r.courseCode || r._id).replace(/\s+/g, "").toUpperCase();
+        const existing = courseMap[cCode];
+        if (!existing) {
           courseMap[cCode] = r;
+        } else {
+          const rSess = String(r.session || "").trim();
+          const exSess = String(existing.session || "").trim();
+
+          const rGP = extractCourseGradePoint(r);
+          const exGP = extractCourseGradePoint(existing);
+
+          if (rSess > exSess) {
+            courseMap[cCode] = r;
+          } else if (rSess === exSess) {
+            const isNewer = new Date(r.updatedAt || r.createdAt || 0).getTime() > new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+            if (rGP > exGP || isNewer) {
+              courseMap[cCode] = r;
+            }
+          }
         }
       });
 
@@ -1587,14 +1669,29 @@ exports.calculateSemesterGPA = async (req, res) => {
           { semesterGPA: cgpa }
         );
 
-        // Update or Create CGPARecord for student
+        // Retrieve student's actual session from Student profile if available
+        let studentActualSession = session;
+        const studentProfile = await Student.findOne({ studentId: sId }).lean();
+        if (studentProfile && studentProfile.session) {
+          studentActualSession = studentProfile.session;
+        }
+
+        // Delete any CGPARecord for this student and level/term stored under a retake batch session
+        await CGPARecord.deleteMany({
+          studentId: sId,
+          level,
+          term,
+          session: { $ne: studentActualSession }
+        });
+
+        // Update or Create CGPARecord for student under their actual enrolled session
         await CGPARecord.findOneAndUpdate(
-          { studentId: sId, level, term },
+          { studentId: sId, level, term, session: studentActualSession },
           {
             student: studentObjId,
             studentId: sId,
             studentName: studentName || sId,
-            session,
+            session: studentActualSession,
             level,
             term,
             department: "EDTE",
@@ -1662,21 +1759,74 @@ exports.setDeadlineAndNotice = async (req, res) => {
       resultDeadlineType = "Final";
     }
 
-    // Create targeted Notice (with deadline info)
-    const notice = await Notice.create({
-      title: noticeTitle,
-      content: noticeContent,
-      author: req.user._id || req.user.id,
-      authorName: req.user.name || "System Admin",
-      targetAudience: resolvedAudience,
-      isPinned: true,
-      category: "Academic",
-      deadlineDate: resolvedDeadline ? new Date(resolvedDeadline) : null,
-      resultDeadlineType,
-      session: session || "",
-      level: level || "",
-      term: term || "",
-    });
+    // Helper to extract digits & normalize session string
+    const extractDigit = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
+    const normSessStr = (s) => {
+      if (!s) return "";
+      const str = String(s).trim();
+      const match = str.match(/\d{4}[-\s]?\d{2,4}/);
+      if (match) {
+        const raw = match[0].replace(/\s+/g, "-");
+        const parts = raw.split("-");
+        if (parts.length === 2 && parts[1].length === 4) {
+          return `${parts[0]}-${parts[1].substring(2)}`;
+        }
+        return raw;
+      }
+      return str.toLowerCase().replace(/\s+/g, "-");
+    };
+
+    const targetSess = normSessStr(session);
+    const targetLdig = extractDigit(level);
+    const targetTdig = extractDigit(term);
+
+    let existingNotice = null;
+    if (resolvedDeadline && targetLdig && targetTdig) {
+      const candidateNotices = await Notice.find({
+        deadlineDate: { $ne: null },
+        $or: [
+          { resultDeadlineType },
+          { title: { $regex: new RegExp(resultDeadlineType || "Result", "i") } }
+        ]
+      });
+
+      existingNotice = candidateNotices.find((n) => {
+        const nSess = normSessStr(n.session);
+        const nLdig = extractDigit(n.level);
+        const nTdig = extractDigit(n.term);
+        const sMatch = !targetSess || !nSess || nSess === targetSess;
+        return sMatch && nLdig === targetLdig && nTdig === targetTdig;
+      });
+    }
+
+    let notice;
+    if (existingNotice) {
+      existingNotice.title = noticeTitle;
+      existingNotice.content = noticeContent;
+      existingNotice.deadlineDate = resolvedDeadline ? new Date(resolvedDeadline) : null;
+      existingNotice.session = session || existingNotice.session;
+      existingNotice.level = level || existingNotice.level;
+      existingNotice.term = term || existingNotice.term;
+      existingNotice.resultDeadlineType = resultDeadlineType;
+      existingNotice.updatedAt = new Date();
+      await existingNotice.save();
+      notice = existingNotice;
+    } else {
+      notice = await Notice.create({
+        title: noticeTitle,
+        content: noticeContent,
+        author: req.user._id || req.user.id,
+        authorName: req.user.name || "System Admin",
+        targetAudience: resolvedAudience,
+        isPinned: true,
+        category: "Academic",
+        deadlineDate: resolvedDeadline ? new Date(resolvedDeadline) : null,
+        resultDeadlineType,
+        session: session || "",
+        level: level || "",
+        term: term || "",
+      });
+    }
 
     // Format deadline for display
     const deadlineDisplay = resolvedDeadline
@@ -1788,16 +1938,48 @@ exports.schedulePublicationBySession = async (req, res) => {
       return res.status(400).json({ error: "Invalid date format for publication schedule." });
     }
 
-    // Update all Final result uploads for this session/level/term
-    const updatedUploads = await ResultUpload.updateMany(
-      {
-        session: sessionRegex,
-        level: levelRegex,
-        term: termRegex,
-        resultType: "Final",
-      },
-      { scheduledPublishDate: pubDate }
-    );
+    const now = new Date();
+    const isFuture = pubDate > now;
+
+    // Remove any previous schedule notices for this session/level/term to avoid duplicate notices
+    await Notice.deleteMany({
+      category: "Academic",
+      session: sessionRegex,
+      level: levelRegex,
+      term: termRegex,
+      title: { $regex: /Timed Release Schedule/i },
+    });
+
+    const matchingUploads = await ResultUpload.find({
+      session: sessionRegex,
+      level: levelRegex,
+      term: termRegex,
+      resultType: "Final",
+      isDeleted: { $ne: true },
+    });
+    const uploadIds = matchingUploads.map((u) => u._id);
+
+    if (uploadIds.length > 0) {
+      if (isFuture) {
+        await ResultUpload.updateMany(
+          { _id: { $in: uploadIds } },
+          { status: "Submitted", scheduledPublishDate: pubDate, publishedAt: null, updatedAt: new Date() }
+        );
+        await Result.updateMany(
+          { uploadId: { $in: uploadIds } },
+          { status: "Submitted", scheduledPublishDate: pubDate, publishedAt: null }
+        );
+      } else {
+        await ResultUpload.updateMany(
+          { _id: { $in: uploadIds } },
+          { status: "Published", scheduledPublishDate: pubDate, publishedAt: pubDate, updatedAt: new Date() }
+        );
+        await Result.updateMany(
+          { uploadId: { $in: uploadIds } },
+          { status: "Published", scheduledPublishDate: pubDate, publishedAt: pubDate }
+        );
+      }
+    }
 
     // Create targeted Notice announcement for students
     const formattedDate = pubDate.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
@@ -1819,8 +2001,10 @@ exports.schedulePublicationBySession = async (req, res) => {
     if (io) io.emit("new_notice", { notice });
 
     res.json({
-      message: `Automatic publication scheduled for ${level} ${term} (${session}) on ${formattedDate}.`,
-      updatedCount: updatedUploads.modifiedCount,
+      message: isFuture
+        ? `Automatic publication scheduled for ${level} ${term} (${session}) on ${formattedDate}. Results will be released to students on schedule.`
+        : `Results for ${level} ${term} (${session}) published successfully!`,
+      updatedCount: matchingUploads.length,
       scheduledPublishDate: pubDate,
     });
   } catch (error) {
@@ -1994,6 +2178,13 @@ exports.getStudentPublishedResults = async (req, res) => {
       };
     });
 
+    publishedResults = publishedResults.filter((r) => {
+      if (r.scheduledPublishDate && new Date(r.scheduledPublishDate) > nowTime) {
+        return false;
+      }
+      return true;
+    });
+
     // STRICT FILTER: Fetch student's APPROVED registrations ONLY
     const Registration = require("../models/Registration");
     const RegistrationPayment = require("../models/RegistrationPayment");
@@ -2075,8 +2266,32 @@ exports.getStudentPublishedResults = async (req, res) => {
       });
     });
 
+    const RetakeRequest = require("../models/RetakeRequest");
+    const approvedPaidRetakes = await RetakeRequest.find({
+      $or: [
+        { student: studentUser._id || studentUser.id },
+        ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+        ...(studentUser.studentId ? [{ studentId: studentUser.studentId }] : [])
+      ],
+      status: "Approved",
+      paymentStatus: "Paid"
+    }).lean();
+
+    approvedPaidRetakes.forEach(retake => {
+      const codeClean = (retake.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      if (codeClean) approvedCourseCodes.add(codeClean);
+      const lDigit = (retake.level || "").replace(/\D/g, "");
+      const tDigit = (retake.term || "").replace(/\D/g, "");
+      if (lDigit && tDigit) {
+        approvedLevelTerms.add(`Level ${lDigit} - Term ${tDigit}`);
+        approvedLevelTerms.add(`Level ${lDigit} Term ${tDigit}`);
+        approvedLevelTerms.add(`L${lDigit}T${tDigit}`);
+        approvedLevelTerms.add(`${lDigit}-${tDigit}`);
+      }
+    });
+
     publishedResults = publishedResults.filter(r => {
-      if (approvedRegs.length === 0) return false;
+      if (approvedRegs.length === 0 && approvedPaidRetakes.length === 0) return false;
 
       const codeClean = (r.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
       const rLDigit = (r.level || "").replace(/\D/g, "");
@@ -2091,6 +2306,35 @@ exports.getStudentPublishedResults = async (req, res) => {
 
       return false;
     });
+
+    // Deduplicate published results per courseCode and resultType (prioritize newer session retake results over old failed/repeated results)
+    const uniqueResultMap = new Map();
+    publishedResults.forEach((r) => {
+      const cleanCode = String(r.courseCode || "").replace(/\s+/g, "").toUpperCase();
+      const rType = r.resultType || "Final";
+      const key = `${cleanCode}_${rType}`;
+
+      const existing = uniqueResultMap.get(key);
+      if (!existing) {
+        uniqueResultMap.set(key, r);
+      } else {
+        const rSessStr = String(r.session || "").trim();
+        const existingSessStr = String(existing.session || "").trim();
+
+        if (rSessStr > existingSessStr) {
+          uniqueResultMap.set(key, r);
+        } else if (rSessStr === existingSessStr) {
+          const rDate = new Date(r.updatedAt || r.createdAt || 0).getTime();
+          const existingDate = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+          const isNewer = rDate > existingDate;
+          const hasValidGrade = (r.letterGrade && isNaN(Number(r.letterGrade)) && r.letterGrade !== "-" && r.letterGrade !== "F") && (!existing.letterGrade || !isNaN(Number(existing.letterGrade)) || existing.letterGrade === "-" || existing.letterGrade === "F");
+          if (hasValidGrade || isNewer) {
+            uniqueResultMap.set(key, r);
+          }
+        }
+      }
+    });
+    publishedResults = Array.from(uniqueResultMap.values());
 
     // Helper to normalize Level-Term keys cleanly (e.g. "Level-3", "Term-2" -> "Level 3 - Term 2")
     const normalizeLevelTermKey = (lStr, tStr) => {

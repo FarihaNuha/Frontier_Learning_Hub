@@ -29,12 +29,14 @@ const verifyToken = async (req, res, next) => {
     }
 
     req.user = {
+      _id: dbUser._id,
       id: dbUser._id.toString(),
       uid: dbUser._id.toString(),
       email: dbUser.email,
       role: dbUser.role,
       name: dbUser.name,
       department: dbUser.department,
+      studentId: dbUser.studentId || "",
     };
     console.log(
       "✅ Token verified for user:",

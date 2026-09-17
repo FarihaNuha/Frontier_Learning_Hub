@@ -4,7 +4,7 @@ import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
-import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX, FiUsers, FiBookmark, FiSearch, FiFilter, FiPlus } from "react-icons/fi";
+import { FiUpload, FiList, FiAlertCircle, FiTrash2, FiEdit2, FiCheck, FiX, FiUsers, FiBookmark, FiSearch, FiFilter, FiPlus, FiDownload } from "react-icons/fi";
 
 export default function AdminAdvisers() {
   const [advisers, setAdvisers] = useState([]);
@@ -162,6 +162,29 @@ export default function AdminAdvisers() {
     return matchesSearch && matchesDept && matchesSess;
   });
 
+  const exportAdvisersExcel = () => {
+    if (filteredAdvisers.length === 0) {
+      toast.error("No adviser records to export.");
+      return;
+    }
+
+    const exportData = filteredAdvisers.map((a) => ({
+      "ID": a.teacherId || "",
+      "Teacher": a.teacherName || "",
+      "Email": a.teacherEmail || "",
+      "Department": a.department || "",
+      "Program": a.program || "",
+      "Session": a.session || "",
+      "Assigned Batch": a.assignedBatch || "",
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Advisers");
+    XLSX.writeFile(wb, `Advisers_Export_${new Date().toISOString().split("T")[0]}.xlsx`);
+    toast.success("Adviser directory exported to Excel successfully!");
+  };
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <AdminSidebar />
@@ -248,6 +271,26 @@ export default function AdminAdvisers() {
             >
               <FiUpload style={{ transform: "rotate(180deg)" }} size={18} />
               <span>Download Template</span>
+            </button>
+
+            <button
+              onClick={exportAdvisersExcel}
+              style={{
+                background: "#0284c7",
+                color: "#ffffff",
+                border: "none",
+                padding: "12px 18px",
+                borderRadius: "8px",
+                fontWeight: "600",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(2, 132, 199, 0.2)",
+              }}
+            >
+              <FiDownload size={18} />
+              <span>Export Excel</span>
             </button>
 
             <button

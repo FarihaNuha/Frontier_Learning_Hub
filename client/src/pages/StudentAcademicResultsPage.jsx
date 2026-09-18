@@ -152,7 +152,15 @@ export default function StudentAcademicResultsPage() {
   const rawSemesterResults = selectedSemester ? (resultsByLevelTerm[selectedSemester] || []) : [];
   const currentSemesterResults = rawSemesterResults.filter((r) => {
     if (resultTypeTab === "Midterm") {
-      return r.resultType === "Midterm";
+      if (r.resultType === "Midterm") return true;
+      if (r.resultType === "Final" || !r.resultType) {
+        const hasSeparateMidterm = rawSemesterResults.some(
+          (other) => (other.courseCode || "").replace(/\s+/g, "").toUpperCase() === (r.courseCode || "").replace(/\s+/g, "").toUpperCase() && other.resultType === "Midterm"
+        );
+        if (hasSeparateMidterm) return false;
+        return true;
+      }
+      return true;
     }
     return r.resultType === "Final" || (!r.resultType && r.gradePoint !== null);
   });
@@ -429,14 +437,20 @@ export default function StudentAcademicResultsPage() {
                           <th style={{ padding: "12px 14px", width: "85px" }}>Credit Hours</th>
                           <th style={{ padding: "12px 14px" }}>MT Part A</th>
                           <th style={{ padding: "12px 14px" }}>MT Part B</th>
-                          <th style={{ padding: "12px 14px" }}>FT Part A</th>
-                          <th style={{ padding: "12px 14px" }}>FT Part B</th>
-                          <th style={{ padding: "12px 14px" }}>Attendance</th>
-                          <th style={{ padding: "12px 14px" }}>Continuous Assmt</th>
-                          <th style={{ padding: "12px 14px" }}>Total</th>
-                          <th style={{ padding: "12px 14px" }}>GPA</th>
-                          {resultTypeTab === "Midterm" && (
-                            <th style={{ padding: "12px 14px", textAlign: "center" }}>Actions & Deadline</th>
+                          {resultTypeTab === "Midterm" ? (
+                            <>
+                              <th style={{ padding: "12px 14px" }}>Total Midterm</th>
+                              <th style={{ padding: "12px 14px", textAlign: "center" }}>Actions & Deadline</th>
+                            </>
+                          ) : (
+                            <>
+                              <th style={{ padding: "12px 14px" }}>FT Part A</th>
+                              <th style={{ padding: "12px 14px" }}>FT Part B</th>
+                              <th style={{ padding: "12px 14px" }}>Attendance</th>
+                              <th style={{ padding: "12px 14px" }}>Continuous Assmt</th>
+                              <th style={{ padding: "12px 14px" }}>Total</th>
+                              <th style={{ padding: "12px 14px" }}>GPA</th>
+                            </>
                           )}
                         </tr>
                       </thead>
@@ -460,6 +474,10 @@ export default function StudentAcademicResultsPage() {
                             ? "-"
                             : (r.gradePoint !== null && r.gradePoint !== undefined && r.gradePoint !== "-" ? r.gradePoint : (r.letterGrade && r.letterGrade !== "-" ? r.letterGrade : "-"));
 
+                          const mtTotalVal = (r.midPartA !== null && r.midPartA !== undefined && r.midPartB !== null && r.midPartB !== undefined)
+                            ? (Number(r.midPartA) || 0) + (Number(r.midPartB) || 0)
+                            : renderVal(r.totalMarks);
+
                           return (
                             <React.Fragment key={r._id}>
                               <tr style={{ borderBottom: "1px solid #f1f5f9" }}>
@@ -469,55 +487,61 @@ export default function StudentAcademicResultsPage() {
                                 <td style={{ padding: "12px 14px", color: "#64748b" }}>{r.creditHours}</td>
                                 <td style={{ padding: "12px 14px" }}>{renderVal(r.midPartA)}</td>
                                 <td style={{ padding: "12px 14px" }}>{renderVal(r.midPartB)}</td>
-                                <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartA)}</td>
-                                <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartB)}</td>
-                                <td style={{ padding: "12px 14px" }}>{renderVal(r.attendance)}</td>
-                                <td style={{ padding: "12px 14px" }}>{renderVal(r.continuousAssessment)}</td>
-                                <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>{renderVal(r.totalMarks)}</td>
-                                <td style={{ padding: "12px 14px", fontWeight: 800, color: courseGPAVal === "-" ? "#64748b" : "#16a34a" }}>
-                                  {courseGPAVal}
-                                </td>
-                                {resultTypeTab === "Midterm" && (
-                                  <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-                                      <button
-                                        disabled={isBtnDisabled}
-                                        onClick={() => {
-                                          if (isExpired && !existingReq) {
-                                            toast.error("The correction request window for this course has expired.");
-                                            return;
-                                          }
-                                          setSelectedResultForIssue(r);
-                                        }}
-                                        style={{
-                                          padding: "6px 12px",
-                                          borderRadius: "6px",
-                                          border: "none",
-                                          background: isBtnDisabled ? "#e2e8f0" : existingReq ? "#0284c7" : "#3b8db3",
-                                          color: isBtnDisabled ? "#94a3b8" : "#ffffff",
-                                          fontWeight: 600,
-                                          fontSize: "11.5px",
-                                          cursor: isBtnDisabled ? "not-allowed" : "pointer",
-                                          display: "inline-flex",
-                                          alignItems: "center",
-                                          gap: "5px",
-                                        }}
-                                      >
-                                        <FiMessageSquare size={13} />
-                                        {existingReq ? "View / Update Request" : isExpired ? <><FiLock size={12} /> Correction Closed</> : "Correction Request"}
-                                      </button>
-                                      {deadlineFormatted && (
-                                        <span style={{ fontSize: "10.5px", color: isExpired ? "#ef4444" : "#0284c7", fontWeight: 600, display: "flex", alignItems: "center", gap: "3px" }}>
-                                          <FiClock size={10} /> {isExpired ? `Closed (${deadlineFormatted})` : `Ends: ${deadlineFormatted}`}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </td>
+                                {resultTypeTab === "Midterm" ? (
+                                  <>
+                                    <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>{mtTotalVal}</td>
+                                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                                        <button
+                                          disabled={isBtnDisabled}
+                                          onClick={() => {
+                                            if (isExpired && !existingReq) {
+                                              toast.error("The correction request window for this course has expired.");
+                                              return;
+                                            }
+                                            setSelectedResultForIssue(r);
+                                          }}
+                                          style={{
+                                            padding: "6px 12px",
+                                            borderRadius: "6px",
+                                            border: "none",
+                                            background: isBtnDisabled ? "#e2e8f0" : existingReq ? "#0284c7" : "#3b8db3",
+                                            color: isBtnDisabled ? "#94a3b8" : "#ffffff",
+                                            fontWeight: 600,
+                                            fontSize: "11.5px",
+                                            cursor: isBtnDisabled ? "not-allowed" : "pointer",
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "5px",
+                                          }}
+                                        >
+                                          <FiMessageSquare size={13} />
+                                          {existingReq ? "View / Update Request" : isExpired ? <><FiLock size={12} /> Correction Closed</> : "Correction Request"}
+                                        </button>
+                                        {deadlineFormatted && (
+                                          <span style={{ fontSize: "10.5px", color: isExpired ? "#ef4444" : "#0284c7", fontWeight: 600, display: "flex", alignItems: "center", gap: "3px" }}>
+                                            <FiClock size={10} /> {isExpired ? `Closed (${deadlineFormatted})` : `Ends: ${deadlineFormatted}`}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </td>
+                                  </>
+                                ) : (
+                                  <>
+                                    <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartA)}</td>
+                                    <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartB)}</td>
+                                    <td style={{ padding: "12px 14px" }}>{renderVal(r.attendance)}</td>
+                                    <td style={{ padding: "12px 14px" }}>{renderVal(r.continuousAssessment)}</td>
+                                    <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>{renderVal(r.totalMarks)}</td>
+                                    <td style={{ padding: "12px 14px", fontWeight: 800, color: courseGPAVal === "-" ? "#64748b" : "#16a34a" }}>
+                                      {courseGPAVal}
+                                    </td>
+                                  </>
                                 )}
                               </tr>
                               {resultTypeTab === "Midterm" && existingReq && (
                                 <tr style={{ background: "#e2e8f0", color: "#0f172a" }}>
-                                  <td colSpan={13} style={{ padding: "10px 18px", fontSize: "12px" }}>
+                                  <td colSpan={8} style={{ padding: "10px 18px", fontSize: "12px" }}>
                                     <div style={{ background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "10px 14px" }}>
                                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
                                         <span style={{ fontWeight: 700, color: "#334155" }}>💬 Your Request to Teacher:</span>
@@ -548,12 +572,20 @@ export default function StudentAcademicResultsPage() {
                           <td style={{ padding: "14px" }}>
                             {currentSemesterResults.reduce((acc, c) => acc + (Number(c.creditHours) || 0), 0)} Credits
                           </td>
-                          <td colSpan={7} style={{ padding: "14px", textAlign: "right" }}>
-                            Term GPA:
-                          </td>
-                          <td colSpan={resultTypeTab === "Midterm" ? 2 : 1} style={{ padding: "14px", fontSize: "16px", color: "#15803d", fontWeight: 800 }}>
-                            {currentSemesterGPA}
-                          </td>
+                          {resultTypeTab === "Midterm" ? (
+                            <td colSpan={4} style={{ padding: "14px", textAlign: "right", color: "#3b8db3" }}>
+                              {currentSemesterResults.length} Midterm Course(s) Published
+                            </td>
+                          ) : (
+                            <>
+                              <td colSpan={7} style={{ padding: "14px", textAlign: "right" }}>
+                                Term GPA:
+                              </td>
+                              <td style={{ padding: "14px", fontSize: "16px", color: "#15803d", fontWeight: 800 }}>
+                                {currentSemesterGPA}
+                              </td>
+                            </>
+                          )}
                         </tr>
                       </tfoot>
                     </table>

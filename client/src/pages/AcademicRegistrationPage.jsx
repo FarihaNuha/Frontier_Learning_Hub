@@ -43,8 +43,9 @@ export default function AcademicRegistrationPage() {
   ];
 
   const getCardStatus = (lvl, trm) => {
-    if (lvl < currentLvl || (lvl === currentLvl && trm < currentTrm)) return "completed";
-    if (lvl === currentLvl && trm === currentTrm) return "unlocked";
+    const regStatus = getRegistrationStatus(lvl, trm);
+    if (regStatus === "Approved") return "completed";
+    if (lvl < currentLvl || (lvl === currentLvl && trm <= currentTrm)) return "unlocked";
     return "locked";
   };
 
@@ -222,7 +223,7 @@ export default function AcademicRegistrationPage() {
                         textTransform: "uppercase",
                       }}
                     >
-                      {isUnlocked ? "Current" : isCompleted ? "Completed" : "Locked"}
+                      {isUnlocked ? (card.level === currentLvl && card.term === currentTrm ? "Current" : "Open") : isCompleted ? "Completed" : "Locked"}
                     </span>
                   </div>
 

@@ -1512,10 +1512,8 @@ export default function TeacherResultManagementPage() {
                       <th style={{ padding: "12px" }}>MT Part B</th>
                       {viewBatch.resultType === "Final" && <th style={{ padding: "12px" }}>FT Part A</th>}
                       {viewBatch.resultType === "Final" && <th style={{ padding: "12px" }}>FT Part B</th>}
-                      <th style={{ padding: "12px" }}>Attendance</th>
-                      <th style={{ padding: "12px" }}>Cont. Assessment</th>
                       <th style={{ padding: "12px" }}>Total Marks</th>
-                      <th style={{ padding: "12px" }}>Grade / GPA</th>
+                      {viewBatch.resultType === "Final" && <th style={{ padding: "12px" }}>Grade / GPA</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -1569,32 +1567,14 @@ export default function TeacherResultManagementPage() {
                               />
                             </td>
                           )}
-                          <td style={{ padding: "8px 12px" }}>
-                            <input
-                              type="number"
-                              value={rowData.attendance ?? ""}
-                              onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "attendance", e.target.value)}
-                              readOnly={isViewBatchDeadlinePassed}
-                              disabled={isViewBatchDeadlinePassed}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto" }}
-                            />
-                          </td>
-                          <td style={{ padding: "8px 12px" }}>
-                            <input
-                              type="number"
-                              value={rowData.continuousAssessment ?? ""}
-                              onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "continuousAssessment", e.target.value)}
-                              readOnly={isViewBatchDeadlinePassed}
-                              disabled={isViewBatchDeadlinePassed}
-                              style={{ width: "65px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 600, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto" }}
-                            />
-                          </td>
                           <td style={{ padding: "10px 12px", fontWeight: 800, color: "#0f172a", fontSize: "14px" }}>
                             {rowData.totalMarks ?? r.totalMarks ?? "-"}
                           </td>
-                          <td style={{ padding: "10px 12px", fontWeight: 700, color: "#16a34a" }}>
-                            {r.gradePoint ?? r.letterGrade ?? "-"}
-                          </td>
+                          {viewBatch.resultType === "Final" && (
+                            <td style={{ padding: "10px 12px", fontWeight: 700, color: "#16a34a" }}>
+                              {r.gradePoint ?? r.letterGrade ?? (r.gpa || "-")}
+                            </td>
+                          )}
                         </tr>
                       );
                     })}

@@ -187,6 +187,32 @@ exports.getMyCourses = async (req, res) => {
           );
         }
 
+        const CourseImport = require("../models/CourseImport");
+        const cImportRetake = await CourseImport.findOne({
+          courseCode: { $regex: new RegExp(`^${codeStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
+        }).lean();
+
+        let retakeLevelSync = cImportRetake?.level ? `Level-${String(cImportRetake.level).replace(/\D/g, "")}` : "";
+        let retakeTermSync = cImportRetake?.term ? `Term-${String(cImportRetake.term).replace(/\D/g, "")}` : "";
+
+        if (!retakeLevelSync || !retakeTermSync) {
+          const matchL = codeStr.match(/(\d)\d{2}/);
+          if (matchL) {
+            const lNum = parseInt(matchL[1]);
+            const matchT = codeStr.match(/\d(\d\d)/);
+            let tNum = 1;
+            if (matchT) {
+              const numVal = parseInt(matchT[1]);
+              tNum = (numVal >= 10 || (numVal === 9 && codeStr.includes("MATH"))) ? 2 : 1;
+            }
+            if (!retakeLevelSync) retakeLevelSync = `Level-${lNum}`;
+            if (!retakeTermSync) retakeTermSync = `Term-${tNum}`;
+          }
+        }
+
+        if (!retakeLevelSync) retakeLevelSync = retake.level ? `Level-${String(retake.level).replace(/\D/g, "")}` : "Level-1";
+        if (!retakeTermSync) retakeTermSync = retake.term ? `Term-${String(retake.term).replace(/\D/g, "")}` : "Term-1";
+
         await Enrollment.findOneAndUpdate(
           {
             $or: [
@@ -201,8 +227,8 @@ exports.getMyCourses = async (req, res) => {
             courseCode: codeStr,
             courseTitle: retake.courseTitle,
             session: targetSession,
-            level: retake.level,
-            term: retake.term,
+            level: retakeLevelSync,
+            term: retakeTermSync,
           },
           { upsert: true, returnDocument: "after" }
         );
@@ -372,8 +398,34 @@ exports.getMyCourses = async (req, res) => {
             courseCode: { $regex: new RegExp(`^${(c.displayCode || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
           }).lean();
 
-          const resolvedLevel = c.level || matchingEnrollment?.level || importDoc?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
-          const resolvedTerm = c.term || matchingEnrollment?.term || importDoc?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
+          // INTRINSIC LEVEL-TERM RESOLUTION FOR COURSES:
+          // Master CourseImport > Course Doc > Course Code Digits > Enrollment Doc > Student Profile
+          let resolvedLevel = "";
+          let resolvedTerm = "";
+
+          if (importDoc?.level) resolvedLevel = `Level-${String(importDoc.level).replace(/\D/g, "")}`;
+          if (!resolvedLevel && c.level) resolvedLevel = `Level-${String(c.level).replace(/\D/g, "")}`;
+
+          if (importDoc?.term) resolvedTerm = `Term-${String(importDoc.term).replace(/\D/g, "")}`;
+          if (!resolvedTerm && c.term) resolvedTerm = `Term-${String(c.term).replace(/\D/g, "")}`;
+
+          const codeClean = (c.displayCode || "").toUpperCase().trim();
+          const matchL = codeClean.match(/(\d)\d{2}/);
+          if (matchL) {
+            const lNum = parseInt(matchL[1]);
+            const matchT = codeClean.match(/\d(\d\d)/);
+            let tNum = 1;
+            if (matchT) {
+              const numVal = parseInt(matchT[1]);
+              tNum = (numVal >= 10 || (numVal === 9 && codeClean.includes("MATH"))) ? 2 : 1;
+            }
+            if (!resolvedLevel) resolvedLevel = `Level-${lNum}`;
+            if (!resolvedTerm) resolvedTerm = `Term-${tNum}`;
+          }
+
+          if (!resolvedLevel) resolvedLevel = matchingEnrollment?.level || (studentProfile?.currentLevel ? `Level-${studentProfile.currentLevel}` : "Level-1");
+          if (!resolvedTerm) resolvedTerm = matchingEnrollment?.term || (studentProfile?.currentTerm ? `Term-${studentProfile.currentTerm}` : "Term-1");
+
           const resolvedSession = c.session || matchingEnrollment?.session || importDoc?.session || studentProfile?.session || "2023-24";
 
           return {
@@ -408,6 +460,9 @@ exports.getMyCourses = async (req, res) => {
     } else {
       const Teacher = require("../models/Teacher");
       const CourseImport = require("../models/CourseImport");
+      const Registration = require("../models/Registration");
+      const Enrollment = require("../models/Enrollment");
+      const RetakeRequest = require("../models/RetakeRequest");
       const { syncTeacherCourseAssignments } = require("./umsAdminController");
 
       const teacherProfile = await Teacher.findOne({ email: req.user.email }).lean();
@@ -551,67 +606,132 @@ exports.getMyCourses = async (req, res) => {
 
       const { resolveCourseCode } = require("../utils/courseUtils");
 
-      courses = courses.map((c) => {
-        const resolvedCode = resolveCourseCode(c.name, c.displayCode, courseImports);
+      courses = await Promise.all(
+        courses.map(async (c) => {
+          const resolvedCode = resolveCourseCode(c.name, c.displayCode, courseImports);
 
-        // Persist resolved displayCode to MongoDB if this is a real Course document and displayCode was "COURSE"
-        if (
-          c._id &&
-          !String(c._id).startsWith("assigned_") &&
-          !c.isVirtual &&
-          (c.displayCode === "COURSE" || !c.displayCode) &&
-          resolvedCode !== "COURSE"
-        ) {
-          const CourseModel = require("../models/Course");
-          CourseModel.findByIdAndUpdate(c._id, { displayCode: resolvedCode }).catch(() => {});
-        }
+          // Persist resolved displayCode to MongoDB if this is a real Course document and displayCode was "COURSE"
+          if (
+            c._id &&
+            !String(c._id).startsWith("assigned_") &&
+            !c.isVirtual &&
+            (c.displayCode === "COURSE" || !c.displayCode) &&
+            resolvedCode !== "COURSE"
+          ) {
+            const CourseModel = require("../models/Course");
+            CourseModel.findByIdAndUpdate(c._id, { displayCode: resolvedCode }).catch(() => {});
+          }
 
-        const matchImport = courseImports.find(
-          (ci) => ci.courseCode.toUpperCase() === resolvedCode
-        );
-        const matchAssigned =
-          teacherProfile?.assignedCourses?.find(
-            (ac) =>
-              ((ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
-                (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())) &&
-              (!ac.session || !c.session || ac.session.trim().toLowerCase() === c.session.trim().toLowerCase())
-          ) ||
-          teacherProfile?.assignedCourses?.find(
-            (ac) =>
-              (ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
-              (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
+          const matchImport = courseImports.find(
+            (ci) => ci.courseCode.toUpperCase() === resolvedCode
           );
+          const matchAssigned =
+            teacherProfile?.assignedCourses?.find(
+              (ac) =>
+                ((ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
+                  (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())) &&
+                (!ac.session || !c.session || ac.session.trim().toLowerCase() === c.session.trim().toLowerCase())
+            ) ||
+            teacherProfile?.assignedCourses?.find(
+              (ac) =>
+                (ac.courseCode && ac.courseCode.toUpperCase() === resolvedCode) ||
+                (ac.courseName && (c.name || "").trim().toLowerCase() === ac.courseName.trim().toLowerCase())
+            );
 
-        let rawLevel = matchAssigned?.level || c.level || matchImport?.level || "";
-        let rawTerm = matchAssigned?.term || c.term || matchImport?.term || "";
+          let rawLevel = matchAssigned?.level || c.level || matchImport?.level || "";
+          let rawTerm = matchAssigned?.term || c.term || matchImport?.term || "";
 
-        if (matchAssigned?.levelTerm) {
-          const parts = matchAssigned.levelTerm.split("-").map((s) => s.trim());
-          if (parts[0]) rawLevel = parts[0];
-          if (parts[1]) rawTerm = parts[1];
-        }
+          if (matchAssigned?.levelTerm) {
+            const parts = matchAssigned.levelTerm.split("-").map((s) => s.trim());
+            if (parts[0]) rawLevel = parts[0];
+            if (parts[1]) rawTerm = parts[1];
+          }
 
-        let formattedLevel = rawLevel
-          ? rawLevel.toLowerCase().includes("level")
-            ? rawLevel
-            : `Level ${rawLevel}`
-          : "";
-        let formattedTerm = rawTerm
-          ? rawTerm.toLowerCase().includes("term")
-            ? rawTerm
-            : `Term ${rawTerm}`
-          : "";
+          let formattedLevel = rawLevel
+            ? rawLevel.toLowerCase().includes("level")
+              ? rawLevel
+              : `Level ${rawLevel}`
+            : "";
+          let formattedTerm = rawTerm
+            ? rawTerm.toLowerCase().includes("term")
+              ? rawTerm
+              : `Term ${rawTerm}`
+            : "";
 
-        return {
-          ...c,
-          displayCode: resolvedCode,
-          level: formattedLevel,
-          term: formattedTerm,
-          session: c.session || matchAssigned?.session || "2023-24",
-          courseType: c.courseType || matchImport?.courseType || "Theory",
-          creditHours: c.creditHours || matchImport?.creditHours || 3,
-        };
-      });
+          const targetSession = (c.session || matchAssigned?.session || "2023-24").trim();
+          const sessRegex = targetSession ? new RegExp(`^(${targetSession.replace(/(\d{4})-(\d{2})$/, '$1-20$2')}|${targetSession.replace(/(\d{4})-20(\d{2})$/, '$1-$2')})$`, "i") : null;
+          const normCode = resolvedCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+          const normTitle = (c.name || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+
+          const enrolledUserIdsSet = new Set();
+          const enrolledStudentIdsSet = new Set();
+
+          if (sessRegex) {
+            // A. Approved Registrations
+            const approvedRegs = await Registration.find({ status: "Approved", session: { $regex: sessRegex } }).lean();
+            approvedRegs.forEach((r) => {
+              const hasCourse = (r.selectedCourses || []).some((sc) => {
+                const cCode = (sc.courseCode || sc.code || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+                const cTitle = (sc.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+                return (cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle);
+              });
+              if (hasCourse) {
+                if (r.user) enrolledUserIdsSet.add(r.user.toString());
+                if (r.studentId) enrolledStudentIdsSet.add(String(r.studentId).trim());
+              }
+            });
+
+            // B. Enrollments
+            const codeReg = new RegExp(`^${resolvedCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i");
+            const titleReg = new RegExp(`${(c.name || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "i");
+            const enrollments = await Enrollment.find({
+              session: { $regex: sessRegex },
+              $or: [{ courseCode: { $regex: codeReg } }, { courseTitle: { $regex: titleReg } }]
+            }).lean();
+            enrollments.forEach((e) => {
+              if (e.student) enrolledUserIdsSet.add(e.student.toString());
+              if (e.studentId) enrolledStudentIdsSet.add(String(e.studentId).trim());
+            });
+
+            // C. Approved Retake Requests
+            const RetakeRequest = require("../models/RetakeRequest");
+            const approvedRetakes = await RetakeRequest.find({ status: "Approved", targetSession: { $regex: sessRegex } }).lean();
+            approvedRetakes.forEach((retake) => {
+              const cCode = (retake.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+              const cTitle = (retake.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+              if ((cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle)) {
+                if (retake.student) enrolledUserIdsSet.add(retake.student.toString());
+                if (retake.studentId) enrolledStudentIdsSet.add(String(retake.studentId).trim());
+              }
+            });
+          }
+
+          if (enrolledStudentIdsSet.size > 0) {
+            const uDocs = await User.find({ studentId: { $in: Array.from(enrolledStudentIdsSet) } }).select("_id").lean();
+            uDocs.forEach(u => enrolledUserIdsSet.add(u._id.toString()));
+          }
+
+          const cleanUserObjIds = Array.from(enrolledUserIdsSet)
+            .filter(id => mongoose.Types.ObjectId.isValid(id))
+            .map(id => new mongoose.Types.ObjectId(id));
+
+          if (c._id && !c.isVirtual && mongoose.Types.ObjectId.isValid(c._id)) {
+            const CourseModel = require("../models/Course");
+            await CourseModel.findByIdAndUpdate(c._id, { $set: { students: cleanUserObjIds } }).catch(() => {});
+          }
+
+          return {
+            ...c,
+            displayCode: resolvedCode,
+            level: formattedLevel,
+            term: formattedTerm,
+            session: targetSession,
+            students: cleanUserObjIds,
+            courseType: c.courseType || matchImport?.courseType || "Theory",
+            creditHours: c.creditHours || matchImport?.creditHours || 3,
+          };
+        })
+      );
 
       return res.json({ courses });
     }
@@ -635,6 +755,8 @@ exports.getTeacherDashboardSummary = async (req, res) => {
     const Submission = require("../models/Submission");
     const Attendance = require("../models/Attendance");
     const CourseImport = require("../models/CourseImport");
+    const Enrollment = require("../models/Enrollment");
+    const RetakeRequest = require("../models/RetakeRequest");
     const { resolveCourseCode } = require("../utils/courseUtils");
 
     const TeacherProfile = await Teacher.findOne({ email: teacherEmail }).lean();
@@ -800,7 +922,7 @@ exports.getTeacherDashboardSummary = async (req, res) => {
     const activeLevelsSet = new Set();
     const activeTermsSet = new Set();
 
-    const formattedCourses = courses.map(c => {
+    const formattedCourses = await Promise.all(courses.map(async (c) => {
       const resolvedCode = resolveCourseCode(c.name, c.displayCode, courseImports);
       let matchImport = courseImports.find(ci => ci.courseCode.toUpperCase() === resolvedCode);
       let matchAssigned = TeacherProfile?.assignedCourses?.find(ac =>
@@ -828,15 +950,79 @@ exports.getTeacherDashboardSummary = async (req, res) => {
       if (level) activeLevelsSet.add(level);
       if (term) activeTermsSet.add(term);
 
+      const targetSession = c.session || matchAssigned?.session || "2023-24";
+      const cleanSession = targetSession.trim();
+      const sessRegex = cleanSession ? new RegExp(`^(${cleanSession.replace(/(\d{4})-(\d{2})$/, '$1-20$2')}|${cleanSession.replace(/(\d{4})-20(\d{2})$/, '$1-$2')})$`, "i") : null;
+      const normCode = resolvedCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const normTitle = (c.name || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+
+      const enrolledUserIdsSet = new Set();
+      const enrolledStudentIdsSet = new Set();
+
+      if (sessRegex) {
+        // A. Approved Registrations
+        const approvedRegs = await Registration.find({ status: "Approved", session: { $regex: sessRegex } }).lean();
+        approvedRegs.forEach((r) => {
+          const hasCourse = (r.selectedCourses || []).some((sc) => {
+            const cCode = (sc.courseCode || sc.code || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+            const cTitle = (sc.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            return (cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle);
+          });
+          if (hasCourse) {
+            if (r.user) enrolledUserIdsSet.add(r.user.toString());
+            if (r.studentId) enrolledStudentIdsSet.add(String(r.studentId).trim());
+          }
+        });
+
+        // B. Enrollments
+        const codeReg = new RegExp(`^${resolvedCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i");
+        const titleReg = new RegExp(`${(c.name || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "i");
+        const enrollments = await Enrollment.find({
+          session: { $regex: sessRegex },
+          $or: [{ courseCode: { $regex: codeReg } }, { courseTitle: { $regex: titleReg } }]
+        }).lean();
+        enrollments.forEach((e) => {
+          if (e.student) enrolledUserIdsSet.add(e.student.toString());
+          if (e.studentId) enrolledStudentIdsSet.add(String(e.studentId).trim());
+        });
+
+        // C. Approved Retake Requests
+        const RetakeRequest = require("../models/RetakeRequest");
+        const approvedRetakes = await RetakeRequest.find({ status: "Approved", targetSession: { $regex: sessRegex } }).lean();
+        approvedRetakes.forEach((retake) => {
+          const cCode = (retake.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+          const cTitle = (retake.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          if ((cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle)) {
+            if (retake.student) enrolledUserIdsSet.add(retake.student.toString());
+            if (retake.studentId) enrolledStudentIdsSet.add(String(retake.studentId).trim());
+          }
+        });
+      }
+
+      // Resolve studentIds to User IDs
+      if (enrolledStudentIdsSet.size > 0) {
+        const uDocs = await User.find({ studentId: { $in: Array.from(enrolledStudentIdsSet) } }).select("_id").lean();
+        uDocs.forEach(u => enrolledUserIdsSet.add(u._id.toString()));
+      }
+
+      const cleanUserObjIds = Array.from(enrolledUserIdsSet)
+        .filter(id => mongoose.Types.ObjectId.isValid(id))
+        .map(id => new mongoose.Types.ObjectId(id));
+
+      if (c._id && !c.isVirtual && mongoose.Types.ObjectId.isValid(c._id)) {
+        await Course.findByIdAndUpdate(c._id, { $set: { students: cleanUserObjIds } }).catch(() => {});
+      }
+
       return {
         ...c,
         displayCode: resolvedCode,
         level,
         term,
-        session: c.session || matchAssigned?.session || "2023-24",
-        totalEnrolled: (c.students || []).length,
+        session: targetSession,
+        students: cleanUserObjIds,
+        totalEnrolled: cleanUserObjIds.length,
       };
-    });
+    }));
 
     res.json({
       summary: {
@@ -927,19 +1113,23 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
     const normCode = courseCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     const codeRegex = new RegExp(`^${courseCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i");
     const cleanSession = courseSession.trim();
+    const sessRegex = cleanSession ? new RegExp(`^(${cleanSession.replace(/(\d{4})-(\d{2})$/, '$1-20$2')}|${cleanSession.replace(/(\d{4})-20(\d{2})$/, '$1-$2')})$`, "i") : null;
 
-    // 2. Gather student IDs / User IDs ONLY from confirmed Approved Registrations and Enrollments
+    // 2. Gather student IDs / User IDs ONLY from confirmed Approved Registrations, Retakes, and Enrollments for THIS session
     const enrolledUserIdsSet = new Set();
     const enrolledStudentIdsSet = new Set();
     const enrolledEmailsSet = new Set();
 
-    // Source A: Enrollment Collection across all sessions
+    // Source A: Enrollment Collection strictly filtered by session
     const enrollQuery = {
       $or: [
         { courseCode: { $regex: codeRegex } },
         { courseTitle: { $regex: new RegExp(courseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") } }
       ]
     };
+    if (sessRegex) {
+      enrollQuery.session = { $regex: sessRegex };
+    }
 
     const enrollments = await Enrollment.find(enrollQuery).lean();
     enrollments.forEach((e) => {
@@ -947,9 +1137,12 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
       if (e.studentId) enrolledStudentIdsSet.add(String(e.studentId).trim());
     });
 
-    // Source B: Approved Registration Collection ONLY (all sessions/batches)
+    // Source B: Approved Registration Collection strictly filtered by session
     const normTitle = (courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
     const regQuery = { status: "Approved" };
+    if (sessRegex) {
+      regQuery.session = { $regex: sessRegex };
+    }
     const approvedSessionRegs = await Registration.find(regQuery).lean();
 
     const studentRegStatusMap = new Map(); // studentId -> status ("Approved")
@@ -968,6 +1161,28 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
           enrolledStudentIdsSet.add(sid);
           studentRegStatusMap.set(sid, "Approved");
           if (r.session) studentRegSessionMap.set(sid, r.session);
+        }
+      }
+    });
+
+    // Source C: Approved Retake Requests targeting this session
+    const RetakeRequest = require("../models/RetakeRequest");
+    const retakeQuery = { status: "Approved" };
+    if (sessRegex) {
+      retakeQuery.targetSession = { $regex: sessRegex };
+    }
+    const approvedRetakes = await RetakeRequest.find(retakeQuery).lean();
+
+    approvedRetakes.forEach((retake) => {
+      const cCode = (retake.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const cTitle = (retake.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+      if ((cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle)) {
+        if (retake.student) enrolledUserIdsSet.add(retake.student.toString());
+        if (retake.studentId) {
+          const sid = String(retake.studentId).trim();
+          enrolledStudentIdsSet.add(sid);
+          studentRegStatusMap.set(sid, "Approved");
+          if (retake.targetSession) studentRegSessionMap.set(sid, retake.targetSession);
         }
       }
     });
@@ -1063,11 +1278,9 @@ exports.getEnrolledStudentsForCourse = async (req, res) => {
     );
 
     // 4. Auto-heal LMS Course document students array if real course doc exists
-    if (course && course._id && !course.isVirtual && Array.isArray(roster) && roster.length > 0) {
+    if (course && course._id && !course.isVirtual && Array.isArray(roster)) {
       const userObjIds = roster.map((s) => s.userId).filter(Boolean);
-      if (userObjIds.length > 0) {
-        Course.findByIdAndUpdate(course._id, { $addToSet: { students: { $each: userObjIds } } }).catch(() => {});
-      }
+      Course.findByIdAndUpdate(course._id, { $set: { students: userObjIds } }).catch(() => {});
     }
 
     res.json({ course, students: roster });

@@ -27,6 +27,7 @@ import {
   FiLock,
   FiUnlock,
   FiAlertTriangle,
+  FiUsers,
 } from "react-icons/fi";
 import "../styles/dashboard.css";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -736,7 +737,7 @@ export default function TeacherAssessmentPage() {
                                 {/* Department Header */}
                                 <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "12px", borderBottom: "2px solid #3b8db3", marginBottom: "20px" }}>
                                   <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "6px 14px", borderRadius: "8px", fontWeight: 700, fontSize: "14px" }}>
-                                    🏛️ Dept: {deptName}
+                                    Dept: {deptName}
                                   </span>
                                 </div>
 
@@ -748,7 +749,7 @@ export default function TeacherAssessmentPage() {
                                       <div key={levelTermName}>
                                         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", flexWrap: "wrap" }}>
                                           <span style={{ fontSize: "12.5px", fontWeight: 700, color: "#475569", background: "#ffffff", padding: "4px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                                            🎓 {levelTermName}
+                                            {levelTermName}
                                           </span>
                                           <span style={{ fontSize: "12px", color: "#64748b" }}>
                                             ({groupsList.length} {groupsList.length === 1 ? "Marksheet" : "Marksheets"})
@@ -1000,14 +1001,20 @@ export default function TeacherAssessmentPage() {
                       </h2>
                     )}
                   </div>
-                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, opacity: 0.95, marginTop: 6 }}>
-                    <span>📅 Session: <strong>{getCleanSession(selectedCourseGroup)}</strong></span>
-                    <span>🎓 Level: <strong>{getCleanLevel(selectedCourseGroup)}</strong></span>
-                    <span>📘 Term: <strong>{getCleanTerm(selectedCourseGroup)}</strong></span>
-                    <span>📖 Course Type: <strong>Theory</strong></span>
-                    <span>⏱️ Credit Hour: <strong>3</strong></span>
-                    <span>🏛️ Dept: <strong>{getCleanDepartment(selectedCourseGroup)}</strong></span>
-                    <span>👥 Total Students: <strong>{filteredAssessments.length}</strong></span>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", fontSize: 13, color: "rgba(255,255,255,0.95)", marginTop: 8, alignItems: "center" }}>
+                    <span>Session: <strong>{getCleanSession(selectedCourseGroup)}</strong></span>
+                    <span style={{ opacity: 0.5 }}>•</span>
+                    <span>Level: <strong>{getCleanLevel(selectedCourseGroup)}</strong></span>
+                    <span style={{ opacity: 0.5 }}>•</span>
+                    <span>Term: <strong>{getCleanTerm(selectedCourseGroup)}</strong></span>
+                    <span style={{ opacity: 0.5 }}>•</span>
+                    <span>Course Type: <strong>Theory</strong></span>
+                    <span style={{ opacity: 0.5 }}>•</span>
+                    <span>Credit Hour: <strong>3</strong></span>
+                    <span style={{ opacity: 0.5 }}>•</span>
+                    <span>Dept: <strong>{getCleanDepartment(selectedCourseGroup)}</strong></span>
+                    <span style={{ opacity: 0.5 }}>•</span>
+                    <span>Total Students: <strong>{filteredAssessments.length}</strong></span>
                   </div>
                 </div>
 

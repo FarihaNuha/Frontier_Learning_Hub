@@ -23,6 +23,23 @@ const parseOptionalNumber = (val) => {
   return isNaN(num) ? null : num;
 };
 
+const calculateGradeAndGPFromTotal = (total) => {
+  if (total === null || total === undefined || String(total).trim() === "" || isNaN(Number(total))) {
+    return { gradePoint: null, letterGrade: null };
+  }
+  const t = Number(total);
+  if (t >= 80) return { gradePoint: 4.00, letterGrade: "A+" };
+  if (t >= 75) return { gradePoint: 3.75, letterGrade: "A" };
+  if (t >= 70) return { gradePoint: 3.50, letterGrade: "A-" };
+  if (t >= 65) return { gradePoint: 3.25, letterGrade: "B+" };
+  if (t >= 60) return { gradePoint: 3.00, letterGrade: "B" };
+  if (t >= 55) return { gradePoint: 2.75, letterGrade: "B-" };
+  if (t >= 50) return { gradePoint: 2.50, letterGrade: "C+" };
+  if (t >= 45) return { gradePoint: 2.25, letterGrade: "C" };
+  if (t >= 40) return { gradePoint: 2.00, letterGrade: "D" };
+  return { gradePoint: 0.00, letterGrade: "F" };
+};
+
 // Helper to validate Excel columns and row data
 // Helper to validate Excel columns and row data
 const validateResultRows = async (teacherUser, rows, resultType = "Final", targetParams = {}) => {
@@ -37,12 +54,13 @@ const validateResultRows = async (teacherUser, rows, resultType = "Final", targe
   const normalizeSession = (s) => String(s || "").trim().toLowerCase().replace(/\s+/g, "-").replace(/[^0-9-]/g, "");
   const normalizeLvl = (s) => { const m = String(s || "").match(/(\d+)/); return m ? m[1] : ""; };
 
-  // Fetch Teacher, TeacherImportBatch, Course, CourseImport
-  const teacherProfile = await Teacher.findOne({ email: teacherUser.email.toLowerCase() }).lean();
-  const teacherBatches = await TeacherImportBatch.find().lean();
-  const lmsCourses = await Course.find({ teacher: teacherUser._id || teacherUser.id }).lean();
-  const CourseImport = require("../models/CourseImport");
-  const allCourseImports = await CourseImport.find().lean();
+  // Fetch Teacher, TeacherImportBatch, Course, CourseImport in parallel
+  const [teacherProfile, teacherBatches, lmsCourses, allCourseImports] = await Promise.all([
+    Teacher.findOne({ email: teacherUser.email.toLowerCase() }).lean(),
+    TeacherImportBatch.find().lean(),
+    Course.find({ teacher: teacherUser._id || teacherUser.id }).lean(),
+    CourseImport.find().lean(),
+  ]);
 
   const teacherEmail = (teacherUser.email || "").toLowerCase().trim();
   const teacherIdStr = String(teacherUser.teacherId || "").trim();
@@ -541,16 +559,32 @@ exports.uploadResultExcel = async (req, res) => {
       });
     }
 
-    const lmsCourse = await Course.findOne({ displayCode: courseCode });
-    const allStudents = await Student.find().lean();
-    const allUsers = await User.find({ role: "student" }).lean();
+    const [lmsCourse, allStudents, allUsers] = await Promise.all([
+      Course.findOne({ displayCode: courseCode }).lean(),
+      Student.find().lean(),
+      User.find({ role: "student" }).lean(),
+    ]);
 
-    const createdResults = [];
+    const studentMapByStudentId = new Map();
+    const studentMapByEmail = new Map();
+    allStudents.forEach((s) => {
+      if (s.studentId) studentMapByStudentId.set(String(s.studentId).trim(), s);
+      if (s.universityEmail) studentMapByEmail.set(String(s.universityEmail).trim().toLowerCase(), s);
+    });
+
+    const userMapByStudentId = new Map();
+    const userMapByEmail = new Map();
+    allUsers.forEach((u) => {
+      if (u.studentId) userMapByStudentId.set(String(u.studentId).trim(), u);
+      if (u.email) userMapByEmail.set(String(u.email).trim().toLowerCase(), u);
+    });
+
+    const docsToInsert = [];
     for (const row of results) {
       const sId = String(row.studentId || row["Student ID"] || row["ID"] || row["student_id"]).trim();
       const normStudentId = sId.toUpperCase();
-      const sProfile = allStudents.find(s => s.studentId === sId);
-      const sUser = allUsers.find(u => u.studentId === sId || (sProfile && u.email === sProfile.universityEmail));
+      const sProfile = studentMapByStudentId.get(sId);
+      const sUser = userMapByStudentId.get(sId) || (sProfile?.universityEmail ? userMapByEmail.get(sProfile.universityEmail.toLowerCase()) : null);
 
       const cType = row.courseType || row["Course Type"] || "Theory";
       const cTitle = row.courseTitle || row["Course Title"] || courseTitle;
@@ -589,7 +623,7 @@ exports.uploadResultExcel = async (req, res) => {
         totalMarksVal = calcTotal > 0 ? calcTotal : totalMarksVal;
       }
 
-      const rDoc = await Result.create({
+      docsToInsert.push({
         uploadId: uploadBatch._id,
         resultType: activeResultType,
         student: sUser ? sUser._id : null,
@@ -618,9 +652,9 @@ exports.uploadResultExcel = async (req, res) => {
         gradePoint: parseOptionalNumber(row.gradePoint ?? row["GPA"] ?? row["CGPA"] ?? row["Grade Point"]),
         status: initialStatus,
       });
-
-      createdResults.push(rDoc);
     }
+
+    const createdResults = await Result.insertMany(docsToInsert, { ordered: false });
 
     await ResultLog.create({
       uploadId: uploadBatch._id,
@@ -2113,12 +2147,34 @@ exports.getStudentPublishedResults = async (req, res) => {
     ].filter(Boolean);
 
     let publishedResults = await Result.find({
-      status: "Published",
+      status: { $ne: "Deleted" },
+      isDeleted: { $ne: true },
       $or: rawConditions,
     })
       .populate("teacher", "name email department")
       .sort({ session: -1, level: 1, term: 1 })
       .lean();
+
+    // Map Midterm marks by clean course code to ensure Final result records always have full Midterm marks
+    const mtMarksMap = new Map();
+    publishedResults.forEach((r) => {
+      if (r.resultType === "Midterm") {
+        const codeClean = String(r.courseCode || "").replace(/\s+/g, "").toUpperCase();
+        mtMarksMap.set(codeClean, r);
+      }
+    });
+
+    publishedResults = publishedResults.map((r) => {
+      if (r.resultType === "Final" || (!r.resultType && (r.finalPartA || r.finalPartB || r.gradePoint))) {
+        const codeClean = String(r.courseCode || "").replace(/\s+/g, "").toUpperCase();
+        const mtDoc = mtMarksMap.get(codeClean);
+        if (mtDoc) {
+          if (r.midPartA === null || r.midPartA === undefined) r.midPartA = mtDoc.midPartA;
+          if (r.midPartB === null || r.midPartB === undefined) r.midPartB = mtDoc.midPartB;
+        }
+      }
+      return r;
+    });
 
     // Attach correctionWindowEnd from ResultUpload batch or Notice deadline to each result record
     const allUploads = await ResultUpload.find().lean();
@@ -2636,6 +2692,24 @@ exports.batchUpdateMarks = async (req, res) => {
         const attSum = (Number(rDoc.attendance) || 0);
         const contSum = (Number(rDoc.continuousAssessment) || 0);
         rDoc.totalMarks = midSum + finalSum + attSum + contSum;
+
+        if (item.gradePoint !== undefined && item.gradePoint !== null && item.gradePoint !== "") {
+          rDoc.gradePoint = parseOptionalNumber(item.gradePoint);
+        }
+        if (item.letterGrade !== undefined && item.letterGrade !== null && item.letterGrade !== "") {
+          rDoc.letterGrade = String(item.letterGrade).trim().toUpperCase();
+        }
+
+        // Auto-sync gradePoint and letterGrade from totalMarks for Final results
+        if (rDoc.resultType === "Final" || rDoc.finalPartA !== null || rDoc.finalPartB !== null) {
+          const autoGrade = calculateGradeAndGPFromTotal(rDoc.totalMarks);
+          if (item.gradePoint === undefined || item.gradePoint === null || item.gradePoint === "") {
+            rDoc.gradePoint = autoGrade.gradePoint;
+          }
+          if (item.letterGrade === undefined || item.letterGrade === null || item.letterGrade === "" || (rDoc.letterGrade === "F" && autoGrade.gradePoint > 0)) {
+            rDoc.letterGrade = autoGrade.letterGrade;
+          }
+        }
 
         rDoc.updatedAt = new Date();
         await rDoc.save();

@@ -57,9 +57,70 @@ exports.getStudentsByCourse = async (req, res) => {
     const User = require("../models/User");
     const Student = require("../models/Student");
     const Registration = require("../models/Registration");
+    const Enrollment = require("../models/Enrollment");
+    const RetakeRequest = require("../models/RetakeRequest");
+    const mongoose = require("mongoose");
+
+    const cleanSession = (course.session || "").trim();
+    const sessRegex = cleanSession ? new RegExp(`^(${cleanSession.replace(/(\d{4})-(\d{2})$/, '$1-20$2')}|${cleanSession.replace(/(\d{4})-20(\d{2})$/, '$1-$2')})$`, "i") : null;
+    let targetUserIds = course.students || [];
+
+    if (sessRegex) {
+      const codeStr = (course.displayCode || course.name || "").trim();
+      const normCode = codeStr.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      const normTitle = (course.name || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+      const codeReg = new RegExp(`^${codeStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i");
+      const titleReg = new RegExp(`${(course.name || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "i");
+
+      const enrolledUserIdsSet = new Set();
+      const enrolledStudentIdsSet = new Set();
+
+      // A. Approved Registrations
+      const approvedRegs = await Registration.find({ status: "Approved", session: { $regex: sessRegex } }).lean();
+      approvedRegs.forEach((r) => {
+        const hasCourse = (r.selectedCourses || []).some((sc) => {
+          const cCode = (sc.courseCode || sc.code || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+          const cTitle = (sc.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          return (cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle);
+        });
+        if (hasCourse) {
+          if (r.user) enrolledUserIdsSet.add(r.user.toString());
+          if (r.studentId) enrolledStudentIdsSet.add(String(r.studentId).trim());
+        }
+      });
+
+      // B. Enrollments
+      const enrollments = await Enrollment.find({
+        session: { $regex: sessRegex },
+        $or: [{ courseCode: { $regex: codeReg } }, { courseTitle: { $regex: titleReg } }]
+      }).lean();
+      enrollments.forEach((e) => {
+        if (e.student) enrolledUserIdsSet.add(e.student.toString());
+        if (e.studentId) enrolledStudentIdsSet.add(String(e.studentId).trim());
+      });
+
+      // C. Approved Retakes
+      const approvedRetakes = await RetakeRequest.find({ status: "Approved", targetSession: { $regex: sessRegex } }).lean();
+      approvedRetakes.forEach((rt) => {
+        const cCode = (rt.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        const cTitle = (rt.courseTitle || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        if ((cCode && cCode === normCode) || (cTitle && normTitle && cTitle === normTitle)) {
+          if (rt.student) enrolledUserIdsSet.add(rt.student.toString());
+          if (rt.studentId) enrolledStudentIdsSet.add(String(rt.studentId).trim());
+        }
+      });
+
+      if (enrolledStudentIdsSet.size > 0) {
+        const uDocs = await User.find({ studentId: { $in: Array.from(enrolledStudentIdsSet) } }).select("_id").lean();
+        uDocs.forEach((u) => enrolledUserIdsSet.add(u._id.toString()));
+      }
+
+      targetUserIds = Array.from(enrolledUserIdsSet).map((id) => new mongoose.Types.ObjectId(id));
+      await Course.findByIdAndUpdate(course._id, { $set: { students: targetUserIds } }).catch(() => {});
+    }
 
     const rawStudents = await User.find({
-      _id: { $in: course.students },
+      _id: { $in: targetUserIds },
       role: "student",
     }).select("name email studentId department session level term program batch").lean();
 
@@ -463,7 +524,7 @@ function evaluateExcelFormula(formula, present, credit, totalClasses) {
       expr = expr.replace(fullMatch, roundedVal);
     }
     
-    return evalArithmetic(expr);
+    return Math.max(0, evalArithmetic(expr));
   } catch (err) {
     console.error("Formula eval error:", err);
     return 0;

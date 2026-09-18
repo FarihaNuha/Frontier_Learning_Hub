@@ -317,9 +317,43 @@ exports.getStudentAcademicProfile = async (req, res) => {
       ? await AcademicProfile.findOne({ $or: profileOrConditions }).lean()
       : null;
 
-    const retakes = profileOrConditions.length > 0
+    let retakes = profileOrConditions.length > 0
       ? await RetakeRequest.find({ $or: profileOrConditions }).lean()
       : [];
+
+    if (retakes.length > 0) {
+      const studentAllResults = await Result.find({
+        status: { $ne: "Deleted" },
+        isDeleted: { $ne: true },
+        $or: [
+          ...(userId ? [{ student: userId }] : []),
+          ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+          ...(emailLower ? [{ studentEmail: emailLower }] : []),
+        ],
+      }).lean();
+
+      const passedCourseCodes = new Set();
+      studentAllResults.forEach((r) => {
+        if (r.resultType === "Midterm") return;
+        const codeClean = String(r.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        const lg = String(r.letterGrade || "").trim().toUpperCase();
+        const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
+
+        if (lg === "F" || lg === "FAIL" || (gp !== null && !isNaN(gp) && gp === 0)) {
+          return;
+        }
+
+        const tot = r.totalMarks !== null && r.totalMarks !== undefined ? Number(r.totalMarks) : null;
+        if ((gp !== null && !isNaN(gp) && gp > 0) || (lg && lg !== "F" && lg !== "-" && lg !== "0" && lg !== "FAIL") || (tot !== null && !isNaN(tot) && tot >= 40)) {
+          if (codeClean) passedCourseCodes.add(codeClean);
+        }
+      });
+
+      retakes = retakes.filter((rr) => {
+        const codeClean = String(rr.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+        return !passedCourseCodes.has(codeClean);
+      });
+    }
 
     const studentDept = studentProfile?.department || req.user.department || activeReg?.department || "EDTE";
 
@@ -597,51 +631,73 @@ exports.getFailedCoursesForRetake = async (req, res) => {
     ].filter(Boolean);
 
     const publishedResults = await Result.find({
-      status: "Published",
+      status: { $ne: "Deleted" },
+      isDeleted: { $ne: true },
       $or: rawConditions,
     }).lean();
 
-    // Find courses with F or 0 grade point on FINAL term results
+    // Group non-midterm results by clean course code
+    const resultsByCourse = new Map();
+    publishedResults.forEach((r) => {
+      if (r.resultType === "Midterm") return;
+
+      const codeClean = String(r.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      if (!codeClean) return;
+
+      if (!resultsByCourse.has(codeClean)) {
+        resultsByCourse.set(codeClean, []);
+      }
+      resultsByCourse.get(codeClean).push(r);
+    });
+
     const failedMap = new Map();
-    publishedResults.forEach((r) => {
-      if (r.resultType === "Midterm") return;
 
-      const code = String(r.courseCode || "").toUpperCase().trim();
-      const lg = String(r.letterGrade || "").trim().toUpperCase();
-      const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
+    for (const [codeClean, records] of resultsByCourse.entries()) {
+      // Check if ANY published result for this course code is PASSED
+      const hasPassedResult = records.some((r) => {
+        const lg = String(r.letterGrade || "").trim().toUpperCase();
+        const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
 
-      const isFailed = lg === "F" || (gp !== null && gp === 0);
-      if (isFailed) {
-        failedMap.set(code, r);
+        // If letterGrade is explicitly F or FAIL, or gradePoint is 0, it is NOT passed!
+        if (lg === "F" || lg === "FAIL" || (gp !== null && !isNaN(gp) && gp === 0)) {
+          return false;
+        }
+
+        if (gp !== null && !isNaN(gp) && gp > 0) return true;
+        if (lg && lg !== "F" && lg !== "-" && lg !== "0" && lg !== "FAIL") return true;
+
+        const tot = r.totalMarks !== null && r.totalMarks !== undefined ? Number(r.totalMarks) : null;
+        if (tot !== null && !isNaN(tot) && tot >= 40) return true;
+
+        return false;
+      });
+
+      if (!hasPassedResult) {
+        // Pick the latest failed record for retake registration
+        const latestFailedDoc = records.sort(
+          (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0)
+        )[0];
+        if (latestFailedDoc) {
+          failedMap.set(codeClean, latestFailedDoc);
+        }
       }
-    });
-
-    // Remove courses if passed in a later published Final result
-    publishedResults.forEach((r) => {
-      if (r.resultType === "Midterm") return;
-
-      const code = String(r.courseCode || "").toUpperCase().trim();
-      const lg = String(r.letterGrade || "").trim().toUpperCase();
-      const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
-
-      const isPassed = lg !== "F" && gp !== null && gp > 0;
-      if (isPassed) {
-        failedMap.delete(code);
-      }
-    });
+    }
 
     // Remove courses already requested for retake
     const existingRetakes = await RetakeRequest.find({
       $or: [
-        { student: studentUser._id },
+        { student: studentUser._id || studentUser.id },
         ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
         ...(studentUser.studentId ? [{ studentId: studentUser.studentId }] : [])
       ],
-      status: { $in: ["Pending Adviser Approval", "Approved"] },
+      status: { $in: ["Pending Adviser Approval", "Approved", "Completed", "Paid"] },
     }).lean();
 
     existingRetakes.forEach((rr) => {
-      failedMap.delete(String(rr.courseCode || "").toUpperCase().trim());
+      const codeClean = String(rr.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      if (codeClean) {
+        failedMap.delete(codeClean);
+      }
     });
 
     res.json({ failedCourses: Array.from(failedMap.values()) });
@@ -684,6 +740,33 @@ exports.submitRetakeRequest = async (req, res) => {
     const creditsNum = Number(creditHours) || 3;
     const retakeAmount = creditsNum <= 1 ? 100 : (creditsNum >= 3 ? 300 : Math.round(creditsNum * 100));
 
+    const CourseImport = require("../models/CourseImport");
+    const cImport = await CourseImport.findOne({
+      courseCode: { $regex: new RegExp(`^${String(courseCode || "").trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
+    }).lean();
+
+    let retakeLevel = cImport?.level ? `Level ${String(cImport.level).replace(/\D/g, "")}` : "";
+    let retakeTerm = cImport?.term ? `Term ${String(cImport.term).replace(/\D/g, "")}` : "";
+
+    if (!retakeLevel || !retakeTerm) {
+      const codeClean = String(courseCode || "").toUpperCase().trim();
+      const matchL = codeClean.match(/(\d)\d{2}/);
+      if (matchL) {
+        const lNum = parseInt(matchL[1]);
+        const matchT = codeClean.match(/\d(\d\d)/);
+        let tNum = 1;
+        if (matchT) {
+          const numVal = parseInt(matchT[1]);
+          tNum = (numVal >= 10 || (numVal === 9 && codeClean.includes("MATH"))) ? 2 : 1;
+        }
+        if (!retakeLevel) retakeLevel = `Level ${lNum}`;
+        if (!retakeTerm) retakeTerm = `Term ${tNum}`;
+      }
+    }
+
+    if (!retakeLevel) retakeLevel = `Level ${studentProfile?.currentLevel || 1}`;
+    if (!retakeTerm) retakeTerm = `Term ${studentProfile?.currentTerm || 1}`;
+
     const retake = await RetakeRequest.create({
       student: studentUserId,
       studentId: studentIdStr,
@@ -695,8 +778,8 @@ exports.submitRetakeRequest = async (req, res) => {
       previousGrade: previousGrade || "F",
       previousGradePoint: Number(previousGradePoint) || 0.0,
       targetSession: targetSession || "2023-24",
-      level: `Level ${studentProfile?.currentLevel || 1}`,
-      term: `Term ${studentProfile?.currentTerm || 1}`,
+      level: retakeLevel,
+      term: retakeTerm,
       adviserEmail,
       status: "Pending Adviser Approval",
       paymentStatus: "Unpaid",

@@ -114,7 +114,7 @@ export default function StudentRegistrationPaymentPage() {
               <div style={{ fontSize: "18px", fontWeight: 800, color: "#16a34a" }}>৳{totalPaidAmount.toLocaleString()} BDT</div>
             </div>
             <div style={{ background: "#ffffff", padding: "10px 18px", borderRadius: "12px", border: "1px solid #cbd5e1", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
-              <div style={{ fontSize: "11px", color: totalDueAmount > 0 ? "#c2410c" : "#166534", fontWeight: 700, textTransform: "uppercase" }}>Total Outstanding Due</div>
+              <div style={{ fontSize: "11px", color: totalDueAmount > 0 ? "#c2410c" : "#166534", fontWeight: 700, textTransform: "uppercase" }}>Total Due</div>
               <div style={{ fontSize: "18px", fontWeight: 800, color: totalDueAmount > 0 ? "#ea580c" : "#16a34a" }}>৳{totalDueAmount.toLocaleString()} BDT</div>
             </div>
           </div>
@@ -420,7 +420,7 @@ export default function StudentRegistrationPaymentPage() {
                     <div style={{ fontSize: "19px", fontWeight: 800, color: "#0f172a" }}>
                       Grand Total Fee: <span style={{ color: isPaid ? "#16a34a" : "#ea580c" }}>৳{payment.totalAmount?.toLocaleString()} BDT</span>
                       <span style={{ fontSize: "13px", fontWeight: 600, marginLeft: "10px", color: isPaid ? "#15803d" : "#c2410c" }}>
-                        ({isPaid ? "Paid in Full" : `Outstanding Due: ৳${payment.totalAmount?.toLocaleString()} BDT`})
+                        ({isPaid ? "Paid in Full" : `Due: ৳${payment.totalAmount?.toLocaleString()} BDT`})
                       </span>
                     </div>
                   </div>

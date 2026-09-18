@@ -732,7 +732,7 @@ export default function TeacherAttendancePage({
         const roundedVal = Math.round(innerVal * factor) / factor;
         expr = expr.replace(fullMatch, roundedVal);
       }
-      return evalArithmetic(expr);
+      return Math.max(0, evalArithmetic(expr));
     } catch (err) {
       return 0;
     }
@@ -1304,7 +1304,7 @@ export default function TeacherAttendancePage({
                     fontWeight: 600,
                   }}
                 >
-                  📅 {formatDate(selectedDate)} - {courseCode}
+                  {formatDate(selectedDate)} - {courseCode}
                 </p>
               </div>
             </div>

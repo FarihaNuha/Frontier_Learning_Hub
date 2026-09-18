@@ -144,6 +144,23 @@ const findRegistrationCalendarRule = async (studentObj, levelString, termString)
         }
       }
     }
+
+    const openSessionCal = await RegistrationCalendar.findOne({
+      $or: [
+        { session: { $regex: sessRegex } },
+        { session: "All Sessions" }
+      ],
+      isOpen: true
+    }).lean();
+    if (openSessionCal) {
+      if (
+        openSessionCal.department === "All Departments" ||
+        isDepartmentAndProgramMatch(openSessionCal.department, openSessionCal.program, studentObj.department, studentObj.program)
+      ) {
+        return openSessionCal;
+      }
+    }
+
     return null;
   }
 
@@ -241,8 +258,10 @@ exports.submitRegistration = async (req, res) => {
       return res.status(404).json({ error: "Student profile record not found." });
     }
 
-    const levelStr = `Level-${student.currentLevel}`;
-    const termStr = `Term-${student.currentTerm}`;
+    const reqLevel = req.body.level || student.currentLevel;
+    const reqTerm = req.body.term || student.currentTerm;
+    const levelStr = `Level-${reqLevel}`;
+    const termStr = `Term-${reqTerm}`;
 
     // Strictly validate active calendar window for this student's Session & Level/Term
     const calendarDoc = await findRegistrationCalendarRule(student, levelStr, termStr);

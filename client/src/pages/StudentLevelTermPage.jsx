@@ -78,12 +78,11 @@ export default function StudentLevelTermPage() {
   const studentLevel = Number(data?.student?.currentLevel) || 1;
   const studentTerm = Number(data?.student?.currentTerm) || 1;
 
-  const isCompletedSemester = Number(level) < studentLevel || (Number(level) === studentLevel && Number(term) < studentTerm);
   const reg = data?.registration;
-
-  const isApproved = reg?.status === "Approved" || isCompletedSemester;
+  const isApproved = reg?.status === "Approved";
   const isPending = reg?.status === "Pending Adviser Approval";
   const isRejected = reg?.status === "Rejected";
+  const isCompletedSemester = isApproved;
 
   const coursesToDisplay = isApproved
     ? (reg?.selectedCourses?.length > 0 ? reg.selectedCourses : data?.courses || [])
@@ -487,7 +486,7 @@ export default function StudentLevelTermPage() {
           </div>
 
           {/* Action Register Button if open */}
-          {!isCompletedSemester && !reg && (
+          {!isApproved && !isPending && !isRejected && (
             <div style={{ textAlign: "center", padding: "32px 0 0 0" }}>
               <button
                 onClick={() => navigate(`/student/registration/${level}/${term}`)}

@@ -541,6 +541,7 @@ exports.importCourses = async (req, res) => {
       await CourseImport.deleteMany({ $or: deleteConditions });
     }
 
+    const docsToInsert = [];
     for (const record of courses) {
       const {
         courseCode,
@@ -565,7 +566,7 @@ exports.importCourses = async (req, res) => {
       const cleanLevel = String(level !== undefined && level !== null ? level : "").trim();
       const cleanTerm = String(term !== undefined && term !== null ? term : "").trim();
 
-      await CourseImport.create({
+      docsToInsert.push({
         courseCode: cleanCode,
         courseTitle: cleanTitle,
         courseType: cleanType || "Theory",
@@ -575,6 +576,10 @@ exports.importCourses = async (req, res) => {
         level: cleanLevel,
         term: cleanTerm,
       });
+    }
+
+    if (docsToInsert.length > 0) {
+      await CourseImport.insertMany(docsToInsert, { ordered: false });
     }
 
     res.json({ message: "Courses imported successfully." });

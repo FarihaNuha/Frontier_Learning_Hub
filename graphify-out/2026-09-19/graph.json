@@ -180,7 +180,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_dom",
-      "community": 164,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -190,7 +190,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "testing_library_dom",
-      "community": 164,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -380,7 +380,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "client_package_dependencies_react_dom",
-      "community": 12,
+      "community": 154,
       "norm_label": "react-dom"
     },
     {
@@ -390,7 +390,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "react_dom",
-      "community": 12,
+      "community": 154,
       "norm_label": "react-dom"
     },
     {
@@ -400,7 +400,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_package_dependencies_react_hot_toast",
-      "community": 156,
+      "community": 12,
       "norm_label": "react-hot-toast"
     },
     {
@@ -410,7 +410,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "react_hot_toast",
-      "community": 156,
+      "community": 12,
       "norm_label": "react-hot-toast"
     },
     {
@@ -460,7 +460,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "client_package_dependencies_react_scripts",
-      "community": 12,
+      "community": 156,
       "norm_label": "react-scripts"
     },
     {
@@ -470,7 +470,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "react_scripts",
-      "community": 12,
+      "community": 156,
       "norm_label": "react-scripts"
     },
     {
@@ -5927,7 +5927,7 @@
       "label": "getEnrolledStudentsForCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1048",
+      "source_location": "L1065",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getenrolledstudentsforcourse",
       "community": 7,
@@ -5937,7 +5937,7 @@
       "label": "joinCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1295",
+      "source_location": "L1312",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_joincourse",
       "community": 7,
@@ -5947,7 +5947,7 @@
       "label": "getCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1423",
+      "source_location": "L1440",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getcourse",
       "community": 7,
@@ -5957,7 +5957,7 @@
       "label": "leaveCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1453",
+      "source_location": "L1470",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_leavecourse",
       "community": 7,
@@ -5967,7 +5967,7 @@
       "label": "deleteCourse()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1473",
+      "source_location": "L1490",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_deletecourse",
       "community": 7,
@@ -5977,7 +5977,7 @@
       "label": "getJoinRequests()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1496",
+      "source_location": "L1513",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getjoinrequests",
       "community": 7,
@@ -5987,7 +5987,7 @@
       "label": "handleJoinRequest()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1521",
+      "source_location": "L1538",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_handlejoinrequest",
       "community": 7,
@@ -5997,7 +5997,7 @@
       "label": "findAssessmentRecord()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1615",
+      "source_location": "L1632",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_findassessmentrecord",
       "community": 7,
@@ -6007,7 +6007,7 @@
       "label": "getCourseStudentsAnalytics()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1656",
+      "source_location": "L1673",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "community": 7,
@@ -6017,7 +6017,7 @@
       "label": "getStudentAnalytics()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1791",
+      "source_location": "L1808",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getstudentanalytics",
       "community": 7,
@@ -10220,7 +10220,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes",
-      "community": 148,
+      "community": 164,
       "norm_label": "academicroutes.js"
     },
     {
@@ -10230,7 +10230,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes_router",
-      "community": 148,
+      "community": 164,
       "norm_label": "router"
     },
     {
@@ -10240,7 +10240,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_academicroutes_verifytoken_checkrole",
-      "community": 148,
+      "community": 164,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10250,7 +10250,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_academicroutes_ctrl",
-      "community": 148,
+      "community": 164,
       "norm_label": "ctrl"
     },
     {
@@ -10300,7 +10300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 154,
+      "community": 138,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -10310,7 +10310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 154,
+      "community": 138,
       "norm_label": "router"
     },
     {
@@ -10320,7 +10320,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 154,
+      "community": 138,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10330,7 +10330,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 154,
+      "community": 138,
       "norm_label": "ctrl"
     },
     {
@@ -10610,7 +10610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes",
-      "community": 138,
+      "community": 148,
       "norm_label": "examroutes.js"
     },
     {
@@ -10620,7 +10620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes_router",
-      "community": 138,
+      "community": 148,
       "norm_label": "router"
     },
     {
@@ -10630,7 +10630,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_examroutes_verifytoken_checkrole",
-      "community": 138,
+      "community": 148,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10640,7 +10640,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_examroutes_ctrl",
-      "community": 138,
+      "community": 148,
       "norm_label": "ctrl"
     },
     {
@@ -27677,7 +27677,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1686",
+      "source_location": "L1703",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -27688,7 +27688,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1828",
+      "source_location": "L1845",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getstudentanalytics",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -27699,7 +27699,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L919",
+      "source_location": "L936",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getteacherdashboardsummary",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -29032,7 +29032,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1473",
+      "source_location": "L1490",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_deletecourse",
@@ -29042,7 +29042,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1615",
+      "source_location": "L1632",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -29052,7 +29052,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1423",
+      "source_location": "L1440",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getcourse",
@@ -29062,7 +29062,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1656",
+      "source_location": "L1673",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getcoursestudentsanalytics",
@@ -29072,7 +29072,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1048",
+      "source_location": "L1065",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getenrolledstudentsforcourse",
@@ -29082,7 +29082,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1496",
+      "source_location": "L1513",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getjoinrequests",
@@ -29102,7 +29102,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1791",
+      "source_location": "L1808",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getstudentanalytics",
@@ -29122,7 +29122,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1521",
+      "source_location": "L1538",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_handlejoinrequest",
@@ -29132,7 +29132,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1295",
+      "source_location": "L1312",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_joincourse",
@@ -29142,7 +29142,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1453",
+      "source_location": "L1470",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_leavecourse",
@@ -29250,7 +29250,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1732",
+      "source_location": "L1749",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -29261,7 +29261,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1935",
+      "source_location": "L1952",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getstudentanalytics",
       "target": "server_controllers_coursecontroller_findassessmentrecord",

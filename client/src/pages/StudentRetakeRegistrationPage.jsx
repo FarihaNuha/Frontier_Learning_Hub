@@ -183,7 +183,21 @@ export default function StudentRetakeRegistrationPage() {
                       <button
                         onClick={handleSubmitRetake}
                         disabled={submitting}
-                        style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", background: "#16a34a", color: "#ffffff", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "13.5px", cursor: submitting ? "not-allowed" : "pointer" }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          padding: "10px 20px",
+                          background: submitting ? "#94a3b8" : "linear-gradient(135deg, #7EC8E3, #3B8DB3)",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "8px",
+                          fontWeight: 600,
+                          fontSize: "13.5px",
+                          cursor: submitting ? "not-allowed" : "pointer",
+                          boxShadow: "0 4px 12px rgba(59,141,179,0.25)",
+                          transition: "all 0.15s ease"
+                        }}
                       >
                         <FiSend size={15} /> {submitting ? "Submitting..." : "Submit Retake Request to Adviser"}
                       </button>

@@ -234,7 +234,7 @@ export default function TeacherRegistrationApprovalPage() {
                 {selectedReg.hasPreviousDues ? (
                   <div style={{ background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: "10px", padding: "14px", color: "#9f1239" }}>
                     <div style={{ fontWeight: 800, fontSize: "13.5px", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
-                      Attention Adviser: Student Has Outstanding Previous Dues (Total: ৳{selectedReg.totalPreviousDues.toLocaleString()} BDT)
+                      Attention Adviser: Student Has Previous Dues (Total: ৳{selectedReg.totalPreviousDues.toLocaleString()} BDT)
                     </div>
                     <div style={{ fontSize: "12.5px", color: "#881337" }}>
                       The student has pending fee balances for the following previous academic semester(s):

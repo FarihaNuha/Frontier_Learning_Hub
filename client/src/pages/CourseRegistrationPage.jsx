@@ -53,9 +53,14 @@ export default function CourseRegistrationPage() {
         setData(res.data);
         if (res.data?.student) {
           const s = res.data.student;
-          if (String(s.currentLevel) !== String(level) || String(s.currentTerm) !== String(term)) {
-            toast.error(`Registration Restricted: You are currently assigned to Level-${s.currentLevel} Term-${s.currentTerm}. You cannot register for Level-${level} Term-${term}.`);
-            navigate("/student/level-term", { replace: true });
+          const reqL = Number(level);
+          const reqT = Number(term);
+          const studL = Number(s.currentLevel) || 1;
+          const studT = Number(s.currentTerm) || 1;
+          const isAllowed = reqL < studL || (reqL === studL && reqT <= studT);
+          if (!isAllowed) {
+            toast.error(`Registration Restricted: Level-${level} Term-${term} is a future semester.`);
+            navigate("/student/course-registration", { replace: true });
           }
         }
       } catch (err) {
@@ -115,7 +120,11 @@ export default function CourseRegistrationPage() {
   const handleSubmitRegistration = async () => {
     setSubmitting(true);
     try {
-      const res = await api.post("/registration/submit", { selectedCourseIds: selectedIds });
+      const res = await api.post("/registration/submit", {
+        selectedCourseIds: selectedIds,
+        level: Number(level),
+        term: Number(term)
+      });
       setCreatedRegId(res.data.registration?._id);
       toast.success("Registration request submitted to Adviser!");
       return res.data.registration;

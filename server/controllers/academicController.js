@@ -603,17 +603,37 @@ exports.getFailedCoursesForRetake = async (req, res) => {
       studentUserEmail ? { email: studentUserEmail } : null,
     ].filter(Boolean);
 
-    const publishedResults = await Result.find({
-      status: { $ne: "Deleted" },
+    const ResultUpload = require("../models/ResultUpload");
+    const allUploads = await ResultUpload.find().lean();
+    const nowTime = new Date();
+
+    const rawResults = await Result.find({
+      status: "Published",
       isDeleted: { $ne: true },
       $or: rawConditions,
     }).lean();
 
-    // Group non-midterm results by clean course code
+    // Filter to active result records for retakes (ignore Midterm-ONLY records)
+    const publishedResults = rawResults.filter((r) => {
+      const isMidtermOnly = r.resultType === "Midterm" &&
+                            r.finalPartA === null &&
+                            r.finalPartB === null &&
+                            r.finalExam === null &&
+                            (r.gradePoint === null || r.gradePoint === undefined);
+
+      if (isMidtermOnly) return false;
+
+      // If publication schedule was set for future, exclude from retakes
+      if (r.scheduledPublishDate && new Date(r.scheduledPublishDate) > nowTime) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Group released final results by clean course code
     const resultsByCourse = new Map();
     publishedResults.forEach((r) => {
-      if (r.resultType === "Midterm") return;
-
       const codeClean = String(r.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
       if (!codeClean) return;
 
@@ -625,38 +645,50 @@ exports.getFailedCoursesForRetake = async (req, res) => {
 
     const failedMap = new Map();
 
-    for (const [codeClean, records] of resultsByCourse.entries()) {
+    for (const [codeClean, rawCourseRecords] of resultsByCourse.entries()) {
+      // If Final result exists, prefer Final records over Midterm records
+      const finalRecords = rawCourseRecords.filter((r) => r.resultType === "Final");
+      const recordsToEvaluate = finalRecords.length > 0 ? finalRecords : rawCourseRecords;
+
       // Check if ANY published result for this course code is PASSED
-      const hasPassedResult = records.some((r) => {
+      const hasPassedResult = recordsToEvaluate.some((r) => {
         const lg = String(r.letterGrade || "").trim().toUpperCase();
         const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
 
-        // If letterGrade is explicitly F or FAIL, or gradePoint is 0, it is NOT passed!
-        if (lg === "F" || lg === "FAIL" || (gp !== null && !isNaN(gp) && gp === 0)) {
+        // If gradePoint is explicitly 0, or letterGrade is F/FAIL/0, it is NOT passed!
+        if ((gp !== null && !isNaN(gp) && gp === 0) || lg === "F" || lg === "FAIL" || lg === "0") {
           return false;
         }
 
+        // Any result record with gradePoint > 0 is PASSED
         if (gp !== null && !isNaN(gp) && gp > 0) return true;
-        if (lg && lg !== "F" && lg !== "-" && lg !== "0" && lg !== "FAIL") return true;
 
-        const tot = r.totalMarks !== null && r.totalMarks !== undefined ? Number(r.totalMarks) : null;
-        if (tot !== null && !isNaN(tot) && tot >= 40) return true;
+        // If letterGrade is a passing grade, it is PASSED
+        if (["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "D", "P"].includes(lg)) return true;
 
         return false;
       });
 
       if (!hasPassedResult) {
-        // Pick the latest failed record for retake registration
-        const latestFailedDoc = records.sort(
+        // Pick the latest released failed record for retake registration
+        const latestDoc = recordsToEvaluate.sort(
           (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0)
         )[0];
-        if (latestFailedDoc) {
-          failedMap.set(codeClean, latestFailedDoc);
+
+        if (latestDoc) {
+          const lg = String(latestDoc.letterGrade || "").trim().toUpperCase();
+          const gp = latestDoc.gradePoint !== null && latestDoc.gradePoint !== undefined ? Number(latestDoc.gradePoint) : null;
+
+          const isFailed = (gp !== null && !isNaN(gp) && gp === 0) || lg === "F" || lg === "FAIL" || lg === "0";
+
+          if (isFailed) {
+            failedMap.set(codeClean, latestDoc);
+          }
         }
       }
     }
 
-    // Remove courses already requested for retake
+    // Remove courses already requested for retake (which appear in Retake Registration Status table)
     const existingRetakes = await RetakeRequest.find({
       $or: [
         { student: studentUser._id || studentUser.id },

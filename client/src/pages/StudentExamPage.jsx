@@ -1121,7 +1121,7 @@ export default function StudentExamPage({
                                     className="status-badge ontime"
                                     style={{ marginLeft: 8 }}
                                   >
-                                    {sub.totalMarksObtained}/{exam?.totalMarks} ({sub.percentage}%)
+                                    {sub.totalMarksObtained}/{exam?.totalMarks}
                                   </span>
                                   {showShortPending && (
                                     <span
@@ -1136,18 +1136,6 @@ export default function StudentExamPage({
                                       }}
                                     >
                                       Short Answer Grading Pending
-                                    </span>
-                                  )}
-                                  {sub.aiPercentage > 0 && (
-                                    <span
-                                      className={`status-badge ${sub.aiPercentage >= 50 ? "late" : "ontime"}`}
-                                      style={{
-                                        display: "block",
-                                        marginTop: 4,
-                                        fontSize: 11,
-                                      }}
-                                    >
-                                      AI: {sub.aiPercentage}%
                                     </span>
                                   )}
                                   {sub.reason && (
@@ -1247,20 +1235,8 @@ export default function StudentExamPage({
                     className="status-badge ontime"
                     style={{ fontSize: 18, fontWeight: 700 }}
                   >
-                    {selectedSubmission.totalMarksObtained}/{selectedSubmission.examId?.totalMarks} ({selectedSubmission.percentage}%)
+                    {selectedSubmission.totalMarksObtained}/{selectedSubmission.examId?.totalMarks}
                   </span>
-                  {selectedSubmission.aiPercentage > 0 && (
-                    <span
-                      className={`status-badge ${selectedSubmission.aiPercentage >= 50 ? "late" : "ontime"}`}
-                      style={{
-                        display: "block",
-                        marginTop: 6,
-                        fontSize: 12,
-                      }}
-                    >
-                      AI Probability: {selectedSubmission.aiPercentage}%
-                    </span>
-                  )}
                 </div>
               </div>
 

@@ -539,7 +539,16 @@ exports.uploadMarksheet = async (req, res) => {
       const totalMarks = getNum(totalColIndex);
 
       // Find matching User model object
-      const studentUser = await User.findOne({ studentId: studentIdNumber, role: "student" });
+      let studentUser = await User.findOne({ studentId: studentIdNumber, role: "student" });
+      if (!studentUser && studentIdNumber.length >= 5) {
+        const suffix = studentIdNumber.slice(-5);
+        studentUser = await User.findOne({
+          studentId: { $regex: new RegExp(`${suffix}$`, "i") },
+          role: "student"
+        });
+      }
+
+      const finalStudentIdNumber = studentUser ? studentUser.studentId : studentIdNumber;
       const studentId = studentUser ? studentUser._id : null;
 
       // Try dropping legacy unique index if still present in MongoDB
@@ -551,7 +560,7 @@ exports.uploadMarksheet = async (req, res) => {
       let record;
       try {
         record = await Assessment.create({
-          studentIdNumber,
+          studentIdNumber: finalStudentIdNumber,
           studentId,
           courseCode,
           level,
@@ -687,6 +696,26 @@ exports.getStudentAssessments = async (req, res) => {
       status: "Approved"
     }).lean();
 
+    // Fetch student's retakes (Approved, Paid, or Completed)
+    const RetakeRequest = require("../models/RetakeRequest");
+    const approvedRetakes = await RetakeRequest.find({
+      $and: [
+        {
+          $or: [
+            { student: studentObjId },
+            ...(effStudentId ? [{ studentId: effStudentId }] : []),
+            ...(studentIdStr ? [{ studentId: studentIdStr }] : [])
+          ]
+        },
+        {
+          $or: [
+            { status: { $in: ["Approved", "Paid", "Completed"] } },
+            { paymentStatus: "Paid" }
+          ]
+        }
+      ]
+    }).lean();
+
     const approvedLevelTerms = new Set();
     const approvedCourseCodes = new Set();
 
@@ -706,6 +735,20 @@ exports.getStudentAssessments = async (req, res) => {
       });
     });
 
+    (approvedRetakes || []).forEach((retake) => {
+      const lDigit = (retake.level || "").replace(/\D/g, "");
+      const tDigit = (retake.term || "").replace(/\D/g, "");
+      if (lDigit && tDigit) {
+        approvedLevelTerms.add(`Level ${lDigit} - Term ${tDigit}`);
+        approvedLevelTerms.add(`Level ${lDigit} Term ${tDigit}`);
+        approvedLevelTerms.add(`L${lDigit}T${tDigit}`);
+        approvedLevelTerms.add(`${lDigit}-${tDigit}`);
+        approvedLevelTerms.add(`${lDigit}_${tDigit}`);
+      }
+      const codeClean = (retake.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      if (codeClean) approvedCourseCodes.add(codeClean);
+    });
+
     const rawAssessments = await Assessment.find({
       $or: [
         { studentIdNumber: effStudentId },
@@ -717,9 +760,12 @@ exports.getStudentAssessments = async (req, res) => {
       .sort({ courseCode: 1 })
       .lean();
 
-    // STRICT FILTER: If student has no approved registration for a course / Level-Term, DO NOT SHOW assessment marks!
+    // STRICT FILTER: If student has no approved registration/retake for a course / Level-Term, DO NOT SHOW assessment marks!
     const filteredAssessments = rawAssessments.filter((asm) => {
-      if (approvedRegs.length === 0) return false;
+      // If assessment record was uploaded directly matching this student's ObjectId, allow it!
+      if (asm.studentId && asm.studentId.toString() === studentObjId.toString()) return true;
+
+      if (approvedRegs.length === 0 && approvedRetakes.length === 0) return false;
 
       const codeClean = (asm.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
       const asmLDigit = (asm.level || "").replace(/\D/g, "");

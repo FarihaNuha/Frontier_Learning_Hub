@@ -532,7 +532,11 @@ export default function StudentAcademicResultsPage() {
                                     <td style={{ padding: "12px 14px" }}>{renderVal(r.finalPartB)}</td>
                                     <td style={{ padding: "12px 14px" }}>{renderVal(r.attendance)}</td>
                                     <td style={{ padding: "12px 14px" }}>{renderVal(r.continuousAssessment)}</td>
-                                    <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>{renderVal(r.totalMarks)}</td>
+                                    <td style={{ padding: "12px 14px", fontWeight: 700, color: "#0f172a" }}>
+                                      {(r.totalMarks !== null && r.totalMarks !== undefined && Number(r.totalMarks) > 0)
+                                        ? r.totalMarks
+                                        : (((Number(r.midPartA) || 0) + (Number(r.midPartB) || 0) + (Number(r.finalPartA) || 0) + (Number(r.finalPartB) || 0) + (Number(r.attendance) || 0) + (Number(r.continuousAssessment) || 0)) || renderVal(r.totalMarks))}
+                                    </td>
                                     <td style={{ padding: "12px 14px", fontWeight: 800, color: courseGPAVal === "-" ? "#64748b" : "#16a34a" }}>
                                       {courseGPAVal}
                                     </td>

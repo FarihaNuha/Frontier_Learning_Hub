@@ -180,7 +180,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_dom",
-      "community": 12,
+      "community": 165,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -190,7 +190,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "testing_library_dom",
-      "community": 12,
+      "community": 165,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 12,
+      "community": 146,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 12,
+      "community": 146,
       "norm_label": "docx-preview"
     },
     {
@@ -300,7 +300,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "client_package_dependencies_jspdf",
-      "community": 146,
+      "community": 12,
       "norm_label": "jspdf"
     },
     {
@@ -310,7 +310,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "jspdf",
-      "community": 146,
+      "community": 12,
       "norm_label": "jspdf"
     },
     {
@@ -340,7 +340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_dependencies_jszip",
-      "community": 151,
+      "community": 154,
       "norm_label": "jszip"
     },
     {
@@ -350,7 +350,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_json_jszip",
-      "community": 151,
+      "community": 154,
       "norm_label": "jszip"
     },
     {
@@ -380,7 +380,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "client_package_dependencies_react_dom",
-      "community": 156,
+      "community": 12,
       "norm_label": "react-dom"
     },
     {
@@ -390,7 +390,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "react_dom",
-      "community": 156,
+      "community": 12,
       "norm_label": "react-dom"
     },
     {
@@ -400,7 +400,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_package_dependencies_react_hot_toast",
-      "community": 12,
+      "community": 164,
       "norm_label": "react-hot-toast"
     },
     {
@@ -410,7 +410,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "react_hot_toast",
-      "community": 12,
+      "community": 164,
       "norm_label": "react-hot-toast"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "client_package_dependencies_react_router_dom",
-      "community": 165,
+      "community": 156,
       "norm_label": "react-router-dom"
     },
     {
@@ -450,7 +450,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "react_router_dom",
-      "community": 165,
+      "community": 156,
       "norm_label": "react-router-dom"
     },
     {
@@ -460,7 +460,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "client_package_dependencies_react_scripts",
-      "community": 164,
+      "community": 12,
       "norm_label": "react-scripts"
     },
     {
@@ -470,7 +470,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "react_scripts",
-      "community": 164,
+      "community": 12,
       "norm_label": "react-scripts"
     },
     {
@@ -2487,7 +2487,7 @@
       "label": "RTC_CONFIG",
       "file_type": "code",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L40",
+      "source_location": "L41",
       "_origin": "ast",
       "id": "client_src_pages_messagepage_rtc_config",
       "community": 4,
@@ -2497,7 +2497,7 @@
       "label": "MessagePage()",
       "file_type": "code",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "client_src_pages_messagepage_messagepage",
       "community": 4,
@@ -8360,7 +8360,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware",
-      "community": 111,
+      "community": 151,
       "norm_label": "authmiddleware.js"
     },
     {
@@ -8370,7 +8370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_jwt",
-      "community": 111,
+      "community": 151,
       "norm_label": "jwt"
     },
     {
@@ -8380,7 +8380,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_user",
-      "community": 111,
+      "community": 151,
       "norm_label": "user"
     },
     {
@@ -10260,7 +10260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes",
-      "community": 148,
+      "community": 151,
       "norm_label": "adminroutes.js"
     },
     {
@@ -10270,7 +10270,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes_router",
-      "community": 148,
+      "community": 151,
       "norm_label": "router"
     },
     {
@@ -10280,7 +10280,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_adminroutes_verifytoken_checkrole",
-      "community": 148,
+      "community": 151,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10290,7 +10290,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_adminroutes_ctrl",
-      "community": 148,
+      "community": 151,
       "norm_label": "ctrl"
     },
     {
@@ -10300,7 +10300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 154,
+      "community": 138,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -10310,7 +10310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 154,
+      "community": 138,
       "norm_label": "router"
     },
     {
@@ -10320,7 +10320,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 154,
+      "community": 138,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10330,7 +10330,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 154,
+      "community": 138,
       "norm_label": "ctrl"
     },
     {
@@ -10610,7 +10610,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes",
-      "community": 138,
+      "community": 148,
       "norm_label": "examroutes.js"
     },
     {
@@ -10620,7 +10620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes_router",
-      "community": 138,
+      "community": 148,
       "norm_label": "router"
     },
     {
@@ -10630,7 +10630,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_examroutes_verifytoken_checkrole",
-      "community": 138,
+      "community": 148,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10640,7 +10640,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_examroutes_ctrl",
-      "community": 138,
+      "community": 148,
       "norm_label": "ctrl"
     },
     {
@@ -21165,7 +21165,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L54",
+      "source_location": "L55",
       "weight": 1.0,
       "source": "client_src_pages_messagepage_messagepage",
       "target": "client_src_contexts_authcontext_useauth"
@@ -22985,7 +22985,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "weight": 1.0,
       "source": "client_src_pages_messagepage",
       "target": "client_src_pages_messagepage_messagepage",
@@ -22995,7 +22995,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L40",
+      "source_location": "L41",
       "weight": 1.0,
       "source": "client_src_pages_messagepage",
       "target": "client_src_pages_messagepage_rtc_config",
@@ -32475,7 +32475,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/resultController.js",
-      "source_location": "L2705",
+      "source_location": "L2711",
       "weight": 1.0,
       "source": "server_controllers_resultcontroller_batchupdatemarks",
       "target": "server_controllers_resultcontroller_calculategradeandgpfromtotal",
@@ -43376,5 +43376,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e8adcbd5c115ef443889c04736c9556ef4971960"
+  "built_at_commit": "1b5b02d81121248eb0043ffbfc30776cb20257a1"
 }

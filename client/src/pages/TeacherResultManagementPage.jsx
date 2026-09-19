@@ -123,6 +123,7 @@ export default function TeacherResultManagementPage() {
           attendance: r.attendance ?? "",
           continuousAssessment: r.continuousAssessment ?? "",
           totalMarks: r.totalMarks ?? "",
+          gradePoint: r.gradePoint ?? r.letterGrade ?? r.gpa ?? "",
         };
       });
       setEditableRowMarks(initMap);
@@ -134,14 +135,18 @@ export default function TeacherResultManagementPage() {
       const existing = prev[resultId] || {};
       const updatedRow = { ...existing, [field]: val };
 
-      // Calculate total marks live
-      const midA = Number(field === "midPartA" ? val : updatedRow.midPartA) || 0;
-      const midB = Number(field === "midPartB" ? val : updatedRow.midPartB) || 0;
-      const ftA = Number(field === "finalPartA" ? val : updatedRow.finalPartA) || 0;
-      const ftB = Number(field === "finalPartB" ? val : updatedRow.finalPartB) || 0;
-      const att = Number(field === "attendance" ? val : updatedRow.attendance) || 0;
-      const cont = Number(field === "continuousAssessment" ? val : updatedRow.continuousAssessment) || 0;
-      updatedRow.totalMarks = midA + midB + ftA + ftB + att + cont;
+      // Calculate total marks live if part marks change, unless totalMarks was directly edited
+      if (field !== "totalMarks" && field !== "gradePoint") {
+        const midA = Number(field === "midPartA" ? val : updatedRow.midPartA) || 0;
+        const midB = Number(field === "midPartB" ? val : updatedRow.midPartB) || 0;
+        const ftA = Number(field === "finalPartA" ? val : updatedRow.finalPartA) || 0;
+        const ftB = Number(field === "finalPartB" ? val : updatedRow.finalPartB) || 0;
+        const att = Number(field === "attendance" ? val : updatedRow.attendance) || 0;
+        const cont = Number(field === "continuousAssessment" ? val : updatedRow.continuousAssessment) || 0;
+        if (midA || midB || ftA || ftB || att || cont) {
+          updatedRow.totalMarks = midA + midB + ftA + ftB + att + cont;
+        }
+      }
 
       return {
         ...prev,
@@ -1567,12 +1572,27 @@ export default function TeacherResultManagementPage() {
                               />
                             </td>
                           )}
-                          <td style={{ padding: "10px 12px", fontWeight: 800, color: "#0f172a", fontSize: "14px" }}>
-                            {rowData.totalMarks ?? r.totalMarks ?? "-"}
+                          <td style={{ padding: "8px 12px" }}>
+                            <input
+                              type="number"
+                              value={rowData.totalMarks ?? ""}
+                              onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "totalMarks", e.target.value)}
+                              readOnly={isViewBatchDeadlinePassed}
+                              disabled={isViewBatchDeadlinePassed}
+                              style={{ width: "70px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 700, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto", color: "#0f172a" }}
+                            />
                           </td>
                           {viewBatch.resultType === "Final" && (
-                            <td style={{ padding: "10px 12px", fontWeight: 700, color: "#16a34a" }}>
-                              {r.gradePoint ?? r.letterGrade ?? (r.gpa || "-")}
+                            <td style={{ padding: "8px 12px" }}>
+                              <input
+                                type="text"
+                                value={rowData.gradePoint ?? ""}
+                                onChange={(e) => !isViewBatchDeadlinePassed && handleCellMarkChange(r._id, "gradePoint", e.target.value)}
+                                readOnly={isViewBatchDeadlinePassed}
+                                disabled={isViewBatchDeadlinePassed}
+                                placeholder="e.g. 4.00"
+                                style={{ width: "75px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "13px", fontWeight: 700, background: isViewBatchDeadlinePassed ? "#f1f5f9" : "#fff", cursor: isViewBatchDeadlinePassed ? "not-allowed" : "auto", color: "#16a34a" }}
+                              />
                             </td>
                           )}
                         </tr>

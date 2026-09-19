@@ -18,7 +18,6 @@ const examSchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    enum: ["EDTE", "IRE", "Software", "Cyber", "DataScience", "General"],
     required: true,
   },
   duration: { type: Number, required: true, min: 1, max: 180 },

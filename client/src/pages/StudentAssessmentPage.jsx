@@ -136,12 +136,16 @@ export default function StudentAssessmentPage() {
   const rawAssessments = courseId
     ? (courseInfo
         ? assessments.filter(
-            (a) => (a.courseCode || "").trim().toLowerCase() === (courseInfo.displayCode || "").trim().toLowerCase()
+            (a) =>
+              (a.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase() ===
+              (courseInfo.displayCode || courseInfo.courseCode || courseInfo.name || "")
+                .replace(/[^a-zA-Z0-9]/g, "")
+                .toLowerCase()
           )
         : [])
     : assessments;
 
-  const displayedAssessments = selectedLevelTerm === "All"
+  const displayedAssessments = (selectedLevelTerm === "All" || courseId)
     ? rawAssessments
     : rawAssessments.filter((a) => {
         const lvlTermStr = (a.levelTerm || a.level || "").toLowerCase();
@@ -160,6 +164,14 @@ export default function StudentAssessmentPage() {
     const targetL = Math.ceil(cardIndex / 2);
     const targetT = cardIndex % 2 === 1 ? 1 : 2;
 
+    // 1. Any assessment record present for this Level & Term? Unlocked!
+    const hasAssessment = rawAssessments.some((a) => {
+      const lt = (a.levelTerm || a.level || "").toLowerCase();
+      return lt.includes(String(targetL)) && lt.includes(String(targetT));
+    });
+    if (hasAssessment) return true;
+
+    // 2. Any approved registration or retake for this level & term? Unlocked!
     const regs = studentInfo?.registrations || [];
     const hasApprovedReg = regs.some((r) => {
       const rL = Number(String(r.level || "").replace(/[^0-9]/g, ""));
@@ -167,8 +179,16 @@ export default function StudentAssessmentPage() {
       const isAppr = r.status === "Approved" || r.status === "Registered";
       return rL === targetL && rT === targetT && isAppr;
     });
+    if (hasApprovedReg) return true;
 
-    return hasApprovedReg;
+    // 3. Current or previous level/term? Unlocked!
+    const currentL = studentInfo?.student?.currentLevel || studentInfo?.currentLevel || 1;
+    const currentT = studentInfo?.student?.currentTerm || studentInfo?.currentTerm || 1;
+    if (targetL < currentL || (targetL === currentL && targetT <= currentT)) {
+      return true;
+    }
+
+    return false;
   };
 
   return (

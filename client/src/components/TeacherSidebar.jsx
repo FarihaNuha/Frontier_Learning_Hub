@@ -125,7 +125,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
           <h3>{user?.name || "Teacher"}</h3>
           {user?.department && (
             <p style={{ fontWeight: 600, color: "#3B8DB3" }}>
-              {user.department}
+              {String(user.department).replace(/geneal/i, "General")}
             </p>
           )}
           <p className="user-email" style={{ fontSize: 12, color: "#6B89A0", marginTop: 4 }}>

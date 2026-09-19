@@ -180,7 +180,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_dom",
-      "community": 156,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -190,7 +190,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "testing_library_dom",
-      "community": 156,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 149,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 149,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -380,7 +380,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "client_package_dependencies_react_dom",
-      "community": 12,
+      "community": 156,
       "norm_label": "react-dom"
     },
     {
@@ -390,7 +390,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "react_dom",
-      "community": 12,
+      "community": 156,
       "norm_label": "react-dom"
     },
     {
@@ -400,7 +400,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_package_dependencies_react_hot_toast",
-      "community": 152,
+      "community": 12,
       "norm_label": "react-hot-toast"
     },
     {
@@ -410,7 +410,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "react_hot_toast",
-      "community": 152,
+      "community": 12,
       "norm_label": "react-hot-toast"
     },
     {
@@ -420,7 +420,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "client_package_dependencies_react_icons",
-      "community": 12,
+      "community": 144,
       "norm_label": "react-icons"
     },
     {
@@ -430,7 +430,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "react_icons",
-      "community": 12,
+      "community": 144,
       "norm_label": "react-icons"
     },
     {
@@ -460,7 +460,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "client_package_dependencies_react_scripts",
-      "community": 12,
+      "community": 165,
       "norm_label": "react-scripts"
     },
     {
@@ -470,7 +470,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "react_scripts",
-      "community": 12,
+      "community": 165,
       "norm_label": "react-scripts"
     },
     {
@@ -1400,7 +1400,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal",
-      "community": 144,
+      "community": 4,
       "norm_label": "filepreviewmodal.jsx"
     },
     {
@@ -1410,7 +1410,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal_filepreviewmodal",
-      "community": 144,
+      "community": 4,
       "norm_label": "filepreviewmodal()"
     },
     {
@@ -1510,7 +1510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_paymentcheckoutmodal",
-      "community": 138,
+      "community": 0,
       "norm_label": "paymentcheckoutmodal.jsx"
     },
     {
@@ -1520,7 +1520,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "client_src_components_paymentcheckoutmodal_paymentcheckoutmodal",
-      "community": 138,
+      "community": 0,
       "norm_label": "paymentcheckoutmodal()"
     },
     {
@@ -1530,7 +1530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_registrationinvoicemodal",
-      "community": 138,
+      "community": 0,
       "norm_label": "registrationinvoicemodal.jsx"
     },
     {
@@ -1540,7 +1540,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_src_components_registrationinvoicemodal_registrationinvoicemodal",
-      "community": 138,
+      "community": 0,
       "norm_label": "registrationinvoicemodal()"
     },
     {
@@ -1680,7 +1680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext",
-      "community": 21,
+      "community": 52,
       "norm_label": "authcontext.jsx"
     },
     {
@@ -1690,7 +1690,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_authcontext",
-      "community": 21,
+      "community": 52,
       "norm_label": "authcontext"
     },
     {
@@ -1700,7 +1700,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_getsocketurl",
-      "community": 21,
+      "community": 52,
       "norm_label": "getsocketurl()"
     },
     {
@@ -1710,7 +1710,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_getactivestatussetting",
-      "community": 21,
+      "community": 52,
       "norm_label": "getactivestatussetting()"
     },
     {
@@ -1720,7 +1720,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_authprovider",
-      "community": 21,
+      "community": 52,
       "norm_label": "authprovider()"
     },
     {
@@ -2240,7 +2240,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_courseanalyticspage",
-      "community": 21,
+      "community": 0,
       "norm_label": "courseanalyticspage.jsx"
     },
     {
@@ -2250,7 +2250,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "client_src_pages_courseanalyticspage_courseanalyticspage",
-      "community": 21,
+      "community": 134,
       "norm_label": "courseanalyticspage()"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity",
-      "community": 144,
+      "community": 4,
       "norm_label": "coursecommunity.jsx"
     },
     {
@@ -2270,7 +2270,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_rendercontentwithlinks",
-      "community": 144,
+      "community": 4,
       "norm_label": "rendercontentwithlinks()"
     },
     {
@@ -2280,7 +2280,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursecommunity",
-      "community": 144,
+      "community": 4,
       "norm_label": "coursecommunity()"
     },
     {
@@ -2290,7 +2290,7 @@
       "source_location": "L460",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_getfileurl",
-      "community": 144,
+      "community": 4,
       "norm_label": "getfileurl()"
     },
     {
@@ -2300,7 +2300,7 @@
       "source_location": "L472",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderattachments",
-      "community": 144,
+      "community": 4,
       "norm_label": "renderattachments()"
     },
     {
@@ -2310,7 +2310,7 @@
       "source_location": "L581",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderlectureattachment",
-      "community": 144,
+      "community": 4,
       "norm_label": "renderlectureattachment()"
     },
     {
@@ -2320,7 +2320,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_commentitem",
-      "community": 144,
+      "community": 4,
       "norm_label": "commentitem()"
     },
     {
@@ -2330,7 +2330,7 @@
       "source_location": "L859",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursepostcard",
-      "community": 144,
+      "community": 4,
       "norm_label": "coursepostcard()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_location": "L1286",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_editpostmodal",
-      "community": 144,
+      "community": 4,
       "norm_label": "editpostmodal()"
     },
     {
@@ -2390,7 +2390,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_coursedashboard",
-      "community": 0,
+      "community": 134,
       "norm_label": "coursedashboard.jsx"
     },
     {
@@ -2450,7 +2450,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage",
-      "community": 138,
+      "community": 0,
       "norm_label": "courseregistrationpage.jsx"
     },
     {
@@ -2460,7 +2460,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "client_src_pages_courseregistrationpage_fixed_registration_fees",
-      "community": 138,
+      "community": 0,
       "norm_label": "fixed_registration_fees"
     },
     {
@@ -2480,7 +2480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_messagepage",
-      "community": 4,
+      "community": 21,
       "norm_label": "messagepage.jsx"
     },
     {
@@ -2490,7 +2490,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "client_src_pages_messagepage_rtc_config",
-      "community": 4,
+      "community": 21,
       "norm_label": "rtc_config"
     },
     {
@@ -2500,7 +2500,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "client_src_pages_messagepage_messagepage",
-      "community": 4,
+      "community": 21,
       "norm_label": "messagepage()"
     },
     {
@@ -2510,7 +2510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_notificationspage",
-      "community": 21,
+      "community": 0,
       "norm_label": "notificationspage.jsx"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "client_src_pages_notificationspage_notificationspage",
-      "community": 21,
+      "community": 134,
       "norm_label": "notificationspage()"
     },
     {
@@ -2600,7 +2600,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_settingspage",
-      "community": 21,
+      "community": 0,
       "norm_label": "settingspage.jsx"
     },
     {
@@ -2660,7 +2660,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentassessmentpage",
-      "community": 134,
+      "community": 0,
       "norm_label": "studentassessmentpage.jsx"
     },
     {
@@ -2680,7 +2680,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentassignmentpage",
-      "community": 0,
+      "community": 52,
       "norm_label": "studentassignmentpage.jsx"
     },
     {
@@ -2690,7 +2690,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "client_src_pages_studentassignmentpage_studentassignmentpage",
-      "community": 0,
+      "community": 52,
       "norm_label": "studentassignmentpage()"
     },
     {
@@ -2700,7 +2700,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentattendancepage",
-      "community": 0,
+      "community": 134,
       "norm_label": "studentattendancepage.jsx"
     },
     {
@@ -2710,7 +2710,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "client_src_pages_studentattendancepage_studentattendancepage",
-      "community": 0,
+      "community": 134,
       "norm_label": "studentattendancepage()"
     },
     {
@@ -2720,7 +2720,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentdashboard",
-      "community": 0,
+      "community": 52,
       "norm_label": "studentdashboard.jsx"
     },
     {
@@ -2730,7 +2730,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "client_src_pages_studentdashboard_studentdashboard",
-      "community": 0,
+      "community": 52,
       "norm_label": "studentdashboard()"
     },
     {
@@ -2750,7 +2750,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "client_src_pages_studentexampage_studentexampage",
-      "community": 0,
+      "community": 134,
       "norm_label": "studentexampage()"
     },
     {
@@ -2760,7 +2760,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentleveltermpage",
-      "community": 138,
+      "community": 0,
       "norm_label": "studentleveltermpage.jsx"
     },
     {
@@ -2770,7 +2770,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_src_pages_studentleveltermpage_studentleveltermpage",
-      "community": 138,
+      "community": 0,
       "norm_label": "studentleveltermpage()"
     },
     {
@@ -2800,7 +2800,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentregistrationpaymentpage",
-      "community": 138,
+      "community": 0,
       "norm_label": "studentregistrationpaymentpage.jsx"
     },
     {
@@ -2810,7 +2810,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_src_pages_studentregistrationpaymentpage_fixed_registration_fees",
-      "community": 138,
+      "community": 0,
       "norm_label": "fixed_registration_fees"
     },
     {
@@ -2970,7 +2970,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_teacherexampage",
-      "community": 21,
+      "community": 134,
       "norm_label": "teacherexampage.jsx"
     },
     {
@@ -2980,7 +2980,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "client_src_pages_teacherexampage_teacherexampage",
-      "community": 21,
+      "community": 134,
       "norm_label": "teacherexampage()"
     },
     {
@@ -2990,7 +2990,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "client_src_pages_teacherexampage_rationale_35",
-      "community": 21,
+      "community": 134,
       "norm_label": "important: url \u09a5\u09c7\u0995\u09c7 \u0986\u09b8\u09be courseid \u09ac\u09af\u09ac\u09b9\u09be\u09b0 \u0995\u09b0\u09c1\u09a8"
     },
     {
@@ -3020,7 +3020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_teacherregistrationapprovalpage",
-      "community": 138,
+      "community": 0,
       "norm_label": "teacherregistrationapprovalpage.jsx"
     },
     {
@@ -3030,7 +3030,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "client_src_pages_teacherregistrationapprovalpage_teacherregistrationapprovalpage",
-      "community": 138,
+      "community": 0,
       "norm_label": "teacherregistrationapprovalpage()"
     },
     {
@@ -3120,7 +3120,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_services_api",
-      "community": 18,
+      "community": 0,
       "norm_label": "api.js"
     },
     {
@@ -3130,7 +3130,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "client_src_services_api_getbackendurl",
-      "community": 18,
+      "community": 0,
       "norm_label": "getbackendurl()"
     },
     {
@@ -3140,7 +3140,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "client_src_services_api_backend_url",
-      "community": 0,
+      "community": 52,
       "norm_label": "backend_url"
     },
     {
@@ -3190,7 +3190,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "client_src_services_apicache_clearallcache",
-      "community": 21,
+      "community": 52,
       "norm_label": "clearallcache()"
     },
     {
@@ -4917,7 +4917,7 @@
       "label": "getTeacherAssessments()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L791",
+      "source_location": "L754",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_getteacherassessments",
       "community": 72,
@@ -4927,7 +4927,7 @@
       "label": "deleteCourseAssessment()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L809",
+      "source_location": "L772",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_deletecourseassessment",
       "community": 72,
@@ -4937,7 +4937,7 @@
       "label": "deleteSingleAssessment()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L868",
+      "source_location": "L831",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_deletesingleassessment",
       "community": 72,
@@ -4947,7 +4947,7 @@
       "label": "setAssessmentCorrectionDeadline()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L902",
+      "source_location": "L865",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_setassessmentcorrectiondeadline",
       "community": 72,
@@ -8370,7 +8370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware",
-      "community": 151,
+      "community": 152,
       "norm_label": "authmiddleware.js"
     },
     {
@@ -8380,7 +8380,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_jwt",
-      "community": 151,
+      "community": 152,
       "norm_label": "jwt"
     },
     {
@@ -8390,7 +8390,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_user",
-      "community": 151,
+      "community": 152,
       "norm_label": "user"
     },
     {
@@ -10250,7 +10250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes",
-      "community": 148,
+      "community": 152,
       "norm_label": "academicroutes.js"
     },
     {
@@ -10260,7 +10260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes_router",
-      "community": 148,
+      "community": 152,
       "norm_label": "router"
     },
     {
@@ -10270,7 +10270,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_academicroutes_verifytoken_checkrole",
-      "community": 148,
+      "community": 152,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10280,7 +10280,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_academicroutes_ctrl",
-      "community": 148,
+      "community": 152,
       "norm_label": "ctrl"
     },
     {
@@ -10330,7 +10330,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 146,
+      "community": 148,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -10340,7 +10340,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 146,
+      "community": 148,
       "norm_label": "router"
     },
     {
@@ -10350,7 +10350,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 146,
+      "community": 148,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10360,7 +10360,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 146,
+      "community": 148,
       "norm_label": "ctrl"
     },
     {
@@ -10470,7 +10470,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes",
-      "community": 78,
+      "community": 138,
       "norm_label": "attendanceroutes.js"
     },
     {
@@ -10480,7 +10480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_router",
-      "community": 78,
+      "community": 138,
       "norm_label": "router"
     },
     {
@@ -10490,7 +10490,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_verifytoken_checkrole",
-      "community": 78,
+      "community": 138,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10500,7 +10500,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_ctrl",
-      "community": 78,
+      "community": 138,
       "norm_label": "ctrl"
     },
     {
@@ -10640,7 +10640,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes",
-      "community": 147,
+      "community": 78,
       "norm_label": "examroutes.js"
     },
     {
@@ -10650,7 +10650,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes_router",
-      "community": 147,
+      "community": 78,
       "norm_label": "router"
     },
     {
@@ -10660,7 +10660,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_examroutes_verifytoken_checkrole",
-      "community": 147,
+      "community": 78,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10670,7 +10670,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_examroutes_ctrl",
-      "community": 147,
+      "community": 78,
       "norm_label": "ctrl"
     },
     {
@@ -26709,7 +26709,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L809",
+      "source_location": "L772",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_deletecourseassessment",
@@ -26719,7 +26719,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L868",
+      "source_location": "L831",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_deletesingleassessment",
@@ -26759,7 +26759,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L791",
+      "source_location": "L754",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_getteacherassessments",
@@ -26789,7 +26789,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L902",
+      "source_location": "L865",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_setassessmentcorrectiondeadline",

@@ -44,11 +44,16 @@ exports.createExam = async (req, res) => {
       totalMarks += q.marks;
     });
 
+    let cleanDept = String(department || "").trim();
+    if (cleanDept.toLowerCase() === "geneal") {
+      cleanDept = "General";
+    }
+
     const exam = await Exam.create({
       title,
       course,
       courseId: courseId || null,
-      department,
+      department: cleanDept,
       duration,
       questions,
       totalMarks,

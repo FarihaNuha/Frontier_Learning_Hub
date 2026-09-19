@@ -635,12 +635,39 @@ export default function StudentAssignmentPage({
                             <FiClock size={12} /> {timeInfo.text}
                           </span>
                           {submission && (
-                            <span
-                              className={`status-badge ${submission.isLate ? "late" : "ontime"}`}
-                            >
-                              <FiCheckCircle size={12} />{" "}
-                              {submission.isLate ? "Late" : "Submitted"}
-                            </span>
+                            <>
+                              <span
+                                className={`status-badge ${submission.isLate ? "late" : "ontime"}`}
+                              >
+                                <FiCheckCircle size={12} />{" "}
+                                {submission.isLate ? "Late" : "Submitted"}
+                              </span>
+                              {submission.marks !== null && submission.marks !== undefined ? (
+                                <span
+                                  className="status-badge ontime"
+                                  style={{
+                                    background: "#ECFDF5",
+                                    color: "#059669",
+                                    fontWeight: 700,
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  Graded: {submission.marks}/{assignment.totalMarks || 100}
+                                </span>
+                              ) : (
+                                <span
+                                  className="status-badge"
+                                  style={{
+                                    background: "#FEF3C7",
+                                    color: "#D97706",
+                                    fontWeight: 600,
+                                    fontSize: "11px",
+                                  }}
+                                >
+                                  Pending Grading
+                                </span>
+                              )}
+                            </>
                           )}
                           {!submission && !subEnabled && (
                             <span className="status-badge late">
@@ -811,6 +838,31 @@ export default function StudentAssignmentPage({
                   {existingSubmission.comment && (
                     <p style={{ fontSize: 13, color: "#6B89A0", marginTop: 4 }}>
                       Comment: {existingSubmission.comment}
+                    </p>
+                  )}
+
+                  {existingSubmission.marks !== null && existingSubmission.marks !== undefined ? (
+                    <div
+                      style={{
+                        marginTop: 10,
+                        padding: 12,
+                        background: "#DCFCE7",
+                        borderRadius: 8,
+                        border: "1px solid #86EFAC",
+                      }}
+                    >
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#166534" }}>
+                        Obtained Grade: {existingSubmission.marks} / {selectedAssignment.totalMarks || 100}
+                      </p>
+                      {existingSubmission.feedback && (
+                        <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#15803D" }}>
+                          <strong>Teacher Feedback:</strong> {existingSubmission.feedback}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: 13, color: "#D97706", fontWeight: 600, marginTop: 8, marginBottom: 0 }}>
+                      Grading Status: Pending Teacher Evaluation
                     </p>
                   )}
                 </div>

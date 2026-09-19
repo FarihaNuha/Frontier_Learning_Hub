@@ -21,8 +21,13 @@ const startScheduler = require("./scheduler/deadlineReminder");
 // Connect to MongoDB
 connectDB();
 
+const compression = require("compression");
+
 const app = express();
 const server = http.createServer(app);
+
+// Enable Gzip/Brotli response compression for ultra-fast payloads
+app.use(compression({ level: 6, threshold: 512 }));
 
 // Initialize Socket.IO
 initSocket(server);
@@ -136,12 +141,15 @@ const restoreMissingFileFromDB = async (filename, targetFilePath) => {
   return false;
 };
 
-// Static files - uploads folder (with inline Content-Disposition for browser preview)
+// Static files - uploads folder (with inline Content-Disposition for browser preview & 1 day cache)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
+  maxAge: "1d",
+  etag: true,
   setHeaders: (res, filePath) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Cache-Control", "public, max-age=86400, must-revalidate");
     const ext = path.extname(filePath).toLowerCase();
     const inlineTypes = [".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4", ".webm", ".ogg", ".mp3", ".wav"];
     if (inlineTypes.includes(ext)) {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { invalidateCache } from "./apiCache";
 
 const getBackendUrl = () => {
   if (process.env.REACT_APP_API_URL) {
@@ -35,9 +36,23 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Response interceptor - DON'T auto logout on 401
+// Response interceptor - DON'T auto logout on 401 & auto-invalidate cache on mutations
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const method = response.config?.method?.toLowerCase();
+    if (["post", "put", "delete", "patch"].includes(method)) {
+      const url = response.config?.url || "";
+      if (url.includes("assignments")) invalidateCache("assignments");
+      if (url.includes("assessments")) invalidateCache("assessments");
+      if (url.includes("exams")) invalidateCache("exams");
+      if (url.includes("courses")) invalidateCache("courses");
+      if (url.includes("results")) invalidateCache("results");
+      if (url.includes("attendance")) invalidateCache("attendance");
+      if (url.includes("academic")) invalidateCache("academic");
+      if (url.includes("notifications")) invalidateCache("notifications");
+    }
+    return response;
+  },
   (error) => {
     // Just log the error, don't redirect to login
     console.error("API Error:", error.response?.status, error.config?.url);

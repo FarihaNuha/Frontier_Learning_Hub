@@ -2235,10 +2235,27 @@ exports.getStudentPublishedResults = async (req, res) => {
     });
 
     publishedResults = publishedResults.filter((r) => {
-      if (r.scheduledPublishDate && new Date(r.scheduledPublishDate) > nowTime) {
-        return false;
+      // Midterm results are directly visible to students upon teacher upload/update
+      if (r.resultType === "Midterm") {
+        return true;
       }
-      return true;
+
+      // Final results require Admin release (status === "Published") or scheduled release date reached
+      let uBatch = r.uploadId ? allUploads.find(u => u._id.toString() === r.uploadId.toString()) : null;
+      if (!uBatch && r.courseCode) {
+        const cleanC = r.courseCode.replace(/\s+/g, "").toUpperCase();
+        uBatch = allUploads.find(u =>
+          u.courseCode.replace(/\s+/g, "").toUpperCase() === cleanC &&
+          u.session === r.session &&
+          (u.resultType || "Final") === (r.resultType || "Final")
+        );
+      }
+
+      const isPublished = r.status === "Published" || uBatch?.status === "Published";
+      const isSchedReleased = (r.scheduledPublishDate && new Date(r.scheduledPublishDate) <= nowTime) ||
+                              (uBatch?.scheduledPublishDate && new Date(uBatch.scheduledPublishDate) <= nowTime);
+
+      return isPublished || isSchedReleased;
     });
 
     // STRICT FILTER: Fetch student's APPROVED registrations ONLY
@@ -2684,14 +2701,20 @@ exports.batchUpdateMarks = async (req, res) => {
         if (item.continuousAssessment !== undefined) rDoc.continuousAssessment = parseOptionalNumber(item.continuousAssessment);
         if (item.totalMarks !== undefined) rDoc.totalMarks = parseOptionalNumber(item.totalMarks);
 
-        // Recalculate total if individual marks updated
+        // Recalculate total if individual marks updated, unless totalMarks is explicitly provided in payload
         const midSum = (Number(rDoc.midPartA) || 0) + (Number(rDoc.midPartB) || 0);
         const finalSum = (rDoc.finalPartA !== null || rDoc.finalPartB !== null) 
           ? ((Number(rDoc.finalPartA) || 0) + (Number(rDoc.finalPartB) || 0))
           : (Number(rDoc.finalExam) || 0);
         const attSum = (Number(rDoc.attendance) || 0);
         const contSum = (Number(rDoc.continuousAssessment) || 0);
-        rDoc.totalMarks = midSum + finalSum + attSum + contSum;
+        const partsSum = midSum + finalSum + attSum + contSum;
+
+        if (item.totalMarks !== undefined && item.totalMarks !== null && item.totalMarks !== "") {
+          rDoc.totalMarks = parseOptionalNumber(item.totalMarks);
+        } else {
+          rDoc.totalMarks = partsSum;
+        }
 
         if (item.gradePoint !== undefined && item.gradePoint !== null && item.gradePoint !== "") {
           rDoc.gradePoint = parseOptionalNumber(item.gradePoint);
@@ -2700,14 +2723,28 @@ exports.batchUpdateMarks = async (req, res) => {
           rDoc.letterGrade = String(item.letterGrade).trim().toUpperCase();
         }
 
-        // Auto-sync gradePoint and letterGrade from totalMarks for Final results
+        // Auto-sync gradePoint and letterGrade from totalMarks for Final results if not explicitly provided
         if (rDoc.resultType === "Final" || rDoc.finalPartA !== null || rDoc.finalPartB !== null) {
           const autoGrade = calculateGradeAndGPFromTotal(rDoc.totalMarks);
           if (item.gradePoint === undefined || item.gradePoint === null || item.gradePoint === "") {
             rDoc.gradePoint = autoGrade.gradePoint;
           }
-          if (item.letterGrade === undefined || item.letterGrade === null || item.letterGrade === "" || (rDoc.letterGrade === "F" && autoGrade.gradePoint > 0)) {
-            rDoc.letterGrade = autoGrade.letterGrade;
+          if (item.letterGrade === undefined || item.letterGrade === null || item.letterGrade === "" || rDoc.letterGrade === "F") {
+            if (autoGrade.letterGrade && autoGrade.letterGrade !== "F") {
+              rDoc.letterGrade = autoGrade.letterGrade;
+            } else if (rDoc.gradePoint !== null && Number(rDoc.gradePoint) > 0) {
+              const gpNum = Number(rDoc.gradePoint);
+              if (gpNum >= 4.0) rDoc.letterGrade = "A+";
+              else if (gpNum >= 3.75) rDoc.letterGrade = "A";
+              else if (gpNum >= 3.5) rDoc.letterGrade = "A-";
+              else if (gpNum >= 3.25) rDoc.letterGrade = "B+";
+              else if (gpNum >= 3.0) rDoc.letterGrade = "B";
+              else if (gpNum >= 2.75) rDoc.letterGrade = "B-";
+              else if (gpNum >= 2.5) rDoc.letterGrade = "C+";
+              else if (gpNum >= 2.25) rDoc.letterGrade = "C";
+              else if (gpNum >= 2.0) rDoc.letterGrade = "D";
+              else rDoc.letterGrade = "P";
+            }
           }
         }
 

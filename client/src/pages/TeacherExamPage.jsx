@@ -724,28 +724,6 @@ export default function TeacherExamPage({
                       >
                         {sub.totalMarksObtained} / {selectedExam.totalMarks}
                       </span>
-                      <span
-                        style={{
-                          fontSize: 12,
-                          color: "#6B89A0",
-                          display: "block",
-                        }}
-                      >
-                        ({sub.percentage}%)
-                      </span>
-                      {sub.aiPercentage !== undefined &&
-                        sub.aiPercentage !== null && (
-                          <span
-                            className={`status-badge ${sub.aiPercentage >= 50 ? "late" : "ontime"}`}
-                            style={{
-                              display: "block",
-                              marginTop: 4,
-                              fontSize: 11,
-                            }}
-                          >
-                            AI: {sub.aiPercentage}%
-                          </span>
-                        )}
                     </div>
                   </div>
 

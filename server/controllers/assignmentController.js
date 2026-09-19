@@ -29,12 +29,17 @@ exports.createAssignment = async (req, res) => {
         .json({ error: "Please provide all required fields" });
     }
 
+    let cleanDept = String(department || "").trim();
+    if (cleanDept.toLowerCase() === "geneal") {
+      cleanDept = "General";
+    }
+
     const assignmentData = {
       title,
       description: description || "",
       course,
       courseId: courseId || null,
-      department,
+      department: cleanDept,
       deadline: new Date(deadline),
       totalMarks: totalMarks || 100,
       createdBy: req.user.uid,

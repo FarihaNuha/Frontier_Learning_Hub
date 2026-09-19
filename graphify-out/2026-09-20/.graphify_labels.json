@@ -145,10 +145,7 @@
   "143": "registrationPaymentRoutes.js",
   "144": "react-scripts",
   "145": "jspdf",
-  "146": "announcementRoutes.js",
-  "147": "examRoutes.js",
   "148": "run_recalculate.js",
-  "149": "docx-preview",
   "150": "test_login_activation.js",
   "151": "test_assignment_controller.js",
   "152": "authMiddleware.js",
@@ -163,5 +160,6 @@
   "161": "test_plagiarism_local.js",
   "162": "reset_db.js",
   "163": "test_view.js",
+  "165": "examRoutes.js",
   "166": "xlsx"
 }

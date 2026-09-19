@@ -317,43 +317,16 @@ exports.getStudentAcademicProfile = async (req, res) => {
       ? await AcademicProfile.findOne({ $or: profileOrConditions }).lean()
       : null;
 
-    let retakes = profileOrConditions.length > 0
-      ? await RetakeRequest.find({ $or: profileOrConditions }).lean()
+    const retakesOrConditions = [
+      ...(userId ? [{ student: userId }] : []),
+      ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
+      ...(emailLower ? [{ studentEmail: emailLower }] : []),
+      ...(emailLower ? [{ email: emailLower }] : []),
+    ];
+
+    const retakes = retakesOrConditions.length > 0
+      ? await RetakeRequest.find({ $or: retakesOrConditions }).sort({ createdAt: -1 }).lean()
       : [];
-
-    if (retakes.length > 0) {
-      const studentAllResults = await Result.find({
-        status: { $ne: "Deleted" },
-        isDeleted: { $ne: true },
-        $or: [
-          ...(userId ? [{ student: userId }] : []),
-          ...(studentIdStr ? [{ studentId: studentIdStr }] : []),
-          ...(emailLower ? [{ studentEmail: emailLower }] : []),
-        ],
-      }).lean();
-
-      const passedCourseCodes = new Set();
-      studentAllResults.forEach((r) => {
-        if (r.resultType === "Midterm") return;
-        const codeClean = String(r.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-        const lg = String(r.letterGrade || "").trim().toUpperCase();
-        const gp = r.gradePoint !== null && r.gradePoint !== undefined ? Number(r.gradePoint) : null;
-
-        if (lg === "F" || lg === "FAIL" || (gp !== null && !isNaN(gp) && gp === 0)) {
-          return;
-        }
-
-        const tot = r.totalMarks !== null && r.totalMarks !== undefined ? Number(r.totalMarks) : null;
-        if ((gp !== null && !isNaN(gp) && gp > 0) || (lg && lg !== "F" && lg !== "-" && lg !== "0" && lg !== "FAIL") || (tot !== null && !isNaN(tot) && tot >= 40)) {
-          if (codeClean) passedCourseCodes.add(codeClean);
-        }
-      });
-
-      retakes = retakes.filter((rr) => {
-        const codeClean = String(rr.courseCode || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-        return !passedCourseCodes.has(codeClean);
-      });
-    }
 
     const studentDept = studentProfile?.department || req.user.department || activeReg?.department || "EDTE";
 

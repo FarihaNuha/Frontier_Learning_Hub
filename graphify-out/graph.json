@@ -180,7 +180,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_dom",
-      "community": 164,
+      "community": 165,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -190,7 +190,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "testing_library_dom",
-      "community": 164,
+      "community": 165,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 161,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 161,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "client_package_dependencies_jspdf_autotable",
-      "community": 12,
+      "community": 154,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -330,7 +330,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "jspdf_autotable",
-      "community": 12,
+      "community": 154,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -340,7 +340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_dependencies_jszip",
-      "community": 151,
+      "community": 12,
       "norm_label": "jszip"
     },
     {
@@ -350,7 +350,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_json_jszip",
-      "community": 151,
+      "community": 12,
       "norm_label": "jszip"
     },
     {
@@ -380,7 +380,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "client_package_dependencies_react_dom",
-      "community": 12,
+      "community": 156,
       "norm_label": "react-dom"
     },
     {
@@ -390,7 +390,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "react_dom",
-      "community": 12,
+      "community": 156,
       "norm_label": "react-dom"
     },
     {
@@ -400,7 +400,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_package_dependencies_react_hot_toast",
-      "community": 156,
+      "community": 164,
       "norm_label": "react-hot-toast"
     },
     {
@@ -410,7 +410,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "react_hot_toast",
-      "community": 156,
+      "community": 164,
       "norm_label": "react-hot-toast"
     },
     {
@@ -420,7 +420,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "client_package_dependencies_react_icons",
-      "community": 12,
+      "community": 161,
       "norm_label": "react-icons"
     },
     {
@@ -430,7 +430,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "react_icons",
-      "community": 12,
+      "community": 161,
       "norm_label": "react-icons"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "client_package_dependencies_react_router_dom",
-      "community": 165,
+      "community": 12,
       "norm_label": "react-router-dom"
     },
     {
@@ -450,7 +450,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "react_router_dom",
-      "community": 165,
+      "community": 12,
       "norm_label": "react-router-dom"
     },
     {
@@ -2487,7 +2487,7 @@
       "label": "RTC_CONFIG",
       "file_type": "code",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L40",
+      "source_location": "L41",
       "_origin": "ast",
       "id": "client_src_pages_messagepage_rtc_config",
       "community": 4,
@@ -2497,7 +2497,7 @@
       "label": "MessagePage()",
       "file_type": "code",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "client_src_pages_messagepage_messagepage",
       "community": 4,
@@ -4587,7 +4587,7 @@
       "label": "getStudentTranscript()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L499",
+      "source_location": "L472",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getstudenttranscript",
       "community": 28,
@@ -4597,7 +4597,7 @@
       "label": "getFailedCoursesForRetake()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L616",
+      "source_location": "L589",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getfailedcoursesforretake",
       "community": 28,
@@ -4607,7 +4607,7 @@
       "label": "submitRetakeRequest()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L710",
+      "source_location": "L683",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_submitretakerequest",
       "community": 42,
@@ -4617,7 +4617,7 @@
       "label": "payRetakeFee()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L819",
+      "source_location": "L792",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_payretakefee",
       "community": 42,
@@ -4627,7 +4627,7 @@
       "label": "getTeacherRetakeRequests()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L947",
+      "source_location": "L920",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getteacherretakerequests",
       "community": 28,
@@ -4637,7 +4637,7 @@
       "label": "processRetakeRequest()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L982",
+      "source_location": "L955",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_processretakerequest",
       "community": 42,
@@ -4647,7 +4647,7 @@
       "label": "promoteStudentsBatch()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1042",
+      "source_location": "L1015",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_promotestudentsbatch",
       "community": 42,
@@ -4657,7 +4657,7 @@
       "label": "graduateStudent()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1153",
+      "source_location": "L1126",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_graduatestudent",
       "community": 42,
@@ -4667,7 +4667,7 @@
       "label": "getStudentDashboardStats()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1187",
+      "source_location": "L1160",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getstudentdashboardstats",
       "community": 28,
@@ -4677,7 +4677,7 @@
       "label": "getTeacherDashboardStats()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1204",
+      "source_location": "L1177",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getteacherdashboardstats",
       "community": 28,
@@ -4687,7 +4687,7 @@
       "label": "getAdminDashboardStats()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1232",
+      "source_location": "L1205",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getadmindashboardstats",
       "community": 28,
@@ -4697,7 +4697,7 @@
       "label": "getAuditLogs()",
       "file_type": "code",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1255",
+      "source_location": "L1228",
       "_origin": "ast",
       "id": "server_controllers_academiccontroller_getauditlogs",
       "community": 28,
@@ -8360,7 +8360,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware",
-      "community": 152,
+      "community": 111,
       "norm_label": "authmiddleware.js"
     },
     {
@@ -8370,7 +8370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_jwt",
-      "community": 152,
+      "community": 111,
       "norm_label": "jwt"
     },
     {
@@ -8380,7 +8380,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_user",
-      "community": 152,
+      "community": 111,
       "norm_label": "user"
     },
     {
@@ -10220,7 +10220,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes",
-      "community": 148,
+      "community": 152,
       "norm_label": "academicroutes.js"
     },
     {
@@ -10230,7 +10230,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes_router",
-      "community": 148,
+      "community": 152,
       "norm_label": "router"
     },
     {
@@ -10240,7 +10240,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_academicroutes_verifytoken_checkrole",
-      "community": 148,
+      "community": 152,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10250,7 +10250,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_academicroutes_ctrl",
-      "community": 148,
+      "community": 152,
       "norm_label": "ctrl"
     },
     {
@@ -10260,7 +10260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes",
-      "community": 152,
+      "community": 151,
       "norm_label": "adminroutes.js"
     },
     {
@@ -10270,7 +10270,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes_router",
-      "community": 152,
+      "community": 151,
       "norm_label": "router"
     },
     {
@@ -10280,7 +10280,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_adminroutes_verifytoken_checkrole",
-      "community": 152,
+      "community": 151,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10290,7 +10290,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_adminroutes_ctrl",
-      "community": 152,
+      "community": 151,
       "norm_label": "ctrl"
     },
     {
@@ -10300,7 +10300,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 154,
+      "community": 148,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -10310,7 +10310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 154,
+      "community": 148,
       "norm_label": "router"
     },
     {
@@ -10320,7 +10320,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 154,
+      "community": 148,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10330,7 +10330,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 154,
+      "community": 148,
       "norm_label": "ctrl"
     },
     {
@@ -21165,7 +21165,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L54",
+      "source_location": "L55",
       "weight": 1.0,
       "source": "client_src_pages_messagepage_messagepage",
       "target": "client_src_contexts_authcontext_useauth"
@@ -22985,7 +22985,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "weight": 1.0,
       "source": "client_src_pages_messagepage",
       "target": "client_src_pages_messagepage_messagepage",
@@ -22995,7 +22995,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L40",
+      "source_location": "L41",
       "weight": 1.0,
       "source": "client_src_pages_messagepage",
       "target": "client_src_pages_messagepage_rtc_config",
@@ -25744,7 +25744,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1232",
+      "source_location": "L1205",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_getadmindashboardstats",
@@ -25754,7 +25754,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1255",
+      "source_location": "L1228",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_getauditlogs",
@@ -25764,7 +25764,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L616",
+      "source_location": "L589",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_getfailedcoursesforretake",
@@ -25794,7 +25794,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1187",
+      "source_location": "L1160",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_getstudentdashboardstats",
@@ -25804,7 +25804,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L499",
+      "source_location": "L472",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_getstudenttranscript",
@@ -25814,7 +25814,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1204",
+      "source_location": "L1177",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_getteacherdashboardstats",
@@ -25824,7 +25824,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L947",
+      "source_location": "L920",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_getteacherretakerequests",
@@ -25834,7 +25834,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1153",
+      "source_location": "L1126",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_graduatestudent",
@@ -25854,7 +25854,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L819",
+      "source_location": "L792",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_payretakefee",
@@ -25864,7 +25864,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L982",
+      "source_location": "L955",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_processretakerequest",
@@ -25874,7 +25874,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1042",
+      "source_location": "L1015",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_promotestudentsbatch",
@@ -25924,7 +25924,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L710",
+      "source_location": "L683",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller",
       "target": "server_controllers_academiccontroller_submitretakerequest",
@@ -26208,7 +26208,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1236",
+      "source_location": "L1209",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_getadmindashboardstats",
       "target": "server_controllers_academiccontroller_department"
@@ -26218,7 +26218,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L590",
+      "source_location": "L563",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_getstudenttranscript",
       "target": "server_controllers_academiccontroller_createauditlog",
@@ -26229,7 +26229,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1178",
+      "source_location": "L1151",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_graduatestudent",
       "target": "server_controllers_academiccontroller_createauditlog",
@@ -26240,7 +26240,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L933",
+      "source_location": "L906",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_payretakefee",
       "target": "server_controllers_academiccontroller_createauditlog",
@@ -26251,7 +26251,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1022",
+      "source_location": "L995",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_processretakerequest",
       "target": "server_controllers_academiccontroller_createauditlog",
@@ -26262,7 +26262,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1143",
+      "source_location": "L1116",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_promotestudentsbatch",
       "target": "server_controllers_academiccontroller_createauditlog",
@@ -26273,7 +26273,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L789",
+      "source_location": "L762",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_submitretakerequest",
       "target": "server_controllers_academiccontroller_createauditlog",
@@ -26339,7 +26339,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L546",
+      "source_location": "L519",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_getstudenttranscript",
       "target": "server_controllers_academiccontroller_computegradepoint",
@@ -26361,7 +26361,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1189",
+      "source_location": "L1162",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_getstudentdashboardstats",
       "target": "server_controllers_academiccontroller_calculatestudentcgpa",
@@ -26372,7 +26372,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L511",
+      "source_location": "L484",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_getstudenttranscript",
       "target": "server_controllers_academiccontroller_calculatestudentcgpa",
@@ -26384,7 +26384,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L803",
+      "source_location": "L776",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_submitretakerequest",
       "target": "server_socket_getio"
@@ -26395,7 +26395,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/academicController.js",
-      "source_location": "L1032",
+      "source_location": "L1005",
       "weight": 1.0,
       "source": "server_controllers_academiccontroller_processretakerequest",
       "target": "server_socket_getio"
@@ -43376,5 +43376,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "917be64e3db557d404a2a3413fcd67ca86000da5"
+  "built_at_commit": "e8adcbd5c115ef443889c04736c9556ef4971960"
 }

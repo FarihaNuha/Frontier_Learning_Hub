@@ -1,7 +1,7 @@
 # Graph Report - UFTB_Moodle  (2026-09-19)
 
 ## Corpus Check
-- 277 files · ~241,731 words
+- 277 files · ~241,522 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `917be64e`
+- Built from commit: `e8adcbd5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -258,7 +258,7 @@ Nodes (18): concurrently, author, dependencies, concurrently, nodemon, descripti
 
 ### Community 12 - "dependencies"
 Cohesion: 0.11
-Nodes (19): dependencies, axios, jspdf-autotable, react-hot-toast, react-icons, socket.io-client, @testing-library/dom, @testing-library/jest-dom (+11 more)
+Nodes (19): dependencies, axios, docx-preview, jspdf-autotable, react-hot-toast, socket.io-client, @testing-library/dom, @testing-library/jest-dom (+11 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.08
@@ -549,8 +549,8 @@ Cohesion: 0.30
 Nodes (4): PaymentCheckoutModal(), RegistrationInvoiceModal(), FIXED_REGISTRATION_FEES, FIXED_REGISTRATION_FEES
 
 ### Community 111 - "docx-preview"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.29
+Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
 
 ### Community 112 - "courseController.js"
 Cohesion: 0.40
@@ -629,8 +629,12 @@ Cohesion: 0.33
 Nodes (9): FilePreviewModal(), CommentItem(), CourseCommunity(), CoursePostCard(), EditPostModal(), getFileUrl(), renderAttachments(), renderContentWithLinks() (+1 more)
 
 ### Community 152 - "authMiddleware.js"
-Cohesion: 0.29
-Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
+
+### Community 154 - "react-dom"
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 155 - "Course.js"
 Cohesion: 0.22
@@ -643,10 +647,6 @@ Nodes (4): dns, mongoose, path, Teacher
 ### Community 163 - "test_view.js"
 Cohesion: 0.17
 Nodes (9): mongoose, resultSchema, dns, mongoose, Notice, path, Result, ResultUpload (+1 more)
-
-### Community 164 - "academicRoutes.js"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ## Knowledge Gaps
 - **856 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `name`, `version` (+851 more)

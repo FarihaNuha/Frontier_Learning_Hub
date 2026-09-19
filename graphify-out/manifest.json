@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/MessagePage.jsx": {
-    "mtime": 1789484268.2537436,
-    "ast_hash": "42ed723fc9f5e0dd864a8e5f629c745f",
+    "mtime": 1789807396.2247283,
+    "ast_hash": "adcfbc2e4ec3821feae41decc405501c",
     "semantic_hash": ""
   },
   "client/src/pages/PostDetailPage.jsx": {
@@ -790,8 +790,8 @@
     "semantic_hash": ""
   },
   "server/controllers/academicController.js": {
-    "mtime": 1789758557.2163842,
-    "ast_hash": "5df7be4d34bfe4e45160a89c24e3113f",
+    "mtime": 1789804559.759338,
+    "ast_hash": "b16361dbd5211f53032ff4e290e9ce67",
     "semantic_hash": ""
   },
   "server/models/AcademicProfile.js": {

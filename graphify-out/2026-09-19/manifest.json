@@ -140,8 +140,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssessmentPage.jsx": {
-    "mtime": 1789734176.2166922,
-    "ast_hash": "f88630df1239341b54159156662bbaf8",
+    "mtime": 1789760415.6069152,
+    "ast_hash": "5edc7bba983aae4117ce3bbcd6fdf98a",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "server/controllers/courseController.js": {
-    "mtime": 1789759636.6079392,
-    "ast_hash": "d28bbf8f265f5fad9c5a35007e3bad11",
+    "mtime": 1789759845.0604248,
+    "ast_hash": "32976f758e4e6dceed6440640150f170",
     "semantic_hash": ""
   },
   "server/controllers/examController.js": {
@@ -790,8 +790,8 @@
     "semantic_hash": ""
   },
   "server/controllers/academicController.js": {
-    "mtime": 1789758557.2163842,
-    "ast_hash": "5df7be4d34bfe4e45160a89c24e3113f",
+    "mtime": 1789804559.759338,
+    "ast_hash": "b16361dbd5211f53032ff4e290e9ce67",
     "semantic_hash": ""
   },
   "server/models/AcademicProfile.js": {

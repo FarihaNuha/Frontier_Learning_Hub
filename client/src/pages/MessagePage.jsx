@@ -33,6 +33,7 @@ import {
   FiInbox,
   FiMonitor,
   FiBookOpen,
+  FiCalendar,
 } from "react-icons/fi";
 import "../styles/community.css";
 

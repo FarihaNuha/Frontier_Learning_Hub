@@ -62,7 +62,19 @@ jobs:
           chmod +x android/gradlew
 
       - name: Sync Capacitor Android
-        run: npx cap sync android --verbose || echo "Assets pre-synced directly"
+        run: |
+          mkdir -p android/capacitor-cordova-android-plugins
+          npx cap sync android --verbose || echo "Assets pre-synced directly"
+          if [ ! -f android/capacitor-cordova-android-plugins/cordova.variables.gradle ]; then
+            cat << 'EOF' > android/capacitor-cordova-android-plugins/cordova.variables.gradle
+          // Fallback cordova.variables.gradle
+          ext {
+            cdvMinSdkVersion = project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
+            cdvPluginPostBuildExtras = []
+            cordovaConfig = [:]
+          }
+          EOF
+          fi
 
       - name: Build Debug APK
         working-directory: ./android

@@ -43,15 +43,15 @@ jobs:
           DISABLE_ESLINT_PLUGIN: "true"
           GENERATE_SOURCEMAP: "false"
 
-      - name: Sync Capacitor Android
-        run: npx cap sync android
-
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
       - name: Build Debug APK
         working-directory: ./android
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace --no-daemon
 
       - name: Prepare APK Output
         run: |
@@ -85,7 +85,7 @@ jobs:
             
             #### 📥 Direct Download:
             Click the link below to download the APK directly to your phone:
-            **[Download UniCore-app.apk](https://github.com/FarihaNuha/Frontier_Learning_Academy/releases/download/v1.0.0-apk/UniCore-app.apk)**
+            **[Download UniCore-app.apk](https://github.com/FarihaNuha/Frontier_Learning_Hub/releases/download/v1.0.0-apk/UniCore-app.apk)**
           files: release-output/UniCore-app.apk
           draft: false
           prerelease: false

@@ -5,8 +5,8 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "client/package.json": {
-    "mtime": 1790762000.7506661,
-    "ast_hash": "146d9c6f754b88ec669722275206ed30",
+    "mtime": 1784659047.6964276,
+    "ast_hash": "71196e464c614879df1746347a24c079",
     "semantic_hash": ""
   },
   "client/public/manifest.json": {
@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "client/src/App.jsx": {
-    "mtime": 1790762107.1649818,
-    "ast_hash": "e4597ac96a9f9afe14b77db91d17671a",
+    "mtime": 1789460237.0687628,
+    "ast_hash": "c727271653e337fc6cc3b038ec08c8de",
     "semantic_hash": ""
   },
   "client/src/components/GlobalNotificationBell.jsx": {
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/MessagePage.jsx": {
-    "mtime": 1790761713.5993884,
-    "ast_hash": "582c565be7f3c2e9289a9e5a6f038807",
+    "mtime": 1789807396.2247283,
+    "ast_hash": "adcfbc2e4ec3821feae41decc405501c",
     "semantic_hash": ""
   },
   "client/src/pages/PostDetailPage.jsx": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssignmentPage.jsx": {
-    "mtime": 1789929302.082003,
-    "ast_hash": "19fe4e48aefe8bed7f79296b36c75442",
+    "mtime": 1789928091.0726502,
+    "ast_hash": "52ecfb24f606b75537e68ee617bb69ad",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAttendancePage.jsx": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentDashboard.jsx": {
-    "mtime": 1789929302.0935493,
-    "ast_hash": "811b308fbe5e9816856267c7fe33cc5e",
+    "mtime": 1789928040.0874946,
+    "ast_hash": "13b28faff0b46a0fa8e5dec91cff1ef9",
     "semantic_hash": ""
   },
   "client/src/pages/StudentExamPage.jsx": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1789929302.078999,
-    "ast_hash": "3218ddd4fbfecd6754a06ee13fad41f8",
+    "mtime": 1789928100.1412475,
+    "ast_hash": "6dc18d923a4eda5744dee5dd937b23ea",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1789929302.0905302,
-    "ast_hash": "404bf04c7639e94a46c240717009745e",
+    "mtime": 1789928049.3547506,
+    "ast_hash": "b6a51924e9c1e803a310cfd77de77258",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1790762776.5699203,
-    "ast_hash": "8f2ec79cd39555ca1fdd1903de658eaa",
+    "mtime": 1784659047.7169993,
+    "ast_hash": "d9b342d692f5cfbf32ca8ef9a0c39049",
     "semantic_hash": ""
   },
   "scratch/test_view.js": {
@@ -210,13 +210,13 @@
     "semantic_hash": ""
   },
   "server/controllers/authController.js": {
-    "mtime": 1790761967.4897983,
-    "ast_hash": "320b2c89c853b1fd0401eee5dd14c4bb",
+    "mtime": 1789392511.5647745,
+    "ast_hash": "5a04ad2e6d368c25a0ecb5b23c722bea",
     "semantic_hash": ""
   },
   "server/controllers/communityController.js": {
-    "mtime": 1790762015.8073344,
-    "ast_hash": "674e83da2d805947a20984a48489452e",
+    "mtime": 1786126525.9022784,
+    "ast_hash": "46fe86bfe9a1811c5ae555b55da334d9",
     "semantic_hash": ""
   },
   "server/controllers/courseController.js": {
@@ -230,8 +230,8 @@
     "semantic_hash": ""
   },
   "server/controllers/lectureController.js": {
-    "mtime": 1789929302.100034,
-    "ast_hash": "c37275bde6990ec94950e1a0bc367468",
+    "mtime": 1789928021.9543512,
+    "ast_hash": "8c68abab9182fce57fa43fc278c7c868",
     "semantic_hash": ""
   },
   "server/controllers/notificationController.js": {
@@ -335,8 +335,8 @@
     "semantic_hash": ""
   },
   "server/package.json": {
-    "mtime": 1790762190.9846845,
-    "ast_hash": "8543ba9b3225868d9728bb6d9e40a1ff",
+    "mtime": 1789852889.5558953,
+    "ast_hash": "fea32e4d4dd582cdb20fcdeebf6e8d14",
     "semantic_hash": ""
   },
   "server/query_lectures.js": {
@@ -365,9 +365,9 @@
     "semantic_hash": ""
   },
   "server/routes/authRoutes.js": {
-    "mtime": 1790761978.523836,
-    "ast_hash": "fb93814976f43a711f9496cc6ab22916",
-    "semantic_hash": ""
+    "mtime": 1784188241.5714748,
+    "ast_hash": "cf17f25ccac007ba347a137c8c878fab",
+    "semantic_hash": "cf17f25ccac007ba347a137c8c878fab"
   },
   "server/routes/communityRoutes.js": {
     "mtime": 1784887580.6441445,
@@ -535,8 +535,8 @@
     "semantic_hash": ""
   },
   "client/src/components/FilePreviewModal.jsx": {
-    "mtime": 1789929302.0870078,
-    "ast_hash": "60bca11bfbbd0885c24da5bbe4495962",
+    "mtime": 1789928068.191639,
+    "ast_hash": "47c4e2b81adaaec29ceff815d07cb96a",
     "semantic_hash": ""
   },
   "client/src/pages/NotificationsPage.jsx": {
@@ -550,38 +550,38 @@
     "semantic_hash": ""
   },
   "client/src/components/AdminSidebar.jsx": {
-    "mtime": 1790761456.9918966,
-    "ast_hash": "016dbb0272707858db3f347c627a97a4",
+    "mtime": 1789325503.2942402,
+    "ast_hash": "89b734157952562ac099b6d09bb862d5",
     "semantic_hash": ""
   },
   "client/src/pages/AdminAdvisers.jsx": {
-    "mtime": 1790761512.6498747,
-    "ast_hash": "f86678e163e099c67788e0c2e34f9c03",
+    "mtime": 1789659837.5040352,
+    "ast_hash": "78314d31000df4c2e1375e5fa66587b7",
     "semantic_hash": ""
   },
   "client/src/pages/AdminCourses.jsx": {
-    "mtime": 1790761542.5502765,
-    "ast_hash": "cd696c31c1061b39083f6d1762a9b351",
+    "mtime": 1789483281.8542042,
+    "ast_hash": "2d824a84a9041847cc744368e52c2bed",
     "semantic_hash": ""
   },
   "client/src/pages/AdminDashboard.jsx": {
-    "mtime": 1790761505.1248317,
-    "ast_hash": "a9104f1b644bceadcb65f8ee90b696e0",
+    "mtime": 1789483182.0528731,
+    "ast_hash": "8e27f6726ef5f4ad6660e8b5e31e1cbc",
     "semantic_hash": ""
   },
   "client/src/pages/AdminSettings.jsx": {
-    "mtime": 1790761621.8887737,
-    "ast_hash": "09a22239468cb6cf2864c486fb146a09",
+    "mtime": 1789483182.0590482,
+    "ast_hash": "11fbb2c7715c5d56592f20f7c89eb55a",
     "semantic_hash": ""
   },
   "client/src/pages/AdminStudents.jsx": {
-    "mtime": 1790761631.6356776,
-    "ast_hash": "7b306d29e0c9733c48e847a0bf115d7e",
+    "mtime": 1789659805.840973,
+    "ast_hash": "04bb7da679127e002a6ca735034851cc",
     "semantic_hash": ""
   },
   "client/src/pages/AdminTeachers.jsx": {
-    "mtime": 1790761641.1548603,
-    "ast_hash": "c0c9c38fec82e6fdae485002276693d5",
+    "mtime": 1789659894.3806338,
+    "ast_hash": "d45ff4faa4ae47452c912c39e5d628f5",
     "semantic_hash": ""
   },
   "server/controllers/umsAdminController.js": {
@@ -635,23 +635,23 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminPaymentManagement.jsx": {
-    "mtime": 1790761562.3544092,
-    "ast_hash": "3814ca146bfddc44673026598447afa8",
+    "mtime": 1789483281.8569627,
+    "ast_hash": "28f937a343317f93cd56a60a5345cdd9",
     "semantic_hash": ""
   },
   "client/src/pages/AdminRegistrationCalendar.jsx": {
-    "mtime": 1790761577.0448685,
-    "ast_hash": "6200cabc84f3b9c2d99d717c9c7fcd1d",
+    "mtime": 1789483281.8596542,
+    "ast_hash": "559d6d12bd74737be09f54747df2c7bb",
     "semantic_hash": ""
   },
   "client/src/pages/AdminRegistrationList.jsx": {
-    "mtime": 1790761588.2463186,
-    "ast_hash": "a72b058ef0be5449b72426d6a3a6cdc7",
+    "mtime": 1789483281.861326,
+    "ast_hash": "276ff67030e6ad23bc88fd2f61f0552a",
     "semantic_hash": ""
   },
   "client/src/pages/AdminResultManagementPage.jsx": {
-    "mtime": 1790761609.9952037,
-    "ast_hash": "4f1153b553951117d94859890a1d5adc",
+    "mtime": 1789675317.7523105,
+    "ast_hash": "13d121e5629b6238ff988a03fd283e91",
     "semantic_hash": ""
   },
   "client/src/pages/CourseRegistrationPage.jsx": {
@@ -760,13 +760,13 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminAuditLogsPage.jsx": {
-    "mtime": 1790761524.435458,
-    "ast_hash": "86e53e87e9341f1b71441fe43304e5f4",
+    "mtime": 1789483281.8527582,
+    "ast_hash": "1ee10d850c66ebe55365296588c05f4d",
     "semantic_hash": ""
   },
   "client/src/pages/AdminProgressionPage.jsx": {
-    "mtime": 1790761570.5149076,
-    "ast_hash": "2bb8611a90fabba424795135441b2fc6",
+    "mtime": 1789484972.998794,
+    "ast_hash": "367c466389b7c1db77e1e1b3bb47f50c",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAcademicProfilePage.jsx": {
@@ -835,13 +835,13 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminCalendarManagementPage.jsx": {
-    "mtime": 1790761533.1672785,
-    "ast_hash": "9d80e71c5cdec44aea3f045a9007e099",
+    "mtime": 1789483182.051769,
+    "ast_hash": "9749282b9df907859cedcd761fa7e433",
     "semantic_hash": ""
   },
   "client/src/pages/AdminNoticeManagementPage.jsx": {
-    "mtime": 1790761551.6038444,
-    "ast_hash": "49347bf161ff5a7f5ae51e8fefa9533c",
+    "mtime": 1789483182.0541515,
+    "ast_hash": "e3f772f98fb18c8929c37d0060c66842",
     "semantic_hash": ""
   },
   "server/controllers/academicCalendarController.js": {
@@ -875,8 +875,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/AdminRegistrationPaymentPage.jsx": {
-    "mtime": 1790761596.31173,
-    "ast_hash": "e644591dd90725d9e99e04a66aad991b",
+    "mtime": 1789483281.86307,
+    "ast_hash": "50f138b5842f86a3e793fc72de05bf0b",
     "semantic_hash": ""
   },
   "client/src/pages/StudentRegistrationPaymentPage.jsx": {
@@ -1382,451 +1382,6 @@
   "server/scratch/test_fee_calc.js": {
     "mtime": 1789666010.0832503,
     "ast_hash": "6e7a2fe7feed889cc8aeb6ed2bb6c81f",
-    "semantic_hash": ""
-  },
-  "android/app/build.gradle": {
-    "mtime": 1790764272.739862,
-    "ast_hash": "877c248de3afa76e2421ce7c46d48690",
-    "semantic_hash": ""
-  },
-  "android/app/capacitor.build.gradle": {
-    "mtime": 1790763466.0325112,
-    "ast_hash": "75b5496f2adae541d30128ccbc950797",
-    "semantic_hash": ""
-  },
-  "android/app/google-services.json": {
-    "mtime": 1790762873.8293173,
-    "ast_hash": "44f776364684d300eb96206da7581d74",
-    "semantic_hash": ""
-  },
-  "android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java": {
-    "mtime": 1789138888.0,
-    "ast_hash": "fbaf7cc870c663eb52dcf218531c439d",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/capacitor.config.json": {
-    "mtime": 1790763465.5955577,
-    "ast_hash": "efa86a5d914e310f2d78dc5a62be8283",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/capacitor.plugins.json": {
-    "mtime": 1790763465.6289835,
-    "ast_hash": "c4a9896deac2ad1611f8d23ce3ad6eb8",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/asset-manifest.json": {
-    "mtime": 1790762911.7054865,
-    "ast_hash": "b2dd749f071596524b2048c360dccb2f",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/cordova.js": {
-    "mtime": 1790763466.027498,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/cordova_plugins.js": {
-    "mtime": 1790763466.027498,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/manifest.json": {
-    "mtime": 1787050334.680609,
-    "ast_hash": "b72b70eea422495ddca0eada974a1d8d",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/1048.770d0907.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "7c35af016e0d8f03d0989dadd2eeebd5",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/1052.ba058c5b.chunk.js": {
-    "mtime": 1790762911.7034886,
-    "ast_hash": "234c1c268a6edc12788e692fca3af925",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/118.492c60e7.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "984e41bd6fd817d79565ec628b8c76b6",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/1676.71f4e78a.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "f46a2b22589d3569eaccca6d75d69cda",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/1872.99d63567.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "24e65f250abb362b8d264640d1e4a2cd",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/2463.8269fbaa.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "ffb42e2cf4d2dc5af316e5fa6e9d7dc5",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/2572.b1990202.chunk.js": {
-    "mtime": 1790762911.7004886,
-    "ast_hash": "59ab01cad22c0603149883e60d976f7a",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/265.598e4165.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "b17c63c1ce413fb037a043234d38e293",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/2852.0b6a8c63.chunk.js": {
-    "mtime": 1790762911.7004886,
-    "ast_hash": "fd92e196e712e2e9af4530f11fbb5a53",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/2875.86f7d505.chunk.js": {
-    "mtime": 1790762911.698491,
-    "ast_hash": "fa52c2b51c9d8368e9f4392dccf2c45e",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/2879.ce4b9cde.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "ce80b33e93a5f6af25cf2bb683b6c63a",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/2959.6dfcb93e.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "1ce93dd861d9deff12b4b42f9de50b1a",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/3098.72c956b1.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "a050b566f46ad04876dbf7a790e082c0",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/3361.483d6b75.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "e4f2b387902f4e65a0e884b4ac0f486b",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/3423.4324c1ee.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "70853865e8643e850868408b6942f3c3",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/346.44ddc56d.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "d063a0c03f876e2180ded3779f5304a0",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/377.73762af7.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "eda03519fa511e4343cac214a0758bfa",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/384.1e917373.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "e171f686652da65119781c2e95b1a06e",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/3890.b2ba58b3.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "94ac78a83ed24a2cd7df3d7eb19399da",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/3905.770d0907.chunk.js": {
-    "mtime": 1790762911.6893098,
-    "ast_hash": "7c35af016e0d8f03d0989dadd2eeebd5",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/3978.c38af554.chunk.js": {
-    "mtime": 1790762911.7004886,
-    "ast_hash": "256ed84ff479ee803553c2fcc3956fcb",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4041.5f14f74f.chunk.js": {
-    "mtime": 1790762911.7004886,
-    "ast_hash": "b9401cf3420e2d0755155d521f771a13",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4059.e644c6dc.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "359e0f84b0ce32aef836c8a3cca27f9f",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4072.0644829f.chunk.js": {
-    "mtime": 1790762911.7004886,
-    "ast_hash": "3034d6eb3a87bdd942e42518263e6cb9",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/42.58ff1aaf.chunk.js": {
-    "mtime": 1790762911.6954875,
-    "ast_hash": "c659de8f7d2c3a1fac40ff0cc8e17aff",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4217.1fb397e4.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "c7d4f1b9a59e5db31a9a64da6a40d7ad",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4273.a494e1b7.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "3fa77db1d715f48248b74fab885d38cd",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4274.e40d3ad9.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "cf4cd2fc88e01a4bb676159609117750",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4590.51c674c6.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "164234d0bcd8a41f8fd0eae22e531504",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4839.f2803783.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "c4aede83241fc65877c455133ad268e1",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/4991.d6851b1a.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "ad5944de0ef1c0265a46b25bdfd78835",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/5163.714942c4.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "daf15eed15d701c44e61dd4cdefc962f",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/5203.f9210fae.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "f76e9e59bf3bd43c053adfbad774af84",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/5271.90e51dc0.chunk.js": {
-    "mtime": 1790762911.706486,
-    "ast_hash": "4ab678904dd87d12b615a9ac5f05ea02",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/5281.cfbb685a.chunk.js": {
-    "mtime": 1790762911.698491,
-    "ast_hash": "197373dc9cd2a60a1de1fa9fe6eef998",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/5862.a0adee7c.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "d1a6613dc08b4279ae11f8d9290131d3",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/593.8e9c6f38.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "4746b7ab1ef49c07f2da9a8b6e5179bc",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6062.df761dd5.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "ed530d8df6bc1ea78b077f5745886d24",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6103.734ce4e0.chunk.js": {
-    "mtime": 1790762911.7004886,
-    "ast_hash": "490ee82511aff205d2fdbd0e6b110631",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6168.5dc79410.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "91731875d8e9eec5da68fc3f3b9108dd",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6286.770d0907.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "7c35af016e0d8f03d0989dadd2eeebd5",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6703.37bb3f29.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "3f372c439f7f2fd1b9c36243337d03bd",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6955.5696da7d.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "a464fee3edee984b102457d847539bd3",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6970.4befd0bb.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "65a403cc09f0f98ae2fb570cd2ea96d9",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/6995.b0da742d.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "c256f865c62c4a76240afb9258e22277",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/7082.8b34610c.chunk.js": {
-    "mtime": 1790762911.7054865,
-    "ast_hash": "38dbf89ec0afbda5ff06bcb911fbcc50",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/7130.9b73483d.chunk.js": {
-    "mtime": 1790762911.6924777,
-    "ast_hash": "a031691264aff70039aa6ce147e485d4",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/723.b3f97bd0.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "46141c5d9d2821f1a766e245cfb6b6c6",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/7466.777bf14e.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "85b4dfeaa548e12acc45b61c1a66a3ab",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/7844.aa568483.chunk.js": {
-    "mtime": 1790762911.6893098,
-    "ast_hash": "1ee7df9fe0530abd11955d7a25a767d1",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/8016.e2bb601f.chunk.js": {
-    "mtime": 1790762911.6954875,
-    "ast_hash": "f07956cd6e66b6427f0ff8d80bc0d877",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/8212.948d9bb0.chunk.js": {
-    "mtime": 1790762911.6883066,
-    "ast_hash": "4191c80d578a2407ea073207d986e2c0",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/8291.5b6f6317.chunk.js": {
-    "mtime": 1790762911.706486,
-    "ast_hash": "1e5238b321d6b49a60d23a9dc0dea5b9",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/8296.2c3cabce.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "62eee49048851b8e2e4caaec3c780a3b",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/8310.58ea8908.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "64c0821d3bba527e36a94dc6fbb41e07",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/866.7574ffc3.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "729946f0e7e81fec6699b6dd35507f54",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/8779.e4e73736.chunk.js": {
-    "mtime": 1790762911.6964867,
-    "ast_hash": "6a0b0cac8e35af171842bce796570489",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/8859.f60ab36c.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "279dd37857ed5c456d5e86446de83ea3",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/896.ebdd9511.chunk.js": {
-    "mtime": 1790762911.6954875,
-    "ast_hash": "9b84abe351d8d5c85accb15e6ade4000",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/897.06f8856f.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "3ec1856ce3d843ee62152a20cd20295c",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/905.c4fde1ae.chunk.js": {
-    "mtime": 1790762911.7004886,
-    "ast_hash": "26f44ce0dc4af54c7c0278c9556fa55e",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/9172.23445dda.chunk.js": {
-    "mtime": 1790762911.706486,
-    "ast_hash": "2f585bf479676e845ceca370d5851393",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/9545.4a6037aa.chunk.js": {
-    "mtime": 1790762911.697499,
-    "ast_hash": "9c501f51cfe9f4a0181dd74fc78e66bc",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/9640.639b92ae.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "41b2e8639b2b56828cae9f3445239430",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/9713.98e0fcc1.chunk.js": {
-    "mtime": 1790762911.6913056,
-    "ast_hash": "f97eafd8c4966282b71c7abf3df644d1",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/9908.e548ceae.chunk.js": {
-    "mtime": 1790762911.694487,
-    "ast_hash": "877be3d34a62f4f8c8c69f272ec15410",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/assets/public/static/js/main.b1162215.js": {
-    "mtime": 1790762911.7034886,
-    "ast_hash": "a1e328ec66a8c1ac1cff4eb3a654f0d7",
-    "semantic_hash": ""
-  },
-  "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java": {
-    "mtime": 1790762823.342391,
-    "ast_hash": "9a0bf6b42e55b87fde7755f29563c3af",
-    "semantic_hash": ""
-  },
-  "android/app/src/test/java/com/getcapacitor/myapp/ExampleUnitTest.java": {
-    "mtime": 1789138888.0,
-    "ast_hash": "e91b4501c14da821682fa5c26a16d616",
-    "semantic_hash": ""
-  },
-  "android/build.gradle": {
-    "mtime": 1789138888.0,
-    "ast_hash": "682315a426653617c6a74fc12bef55b6",
-    "semantic_hash": ""
-  },
-  "android/capacitor-cordova-android-plugins/build.gradle": {
-    "mtime": 1790763466.0376544,
-    "ast_hash": "2af61653d70c95d20802c8b5c433ba90",
-    "semantic_hash": ""
-  },
-  "android/capacitor-cordova-android-plugins/cordova.variables.gradle": {
-    "mtime": 1790763466.0386412,
-    "ast_hash": "d2372a0ae9aa60abb8d03e7f06bf9194",
-    "semantic_hash": ""
-  },
-  "android/capacitor.settings.gradle": {
-    "mtime": 1790763466.0315094,
-    "ast_hash": "df7d939820ba91e1efe8067269b58510",
-    "semantic_hash": ""
-  },
-  "android/gradlew": {
-    "mtime": 1789138888.0,
-    "ast_hash": "794669d78aef1dd5c7d889ef618b311a",
-    "semantic_hash": ""
-  },
-  "android/settings.gradle": {
-    "mtime": 1789138888.0,
-    "ast_hash": "f6cd925b3f859e23c3d819fe2459e0e4",
-    "semantic_hash": ""
-  },
-  "android/variables.gradle": {
-    "mtime": 1790764534.6082997,
-    "ast_hash": "a4f29983031d0459efbed91505ecd76c",
-    "semantic_hash": ""
-  },
-  "capacitor.config.json": {
-    "mtime": 1790763392.2587671,
-    "ast_hash": "b0f9c087722bf8f634cc35c05e1cabe0",
-    "semantic_hash": ""
-  },
-  "client/src/services/nativeBridge.js": {
-    "mtime": 1790762066.5975447,
-    "ast_hash": "46da531255f909e90ef6674f0fe9adbd",
-    "semantic_hash": ""
-  },
-  "server/services/fcmService.js": {
-    "mtime": 1790761947.7615385,
-    "ast_hash": "7721a1fa678569e22ebf5988ad0db247",
     "semantic_hash": ""
   }
 }

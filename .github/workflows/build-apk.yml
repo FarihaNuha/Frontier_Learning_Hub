@@ -43,11 +43,16 @@ jobs:
           DISABLE_ESLINT_PLUGIN: "true"
           GENERATE_SOURCEMAP: "false"
 
-      - name: Make Gradle executable
-        run: chmod +x android/gradlew
+      - name: Copy Web Build to Root
+        run: cp -r client/build ./build
+
+      - name: Make Gradle executable & fix line endings
+        run: |
+          sed -i 's/\r$//' android/gradlew || true
+          chmod +x android/gradlew
 
       - name: Sync Capacitor Android
-        run: npx cap sync android
+        run: npx cap sync android --verbose
 
       - name: Build Debug APK
         working-directory: ./android

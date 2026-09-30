@@ -1,7 +1,7 @@
 {
   "appId": "com.frontier.learningacademy",
   "appName": "UniCore",
-  "webDir": "client/build",
+  "webDir": "build",
   "bundledWebRuntime": false,
   "server": {
     "url": "https://frontier-learning-academy.vercel.app",

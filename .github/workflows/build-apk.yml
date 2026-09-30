@@ -28,7 +28,6 @@ jobs:
         run: |
           echo "sdk.dir=${ANDROID_HOME}" > android/local.properties
           cat android/local.properties
-          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" || true
           echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Setup Node.js
@@ -68,31 +67,18 @@ jobs:
       - name: Build Debug APK
         working-directory: ./android
         run: |
+          set -o pipefail
           ./gradlew assembleDebug --stacktrace --no-daemon 2>&1 | tee ../gradle-build.log
-
-      - name: Report Build Log on Failure
-        if: failure()
-        run: |
-          echo "### ❌ Gradle Build Failed" >> $GITHUB_STEP_SUMMARY
-          echo '```text' >> $GITHUB_STEP_SUMMARY
-          tail -n 80 gradle-build.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload Gradle Failure Log
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-build-failure-log
-          path: gradle-build.log
-
 
       - name: Prepare APK Output
         run: |
           mkdir -p release-output
-          APK_FILE=$(find android/app/build/outputs/apk -name "*.apk" | head -n 1)
+          echo "=== Searching for APK files in repository ==="
+          find . -name "*.apk"
+          APK_FILE=$(find . -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ]; then
             cp "$APK_FILE" release-output/UniCore-app.apk
-            echo "Found APK at $APK_FILE, copied to release-output/UniCore-app.apk"
+            echo "Successfully copied $APK_FILE to release-output/UniCore-app.apk"
             ls -lh release-output/UniCore-app.apk
           else
             echo "Error: No APK found!"
@@ -105,6 +91,25 @@ jobs:
           name: UniCore-Android-APK
           path: release-output/UniCore-app.apk
           retention-days: 30
+
+      - name: Debug On Failure
+        if: failure()
+        run: |
+          echo "### ❌ Build Failure Summary" >> $GITHUB_STEP_SUMMARY
+          if [ -f gradle-build.log ]; then
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 80 gradle-build.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "=== Listing android files ==="
+          find android/ -maxdepth 4 || true
+
+      - name: Upload Debug Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-debug-logs
+          path: gradle-build.log
 
       - name: Create or Update GitHub Release with APK
         uses: softprops/action-gh-release@v2

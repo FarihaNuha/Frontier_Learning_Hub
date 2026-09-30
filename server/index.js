@@ -32,9 +32,16 @@ app.use(compression({ level: 6, threshold: 512 }));
 // Initialize Socket.IO
 initSocket(server);
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost",
+  "https://localhost",
+  "capacitor://localhost",
+  "ionic://localhost",
+];
 if (process.env.CLIENT_URL) {
-  process.env.CLIENT_URL.split(",").forEach(url => allowedOrigins.push(url.trim()));
+  process.env.CLIENT_URL.split(",").forEach((url) => allowedOrigins.push(url.trim()));
 }
 
 const isOriginAllowed = (origin) => {
@@ -43,6 +50,8 @@ const isOriginAllowed = (origin) => {
   try {
     const url = new URL(origin);
     if (url.hostname.endsWith(".vercel.app")) return true;
+    if (url.hostname === "localhost" || url.hostname === "127.0.0.1") return true;
+    if (url.protocol === "capacitor:" || url.protocol === "ionic:") return true;
   } catch (e) {}
   return false;
 };

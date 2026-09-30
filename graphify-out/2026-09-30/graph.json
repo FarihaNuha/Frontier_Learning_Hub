@@ -310,7 +310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk",
-      "community": 74,
+      "community": 40,
       "norm_label": "1052.ba058c5b.chunk.js"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk_1052",
-      "community": 74,
+      "community": 40,
       "norm_label": "1052()"
     },
     {
@@ -490,7 +490,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk",
-      "community": 74,
+      "community": 40,
       "norm_label": "265.598e4165.chunk.js"
     },
     {
@@ -500,7 +500,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_4721",
-      "community": 74,
+      "community": 40,
       "norm_label": "4721()"
     },
     {
@@ -510,7 +510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_1700",
-      "community": 74,
+      "community": 40,
       "norm_label": "1700()"
     },
     {
@@ -520,7 +520,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_3113",
-      "community": 74,
+      "community": 40,
       "norm_label": "3113()"
     },
     {
@@ -530,7 +530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_265",
-      "community": 74,
+      "community": 40,
       "norm_label": "265()"
     },
     {
@@ -1320,7 +1320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk",
-      "community": 74,
+      "community": 40,
       "norm_label": "5271.90e51dc0.chunk.js"
     },
     {
@@ -1330,7 +1330,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk_5271",
-      "community": 74,
+      "community": 40,
       "norm_label": "5271()"
     },
     {
@@ -1880,7 +1880,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_8291_5b6f6317_chunk",
-      "community": 74,
+      "community": 226,
       "norm_label": "8291.5b6f6317.chunk.js"
     },
     {
@@ -1890,7 +1890,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_8291_5b6f6317_chunk_5612",
-      "community": 74,
+      "community": 226,
       "norm_label": "5612()"
     },
     {
@@ -1900,7 +1900,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_8291_5b6f6317_chunk_2284",
-      "community": 74,
+      "community": 226,
       "norm_label": "2284()"
     },
     {
@@ -1910,7 +1910,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_8291_5b6f6317_chunk_4620",
-      "community": 74,
+      "community": 226,
       "norm_label": "4620()"
     },
     {
@@ -2180,7 +2180,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_9172_23445dda_chunk",
-      "community": 74,
+      "community": 256,
       "norm_label": "9172.23445dda.chunk.js"
     },
     {
@@ -2190,7 +2190,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_9172_23445dda_chunk_8728",
-      "community": 74,
+      "community": 256,
       "norm_label": "8728()"
     },
     {
@@ -2200,7 +2200,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_9172_23445dda_chunk_9172",
-      "community": 74,
+      "community": 256,
       "norm_label": "9172()"
     },
     {
@@ -2362,6 +2362,286 @@
       "id": "android_app_src_main_assets_public_static_js_9908_e548ceae_chunk_9908",
       "community": 145,
       "norm_label": "9908()"
+    },
+    {
+      "label": "main.4ed04281.js",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "community": 40,
+      "norm_label": "main.4ed04281.js"
+    },
+    {
+      "label": "8827()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_8827",
+      "community": 40,
+      "norm_label": "8827()"
+    },
+    {
+      "label": "5788()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_5788",
+      "community": 40,
+      "norm_label": "5788()"
+    },
+    {
+      "label": "8138()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_8138",
+      "community": 40,
+      "norm_label": "8138()"
+    },
+    {
+      "label": "9344()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_9344",
+      "community": 40,
+      "norm_label": "9344()"
+    },
+    {
+      "label": "1085()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_1085",
+      "community": 40,
+      "norm_label": "1085()"
+    },
+    {
+      "label": "1863()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_1863",
+      "community": 40,
+      "norm_label": "1863()"
+    },
+    {
+      "label": "1352()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_1352",
+      "community": 40,
+      "norm_label": "1352()"
+    },
+    {
+      "label": "7119()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_7119",
+      "community": 40,
+      "norm_label": "7119()"
+    },
+    {
+      "label": "3916()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_3916",
+      "community": 40,
+      "norm_label": "3916()"
+    },
+    {
+      "label": "1983()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_1983",
+      "community": 40,
+      "norm_label": "1983()"
+    },
+    {
+      "label": "9950()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_9950",
+      "community": 40,
+      "norm_label": "9950()"
+    },
+    {
+      "label": "4414()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_4414",
+      "community": 40,
+      "norm_label": "4414()"
+    },
+    {
+      "label": "9487()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_9487",
+      "community": 40,
+      "norm_label": "9487()"
+    },
+    {
+      "label": "5340()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_5340",
+      "community": 40,
+      "norm_label": "5340()"
+    },
+    {
+      "label": "1703()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_1703",
+      "community": 40,
+      "norm_label": "1703()"
+    },
+    {
+      "label": "5887()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_5887",
+      "community": 40,
+      "norm_label": "5887()"
+    },
+    {
+      "label": "6339()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_6339",
+      "community": 40,
+      "norm_label": "6339()"
+    },
+    {
+      "label": "5192()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_5192",
+      "community": 40,
+      "norm_label": "5192()"
+    },
+    {
+      "label": "4517()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "community": 40,
+      "norm_label": "4517()"
+    },
+    {
+      "label": "n()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "community": 40,
+      "norm_label": "n()"
+    },
+    {
+      "label": "u()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "community": 40,
+      "norm_label": "u()"
+    },
+    {
+      "label": "h()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "community": 40,
+      "norm_label": "h()"
+    },
+    {
+      "label": "p()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_p",
+      "community": 40,
+      "norm_label": "p()"
+    },
+    {
+      "label": "x()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "community": 40,
+      "norm_label": "x()"
+    },
+    {
+      "label": "ye()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_ye",
+      "community": 40,
+      "norm_label": "ye()"
+    },
+    {
+      "label": "ve()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_ve",
+      "community": 40,
+      "norm_label": "ve()"
+    },
+    {
+      "label": "be()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "community": 40,
+      "norm_label": "be()"
     },
     {
       "label": "main.b1162215.js",
@@ -2647,7 +2927,7 @@
       "label": "MainActivity",
       "file_type": "code",
       "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
-      "source_location": "L5",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity",
       "community": 206,
@@ -2662,6 +2942,36 @@
       "id": "bridgeactivity",
       "community": 206,
       "norm_label": "bridgeactivity"
+    },
+    {
+      "label": ".onCreate()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity_oncreate",
+      "community": 206,
+      "norm_label": ".oncreate()"
+    },
+    {
+      "label": "Bundle",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "bundle",
+      "community": 206,
+      "norm_label": "bundle"
+    },
+    {
+      "label": "Override",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "override",
+      "community": 206,
+      "norm_label": "override"
     },
     {
       "label": "ExampleUnitTest.java",
@@ -2886,7 +3196,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_android",
-      "community": 226,
+      "community": 12,
       "norm_label": "@capacitor/android"
     },
     {
@@ -2896,7 +3206,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_json_capacitor_android",
-      "community": 226,
+      "community": 12,
       "norm_label": "@capacitor/android"
     },
     {
@@ -2906,7 +3216,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_app",
-      "community": 12,
+      "community": 259,
       "norm_label": "@capacitor/app"
     },
     {
@@ -2916,7 +3226,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_package_json_capacitor_app",
-      "community": 12,
+      "community": 259,
       "norm_label": "@capacitor/app"
     },
     {
@@ -2926,7 +3236,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_cli",
-      "community": 12,
+      "community": 260,
       "norm_label": "@capacitor/cli"
     },
     {
@@ -2936,7 +3246,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "client_package_json_capacitor_cli",
-      "community": 12,
+      "community": 260,
       "norm_label": "@capacitor/cli"
     },
     {
@@ -2946,7 +3256,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_core",
-      "community": 227,
+      "community": 12,
       "norm_label": "@capacitor/core"
     },
     {
@@ -2956,7 +3266,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "client_package_json_capacitor_core",
-      "community": 227,
+      "community": 12,
       "norm_label": "@capacitor/core"
     },
     {
@@ -3006,7 +3316,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_dom",
-      "community": 156,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -3016,7 +3326,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "testing_library_dom",
-      "community": 156,
+      "community": 12,
       "norm_label": "@testing-library/dom"
     },
     {
@@ -3026,7 +3336,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_jest_dom",
-      "community": 233,
+      "community": 12,
       "norm_label": "@testing-library/jest-dom"
     },
     {
@@ -3036,7 +3346,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "testing_library_jest_dom",
-      "community": 233,
+      "community": 12,
       "norm_label": "@testing-library/jest-dom"
     },
     {
@@ -3046,7 +3356,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_dependencies_testing_library_react",
-      "community": 12,
+      "community": 264,
       "norm_label": "@testing-library/react"
     },
     {
@@ -3056,7 +3366,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "testing_library_react",
-      "community": 12,
+      "community": 264,
       "norm_label": "@testing-library/react"
     },
     {
@@ -3106,7 +3416,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 12,
+      "community": 261,
       "norm_label": "docx-preview"
     },
     {
@@ -3116,7 +3426,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 12,
+      "community": 261,
       "norm_label": "docx-preview"
     },
     {
@@ -3146,7 +3456,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "client_package_dependencies_jspdf_autotable",
-      "community": 12,
+      "community": 262,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -3156,7 +3466,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "jspdf_autotable",
-      "community": 12,
+      "community": 262,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -3186,7 +3496,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "client_package_dependencies_react",
-      "community": 74,
+      "community": 257,
       "norm_label": "react"
     },
     {
@@ -3196,7 +3506,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "react",
-      "community": 74,
+      "community": 257,
       "norm_label": "react"
     },
     {
@@ -3206,7 +3516,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "client_package_dependencies_react_dom",
-      "community": 149,
+      "community": 12,
       "norm_label": "react-dom"
     },
     {
@@ -3216,7 +3526,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "react_dom",
-      "community": 149,
+      "community": 12,
       "norm_label": "react-dom"
     },
     {
@@ -3306,7 +3616,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "client_package_dependencies_socket_io_client",
-      "community": 12,
+      "community": 263,
       "norm_label": "socket.io-client"
     },
     {
@@ -3316,7 +3626,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "socket_io_client",
-      "community": 12,
+      "community": 263,
       "norm_label": "socket.io-client"
     },
     {
@@ -3346,7 +3656,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "client_package_dependencies_xlsx",
-      "community": 166,
+      "community": 12,
       "norm_label": "xlsx"
     },
     {
@@ -3356,7 +3666,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "client_package_json_xlsx",
-      "community": 166,
+      "community": 12,
       "norm_label": "xlsx"
     },
     {
@@ -3628,16 +3938,6 @@
       "id": "client_src_app",
       "community": 14,
       "norm_label": "app.jsx"
-    },
-    {
-      "label": "AuthPage",
-      "file_type": "code",
-      "source_file": "client/src/App.jsx",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "client_src_app_authpage",
-      "community": 14,
-      "norm_label": "authpage"
     },
     {
       "label": "TeacherDashboard",
@@ -4150,20 +4450,20 @@
       "norm_label": "protectedroute()"
     },
     {
-      "label": "RoleRouter()",
+      "label": "RootRedirect()",
       "file_type": "code",
       "source_file": "client/src/App.jsx",
       "source_location": "L111",
       "_origin": "ast",
-      "id": "client_src_app_rolerouter",
+      "id": "client_src_app_rootredirect",
       "community": 14,
-      "norm_label": "rolerouter()"
+      "norm_label": "rootredirect()"
     },
     {
       "label": "AppContent()",
       "file_type": "code",
       "source_file": "client/src/App.jsx",
-      "source_location": "L137",
+      "source_location": "L152",
       "_origin": "ast",
       "id": "client_src_app_appcontent",
       "community": 147,
@@ -4173,7 +4473,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "client/src/App.jsx",
-      "source_location": "L749",
+      "source_location": "L755",
       "_origin": "ast",
       "id": "client_src_app_app",
       "community": 69,
@@ -4226,7 +4526,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal",
-      "community": 144,
+      "community": 4,
       "norm_label": "filepreviewmodal.jsx"
     },
     {
@@ -4236,7 +4536,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_src_components_filepreviewmodal_filepreviewmodal",
-      "community": 144,
+      "community": 4,
       "norm_label": "filepreviewmodal()"
     },
     {
@@ -4506,7 +4806,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext",
-      "community": 21,
+      "community": 52,
       "norm_label": "authcontext.jsx"
     },
     {
@@ -4516,7 +4816,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_authcontext",
-      "community": 21,
+      "community": 52,
       "norm_label": "authcontext"
     },
     {
@@ -4526,7 +4826,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_getsocketurl",
-      "community": 21,
+      "community": 52,
       "norm_label": "getsocketurl()"
     },
     {
@@ -4536,7 +4836,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_getactivestatussetting",
-      "community": 21,
+      "community": 52,
       "norm_label": "getactivestatussetting()"
     },
     {
@@ -4546,7 +4846,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_src_contexts_authcontext_authprovider",
-      "community": 21,
+      "community": 52,
       "norm_label": "authprovider()"
     },
     {
@@ -4846,7 +5146,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_adminresultmanagementpage",
-      "community": 74,
+      "community": 18,
       "norm_label": "adminresultmanagementpage.jsx"
     },
     {
@@ -4856,7 +5156,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "client_src_pages_adminresultmanagementpage_formatlevel",
-      "community": 74,
+      "community": 18,
       "norm_label": "formatlevel()"
     },
     {
@@ -4866,7 +5166,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "client_src_pages_adminresultmanagementpage_formatterm",
-      "community": 74,
+      "community": 18,
       "norm_label": "formatterm()"
     },
     {
@@ -4876,7 +5176,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "client_src_pages_adminresultmanagementpage_adminresultmanagementpage",
-      "community": 74,
+      "community": 18,
       "norm_label": "adminresultmanagementpage()"
     },
     {
@@ -5076,7 +5376,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "client_src_pages_courseanalyticspage_courseanalyticspage",
-      "community": 21,
+      "community": 134,
       "norm_label": "courseanalyticspage()"
     },
     {
@@ -5086,7 +5386,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity",
-      "community": 144,
+      "community": 4,
       "norm_label": "coursecommunity.jsx"
     },
     {
@@ -5096,7 +5396,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_rendercontentwithlinks",
-      "community": 144,
+      "community": 4,
       "norm_label": "rendercontentwithlinks()"
     },
     {
@@ -5106,7 +5406,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursecommunity",
-      "community": 144,
+      "community": 4,
       "norm_label": "coursecommunity()"
     },
     {
@@ -5116,7 +5416,7 @@
       "source_location": "L460",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_getfileurl",
-      "community": 144,
+      "community": 4,
       "norm_label": "getfileurl()"
     },
     {
@@ -5126,7 +5426,7 @@
       "source_location": "L472",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderattachments",
-      "community": 144,
+      "community": 4,
       "norm_label": "renderattachments()"
     },
     {
@@ -5136,7 +5436,7 @@
       "source_location": "L581",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_renderlectureattachment",
-      "community": 144,
+      "community": 4,
       "norm_label": "renderlectureattachment()"
     },
     {
@@ -5146,7 +5446,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_commentitem",
-      "community": 144,
+      "community": 4,
       "norm_label": "commentitem()"
     },
     {
@@ -5156,7 +5456,7 @@
       "source_location": "L859",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_coursepostcard",
-      "community": 144,
+      "community": 4,
       "norm_label": "coursepostcard()"
     },
     {
@@ -5166,7 +5466,7 @@
       "source_location": "L1286",
       "_origin": "ast",
       "id": "client_src_pages_coursecommunity_editpostmodal",
-      "community": 144,
+      "community": 4,
       "norm_label": "editpostmodal()"
     },
     {
@@ -5346,7 +5646,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "client_src_pages_notificationspage_notificationspage",
-      "community": 21,
+      "community": 134,
       "norm_label": "notificationspage()"
     },
     {
@@ -5546,7 +5846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_studentdashboard",
-      "community": 0,
+      "community": 52,
       "norm_label": "studentdashboard.jsx"
     },
     {
@@ -5556,7 +5856,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "client_src_pages_studentdashboard_studentdashboard",
-      "community": 0,
+      "community": 52,
       "norm_label": "studentdashboard()"
     },
     {
@@ -5706,7 +6006,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "client_src_pages_teacherassessmentpage_teacherassessmentpage",
-      "community": 21,
+      "community": 134,
       "norm_label": "teacherassessmentpage()"
     },
     {
@@ -5736,7 +6036,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_teacherattendancepage",
-      "community": 134,
+      "community": 21,
       "norm_label": "teacherattendancepage.jsx"
     },
     {
@@ -5876,7 +6176,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "client_src_pages_teacherresultmanagementpage_teacherresultmanagementpage",
-      "community": 74,
+      "community": 257,
       "norm_label": "teacherresultmanagementpage()"
     },
     {
@@ -5906,7 +6206,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "client_src_pages_underdevelopmentpage",
-      "community": 21,
+      "community": 134,
       "norm_label": "underdevelopmentpage.jsx"
     },
     {
@@ -5916,7 +6216,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_src_pages_underdevelopmentpage_underdevelopmentpage",
-      "community": 21,
+      "community": 134,
       "norm_label": "underdevelopmentpage()"
     },
     {
@@ -5966,7 +6266,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "client_src_services_api_backend_url",
-      "community": 0,
+      "community": 52,
       "norm_label": "backend_url"
     },
     {
@@ -5976,7 +6276,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "client_src_services_api_api",
-      "community": 18,
+      "community": 21,
       "norm_label": "api"
     },
     {
@@ -6016,7 +6316,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "client_src_services_apicache_clearallcache",
-      "community": 21,
+      "community": 52,
       "norm_label": "clearallcache()"
     },
     {
@@ -6200,10 +6500,20 @@
       "norm_label": "test"
     },
     {
-      "label": "dev",
+      "label": "build",
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L7",
+      "_origin": "ast",
+      "id": "package_scripts_build",
+      "community": 11,
+      "norm_label": "build"
+    },
+    {
+      "label": "dev",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L8",
       "_origin": "ast",
       "id": "package_scripts_dev",
       "community": 11,
@@ -6213,7 +6523,7 @@
       "label": "server",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L8",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "package_scripts_server",
       "community": 11,
@@ -6223,7 +6533,7 @@
       "label": "client",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L9",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "package_scripts_client",
       "community": 11,
@@ -6233,7 +6543,7 @@
       "label": "install-all",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L10",
+      "source_location": "L11",
       "_origin": "ast",
       "id": "package_scripts_install_all",
       "community": 11,
@@ -6243,7 +6553,7 @@
       "label": "keywords",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "package_keywords",
       "community": 11,
@@ -6253,7 +6563,7 @@
       "label": "author",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L13",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "package_author",
       "community": 11,
@@ -6263,7 +6573,7 @@
       "label": "license",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L14",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "package_license",
       "community": 11,
@@ -6273,7 +6583,7 @@
       "label": "description",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "package_description",
       "community": 11,
@@ -6283,7 +6593,7 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "package_dependencies",
       "community": 11,
@@ -6293,7 +6603,7 @@
       "label": "@capacitor/android",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "package_dependencies_capacitor_android",
       "community": 11,
@@ -6303,7 +6613,7 @@
       "label": "@capacitor/android",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "package_json_capacitor_android",
       "community": 11,
@@ -6313,7 +6623,7 @@
       "label": "@capacitor/app",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "package_dependencies_capacitor_app",
       "community": 11,
@@ -6323,7 +6633,7 @@
       "label": "@capacitor/app",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "package_json_capacitor_app",
       "community": 11,
@@ -6333,7 +6643,7 @@
       "label": "@capacitor/cli",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "package_dependencies_capacitor_cli",
       "community": 11,
@@ -6343,7 +6653,7 @@
       "label": "@capacitor/cli",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "package_json_capacitor_cli",
       "community": 11,
@@ -6353,7 +6663,7 @@
       "label": "@capacitor/core",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "package_dependencies_capacitor_core",
       "community": 11,
@@ -6363,7 +6673,7 @@
       "label": "@capacitor/core",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "package_json_capacitor_core",
       "community": 11,
@@ -6373,7 +6683,7 @@
       "label": "@capacitor/push-notifications",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "package_dependencies_capacitor_push_notifications",
       "community": 11,
@@ -6383,7 +6693,7 @@
       "label": "@capacitor/push-notifications",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "package_json_capacitor_push_notifications",
       "community": 11,
@@ -6393,7 +6703,7 @@
       "label": "@capacitor/status-bar",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "package_dependencies_capacitor_status_bar",
       "community": 11,
@@ -6403,7 +6713,7 @@
       "label": "@capacitor/status-bar",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "package_json_capacitor_status_bar",
       "community": 11,
@@ -6413,7 +6723,7 @@
       "label": "concurrently",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "package_dependencies_concurrently",
       "community": 11,
@@ -6423,7 +6733,7 @@
       "label": "concurrently",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "concurrently",
       "community": 11,
@@ -6433,7 +6743,7 @@
       "label": "nodemon",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "package_dependencies_nodemon",
       "community": 11,
@@ -6443,7 +6753,7 @@
       "label": "nodemon",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "package_json_nodemon",
       "community": 11,
@@ -6616,7 +6926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_inspect_notices",
-      "community": 74,
+      "community": 227,
       "norm_label": "inspect_notices.js"
     },
     {
@@ -6626,7 +6936,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_inspect_notices_path",
-      "community": 74,
+      "community": 227,
       "norm_label": "path"
     },
     {
@@ -6636,7 +6946,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "scratch_inspect_notices_mongoose",
-      "community": 74,
+      "community": 227,
       "norm_label": "mongoose"
     },
     {
@@ -6646,7 +6956,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "scratch_inspect_notices_inspectnotices",
-      "community": 74,
+      "community": 227,
       "norm_label": "inspectnotices()"
     },
     {
@@ -6806,7 +7116,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_test_passed_deadlines_logic",
-      "community": 74,
+      "community": 233,
       "norm_label": "test_passed_deadlines_logic.js"
     },
     {
@@ -6816,7 +7126,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_test_passed_deadlines_logic_path",
-      "community": 74,
+      "community": 233,
       "norm_label": "path"
     },
     {
@@ -6826,7 +7136,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "scratch_test_passed_deadlines_logic_mongoose",
-      "community": 74,
+      "community": 233,
       "norm_label": "mongoose"
     },
     {
@@ -6836,7 +7146,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "scratch_test_passed_deadlines_logic_testpasseddeadlineslogic",
-      "community": 74,
+      "community": 233,
       "norm_label": "testpasseddeadlineslogic()"
     },
     {
@@ -11396,7 +11706,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_verifytoken",
-      "community": 78,
+      "community": 142,
       "norm_label": "verifytoken()"
     },
     {
@@ -11406,7 +11716,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_checkrole",
-      "community": 148,
+      "community": 142,
       "norm_label": "checkrole()"
     },
     {
@@ -11536,7 +11846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_adviser",
-      "community": 68,
+      "community": 167,
       "norm_label": "adviser.js"
     },
     {
@@ -11546,7 +11856,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_adviser_mongoose",
-      "community": 68,
+      "community": 167,
       "norm_label": "mongoose"
     },
     {
@@ -11556,7 +11866,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_adviser_adviserschema",
-      "community": 68,
+      "community": 167,
       "norm_label": "adviserschema"
     },
     {
@@ -11636,7 +11946,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment",
-      "community": 5,
+      "community": 60,
       "norm_label": "assignment.js"
     },
     {
@@ -11646,7 +11956,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment_mongoose",
-      "community": 5,
+      "community": 60,
       "norm_label": "mongoose"
     },
     {
@@ -11656,7 +11966,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_assignment_assignmentschema",
-      "community": 5,
+      "community": 60,
       "norm_label": "assignmentschema"
     },
     {
@@ -11756,7 +12066,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment",
-      "community": 135,
+      "community": 3,
       "norm_label": "communitycomment.js"
     },
     {
@@ -11766,7 +12076,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment_mongoose",
-      "community": 135,
+      "community": 3,
       "norm_label": "mongoose"
     },
     {
@@ -11776,7 +12086,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_communitycomment_communitycommentschema",
-      "community": 135,
+      "community": 3,
       "norm_label": "communitycommentschema"
     },
     {
@@ -11786,7 +12096,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitypost",
-      "community": 135,
+      "community": 3,
       "norm_label": "communitypost.js"
     },
     {
@@ -11796,7 +12106,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitypost_mongoose",
-      "community": 135,
+      "community": 3,
       "norm_label": "mongoose"
     },
     {
@@ -11806,7 +12116,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_communitypost_communitypostschema",
-      "community": 135,
+      "community": 3,
       "norm_label": "communitypostschema"
     },
     {
@@ -11816,7 +12126,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_contactrequest",
-      "community": 23,
+      "community": 144,
       "norm_label": "contactrequest.js"
     },
     {
@@ -11826,7 +12136,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_contactrequest_mongoose",
-      "community": 23,
+      "community": 144,
       "norm_label": "mongoose"
     },
     {
@@ -11836,7 +12146,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_contactrequest_contactrequestschema",
-      "community": 23,
+      "community": 144,
       "norm_label": "contactrequestschema"
     },
     {
@@ -11966,7 +12276,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_exam",
-      "community": 61,
+      "community": 149,
       "norm_label": "exam.js"
     },
     {
@@ -11976,7 +12286,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_exam_mongoose",
-      "community": 61,
+      "community": 149,
       "norm_label": "mongoose"
     },
     {
@@ -11986,7 +12296,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_exam_questionschema",
-      "community": 61,
+      "community": 149,
       "norm_label": "questionschema"
     },
     {
@@ -11996,7 +12306,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_models_exam_examschema",
-      "community": 61,
+      "community": 149,
       "norm_label": "examschema"
     },
     {
@@ -12136,7 +12446,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification",
-      "community": 90,
+      "community": 72,
       "norm_label": "notification.js"
     },
     {
@@ -12146,7 +12456,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notification_mongoose",
-      "community": 90,
+      "community": 72,
       "norm_label": "mongoose"
     },
     {
@@ -12156,7 +12466,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notification_notificationschema",
-      "community": 90,
+      "community": 72,
       "norm_label": "notificationschema"
     },
     {
@@ -12346,7 +12656,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_result",
-      "community": 163,
+      "community": 258,
       "norm_label": "result.js"
     },
     {
@@ -12356,7 +12666,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_result_mongoose",
-      "community": 163,
+      "community": 258,
       "norm_label": "mongoose"
     },
     {
@@ -12366,7 +12676,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_result_resultschema",
-      "community": 163,
+      "community": 258,
       "norm_label": "resultschema"
     },
     {
@@ -12526,7 +12836,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission",
-      "community": 64,
+      "community": 111,
       "norm_label": "submission.js"
     },
     {
@@ -12536,7 +12846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission_mongoose",
-      "community": 64,
+      "community": 111,
       "norm_label": "mongoose"
     },
     {
@@ -12546,7 +12856,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_submission_submissionschema",
-      "community": 64,
+      "community": 111,
       "norm_label": "submissionschema"
     },
     {
@@ -12886,7 +13196,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "server_package_dependencies_cors",
-      "community": 236,
+      "community": 2,
       "norm_label": "cors"
     },
     {
@@ -12896,7 +13206,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "cors",
-      "community": 236,
+      "community": 2,
       "norm_label": "cors"
     },
     {
@@ -13066,7 +13376,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "server_package_dependencies_node_cron",
-      "community": 2,
+      "community": 265,
       "norm_label": "node-cron"
     },
     {
@@ -13076,7 +13386,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "node_cron",
-      "community": 2,
+      "community": 265,
       "norm_label": "node-cron"
     },
     {
@@ -13306,7 +13616,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes",
-      "community": 151,
+      "community": 142,
       "norm_label": "adminroutes.js"
     },
     {
@@ -13316,7 +13626,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes_router",
-      "community": 151,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -13326,7 +13636,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_adminroutes_verifytoken_checkrole",
-      "community": 151,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13336,7 +13646,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_adminroutes_ctrl",
-      "community": 151,
+      "community": 142,
       "norm_label": "ctrl"
     },
     {
@@ -13616,7 +13926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_courseroutes",
-      "community": 111,
+      "community": 142,
       "norm_label": "courseroutes.js"
     },
     {
@@ -13626,7 +13936,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_courseroutes_router",
-      "community": 111,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -13636,7 +13946,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_courseroutes_verifytoken_checkrole",
-      "community": 111,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13646,7 +13956,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_courseroutes_ctrl",
-      "community": 111,
+      "community": 142,
       "norm_label": "ctrl"
     },
     {
@@ -13656,7 +13966,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes",
-      "community": 78,
+      "community": 142,
       "norm_label": "examroutes.js"
     },
     {
@@ -13666,7 +13976,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes_router",
-      "community": 78,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -13676,7 +13986,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_examroutes_verifytoken_checkrole",
-      "community": 78,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13686,7 +13996,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_examroutes_ctrl",
-      "community": 78,
+      "community": 142,
       "norm_label": "ctrl"
     },
     {
@@ -13696,7 +14006,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_lectureroutes",
-      "community": 40,
+      "community": 1,
       "norm_label": "lectureroutes.js"
     },
     {
@@ -13706,7 +14016,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_lectureroutes_router",
-      "community": 40,
+      "community": 1,
       "norm_label": "router"
     },
     {
@@ -13716,7 +14026,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_lectureroutes_upload",
-      "community": 40,
+      "community": 1,
       "norm_label": "upload"
     },
     {
@@ -13726,7 +14036,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_lectureroutes_verifytoken_checkrole",
-      "community": 40,
+      "community": 1,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13736,7 +14046,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_routes_lectureroutes_ctrl",
-      "community": 40,
+      "community": 1,
       "norm_label": "ctrl"
     },
     {
@@ -13786,7 +14096,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes",
-      "community": 110,
+      "community": 142,
       "norm_label": "registrationpaymentroutes.js"
     },
     {
@@ -13796,7 +14106,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_router",
-      "community": 110,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -13806,7 +14116,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_verifytoken_checkrole",
-      "community": 110,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13816,7 +14126,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_payctrl",
-      "community": 110,
+      "community": 142,
       "norm_label": "payctrl"
     },
     {
@@ -13826,7 +14136,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationroutes",
-      "community": 60,
+      "community": 142,
       "norm_label": "registrationroutes.js"
     },
     {
@@ -13836,7 +14146,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationroutes_express",
-      "community": 60,
+      "community": 142,
       "norm_label": "express"
     },
     {
@@ -13846,7 +14156,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_registrationroutes_router",
-      "community": 60,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -13856,7 +14166,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_registrationroutes_verifytoken_checkrole",
-      "community": 60,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13866,7 +14176,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_routes_registrationroutes_regctrl",
-      "community": 60,
+      "community": 142,
       "norm_label": "regctrl"
     },
     {
@@ -13876,7 +14186,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_resultroutes",
-      "community": 148,
+      "community": 236,
       "norm_label": "resultroutes.js"
     },
     {
@@ -13886,7 +14196,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_resultroutes_router",
-      "community": 148,
+      "community": 236,
       "norm_label": "router"
     },
     {
@@ -13896,7 +14206,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_resultroutes_verifytoken_checkrole",
-      "community": 148,
+      "community": 236,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13906,7 +14216,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_resultroutes_ctrl",
-      "community": 148,
+      "community": 236,
       "norm_label": "ctrl"
     },
     {
@@ -15296,7 +15606,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism",
-      "community": 64,
+      "community": 135,
       "norm_label": "recalculate_all_plagiarism.js"
     },
     {
@@ -15306,7 +15616,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_mongoose",
-      "community": 64,
+      "community": 135,
       "norm_label": "mongoose"
     },
     {
@@ -15316,7 +15626,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_path",
-      "community": 64,
+      "community": 135,
       "norm_label": "path"
     },
     {
@@ -15326,7 +15636,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_dns",
-      "community": 64,
+      "community": 135,
       "norm_label": "dns"
     },
     {
@@ -15336,7 +15646,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_similarityservice",
-      "community": 64,
+      "community": 135,
       "norm_label": "similarityservice"
     },
     {
@@ -15346,7 +15656,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_submission",
-      "community": 64,
+      "community": 135,
       "norm_label": "submission"
     },
     {
@@ -15356,7 +15666,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_user",
-      "community": 64,
+      "community": 135,
       "norm_label": "user"
     },
     {
@@ -15366,7 +15676,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_fs",
-      "community": 64,
+      "community": 135,
       "norm_label": "fs"
     },
     {
@@ -15376,7 +15686,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_recalculateassignmentsimilarity",
-      "community": 64,
+      "community": 135,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -15386,7 +15696,7 @@
       "source_location": "L134",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_main",
-      "community": 64,
+      "community": 135,
       "norm_label": "main()"
     },
     {
@@ -15606,7 +15916,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate",
-      "community": 64,
+      "community": 111,
       "norm_label": "run_recalculate.js"
     },
     {
@@ -15616,7 +15926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_mongoose",
-      "community": 64,
+      "community": 111,
       "norm_label": "mongoose"
     },
     {
@@ -15626,7 +15936,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_path",
-      "community": 64,
+      "community": 111,
       "norm_label": "path"
     },
     {
@@ -15636,7 +15946,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_similarityservice",
-      "community": 64,
+      "community": 111,
       "norm_label": "similarityservice"
     },
     {
@@ -15646,7 +15956,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_submission",
-      "community": 64,
+      "community": 111,
       "norm_label": "submission"
     },
     {
@@ -15656,7 +15966,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_user",
-      "community": 64,
+      "community": 111,
       "norm_label": "user"
     },
     {
@@ -15666,7 +15976,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_fs",
-      "community": 64,
+      "community": 111,
       "norm_label": "fs"
     },
     {
@@ -15676,7 +15986,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_recalculateassignmentsimilarity",
-      "community": 64,
+      "community": 111,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -15686,7 +15996,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_main",
-      "community": 64,
+      "community": 111,
       "norm_label": "main()"
     },
     {
@@ -16066,7 +16376,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller",
-      "community": 5,
+      "community": 60,
       "norm_label": "test_assignment_controller.js"
     },
     {
@@ -16076,7 +16386,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_assert",
-      "community": 5,
+      "community": 60,
       "norm_label": "assert"
     },
     {
@@ -16086,7 +16396,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_mongoose",
-      "community": 5,
+      "community": 60,
       "norm_label": "mongoose"
     },
     {
@@ -16096,7 +16406,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_fs",
-      "community": 5,
+      "community": 60,
       "norm_label": "fs"
     },
     {
@@ -16106,7 +16416,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_path",
-      "community": 5,
+      "community": 60,
       "norm_label": "path"
     },
     {
@@ -16116,7 +16426,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_assignment",
-      "community": 5,
+      "community": 60,
       "norm_label": "assignment"
     },
     {
@@ -16126,7 +16436,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_submission",
-      "community": 5,
+      "community": 60,
       "norm_label": "submission"
     },
     {
@@ -16136,7 +16446,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_assignmentcontroller",
-      "community": 5,
+      "community": 60,
       "norm_label": "assignmentcontroller"
     },
     {
@@ -16146,7 +16456,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_testviewassignmentbase64",
-      "community": 5,
+      "community": 60,
       "norm_label": "testviewassignmentbase64()"
     },
     {
@@ -16156,7 +16466,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_testviewsubmissionbase64",
-      "community": 5,
+      "community": 60,
       "norm_label": "testviewsubmissionbase64()"
     },
     {
@@ -16166,7 +16476,7 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "server_scratch_test_assignment_controller_runall",
-      "community": 5,
+      "community": 60,
       "norm_label": "runall()"
     },
     {
@@ -16536,7 +16846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model",
-      "community": 61,
+      "community": 149,
       "norm_label": "test_exam_model.js"
     },
     {
@@ -16546,7 +16856,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_mongoose",
-      "community": 61,
+      "community": 149,
       "norm_label": "mongoose"
     },
     {
@@ -16556,7 +16866,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_exam",
-      "community": 61,
+      "community": 149,
       "norm_label": "exam"
     },
     {
@@ -16566,7 +16876,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_exam_model_testmodel",
-      "community": 61,
+      "community": 149,
       "norm_label": "testmodel()"
     },
     {
@@ -16746,7 +17056,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_file_resolution",
-      "community": 74,
+      "community": 151,
       "norm_label": "test_file_resolution.js"
     },
     {
@@ -16756,7 +17066,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_file_resolution_mongoose",
-      "community": 74,
+      "community": 151,
       "norm_label": "mongoose"
     },
     {
@@ -16766,7 +17076,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_file_resolution_path",
-      "community": 74,
+      "community": 151,
       "norm_label": "path"
     },
     {
@@ -16776,7 +17086,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_file_resolution_fs",
-      "community": 74,
+      "community": 151,
       "norm_label": "fs"
     },
     {
@@ -16786,7 +17096,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_file_resolution_dns",
-      "community": 74,
+      "community": 151,
       "norm_label": "dns"
     },
     {
@@ -16796,7 +17106,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_file_resolution_run",
-      "community": 74,
+      "community": 151,
       "norm_label": "run()"
     },
     {
@@ -17696,7 +18006,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local",
-      "community": 64,
+      "community": 156,
       "norm_label": "test_plagiarism_local.js"
     },
     {
@@ -17706,7 +18016,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_mongoose",
-      "community": 64,
+      "community": 156,
       "norm_label": "mongoose"
     },
     {
@@ -17716,7 +18026,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_path",
-      "community": 64,
+      "community": 156,
       "norm_label": "path"
     },
     {
@@ -17726,7 +18036,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_fs",
-      "community": 64,
+      "community": 156,
       "norm_label": "fs"
     },
     {
@@ -17736,7 +18046,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_similarityservice",
-      "community": 64,
+      "community": 156,
       "norm_label": "similarityservice"
     },
     {
@@ -17746,7 +18056,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_run",
-      "community": 64,
+      "community": 156,
       "norm_label": "run()"
     },
     {
@@ -19316,7 +19626,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_services_previewservice",
-      "community": 5,
+      "community": 110,
       "norm_label": "previewservice.js"
     },
     {
@@ -19326,7 +19636,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_services_previewservice_fs",
-      "community": 5,
+      "community": 110,
       "norm_label": "fs"
     },
     {
@@ -19336,7 +19646,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_services_previewservice_path",
-      "community": 5,
+      "community": 110,
       "norm_label": "path"
     },
     {
@@ -19346,7 +19656,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_services_previewservice_mammoth",
-      "community": 5,
+      "community": 110,
       "norm_label": "mammoth"
     },
     {
@@ -19356,7 +19666,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_services_previewservice_xlsx",
-      "community": 5,
+      "community": 110,
       "norm_label": "xlsx"
     },
     {
@@ -19366,7 +19676,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_services_previewservice_jszip",
-      "community": 5,
+      "community": 110,
       "norm_label": "jszip"
     },
     {
@@ -19376,7 +19686,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_services_previewservice_extractslideelements",
-      "community": 5,
+      "community": 110,
       "norm_label": "extractslideelements()"
     },
     {
@@ -19386,7 +19696,7 @@
       "source_location": "L214",
       "_origin": "ast",
       "id": "server_services_previewservice_formattablehtml",
-      "community": 5,
+      "community": 110,
       "norm_label": "formattablehtml()"
     },
     {
@@ -19396,7 +19706,7 @@
       "source_location": "L242",
       "_origin": "ast",
       "id": "server_services_previewservice_formattextelementhtml",
-      "community": 5,
+      "community": 110,
       "norm_label": "formattextelementhtml()"
     },
     {
@@ -19406,7 +19716,7 @@
       "source_location": "L304",
       "_origin": "ast",
       "id": "server_services_previewservice_buildslidebodyhtml",
-      "community": 5,
+      "community": 110,
       "norm_label": "buildslidebodyhtml()"
     },
     {
@@ -19416,7 +19726,7 @@
       "source_location": "L445",
       "_origin": "ast",
       "id": "server_services_previewservice_extractpptxslideshtml",
-      "community": 5,
+      "community": 110,
       "norm_label": "extractpptxslideshtml()"
     },
     {
@@ -19426,7 +19736,7 @@
       "source_location": "L539",
       "_origin": "ast",
       "id": "server_services_previewservice_extractpptxslidesarray",
-      "community": 5,
+      "community": 110,
       "norm_label": "extractpptxslidesarray()"
     },
     {
@@ -19436,7 +19746,7 @@
       "source_location": "L666",
       "_origin": "ast",
       "id": "server_services_previewservice_generatepreviewdata",
-      "community": 5,
+      "community": 110,
       "norm_label": "generatepreviewdata()"
     },
     {
@@ -19576,7 +19886,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_socket",
-      "community": 23,
+      "community": 144,
       "norm_label": "socket.js"
     },
     {
@@ -19586,7 +19896,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_socket_server",
-      "community": 23,
+      "community": 144,
       "norm_label": "{ server }"
     },
     {
@@ -19596,7 +19906,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_socket_user",
-      "community": 23,
+      "community": 144,
       "norm_label": "user"
     },
     {
@@ -19606,7 +19916,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_socket_contactrequest",
-      "community": 23,
+      "community": 144,
       "norm_label": "contactrequest"
     },
     {
@@ -19616,7 +19926,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_socket_onlineusers",
-      "community": 23,
+      "community": 144,
       "norm_label": "onlineusers"
     },
     {
@@ -19626,7 +19936,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_socket_initsocket",
-      "community": 23,
+      "community": 144,
       "norm_label": "initsocket()"
     },
     {
@@ -19798,6 +20108,66 @@
       "id": "server_utils_courseutils_resolvecoursecode",
       "community": 37,
       "norm_label": "resolvecoursecode()"
+    },
+    {
+      "label": "vercel.json",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "vercel",
+      "community": 166,
+      "norm_label": "vercel.json"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "vercel_version",
+      "community": 166,
+      "norm_label": "version"
+    },
+    {
+      "label": "buildCommand",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "vercel_buildcommand",
+      "community": 166,
+      "norm_label": "buildcommand"
+    },
+    {
+      "label": "outputDirectory",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "vercel_outputdirectory",
+      "community": 166,
+      "norm_label": "outputdirectory"
+    },
+    {
+      "label": "framework",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "vercel_framework",
+      "community": 166,
+      "norm_label": "framework"
+    },
+    {
+      "label": "rewrites",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "vercel_rewrites",
+      "community": 166,
+      "norm_label": "rewrites"
     }
   ],
   "links": [
@@ -20046,29 +20416,7 @@
       "source_location": "L2",
       "weight": 1.0,
       "source": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk_1052",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_h"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/1052.ba058c5b.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk_1052",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/1052.ba058c5b.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk_1052",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
     },
     {
       "relation": "contains",
@@ -20228,52 +20576,8 @@
       "source_file": "android/app/src/main/assets/public/static/js/265.598e4165.chunk.js",
       "source_location": "L1",
       "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_3113",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_h"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/265.598e4165.chunk.js",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_3113",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "collection",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/265.598e4165.chunk.js",
-      "source_location": "L1",
-      "weight": 1.0,
       "source": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_265",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_be"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/265.598e4165.chunk.js",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_265",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "collection",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/265.598e4165.chunk.js",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_265",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_ye"
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
     },
     {
       "relation": "contains",
@@ -20824,18 +21128,7 @@
       "source_location": "L2",
       "weight": 1.0,
       "source": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk_5271",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_h"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/5271.90e51dc0.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk_5271",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
     },
     {
       "relation": "contains",
@@ -21228,17 +21521,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/8291.5b6f6317.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_8291_5b6f6317_chunk_4620",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "android/app/src/main/assets/public/static/js/8296.2c3cabce.chunk.js",
@@ -21439,50 +21721,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/9172.23445dda.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_9172_23445dda_chunk_8728",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_h"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "collection",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/9172.23445dda.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_9172_23445dda_chunk_8728",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/9172.23445dda.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_9172_23445dda_chunk_8728",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_p"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/9172.23445dda.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_9172_23445dda_chunk_8728",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "android/app/src/main/assets/public/static/js/9545.4a6037aa.chunk.js",
@@ -21601,6 +21839,837 @@
       "source": "android_app_src_main_assets_public_static_js_9908_e548ceae_chunk",
       "target": "android_app_src_main_assets_public_static_js_9908_e548ceae_chunk_9908",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_1085",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_1352",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_1703",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_1863",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_1983",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_3916",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_4414",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_5192",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_5340",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_5788",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_5887",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_6339",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_7119",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_8138",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_8827",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_9344",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_9487",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_9950",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_ve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_ye",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_8138",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_8138",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_9344",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_1863",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_1863",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_1352",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_7119",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_9950",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4414",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_9487",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_9487",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5340",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_6339",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_5192",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_p",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_ye",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_p",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_ve",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_b1162215_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_b1162215_9487",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_b1162215_be",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_ye",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_4ed04281_be",
+      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_ve",
+      "confidence_score": 0.5
     },
     {
       "relation": "contains",
@@ -22229,61 +23298,6 @@
       "relation": "indirect_call",
       "context": "argument",
       "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/components/GlobalNotificationBell.jsx",
-      "source_location": "L409",
-      "weight": 1.0,
-      "source": "client_src_components_globalnotificationbell_globalnotificationbell",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/AdminNoticeManagementPage.jsx",
-      "source_location": "L68",
-      "weight": 1.0,
-      "source": "client_src_pages_adminnoticemanagementpage_adminnoticemanagementpage",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/NotificationsPage.jsx",
-      "source_location": "L197",
-      "weight": 1.0,
-      "source": "client_src_pages_notificationspage_notificationspage",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "scratch/inspect_notices.js",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "scratch_inspect_notices_inspectnotices",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "scratch/test_passed_deadlines_logic.js",
-      "source_location": "L62",
-      "weight": 1.0,
-      "source": "scratch_test_passed_deadlines_logic_testpasseddeadlineslogic",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_n"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
       "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
       "source_location": "L172",
       "weight": 1.0,
@@ -22301,50 +23315,6 @@
       "source": "android_app_src_main_assets_public_static_js_main_b1162215_h",
       "target": "android_app_src_main_assets_public_static_js_main_b1162215_u",
       "confidence_score": 1.0
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/contexts/AuthContext.jsx",
-      "source_location": "L36",
-      "weight": 1.0,
-      "source": "client_src_contexts_authcontext_authprovider",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/AdminResultManagementPage.jsx",
-      "source_location": "L467",
-      "weight": 1.0,
-      "source": "client_src_pages_adminresultmanagementpage_adminresultmanagementpage",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/MessagePage.jsx",
-      "source_location": "L867",
-      "weight": 1.0,
-      "source": "client_src_pages_messagepage_messagepage",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "server/controllers/resultController.js",
-      "source_location": "L578",
-      "weight": 1.0,
-      "source": "server_controllers_resultcontroller_uploadresultexcel",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_u"
     },
     {
       "relation": "indirect_call",
@@ -22372,100 +23342,12 @@
       "relation": "indirect_call",
       "context": "argument",
       "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/AdminTeachers.jsx",
-      "source_location": "L166",
-      "weight": 1.0,
-      "source": "client_src_pages_adminteachers_adminteachers",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_h"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/TeacherAttendancePage.jsx",
-      "source_location": "L178",
-      "weight": 1.0,
-      "source": "client_src_pages_teacherattendancepage_teacherattendancepage",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_h"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/TeacherResultManagementPage.jsx",
-      "source_location": "L402",
-      "weight": 1.0,
-      "source": "client_src_pages_teacherresultmanagementpage_teacherresultmanagementpage",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_h"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
       "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
       "source_location": "L172",
       "weight": 1.0,
       "source": "android_app_src_main_assets_public_static_js_main_b1162215_be",
       "target": "android_app_src_main_assets_public_static_js_main_b1162215_p",
       "confidence_score": 0.5
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "client/src/pages/AdminRegistrationPaymentPage.jsx",
-      "source_location": "L163",
-      "weight": 1.0,
-      "source": "client_src_pages_adminregistrationpaymentpage_adminregistrationpaymentpage",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_p"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L238",
-      "weight": 1.0,
-      "source": "server_controllers_assignmentcontroller_resolveserverfilepath",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_p"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "server/controllers/registrationPaymentController.js",
-      "source_location": "L446",
-      "weight": 1.0,
-      "source": "server_controllers_registrationpaymentcontroller_getstudentpaymenthistory",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_p"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "server/scratch/recalculate_all_plagiarism.js",
-      "source_location": "L55",
-      "weight": 1.0,
-      "source": "server_scratch_recalculate_all_plagiarism_recalculateassignmentsimilarity",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_p"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "server/scratch/test_file_resolution.js",
-      "source_location": "L33",
-      "weight": 1.0,
-      "source": "server_scratch_test_file_resolution_run",
-      "target": "android_app_src_main_assets_public_static_js_main_b1162215_p"
     },
     {
       "relation": "indirect_call",
@@ -22493,7 +23375,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
-      "source_location": "L5",
+      "source_location": "L9",
       "weight": 1.0,
       "source": "android_app_src_main_java_com_frontier_learningacademy_mainactivity",
       "target": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity",
@@ -22504,20 +23386,63 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
-      "source_location": "L3",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "android_app_src_main_java_com_frontier_learningacademy_mainactivity",
       "target": "bridgeactivity",
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "android_app_src_main_java_com_frontier_learningacademy_mainactivity",
+      "target": "bundle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity",
+      "target": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity_oncreate",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
-      "source_location": "L5",
+      "source_location": "L9",
       "weight": 1.0,
       "source": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity",
       "target": "bridgeactivity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
+      "source_location": "L10",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity_oncreate",
+      "target": "bundle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
+      "source_location": "L10",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "android_app_src_main_java_com_frontier_learningacademy_mainactivity_mainactivity_oncreate",
+      "target": "override",
       "confidence_score": 1.0
     },
     {
@@ -23613,7 +24538,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
-      "source_location": "L749",
+      "source_location": "L755",
       "weight": 1.0,
       "source": "client_src_app",
       "target": "client_src_app_app",
@@ -23623,20 +24548,10 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
-      "source_location": "L137",
+      "source_location": "L152",
       "weight": 1.0,
       "source": "client_src_app",
       "target": "client_src_app_appcontent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "client/src/App.jsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "client_src_app",
-      "target": "client_src_app_authpage",
       "confidence_score": 1.0
     },
     {
@@ -23756,7 +24671,7 @@
       "source_location": "L111",
       "weight": 1.0,
       "source": "client_src_app",
-      "target": "client_src_app_rolerouter",
+      "target": "client_src_app_rootredirect",
       "confidence_score": 1.0
     },
     {
@@ -24103,6 +25018,28 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "client_src_app",
+      "target": "client_src_pages_authpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "client_src_app",
+      "target": "client_src_pages_authpage_authpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/App.jsx",
       "source_location": "L8",
       "weight": 1.0,
       "source": "client_src_app",
@@ -24149,7 +25086,7 @@
       "source_file": "client/src/App.jsx",
       "source_location": "L112",
       "weight": 1.0,
-      "source": "client_src_app_rolerouter",
+      "source": "client_src_app_rootredirect",
       "target": "client_src_contexts_authcontext_useauth",
       "confidence_score": 1.0
     },
@@ -24158,7 +25095,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
-      "source_location": "L138",
+      "source_location": "L153",
       "weight": 1.0,
       "source": "client_src_app_appcontent",
       "target": "client_src_contexts_authcontext_useauth",
@@ -24169,7 +25106,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
-      "source_location": "L143",
+      "source_location": "L158",
       "weight": 1.0,
       "source": "client_src_app_appcontent",
       "target": "client_src_services_nativebridge_initnativefeatures",
@@ -30507,7 +31444,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0,
       "source": "package",
       "target": "package_author",
@@ -30517,7 +31454,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "package",
       "target": "package_dependencies",
@@ -30527,7 +31464,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "package",
       "target": "package_description",
@@ -30537,7 +31474,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "package",
       "target": "package_keywords",
@@ -30547,7 +31484,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "package",
       "target": "package_license",
@@ -30597,20 +31534,10 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_client",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
       "source_location": "L7",
       "weight": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_dev",
+      "target": "package_scripts_build",
       "confidence_score": 1.0
     },
     {
@@ -30620,7 +31547,7 @@
       "source_location": "L10",
       "weight": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_install_all",
+      "target": "package_scripts_client",
       "confidence_score": 1.0
     },
     {
@@ -30628,6 +31555,26 @@
       "confidence": "EXTRACTED",
       "source_file": "package.json",
       "source_location": "L8",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_dev",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_install_all",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L9",
       "weight": 1.0,
       "source": "package_scripts",
       "target": "package_scripts_server",
@@ -30647,7 +31594,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_capacitor_android",
@@ -30657,7 +31604,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_capacitor_app",
@@ -30667,7 +31614,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_capacitor_cli",
@@ -30677,7 +31624,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_capacitor_core",
@@ -30687,7 +31634,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_capacitor_push_notifications",
@@ -30697,7 +31644,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_capacitor_status_bar",
@@ -30707,7 +31654,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_concurrently",
@@ -30717,7 +31664,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_nodemon",
@@ -30727,7 +31674,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_capacitor_android",
@@ -30738,7 +31685,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_capacitor_app",
@@ -30749,7 +31696,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_capacitor_cli",
@@ -30760,7 +31707,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_capacitor_core",
@@ -30771,7 +31718,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_capacitor_push_notifications",
@@ -30782,7 +31729,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_capacitor_status_bar",
@@ -30793,7 +31740,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_concurrently",
@@ -30804,7 +31751,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_nodemon",
@@ -49689,8 +50636,58 @@
       "source": "server_utils_courseutils",
       "target": "server_utils_courseutils_resolvecoursecode",
       "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "vercel.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "vercel",
+      "target": "vercel_buildcommand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "vercel.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "vercel",
+      "target": "vercel_framework",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "vercel.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "vercel",
+      "target": "vercel_outputdirectory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "vercel.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "vercel",
+      "target": "vercel_rewrites",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "vercel.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "vercel",
+      "target": "vercel_version",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e1dc193b66f8dbc62981c67939795f78af9bb150"
+  "built_at_commit": "28fdd920ad25d6d5d042c057aeb8865aaa941cfa"
 }

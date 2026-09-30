@@ -6,9 +6,16 @@ let io;
 const onlineUsers = new Set();
 
 const initSocket = (server) => {
-  const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost",
+    "https://localhost",
+    "capacitor://localhost",
+    "ionic://localhost",
+  ];
   if (process.env.CLIENT_URL) {
-    process.env.CLIENT_URL.split(",").forEach(url => allowedOrigins.push(url.trim()));
+    process.env.CLIENT_URL.split(",").forEach((url) => allowedOrigins.push(url.trim()));
   }
 
   io = new Server(server, {
@@ -19,6 +26,8 @@ const initSocket = (server) => {
         try {
           const url = new URL(origin);
           if (url.hostname.endsWith(".vercel.app")) return callback(null, true);
+          if (url.hostname === "localhost" || url.hostname === "127.0.0.1") return callback(null, true);
+          if (url.protocol === "capacitor:" || url.protocol === "ionic:") return callback(null, true);
         } catch (e) {}
         callback(new Error("Not allowed by CORS"));
       },

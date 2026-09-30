@@ -310,7 +310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk",
-      "community": 40,
+      "community": 266,
       "norm_label": "1052.ba058c5b.chunk.js"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk_1052",
-      "community": 40,
+      "community": 266,
       "norm_label": "1052()"
     },
     {
@@ -490,7 +490,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk",
-      "community": 40,
+      "community": 148,
       "norm_label": "265.598e4165.chunk.js"
     },
     {
@@ -500,7 +500,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_4721",
-      "community": 40,
+      "community": 148,
       "norm_label": "4721()"
     },
     {
@@ -510,7 +510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_1700",
-      "community": 40,
+      "community": 148,
       "norm_label": "1700()"
     },
     {
@@ -520,7 +520,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_3113",
-      "community": 40,
+      "community": 148,
       "norm_label": "3113()"
     },
     {
@@ -530,7 +530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_265",
-      "community": 40,
+      "community": 148,
       "norm_label": "265()"
     },
     {
@@ -1320,7 +1320,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk",
-      "community": 40,
+      "community": 267,
       "norm_label": "5271.90e51dc0.chunk.js"
     },
     {
@@ -1330,7 +1330,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk_5271",
-      "community": 40,
+      "community": 267,
       "norm_label": "5271()"
     },
     {
@@ -2914,6 +2914,286 @@
       "norm_label": "be()"
     },
     {
+      "label": "main.d54da080.js",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "community": 6,
+      "norm_label": "main.d54da080.js"
+    },
+    {
+      "label": "8827()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_8827",
+      "community": 6,
+      "norm_label": "8827()"
+    },
+    {
+      "label": "5788()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_5788",
+      "community": 6,
+      "norm_label": "5788()"
+    },
+    {
+      "label": "8138()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_8138",
+      "community": 6,
+      "norm_label": "8138()"
+    },
+    {
+      "label": "9344()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_9344",
+      "community": 6,
+      "norm_label": "9344()"
+    },
+    {
+      "label": "1085()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_1085",
+      "community": 6,
+      "norm_label": "1085()"
+    },
+    {
+      "label": "1863()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_1863",
+      "community": 6,
+      "norm_label": "1863()"
+    },
+    {
+      "label": "1352()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_1352",
+      "community": 6,
+      "norm_label": "1352()"
+    },
+    {
+      "label": "7119()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_7119",
+      "community": 6,
+      "norm_label": "7119()"
+    },
+    {
+      "label": "3916()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_3916",
+      "community": 6,
+      "norm_label": "3916()"
+    },
+    {
+      "label": "1983()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_1983",
+      "community": 6,
+      "norm_label": "1983()"
+    },
+    {
+      "label": "9950()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_9950",
+      "community": 6,
+      "norm_label": "9950()"
+    },
+    {
+      "label": "4414()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_4414",
+      "community": 6,
+      "norm_label": "4414()"
+    },
+    {
+      "label": "9487()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_9487",
+      "community": 6,
+      "norm_label": "9487()"
+    },
+    {
+      "label": "5340()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_5340",
+      "community": 6,
+      "norm_label": "5340()"
+    },
+    {
+      "label": "1703()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_1703",
+      "community": 6,
+      "norm_label": "1703()"
+    },
+    {
+      "label": "5887()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_5887",
+      "community": 6,
+      "norm_label": "5887()"
+    },
+    {
+      "label": "6339()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_6339",
+      "community": 6,
+      "norm_label": "6339()"
+    },
+    {
+      "label": "5192()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_5192",
+      "community": 6,
+      "norm_label": "5192()"
+    },
+    {
+      "label": "4517()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "community": 6,
+      "norm_label": "4517()"
+    },
+    {
+      "label": "n()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "community": 6,
+      "norm_label": "n()"
+    },
+    {
+      "label": "u()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "community": 6,
+      "norm_label": "u()"
+    },
+    {
+      "label": "h()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "community": 6,
+      "norm_label": "h()"
+    },
+    {
+      "label": "p()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_p",
+      "community": 6,
+      "norm_label": "p()"
+    },
+    {
+      "label": "x()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "community": 6,
+      "norm_label": "x()"
+    },
+    {
+      "label": "ye()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_ye",
+      "community": 6,
+      "norm_label": "ye()"
+    },
+    {
+      "label": "ve()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_ve",
+      "community": 6,
+      "norm_label": "ve()"
+    },
+    {
+      "label": "be()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "community": 6,
+      "norm_label": "be()"
+    },
+    {
       "label": "MainActivity.java",
       "file_type": "code",
       "source_file": "android/app/src/main/java/com/frontier/learningacademy/MainActivity.java",
@@ -3196,7 +3476,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_android",
-      "community": 12,
+      "community": 268,
       "norm_label": "@capacitor/android"
     },
     {
@@ -3206,7 +3486,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_json_capacitor_android",
-      "community": 12,
+      "community": 268,
       "norm_label": "@capacitor/android"
     },
     {
@@ -3276,7 +3556,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_push_notifications",
-      "community": 228,
+      "community": 12,
       "norm_label": "@capacitor/push-notifications"
     },
     {
@@ -3286,7 +3566,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_json_capacitor_push_notifications",
-      "community": 228,
+      "community": 12,
       "norm_label": "@capacitor/push-notifications"
     },
     {
@@ -6253,7 +6533,7 @@
       "label": "getBackendUrl()",
       "file_type": "code",
       "source_file": "client/src/services/api.js",
-      "source_location": "L4",
+      "source_location": "L5",
       "_origin": "ast",
       "id": "client_src_services_api_getbackendurl",
       "community": 18,
@@ -6263,7 +6543,7 @@
       "label": "BACKEND_URL",
       "file_type": "code",
       "source_file": "client/src/services/api.js",
-      "source_location": "L21",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "client_src_services_api_backend_url",
       "community": 52,
@@ -6273,7 +6553,7 @@
       "label": "api",
       "file_type": "code",
       "source_file": "client/src/services/api.js",
-      "source_location": "L23",
+      "source_location": "L44",
       "_origin": "ast",
       "id": "client_src_services_api_api",
       "community": 21,
@@ -8516,7 +8796,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_attendance",
-      "community": 96,
+      "community": 7,
       "norm_label": "attendance"
     },
     {
@@ -8566,7 +8846,7 @@
       "source_location": "L201",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_markattendance",
-      "community": 96,
+      "community": 7,
       "norm_label": "markattendance()"
     },
     {
@@ -8576,7 +8856,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "server_controllers_attendancecontroller_getattendance",
-      "community": 96,
+      "community": 7,
       "norm_label": "getattendance()"
     },
     {
@@ -9166,7 +9446,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller",
-      "community": 56,
+      "community": 7,
       "norm_label": "coursecontroller.js"
     },
     {
@@ -9176,7 +9456,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_mongoose",
-      "community": 56,
+      "community": 7,
       "norm_label": "mongoose"
     },
     {
@@ -9186,7 +9466,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_course",
-      "community": 56,
+      "community": 7,
       "norm_label": "course"
     },
     {
@@ -9196,7 +9476,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_user",
-      "community": 56,
+      "community": 7,
       "norm_label": "user"
     },
     {
@@ -9206,7 +9486,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_createcourse",
-      "community": 56,
+      "community": 7,
       "norm_label": "createcourse()"
     },
     {
@@ -9216,7 +9496,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getmycourses",
-      "community": 91,
+      "community": 7,
       "norm_label": "getmycourses()"
     },
     {
@@ -9226,7 +9506,7 @@
       "source_location": "L745",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getteacherdashboardsummary",
-      "community": 96,
+      "community": 7,
       "norm_label": "getteacherdashboardsummary()"
     },
     {
@@ -9236,7 +9516,7 @@
       "source_location": "L1048",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getenrolledstudentsforcourse",
-      "community": 56,
+      "community": 7,
       "norm_label": "getenrolledstudentsforcourse()"
     },
     {
@@ -9246,7 +9526,7 @@
       "source_location": "L1295",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_joincourse",
-      "community": 56,
+      "community": 7,
       "norm_label": "joincourse()"
     },
     {
@@ -9256,7 +9536,7 @@
       "source_location": "L1423",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getcourse",
-      "community": 56,
+      "community": 7,
       "norm_label": "getcourse()"
     },
     {
@@ -9266,7 +9546,7 @@
       "source_location": "L1453",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_leavecourse",
-      "community": 56,
+      "community": 7,
       "norm_label": "leavecourse()"
     },
     {
@@ -9276,7 +9556,7 @@
       "source_location": "L1473",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_deletecourse",
-      "community": 56,
+      "community": 7,
       "norm_label": "deletecourse()"
     },
     {
@@ -9286,7 +9566,7 @@
       "source_location": "L1496",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getjoinrequests",
-      "community": 56,
+      "community": 7,
       "norm_label": "getjoinrequests()"
     },
     {
@@ -9296,7 +9576,7 @@
       "source_location": "L1521",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_handlejoinrequest",
-      "community": 56,
+      "community": 7,
       "norm_label": "handlejoinrequest()"
     },
     {
@@ -9306,7 +9586,7 @@
       "source_location": "L1615",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_findassessmentrecord",
-      "community": 96,
+      "community": 7,
       "norm_label": "findassessmentrecord()"
     },
     {
@@ -9316,7 +9596,7 @@
       "source_location": "L1656",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getcoursestudentsanalytics",
-      "community": 96,
+      "community": 7,
       "norm_label": "getcoursestudentsanalytics()"
     },
     {
@@ -9326,7 +9606,7 @@
       "source_location": "L1791",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getstudentanalytics",
-      "community": 96,
+      "community": 7,
       "norm_label": "getstudentanalytics()"
     },
     {
@@ -10076,7 +10356,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_isdepartmentandprogrammatch",
-      "community": 48,
+      "community": 36,
       "norm_label": "isdepartmentandprogrammatch()"
     },
     {
@@ -10086,7 +10366,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_findregistrationcalendarrule",
-      "community": 48,
+      "community": 36,
       "norm_label": "findregistrationcalendarrule()"
     },
     {
@@ -10096,7 +10376,7 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_getavailablecourses",
-      "community": 48,
+      "community": 36,
       "norm_label": "getavailablecourses()"
     },
     {
@@ -10106,7 +10386,7 @@
       "source_location": "L249",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_submitregistration",
-      "community": 48,
+      "community": 36,
       "norm_label": "submitregistration()"
     },
     {
@@ -10146,7 +10426,7 @@
       "source_location": "L691",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_approveregistration",
-      "community": 36,
+      "community": 56,
       "norm_label": "approveregistration()"
     },
     {
@@ -10536,7 +10816,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_resultcorrectionrequest",
-      "community": 164,
+      "community": 37,
       "norm_label": "resultcorrectionrequest"
     },
     {
@@ -10766,7 +11046,7 @@
       "source_location": "L2468",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_createcorrectionrequest",
-      "community": 164,
+      "community": 37,
       "norm_label": "createcorrectionrequest()"
     },
     {
@@ -10776,7 +11056,7 @@
       "source_location": "L2567",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getstudentcorrectionrequests",
-      "community": 164,
+      "community": 37,
       "norm_label": "getstudentcorrectionrequests()"
     },
     {
@@ -10786,7 +11066,7 @@
       "source_location": "L2580",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_getteachercorrectionrequests",
-      "community": 164,
+      "community": 37,
       "norm_label": "getteachercorrectionrequests()"
     },
     {
@@ -10796,7 +11076,7 @@
       "source_location": "L2620",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_replytocorrectionrequest",
-      "community": 164,
+      "community": 37,
       "norm_label": "replytocorrectionrequest()"
     },
     {
@@ -10816,7 +11096,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller",
-      "community": 163,
+      "community": 41,
       "norm_label": "searchcontroller.js"
     },
     {
@@ -10826,7 +11106,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_user",
-      "community": 163,
+      "community": 41,
       "norm_label": "user"
     },
     {
@@ -10836,7 +11116,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_student",
-      "community": 163,
+      "community": 41,
       "norm_label": "student"
     },
     {
@@ -10846,7 +11126,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_teacher",
-      "community": 163,
+      "community": 41,
       "norm_label": "teacher"
     },
     {
@@ -10856,7 +11136,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_course",
-      "community": 163,
+      "community": 41,
       "norm_label": "course"
     },
     {
@@ -10866,7 +11146,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_courseimport",
-      "community": 163,
+      "community": 41,
       "norm_label": "courseimport"
     },
     {
@@ -10876,7 +11156,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_notice",
-      "community": 163,
+      "community": 41,
       "norm_label": "notice"
     },
     {
@@ -10886,7 +11166,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_assignment",
-      "community": 163,
+      "community": 41,
       "norm_label": "assignment"
     },
     {
@@ -10896,7 +11176,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_result",
-      "community": 163,
+      "community": 41,
       "norm_label": "result"
     },
     {
@@ -10906,7 +11186,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_controllers_searchcontroller_globalsearch",
-      "community": 163,
+      "community": 41,
       "norm_label": "globalsearch()"
     },
     {
@@ -11523,7 +11803,7 @@
       "label": "isOriginAllowed()",
       "file_type": "code",
       "source_file": "server/index.js",
-      "source_location": "L40",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "server_index_isoriginallowed",
       "community": 23,
@@ -11533,7 +11813,7 @@
       "label": "restoreMissingFileFromDB()",
       "file_type": "code",
       "source_file": "server/index.js",
-      "source_location": "L71",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "server_index_restoremissingfilefromdb",
       "community": 8,
@@ -11946,7 +12226,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment",
-      "community": 60,
+      "community": 41,
       "norm_label": "assignment.js"
     },
     {
@@ -11956,7 +12236,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment_mongoose",
-      "community": 60,
+      "community": 41,
       "norm_label": "mongoose"
     },
     {
@@ -11966,7 +12246,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_assignment_assignmentschema",
-      "community": 60,
+      "community": 41,
       "norm_label": "assignmentschema"
     },
     {
@@ -12066,7 +12346,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment",
-      "community": 3,
+      "community": 265,
       "norm_label": "communitycomment.js"
     },
     {
@@ -12076,7 +12356,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment_mongoose",
-      "community": 3,
+      "community": 265,
       "norm_label": "mongoose"
     },
     {
@@ -12086,7 +12366,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_communitycomment_communitycommentschema",
-      "community": 3,
+      "community": 265,
       "norm_label": "communitycommentschema"
     },
     {
@@ -12126,7 +12406,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_contactrequest",
-      "community": 144,
+      "community": 23,
       "norm_label": "contactrequest.js"
     },
     {
@@ -12136,7 +12416,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_contactrequest_mongoose",
-      "community": 144,
+      "community": 23,
       "norm_label": "mongoose"
     },
     {
@@ -12146,7 +12426,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_contactrequest_contactrequestschema",
-      "community": 144,
+      "community": 23,
       "norm_label": "contactrequestschema"
     },
     {
@@ -12246,7 +12526,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_enrollment",
-      "community": 6,
+      "community": 22,
       "norm_label": "enrollment.js"
     },
     {
@@ -12256,7 +12536,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_enrollment_mongoose",
-      "community": 6,
+      "community": 22,
       "norm_label": "mongoose"
     },
     {
@@ -12266,7 +12546,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_enrollment_enrollmentschema",
-      "community": 6,
+      "community": 22,
       "norm_label": "enrollmentschema"
     },
     {
@@ -12746,7 +13026,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_resultupload",
-      "community": 163,
+      "community": 48,
       "norm_label": "resultupload.js"
     },
     {
@@ -12756,7 +13036,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_resultupload_mongoose",
-      "community": 163,
+      "community": 48,
       "norm_label": "mongoose"
     },
     {
@@ -12766,7 +13046,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_resultupload_resultuploadschema",
-      "community": 163,
+      "community": 48,
       "norm_label": "resultuploadschema"
     },
     {
@@ -13196,7 +13476,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "server_package_dependencies_cors",
-      "community": 2,
+      "community": 269,
       "norm_label": "cors"
     },
     {
@@ -13206,7 +13486,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "cors",
-      "community": 2,
+      "community": 269,
       "norm_label": "cors"
     },
     {
@@ -13376,7 +13656,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "server_package_dependencies_node_cron",
-      "community": 265,
+      "community": 2,
       "norm_label": "node-cron"
     },
     {
@@ -13386,7 +13666,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "node_cron",
-      "community": 265,
+      "community": 2,
       "norm_label": "node-cron"
     },
     {
@@ -13616,7 +13896,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes",
-      "community": 142,
+      "community": 164,
       "norm_label": "adminroutes.js"
     },
     {
@@ -13626,7 +13906,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes_router",
-      "community": 142,
+      "community": 164,
       "norm_label": "router"
     },
     {
@@ -13636,7 +13916,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_adminroutes_verifytoken_checkrole",
-      "community": 142,
+      "community": 164,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13646,7 +13926,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_adminroutes_ctrl",
-      "community": 142,
+      "community": 164,
       "norm_label": "ctrl"
     },
     {
@@ -13656,7 +13936,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 148,
+      "community": 142,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -13666,7 +13946,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 148,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -13676,7 +13956,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 148,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -13686,7 +13966,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 148,
+      "community": 142,
       "norm_label": "ctrl"
     },
     {
@@ -14096,7 +14376,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes",
-      "community": 142,
+      "community": 228,
       "norm_label": "registrationpaymentroutes.js"
     },
     {
@@ -14106,7 +14386,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_router",
-      "community": 142,
+      "community": 228,
       "norm_label": "router"
     },
     {
@@ -14116,7 +14396,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_verifytoken_checkrole",
-      "community": 142,
+      "community": 228,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -14126,7 +14406,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_payctrl",
-      "community": 142,
+      "community": 228,
       "norm_label": "payctrl"
     },
     {
@@ -14296,7 +14576,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes",
-      "community": 78,
+      "community": 142,
       "norm_label": "umsadminroutes.js"
     },
     {
@@ -14306,7 +14586,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_router",
-      "community": 78,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -14316,7 +14596,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_verifytoken_checkrole",
-      "community": 78,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -14326,7 +14606,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_ctrl",
-      "community": 78,
+      "community": 142,
       "norm_label": "ctrl"
     },
     {
@@ -14826,7 +15106,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses",
-      "community": 16,
+      "community": 62,
       "norm_label": "debug_asim_courses.js"
     },
     {
@@ -14836,7 +15116,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_mongoose",
-      "community": 16,
+      "community": 62,
       "norm_label": "mongoose"
     },
     {
@@ -14846,7 +15126,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_user",
-      "community": 16,
+      "community": 62,
       "norm_label": "user"
     },
     {
@@ -14856,7 +15136,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_student",
-      "community": 16,
+      "community": 62,
       "norm_label": "student"
     },
     {
@@ -14866,7 +15146,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_registration",
-      "community": 16,
+      "community": 62,
       "norm_label": "registration"
     },
     {
@@ -14876,7 +15156,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_enrollment",
-      "community": 16,
+      "community": 62,
       "norm_label": "enrollment"
     },
     {
@@ -14886,7 +15166,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_course",
-      "community": 16,
+      "community": 62,
       "norm_label": "course"
     },
     {
@@ -14896,7 +15176,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_courseimport",
-      "community": 16,
+      "community": 62,
       "norm_label": "courseimport"
     },
     {
@@ -14906,7 +15186,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_debug_asim_courses_run",
-      "community": 16,
+      "community": 62,
       "norm_label": "run()"
     },
     {
@@ -15006,7 +15286,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db",
-      "community": 62,
+      "community": 130,
       "norm_label": "fix_registration_status_db.js"
     },
     {
@@ -15016,7 +15296,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_dns",
-      "community": 62,
+      "community": 130,
       "norm_label": "dns"
     },
     {
@@ -15026,7 +15306,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_path",
-      "community": 62,
+      "community": 130,
       "norm_label": "path"
     },
     {
@@ -15036,7 +15316,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_mongoose",
-      "community": 62,
+      "community": 130,
       "norm_label": "mongoose"
     },
     {
@@ -15046,7 +15326,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_user",
-      "community": 62,
+      "community": 130,
       "norm_label": "user"
     },
     {
@@ -15056,7 +15336,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_student",
-      "community": 62,
+      "community": 130,
       "norm_label": "student"
     },
     {
@@ -15066,7 +15346,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_teacher",
-      "community": 62,
+      "community": 130,
       "norm_label": "teacher"
     },
     {
@@ -15076,7 +15356,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_run",
-      "community": 62,
+      "community": 130,
       "norm_label": "run()"
     },
     {
@@ -15146,7 +15426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links",
-      "community": 155,
+      "community": 91,
       "norm_label": "fix_teacher_course_links.js"
     },
     {
@@ -15156,7 +15436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links_dns",
-      "community": 155,
+      "community": 91,
       "norm_label": "dns"
     },
     {
@@ -15166,7 +15446,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links_path",
-      "community": 155,
+      "community": 91,
       "norm_label": "path"
     },
     {
@@ -15176,7 +15456,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links_mongoose",
-      "community": 155,
+      "community": 91,
       "norm_label": "mongoose"
     },
     {
@@ -15186,7 +15466,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links_teacher",
-      "community": 155,
+      "community": 91,
       "norm_label": "teacher"
     },
     {
@@ -15196,7 +15476,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links_course",
-      "community": 155,
+      "community": 91,
       "norm_label": "course"
     },
     {
@@ -15206,7 +15486,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links_user",
-      "community": 155,
+      "community": 91,
       "norm_label": "user"
     },
     {
@@ -15216,7 +15496,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_fix_teacher_course_links_fixteachercourselinks",
-      "community": 155,
+      "community": 91,
       "norm_label": "fixteachercourselinks()"
     },
     {
@@ -15276,7 +15556,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs",
-      "community": 6,
+      "community": 22,
       "norm_label": "inspect_all_regs.js"
     },
     {
@@ -15286,7 +15566,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs_mongoose",
-      "community": 6,
+      "community": 22,
       "norm_label": "mongoose"
     },
     {
@@ -15296,7 +15576,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs_user",
-      "community": 6,
+      "community": 22,
       "norm_label": "user"
     },
     {
@@ -15306,7 +15586,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs_student",
-      "community": 6,
+      "community": 22,
       "norm_label": "student"
     },
     {
@@ -15316,7 +15596,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs_registration",
-      "community": 6,
+      "community": 22,
       "norm_label": "registration"
     },
     {
@@ -15326,7 +15606,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs_enrollment",
-      "community": 6,
+      "community": 22,
       "norm_label": "enrollment"
     },
     {
@@ -15336,7 +15616,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs_course",
-      "community": 6,
+      "community": 22,
       "norm_label": "course"
     },
     {
@@ -15346,7 +15626,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_inspect_all_regs_run",
-      "community": 6,
+      "community": 22,
       "norm_label": "run()"
     },
     {
@@ -16066,7 +16346,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses",
-      "community": 36,
+      "community": 56,
       "norm_label": "setup_asim_courses.js"
     },
     {
@@ -16076,7 +16356,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_mongoose",
-      "community": 36,
+      "community": 56,
       "norm_label": "mongoose"
     },
     {
@@ -16086,7 +16366,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_user",
-      "community": 36,
+      "community": 56,
       "norm_label": "user"
     },
     {
@@ -16096,7 +16376,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_student",
-      "community": 36,
+      "community": 56,
       "norm_label": "student"
     },
     {
@@ -16106,7 +16386,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_registration",
-      "community": 36,
+      "community": 56,
       "norm_label": "registration"
     },
     {
@@ -16116,7 +16396,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_courseimport",
-      "community": 36,
+      "community": 56,
       "norm_label": "courseimport"
     },
     {
@@ -16126,7 +16406,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_approveregistration",
-      "community": 36,
+      "community": 56,
       "norm_label": "{ approveregistration }"
     },
     {
@@ -16136,7 +16416,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_run",
-      "community": 36,
+      "community": 56,
       "norm_label": "run()"
     },
     {
@@ -16146,7 +16426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status",
-      "community": 130,
+      "community": 144,
       "norm_label": "sync_active_status.js"
     },
     {
@@ -16156,7 +16436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_mongoose",
-      "community": 130,
+      "community": 144,
       "norm_label": "mongoose"
     },
     {
@@ -16166,7 +16446,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_user",
-      "community": 130,
+      "community": 144,
       "norm_label": "user"
     },
     {
@@ -16176,7 +16456,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_teacher",
-      "community": 130,
+      "community": 144,
       "norm_label": "teacher"
     },
     {
@@ -16186,7 +16466,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_student",
-      "community": 130,
+      "community": 144,
       "norm_label": "student"
     },
     {
@@ -16196,7 +16476,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_sync_active_status_run",
-      "community": 130,
+      "community": 144,
       "norm_label": "run()"
     },
     {
@@ -16256,7 +16536,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses",
-      "community": 6,
+      "community": 155,
       "norm_label": "sync_student_courses.js"
     },
     {
@@ -16266,7 +16546,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_mongoose",
-      "community": 6,
+      "community": 155,
       "norm_label": "mongoose"
     },
     {
@@ -16276,7 +16556,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_user",
-      "community": 6,
+      "community": 155,
       "norm_label": "user"
     },
     {
@@ -16286,7 +16566,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_student",
-      "community": 6,
+      "community": 155,
       "norm_label": "student"
     },
     {
@@ -16296,7 +16576,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_registration",
-      "community": 6,
+      "community": 155,
       "norm_label": "registration"
     },
     {
@@ -16306,7 +16586,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_enrollment",
-      "community": 6,
+      "community": 155,
       "norm_label": "enrollment"
     },
     {
@@ -16316,7 +16596,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_course",
-      "community": 6,
+      "community": 155,
       "norm_label": "course"
     },
     {
@@ -16326,7 +16606,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_run",
-      "community": 6,
+      "community": 155,
       "norm_label": "run()"
     },
     {
@@ -16546,7 +16826,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_dept_program_filtering",
-      "community": 48,
+      "community": 36,
       "norm_label": "test_dept_program_filtering.js"
     },
     {
@@ -16556,7 +16836,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_dept_program_filtering_mongoose",
-      "community": 48,
+      "community": 36,
       "norm_label": "mongoose"
     },
     {
@@ -16566,7 +16846,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_dept_program_filtering_getavailablecourses",
-      "community": 48,
+      "community": 36,
       "norm_label": "{ getavailablecourses }"
     },
     {
@@ -16576,7 +16856,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_dept_program_filtering_user",
-      "community": 48,
+      "community": 36,
       "norm_label": "user"
     },
     {
@@ -16586,7 +16866,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_dept_program_filtering_student",
-      "community": 48,
+      "community": 36,
       "norm_label": "student"
     },
     {
@@ -16596,7 +16876,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_dept_program_filtering_run",
-      "community": 48,
+      "community": 36,
       "norm_label": "run()"
     },
     {
@@ -17266,7 +17546,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_get_my_courses_endpoint",
-      "community": 91,
+      "community": 7,
       "norm_label": "test_get_my_courses_endpoint.js"
     },
     {
@@ -17276,7 +17556,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_get_my_courses_endpoint_mongoose",
-      "community": 91,
+      "community": 7,
       "norm_label": "mongoose"
     },
     {
@@ -17286,7 +17566,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_get_my_courses_endpoint_getmycourses",
-      "community": 91,
+      "community": 7,
       "norm_label": "{ getmycourses }"
     },
     {
@@ -17296,7 +17576,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_get_my_courses_endpoint_user",
-      "community": 91,
+      "community": 7,
       "norm_label": "user"
     },
     {
@@ -17306,7 +17586,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_get_my_courses_endpoint_run",
-      "community": 91,
+      "community": 7,
       "norm_label": "run()"
     },
     {
@@ -18126,7 +18406,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints",
-      "community": 163,
+      "community": 78,
       "norm_label": "test_rabbi_endpoints.js"
     },
     {
@@ -18136,7 +18416,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_dns",
-      "community": 163,
+      "community": 78,
       "norm_label": "dns"
     },
     {
@@ -18146,7 +18426,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_path",
-      "community": 163,
+      "community": 78,
       "norm_label": "path"
     },
     {
@@ -18156,7 +18436,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_mongoose",
-      "community": 163,
+      "community": 78,
       "norm_label": "mongoose"
     },
     {
@@ -18166,7 +18446,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_user",
-      "community": 163,
+      "community": 78,
       "norm_label": "user"
     },
     {
@@ -18176,7 +18456,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_notice",
-      "community": 163,
+      "community": 78,
       "norm_label": "notice"
     },
     {
@@ -18186,7 +18466,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_resultupload",
-      "community": 163,
+      "community": 78,
       "norm_label": "resultupload"
     },
     {
@@ -18196,7 +18476,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_result",
-      "community": 163,
+      "community": 78,
       "norm_label": "result"
     },
     {
@@ -18206,7 +18486,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_testrabbi",
-      "community": 163,
+      "community": 78,
       "norm_label": "testrabbi()"
     },
     {
@@ -18396,7 +18676,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_session_calendar_validation",
-      "community": 48,
+      "community": 36,
       "norm_label": "test_session_calendar_validation.js"
     },
     {
@@ -18406,7 +18686,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_session_calendar_validation_mongoose",
-      "community": 48,
+      "community": 36,
       "norm_label": "mongoose"
     },
     {
@@ -18416,7 +18696,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_session_calendar_validation_getavailablecourses_submitregistration",
-      "community": 48,
+      "community": 36,
       "norm_label": "{ getavailablecourses, submitregistration }"
     },
     {
@@ -18426,7 +18706,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_session_calendar_validation_user",
-      "community": 48,
+      "community": 36,
       "norm_label": "user"
     },
     {
@@ -18436,7 +18716,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_session_calendar_validation_student",
-      "community": 48,
+      "community": 36,
       "norm_label": "student"
     },
     {
@@ -18446,7 +18726,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_session_calendar_validation_run",
-      "community": 48,
+      "community": 36,
       "norm_label": "run()"
     },
     {
@@ -18586,7 +18866,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary",
-      "community": 41,
+      "community": 16,
       "norm_label": "test_teacher_summary.js"
     },
     {
@@ -18596,7 +18876,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_dns",
-      "community": 41,
+      "community": 16,
       "norm_label": "dns"
     },
     {
@@ -18606,7 +18886,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_path",
-      "community": 41,
+      "community": 16,
       "norm_label": "path"
     },
     {
@@ -18616,7 +18896,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_mongoose",
-      "community": 41,
+      "community": 16,
       "norm_label": "mongoose"
     },
     {
@@ -18626,7 +18906,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_user",
-      "community": 41,
+      "community": 16,
       "norm_label": "user"
     },
     {
@@ -18636,7 +18916,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_teacher",
-      "community": 41,
+      "community": 16,
       "norm_label": "teacher"
     },
     {
@@ -18646,7 +18926,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_course",
-      "community": 41,
+      "community": 16,
       "norm_label": "course"
     },
     {
@@ -18656,7 +18936,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_courseimport",
-      "community": 41,
+      "community": 16,
       "norm_label": "courseimport"
     },
     {
@@ -18666,7 +18946,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_summary_testteachersummary",
-      "community": 41,
+      "community": 16,
       "norm_label": "testteachersummary()"
     },
     {
@@ -19096,7 +19376,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route",
-      "community": 47,
+      "community": 96,
       "norm_label": "verify_correction_request_route.js"
     },
     {
@@ -19106,7 +19386,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route_axios",
-      "community": 47,
+      "community": 96,
       "norm_label": "axios"
     },
     {
@@ -19116,7 +19396,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route_mongoose",
-      "community": 47,
+      "community": 96,
       "norm_label": "mongoose"
     },
     {
@@ -19126,7 +19406,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route_jwt",
-      "community": 47,
+      "community": 96,
       "norm_label": "jwt"
     },
     {
@@ -19136,7 +19416,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route_path",
-      "community": 47,
+      "community": 96,
       "norm_label": "path"
     },
     {
@@ -19146,7 +19426,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route_dns",
-      "community": 47,
+      "community": 96,
       "norm_label": "dns"
     },
     {
@@ -19156,7 +19436,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route_user",
-      "community": 47,
+      "community": 96,
       "norm_label": "user"
     },
     {
@@ -19166,7 +19446,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_verify_correction_request_route_testcorrectionroute",
-      "community": 47,
+      "community": 96,
       "norm_label": "testcorrectionroute()"
     },
     {
@@ -19886,7 +20166,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_socket",
-      "community": 144,
+      "community": 23,
       "norm_label": "socket.js"
     },
     {
@@ -19896,7 +20176,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_socket_server",
-      "community": 144,
+      "community": 23,
       "norm_label": "{ server }"
     },
     {
@@ -19906,7 +20186,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_socket_user",
-      "community": 144,
+      "community": 23,
       "norm_label": "user"
     },
     {
@@ -19916,7 +20196,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_socket_contactrequest",
-      "community": 144,
+      "community": 23,
       "norm_label": "contactrequest"
     },
     {
@@ -19926,7 +20206,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_socket_onlineusers",
-      "community": 144,
+      "community": 23,
       "norm_label": "onlineusers"
     },
     {
@@ -19936,14 +20216,14 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_socket_initsocket",
-      "community": 144,
+      "community": 23,
       "norm_label": "initsocket()"
     },
     {
       "label": "getIO()",
       "file_type": "code",
       "source_file": "server/socket.js",
-      "source_location": "L115",
+      "source_location": "L124",
       "_origin": "ast",
       "id": "server_socket_getio",
       "community": 73,
@@ -19956,7 +20236,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_test_admin_results",
-      "community": 163,
+      "community": 48,
       "norm_label": "test_admin_results.js"
     },
     {
@@ -19966,7 +20246,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_test_admin_results_mongoose",
-      "community": 163,
+      "community": 48,
       "norm_label": "mongoose"
     },
     {
@@ -19976,7 +20256,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_test_admin_results_resultupload",
-      "community": 163,
+      "community": 48,
       "norm_label": "resultupload"
     },
     {
@@ -19986,7 +20266,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_test_admin_results_user",
-      "community": 163,
+      "community": 48,
       "norm_label": "user"
     },
     {
@@ -19996,7 +20276,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_test_admin_results_course",
-      "community": 163,
+      "community": 48,
       "norm_label": "course"
     },
     {
@@ -20006,7 +20286,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_test_admin_results_courseimport",
-      "community": 163,
+      "community": 48,
       "norm_label": "courseimport"
     },
     {
@@ -20016,7 +20296,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_test_admin_results_test",
-      "community": 163,
+      "community": 48,
       "norm_label": "test()"
     },
     {
@@ -20408,17 +20688,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/1052.ba058c5b.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_1052_ba058c5b_chunk_1052",
-      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "android/app/src/main/assets/public/static/js/118.492c60e7.chunk.js",
@@ -20567,17 +20836,6 @@
       "source": "android_app_src_main_assets_public_static_js_265_598e4165_chunk",
       "target": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_4721",
       "confidence_score": 1.0
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/265.598e4165.chunk.js",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_265_598e4165_chunk_265",
-      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
     },
     {
       "relation": "contains",
@@ -21118,17 +21376,6 @@
       "source": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk",
       "target": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk_5271",
       "confidence_score": 1.0
-    },
-    {
-      "relation": "indirect_call",
-      "context": "collection",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/5271.90e51dc0.chunk.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_5271_90e51dc0_chunk_5271",
-      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
     },
     {
       "relation": "contains",
@@ -22618,39 +22865,6 @@
     },
     {
       "relation": "indirect_call",
-      "context": "collection",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
-      "source_location": "L172",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_main_b1162215_4517",
-      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_main_b1162215_9487",
-      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
-    },
-    {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "android/app/src/main/assets/public/static/js/main.b1162215.js",
-      "source_location": "L172",
-      "weight": 1.0,
-      "source": "android_app_src_main_assets_public_static_js_main_b1162215_be",
-      "target": "android_app_src_main_assets_public_static_js_main_4ed04281_x"
-    },
-    {
-      "relation": "indirect_call",
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "android/app/src/main/assets/public/static/js/main.4ed04281.js",
@@ -23369,6 +23583,804 @@
       "weight": 1.0,
       "source": "android_app_src_main_assets_public_static_js_main_b1162215_be",
       "target": "android_app_src_main_assets_public_static_js_main_b1162215_ve",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_1085",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_1352",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_1703",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_1863",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_1983",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_3916",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_4414",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_5192",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_5340",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_5788",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_5887",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_6339",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_7119",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_8138",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_8827",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_9344",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_9487",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_9950",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_ve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_ye",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_8138",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_8138",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_9344",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_1863",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_1863",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_1352",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_7119",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_9950",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4414",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_9487",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_9487",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5340",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_6339",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_5192",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_p",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_ye",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_p",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_ve",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_ye",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.d54da080.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_d54da080_be",
+      "target": "android_app_src_main_assets_public_static_js_main_d54da080_ve",
       "confidence_score": 0.5
     },
     {
@@ -31129,7 +32141,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/services/api.js",
-      "source_location": "L23",
+      "source_location": "L44",
       "weight": 1.0,
       "source": "client_src_services_api",
       "target": "client_src_services_api_api",
@@ -31139,7 +32151,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/services/api.js",
-      "source_location": "L21",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "client_src_services_api",
       "target": "client_src_services_api_backend_url",
@@ -31149,7 +32161,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/services/api.js",
-      "source_location": "L4",
+      "source_location": "L5",
       "weight": 1.0,
       "source": "client_src_services_api",
       "target": "client_src_services_api_getbackendurl",
@@ -31160,7 +32172,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/services/api.js",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0,
       "source": "client_src_services_api",
       "target": "client_src_services_apicache",
@@ -31171,7 +32183,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "client/src/services/api.js",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0,
       "source": "client_src_services_api",
       "target": "client_src_services_apicache_invalidatecache",
@@ -35862,7 +36874,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/index.js",
-      "source_location": "L127",
+      "source_location": "L136",
       "weight": 1.0,
       "source": "server_index_restoremissingfilefromdb",
       "target": "server_controllers_communitycontroller_communitypost"
@@ -37250,7 +38262,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/index.js",
-      "source_location": "L114",
+      "source_location": "L123",
       "weight": 1.0,
       "source": "server_index_restoremissingfilefromdb",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -40734,7 +41746,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/index.js",
-      "source_location": "L40",
+      "source_location": "L47",
       "weight": 1.0,
       "source": "server_index",
       "target": "server_index_isoriginallowed",
@@ -40754,7 +41766,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/index.js",
-      "source_location": "L71",
+      "source_location": "L80",
       "weight": 1.0,
       "source": "server_index",
       "target": "server_index_restoremissingfilefromdb",
@@ -50468,7 +51480,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "server/socket.js",
-      "source_location": "L122",
+      "source_location": "L131",
       "weight": 1.0,
       "context": "collection",
       "source": "server_socket",
@@ -50479,7 +51491,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "server/socket.js",
-      "source_location": "L122",
+      "source_location": "L131",
       "weight": 1.0,
       "context": "collection",
       "source": "server_socket",
@@ -50689,5 +51701,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "28fdd920ad25d6d5d042c057aeb8865aaa941cfa"
+  "built_at_commit": "2c29a72f3955146fcd96c7f0bd054cd4f706136b"
 }

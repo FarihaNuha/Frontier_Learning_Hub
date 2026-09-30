@@ -264,5 +264,9 @@
   "262": "jspdf-autotable",
   "263": "socket.io-client",
   "264": "@testing-library/react",
-  "265": "node-cron"
+  "265": "node-cron",
+  "266": "1052.ba058c5b.chunk.js",
+  "267": "5271.90e51dc0.chunk.js",
+  "268": "@capacitor/android",
+  "269": "cors"
 }

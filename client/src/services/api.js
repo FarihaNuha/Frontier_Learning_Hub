@@ -1,17 +1,38 @@
 import axios from "axios";
+import { Capacitor } from "@capacitor/core";
 import { invalidateCache } from "./apiCache";
 
 const getBackendUrl = () => {
   if (process.env.REACT_APP_API_URL) {
     return process.env.REACT_APP_API_URL;
   }
-  const isLocalhost =
+
+  // 1. In native mobile app (Capacitor Android/iOS), ALWAYS point to the live Render cloud backend
+  try {
+    if (Capacitor.isNativePlatform()) {
+      return "https://frontier-learning-academy.onrender.com";
+    }
+  } catch (e) {}
+
+  // 2. If running inside WebView on localhost without a dev port (Capacitor WebView)
+  if (
     typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1" ||
+    (window.Capacitor?.isNativePlatform?.() ||
+      window.location.protocol === "capacitor:" ||
+      (window.location.hostname === "localhost" && window.location.port === "") ||
+      (window.location.hostname === "127.0.0.1" && window.location.port === ""))
+  ) {
+    return "https://frontier-learning-academy.onrender.com";
+  }
+
+  // 3. Local desktop development with explicit port 3000/3001
+  const isLocalDev =
+    typeof window !== "undefined" &&
+    (window.location.port === "3000" ||
+      window.location.port === "3001" ||
       window.location.hostname.startsWith("192.168."));
 
-  if (isLocalhost) {
+  if (isLocalDev) {
     return "http://localhost:5000";
   }
 

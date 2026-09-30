@@ -167,25 +167,10 @@ function AppContent() {
     }
   }, []);
 
-  // Close the mobile sidebar checkbox when route changes
-  useEffect(() => {
-    const checkbox = document.getElementById("mobile-sidebar-checkbox");
-    if (checkbox) {
-      checkbox.checked = false;
-    }
-  }, [location]);
-
   return (
     <>
       {user && (
         <>
-          <input type="checkbox" id="mobile-sidebar-checkbox" style={{ display: "none" }} />
-          <label htmlFor="mobile-sidebar-checkbox" className="mobile-hamburger-btn">
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
-          </label>
-          <label htmlFor="mobile-sidebar-checkbox" className="mobile-sidebar-overlay"></label>
           <GlobalNotificationBell />
           <GlobalSettingsPortal />
         </>

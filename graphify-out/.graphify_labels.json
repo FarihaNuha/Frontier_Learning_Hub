@@ -268,5 +268,12 @@
   "266": "1052.ba058c5b.chunk.js",
   "267": "5271.90e51dc0.chunk.js",
   "268": "@capacitor/android",
-  "269": "cors"
+  "269": "cors",
+  "270": "test_full_import_teachers.js",
+  "271": "test_registration.js",
+  "272": "6955.ee3287c1.chunk.js",
+  "273": "Payment.js",
+  "274": "RegistrationCalendar.js",
+  "275": "@capacitor/push-notifications",
+  "276": "node-cron"
 }

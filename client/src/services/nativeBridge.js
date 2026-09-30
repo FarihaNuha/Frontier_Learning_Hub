@@ -29,12 +29,12 @@ export const initNativeFeatures = (navigate) => {
   // 2. Hardware & Gesture Back Button Handler
   try {
     App.addListener("backButton", ({ canGoBack }) => {
-      // Priority 1: Close open modals if any
+      // Priority 1: Close open modals or drawers if any
       const openModals = document.querySelectorAll(
-        ".modal-overlay, .share-modal-overlay, .file-preview-overlay, .preview-modal-overlay"
+        ".modal-overlay, .share-modal-overlay, .file-preview-overlay, .preview-modal-overlay, .notification-drawer-overlay"
       );
       if (openModals && openModals.length > 0) {
-        const closeBtn = document.querySelector(".modal-close-btn, .close-btn");
+        const closeBtn = document.querySelector(".modal-close-btn, .close-btn, .close-drawer-btn");
         if (closeBtn) {
           closeBtn.click();
           return;

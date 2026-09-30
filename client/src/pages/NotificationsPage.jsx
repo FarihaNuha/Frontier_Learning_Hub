@@ -102,7 +102,7 @@ export default function NotificationsPage() {
         <StudentSidebar currentPage="notifications" />
       )}
 
-      <div className="main-content" style={{ padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>

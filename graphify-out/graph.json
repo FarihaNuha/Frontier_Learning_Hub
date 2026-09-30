@@ -1624,6 +1624,46 @@
       "norm_label": "6955()"
     },
     {
+      "label": "6955.ee3287c1.chunk.js",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/6955.ee3287c1.chunk.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk",
+      "community": 272,
+      "norm_label": "6955.ee3287c1.chunk.js"
+    },
+    {
+      "label": "6995()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/6955.ee3287c1.chunk.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk_6995",
+      "community": 272,
+      "norm_label": "6995()"
+    },
+    {
+      "label": "6286()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/6955.ee3287c1.chunk.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk_6286",
+      "community": 272,
+      "norm_label": "6286()"
+    },
+    {
+      "label": "6955()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/6955.ee3287c1.chunk.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk_6955",
+      "community": 272,
+      "norm_label": "6955()"
+    },
+    {
       "label": "6970.4befd0bb.chunk.js",
       "file_type": "code",
       "source_file": "android/app/src/main/assets/public/static/js/6970.4befd0bb.chunk.js",
@@ -2362,6 +2402,286 @@
       "id": "android_app_src_main_assets_public_static_js_9908_e548ceae_chunk_9908",
       "community": 145,
       "norm_label": "9908()"
+    },
+    {
+      "label": "main.3c69124b.js",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "community": 111,
+      "norm_label": "main.3c69124b.js"
+    },
+    {
+      "label": "8827()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_8827",
+      "community": 111,
+      "norm_label": "8827()"
+    },
+    {
+      "label": "5788()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_5788",
+      "community": 111,
+      "norm_label": "5788()"
+    },
+    {
+      "label": "8138()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_8138",
+      "community": 111,
+      "norm_label": "8138()"
+    },
+    {
+      "label": "9344()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_9344",
+      "community": 111,
+      "norm_label": "9344()"
+    },
+    {
+      "label": "1085()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_1085",
+      "community": 111,
+      "norm_label": "1085()"
+    },
+    {
+      "label": "1863()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_1863",
+      "community": 111,
+      "norm_label": "1863()"
+    },
+    {
+      "label": "1352()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_1352",
+      "community": 111,
+      "norm_label": "1352()"
+    },
+    {
+      "label": "7119()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_7119",
+      "community": 111,
+      "norm_label": "7119()"
+    },
+    {
+      "label": "3916()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_3916",
+      "community": 111,
+      "norm_label": "3916()"
+    },
+    {
+      "label": "1983()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_1983",
+      "community": 111,
+      "norm_label": "1983()"
+    },
+    {
+      "label": "9950()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_9950",
+      "community": 111,
+      "norm_label": "9950()"
+    },
+    {
+      "label": "4414()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_4414",
+      "community": 111,
+      "norm_label": "4414()"
+    },
+    {
+      "label": "9487()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_9487",
+      "community": 111,
+      "norm_label": "9487()"
+    },
+    {
+      "label": "5340()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_5340",
+      "community": 111,
+      "norm_label": "5340()"
+    },
+    {
+      "label": "1703()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_1703",
+      "community": 111,
+      "norm_label": "1703()"
+    },
+    {
+      "label": "5887()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_5887",
+      "community": 111,
+      "norm_label": "5887()"
+    },
+    {
+      "label": "6339()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_6339",
+      "community": 111,
+      "norm_label": "6339()"
+    },
+    {
+      "label": "5192()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_5192",
+      "community": 111,
+      "norm_label": "5192()"
+    },
+    {
+      "label": "4517()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "community": 111,
+      "norm_label": "4517()"
+    },
+    {
+      "label": "n()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "community": 111,
+      "norm_label": "n()"
+    },
+    {
+      "label": "u()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "community": 111,
+      "norm_label": "u()"
+    },
+    {
+      "label": "h()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "community": 111,
+      "norm_label": "h()"
+    },
+    {
+      "label": "p()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_p",
+      "community": 111,
+      "norm_label": "p()"
+    },
+    {
+      "label": "x()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "community": 111,
+      "norm_label": "x()"
+    },
+    {
+      "label": "ye()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_ye",
+      "community": 111,
+      "norm_label": "ye()"
+    },
+    {
+      "label": "ve()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_ve",
+      "community": 111,
+      "norm_label": "ve()"
+    },
+    {
+      "label": "be()",
+      "file_type": "code",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "_origin": "ast",
+      "id": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "community": 111,
+      "norm_label": "be()"
     },
     {
       "label": "main.4ed04281.js",
@@ -3496,7 +3816,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_app",
-      "community": 259,
+      "community": 12,
       "norm_label": "@capacitor/app"
     },
     {
@@ -3506,7 +3826,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "client_package_json_capacitor_app",
-      "community": 259,
+      "community": 12,
       "norm_label": "@capacitor/app"
     },
     {
@@ -3556,7 +3876,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_push_notifications",
-      "community": 12,
+      "community": 275,
       "norm_label": "@capacitor/push-notifications"
     },
     {
@@ -3566,7 +3886,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "client_package_json_capacitor_push_notifications",
-      "community": 12,
+      "community": 275,
       "norm_label": "@capacitor/push-notifications"
     },
     {
@@ -4753,7 +5073,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "client/src/App.jsx",
-      "source_location": "L755",
+      "source_location": "L740",
       "_origin": "ast",
       "id": "client_src_app_app",
       "community": 69,
@@ -7676,7 +7996,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_check_student_registrations",
-      "community": 121,
+      "community": 130,
       "norm_label": "check_student_registrations.js"
     },
     {
@@ -7686,7 +8006,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_check_student_registrations_mongoose",
-      "community": 121,
+      "community": 130,
       "norm_label": "mongoose"
     },
     {
@@ -7696,7 +8016,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_check_student_registrations_registration",
-      "community": 121,
+      "community": 130,
       "norm_label": "registration"
     },
     {
@@ -7706,7 +8026,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_check_student_registrations_student",
-      "community": 121,
+      "community": 130,
       "norm_label": "student"
     },
     {
@@ -7716,7 +8036,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_check_student_registrations_academicprofile",
-      "community": 121,
+      "community": 130,
       "norm_label": "academicprofile"
     },
     {
@@ -7726,7 +8046,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_check_student_registrations_check",
-      "community": 121,
+      "community": 130,
       "norm_label": "check()"
     },
     {
@@ -10726,7 +11046,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_teacherimportbatch",
-      "community": 15,
+      "community": 269,
       "norm_label": "teacherimportbatch"
     },
     {
@@ -11306,7 +11626,7 @@
       "source_location": "L425",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_syncteachercourseassignments",
-      "community": 15,
+      "community": 269,
       "norm_label": "syncteachercourseassignments()"
     },
     {
@@ -11346,7 +11666,7 @@
       "source_location": "L689",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_getteachers",
-      "community": 15,
+      "community": 269,
       "norm_label": "getteachers()"
     },
     {
@@ -11356,7 +11676,7 @@
       "source_location": "L759",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_getteacheracademicyears",
-      "community": 15,
+      "community": 269,
       "norm_label": "getteacheracademicyears()"
     },
     {
@@ -11406,7 +11726,7 @@
       "source_location": "L1011",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_updateteacher",
-      "community": 15,
+      "community": 269,
       "norm_label": "updateteacher()"
     },
     {
@@ -11416,7 +11736,7 @@
       "source_location": "L1082",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_deleteteacher",
-      "community": 15,
+      "community": 269,
       "norm_label": "deleteteacher()"
     },
     {
@@ -12346,7 +12666,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment",
-      "community": 265,
+      "community": 3,
       "norm_label": "communitycomment.js"
     },
     {
@@ -12356,7 +12676,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_communitycomment_mongoose",
-      "community": 265,
+      "community": 3,
       "norm_label": "mongoose"
     },
     {
@@ -12366,7 +12686,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_communitycomment_communitycommentschema",
-      "community": 265,
+      "community": 3,
       "norm_label": "communitycommentschema"
     },
     {
@@ -12406,7 +12726,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_contactrequest",
-      "community": 23,
+      "community": 156,
       "norm_label": "contactrequest.js"
     },
     {
@@ -12416,7 +12736,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_contactrequest_mongoose",
-      "community": 23,
+      "community": 156,
       "norm_label": "mongoose"
     },
     {
@@ -12426,7 +12746,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_contactrequest_contactrequestschema",
-      "community": 23,
+      "community": 156,
       "norm_label": "contactrequestschema"
     },
     {
@@ -12526,7 +12846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_enrollment",
-      "community": 22,
+      "community": 135,
       "norm_label": "enrollment.js"
     },
     {
@@ -12536,7 +12856,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_enrollment_mongoose",
-      "community": 22,
+      "community": 135,
       "norm_label": "mongoose"
     },
     {
@@ -12546,7 +12866,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_enrollment_enrollmentschema",
-      "community": 22,
+      "community": 135,
       "norm_label": "enrollmentschema"
     },
     {
@@ -12696,7 +13016,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notice",
-      "community": 163,
+      "community": 78,
       "norm_label": "notice.js"
     },
     {
@@ -12706,7 +13026,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notice_mongoose",
-      "community": 163,
+      "community": 78,
       "norm_label": "mongoose"
     },
     {
@@ -12716,7 +13036,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notice_noticeschema",
-      "community": 163,
+      "community": 78,
       "norm_label": "noticeschema"
     },
     {
@@ -12756,7 +13076,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_payment",
-      "community": 53,
+      "community": 273,
       "norm_label": "payment.js"
     },
     {
@@ -12766,7 +13086,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_payment_mongoose",
-      "community": 53,
+      "community": 273,
       "norm_label": "mongoose"
     },
     {
@@ -12776,7 +13096,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_payment_paymentschema",
-      "community": 53,
+      "community": 273,
       "norm_label": "paymentschema"
     },
     {
@@ -12846,7 +13166,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registration",
-      "community": 22,
+      "community": 81,
       "norm_label": "registration.js"
     },
     {
@@ -12856,7 +13176,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registration_mongoose",
-      "community": 22,
+      "community": 81,
       "norm_label": "mongoose"
     },
     {
@@ -12866,7 +13186,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_registration_registrationschema",
-      "community": 22,
+      "community": 81,
       "norm_label": "registrationschema"
     },
     {
@@ -12876,7 +13196,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar",
-      "community": 53,
+      "community": 274,
       "norm_label": "registrationcalendar.js"
     },
     {
@@ -12886,7 +13206,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_mongoose",
-      "community": 53,
+      "community": 274,
       "norm_label": "mongoose"
     },
     {
@@ -12896,7 +13216,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_registrationcalendar_registrationcalendarschema",
-      "community": 53,
+      "community": 274,
       "norm_label": "registrationcalendarschema"
     },
     {
@@ -13116,7 +13436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission",
-      "community": 111,
+      "community": 64,
       "norm_label": "submission.js"
     },
     {
@@ -13126,7 +13446,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission_mongoose",
-      "community": 111,
+      "community": 64,
       "norm_label": "mongoose"
     },
     {
@@ -13136,7 +13456,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_submission_submissionschema",
-      "community": 111,
+      "community": 64,
       "norm_label": "submissionschema"
     },
     {
@@ -13146,7 +13466,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher",
-      "community": 97,
+      "community": 162,
       "norm_label": "teacher.js"
     },
     {
@@ -13156,7 +13476,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher_mongoose",
-      "community": 97,
+      "community": 162,
       "norm_label": "mongoose"
     },
     {
@@ -13166,7 +13486,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_teacher_teacherschema",
-      "community": 97,
+      "community": 162,
       "norm_label": "teacherschema"
     },
     {
@@ -13476,7 +13796,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "server_package_dependencies_cors",
-      "community": 269,
+      "community": 2,
       "norm_label": "cors"
     },
     {
@@ -13486,7 +13806,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "cors",
-      "community": 269,
+      "community": 2,
       "norm_label": "cors"
     },
     {
@@ -13656,7 +13976,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "server_package_dependencies_node_cron",
-      "community": 2,
+      "community": 276,
       "norm_label": "node-cron"
     },
     {
@@ -13666,7 +13986,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "node_cron",
-      "community": 2,
+      "community": 276,
       "norm_label": "node-cron"
     },
     {
@@ -15286,7 +15606,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db",
-      "community": 130,
+      "community": 259,
       "norm_label": "fix_registration_status_db.js"
     },
     {
@@ -15296,7 +15616,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_dns",
-      "community": 130,
+      "community": 259,
       "norm_label": "dns"
     },
     {
@@ -15306,7 +15626,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_path",
-      "community": 130,
+      "community": 259,
       "norm_label": "path"
     },
     {
@@ -15316,7 +15636,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_mongoose",
-      "community": 130,
+      "community": 259,
       "norm_label": "mongoose"
     },
     {
@@ -15326,7 +15646,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_user",
-      "community": 130,
+      "community": 259,
       "norm_label": "user"
     },
     {
@@ -15336,7 +15656,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_student",
-      "community": 130,
+      "community": 259,
       "norm_label": "student"
     },
     {
@@ -15346,7 +15666,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_teacher",
-      "community": 130,
+      "community": 259,
       "norm_label": "teacher"
     },
     {
@@ -15356,7 +15676,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_fix_registration_status_db_run",
-      "community": 130,
+      "community": 259,
       "norm_label": "run()"
     },
     {
@@ -15636,7 +15956,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim",
-      "community": 22,
+      "community": 265,
       "norm_label": "inspect_asim.js"
     },
     {
@@ -15646,7 +15966,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim_mongoose",
-      "community": 22,
+      "community": 265,
       "norm_label": "mongoose"
     },
     {
@@ -15656,7 +15976,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim_user",
-      "community": 22,
+      "community": 265,
       "norm_label": "user"
     },
     {
@@ -15666,7 +15986,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim_student",
-      "community": 22,
+      "community": 265,
       "norm_label": "student"
     },
     {
@@ -15676,7 +15996,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim_registration",
-      "community": 22,
+      "community": 265,
       "norm_label": "registration"
     },
     {
@@ -15686,7 +16006,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim_enrollment",
-      "community": 22,
+      "community": 265,
       "norm_label": "enrollment"
     },
     {
@@ -15696,7 +16016,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim_course",
-      "community": 22,
+      "community": 265,
       "norm_label": "course"
     },
     {
@@ -15706,7 +16026,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_inspect_asim_run",
-      "community": 22,
+      "community": 265,
       "norm_label": "run()"
     },
     {
@@ -15886,7 +16206,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism",
-      "community": 135,
+      "community": 64,
       "norm_label": "recalculate_all_plagiarism.js"
     },
     {
@@ -15896,7 +16216,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_mongoose",
-      "community": 135,
+      "community": 64,
       "norm_label": "mongoose"
     },
     {
@@ -15906,7 +16226,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_path",
-      "community": 135,
+      "community": 64,
       "norm_label": "path"
     },
     {
@@ -15916,7 +16236,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_dns",
-      "community": 135,
+      "community": 64,
       "norm_label": "dns"
     },
     {
@@ -15926,7 +16246,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_similarityservice",
-      "community": 135,
+      "community": 64,
       "norm_label": "similarityservice"
     },
     {
@@ -15936,7 +16256,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_submission",
-      "community": 135,
+      "community": 64,
       "norm_label": "submission"
     },
     {
@@ -15946,7 +16266,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_user",
-      "community": 135,
+      "community": 64,
       "norm_label": "user"
     },
     {
@@ -15956,7 +16276,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_fs",
-      "community": 135,
+      "community": 64,
       "norm_label": "fs"
     },
     {
@@ -15966,7 +16286,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_recalculateassignmentsimilarity",
-      "community": 135,
+      "community": 64,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -15976,7 +16296,7 @@
       "source_location": "L134",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_main",
-      "community": 135,
+      "community": 64,
       "norm_label": "main()"
     },
     {
@@ -16106,7 +16426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status",
-      "community": 22,
+      "community": 81,
       "norm_label": "reset_reg_status.js"
     },
     {
@@ -16116,7 +16436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_mongoose",
-      "community": 22,
+      "community": 81,
       "norm_label": "mongoose"
     },
     {
@@ -16126,7 +16446,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_registration",
-      "community": 22,
+      "community": 81,
       "norm_label": "registration"
     },
     {
@@ -16136,7 +16456,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_run",
-      "community": 22,
+      "community": 81,
       "norm_label": "run()"
     },
     {
@@ -16196,7 +16516,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate",
-      "community": 111,
+      "community": 64,
       "norm_label": "run_recalculate.js"
     },
     {
@@ -16206,7 +16526,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_mongoose",
-      "community": 111,
+      "community": 64,
       "norm_label": "mongoose"
     },
     {
@@ -16216,7 +16536,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_path",
-      "community": 111,
+      "community": 64,
       "norm_label": "path"
     },
     {
@@ -16226,7 +16546,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_similarityservice",
-      "community": 111,
+      "community": 64,
       "norm_label": "similarityservice"
     },
     {
@@ -16236,7 +16556,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_submission",
-      "community": 111,
+      "community": 64,
       "norm_label": "submission"
     },
     {
@@ -16246,7 +16566,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_user",
-      "community": 111,
+      "community": 64,
       "norm_label": "user"
     },
     {
@@ -16256,7 +16576,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_fs",
-      "community": 111,
+      "community": 64,
       "norm_label": "fs"
     },
     {
@@ -16266,7 +16586,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_recalculateassignmentsimilarity",
-      "community": 111,
+      "community": 64,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -16276,7 +16596,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_main",
-      "community": 111,
+      "community": 64,
       "norm_label": "main()"
     },
     {
@@ -16536,7 +16856,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses",
-      "community": 155,
+      "community": 135,
       "norm_label": "sync_student_courses.js"
     },
     {
@@ -16546,7 +16866,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_mongoose",
-      "community": 155,
+      "community": 135,
       "norm_label": "mongoose"
     },
     {
@@ -16556,7 +16876,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_user",
-      "community": 155,
+      "community": 135,
       "norm_label": "user"
     },
     {
@@ -16566,7 +16886,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_student",
-      "community": 155,
+      "community": 135,
       "norm_label": "student"
     },
     {
@@ -16576,7 +16896,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_registration",
-      "community": 155,
+      "community": 135,
       "norm_label": "registration"
     },
     {
@@ -16586,7 +16906,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_enrollment",
-      "community": 155,
+      "community": 135,
       "norm_label": "enrollment"
     },
     {
@@ -16596,7 +16916,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_course",
-      "community": 155,
+      "community": 135,
       "norm_label": "course"
     },
     {
@@ -16606,7 +16926,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_run",
-      "community": 155,
+      "community": 135,
       "norm_label": "run()"
     },
     {
@@ -17476,7 +17796,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_full_import_teachers",
-      "community": 114,
+      "community": 270,
       "norm_label": "test_full_import_teachers.js"
     },
     {
@@ -17486,7 +17806,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_full_import_teachers_dns",
-      "community": 114,
+      "community": 270,
       "norm_label": "dns"
     },
     {
@@ -17496,7 +17816,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_full_import_teachers_path",
-      "community": 114,
+      "community": 270,
       "norm_label": "path"
     },
     {
@@ -17506,7 +17826,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_full_import_teachers_mongoose",
-      "community": 114,
+      "community": 270,
       "norm_label": "mongoose"
     },
     {
@@ -17516,7 +17836,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_full_import_teachers_teacher",
-      "community": 114,
+      "community": 270,
       "norm_label": "teacher"
     },
     {
@@ -17526,7 +17846,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_full_import_teachers_importteachers",
-      "community": 114,
+      "community": 270,
       "norm_label": "{ importteachers }"
     },
     {
@@ -18286,7 +18606,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local",
-      "community": 156,
+      "community": 64,
       "norm_label": "test_plagiarism_local.js"
     },
     {
@@ -18296,7 +18616,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_mongoose",
-      "community": 156,
+      "community": 64,
       "norm_label": "mongoose"
     },
     {
@@ -18306,7 +18626,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_path",
-      "community": 156,
+      "community": 64,
       "norm_label": "path"
     },
     {
@@ -18316,7 +18636,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_fs",
-      "community": 156,
+      "community": 64,
       "norm_label": "fs"
     },
     {
@@ -18326,7 +18646,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_similarityservice",
-      "community": 156,
+      "community": 64,
       "norm_label": "similarityservice"
     },
     {
@@ -18336,7 +18656,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_run",
-      "community": 156,
+      "community": 64,
       "norm_label": "run()"
     },
     {
@@ -18496,7 +18816,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_registration",
-      "community": 47,
+      "community": 271,
       "norm_label": "test_registration.js"
     },
     {
@@ -18506,7 +18826,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_registration_dns",
-      "community": 47,
+      "community": 271,
       "norm_label": "dns"
     },
     {
@@ -18516,7 +18836,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_registration_path",
-      "community": 47,
+      "community": 271,
       "norm_label": "path"
     },
     {
@@ -18526,7 +18846,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_registration_mongoose",
-      "community": 47,
+      "community": 271,
       "norm_label": "mongoose"
     },
     {
@@ -18536,7 +18856,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_registration_user",
-      "community": 47,
+      "community": 271,
       "norm_label": "user"
     },
     {
@@ -18546,7 +18866,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_registration_run",
-      "community": 47,
+      "community": 271,
       "norm_label": "run()"
     },
     {
@@ -20166,7 +20486,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_socket",
-      "community": 23,
+      "community": 156,
       "norm_label": "socket.js"
     },
     {
@@ -20176,7 +20496,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_socket_server",
-      "community": 23,
+      "community": 156,
       "norm_label": "{ server }"
     },
     {
@@ -20186,7 +20506,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_socket_user",
-      "community": 23,
+      "community": 156,
       "norm_label": "user"
     },
     {
@@ -20196,7 +20516,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_socket_contactrequest",
-      "community": 23,
+      "community": 156,
       "norm_label": "contactrequest"
     },
     {
@@ -20206,7 +20526,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_socket_onlineusers",
-      "community": 23,
+      "community": 156,
       "norm_label": "onlineusers"
     },
     {
@@ -20216,7 +20536,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_socket_initsocket",
-      "community": 23,
+      "community": 156,
       "norm_label": "initsocket()"
     },
     {
@@ -21580,6 +21900,36 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/6955.ee3287c1.chunk.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk",
+      "target": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk_6286",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/6955.ee3287c1.chunk.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk",
+      "target": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk_6955",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/6955.ee3287c1.chunk.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk",
+      "target": "android_app_src_main_assets_public_static_js_6955_ee3287c1_chunk_6995",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "android/app/src/main/assets/public/static/js/6970.4befd0bb.chunk.js",
       "source_location": "L1",
       "weight": 1.0,
@@ -22086,6 +22436,804 @@
       "source": "android_app_src_main_assets_public_static_js_9908_e548ceae_chunk",
       "target": "android_app_src_main_assets_public_static_js_9908_e548ceae_chunk_9908",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_1085",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_1352",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_1703",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_1863",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_1983",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_3916",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_4414",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_5192",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_5340",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_5788",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_5887",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_6339",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_7119",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_8138",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_8827",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_9344",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_9487",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_9950",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_ve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_ye",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_8827",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5788",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_8138",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_8138",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_9344",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_1085",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_1863",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_1863",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_1352",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_7119",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_9950",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4414",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_9487",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_9487",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5340",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5887",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_6339",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_5192",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_p",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_4517",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_ye",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_n",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_u",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_p",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_h",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_p",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_ve",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_x",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_ye",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "android/app/src/main/assets/public/static/js/main.3c69124b.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "android_app_src_main_assets_public_static_js_main_3c69124b_be",
+      "target": "android_app_src_main_assets_public_static_js_main_3c69124b_ve",
+      "confidence_score": 0.5
     },
     {
       "relation": "contains",
@@ -25550,7 +26698,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/src/App.jsx",
-      "source_location": "L755",
+      "source_location": "L740",
       "weight": 1.0,
       "source": "client_src_app",
       "target": "client_src_app_app",
@@ -51701,5 +52849,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "2c29a72f3955146fcd96c7f0bd054cd4f706136b"
+  "built_at_commit": "a04b5ca9b90f1200d5874b7ff00c0801fda49ce5"
 }

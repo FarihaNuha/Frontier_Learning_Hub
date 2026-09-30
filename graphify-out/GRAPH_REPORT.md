@@ -1,16 +1,16 @@
 # Graph Report - UFTB_Moodle  (2026-09-30)
 
 ## Corpus Check
-- 369 files · ~325,129 words
+- 371 files · ~336,057 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2043 nodes · 2986 edges · 270 communities (197 shown, 73 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.5)
+- 2075 nodes · 3064 edges · 277 communities (202 shown, 75 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 73 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2c29a72f`
+- Built from commit: `a04b5ca9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -205,6 +205,12 @@
 - node-cron
 - @capacitor/android
 - cors
+- test_full_import_teachers.js
+- test_registration.js
+- Payment.js
+- RegistrationCalendar.js
+- @capacitor/push-notifications
+- node-cron
 
 ## God Nodes (most connected - your core abstractions)
 1. `useAuth()` - 67 edges
@@ -215,8 +221,8 @@
 6. `TeacherSidebar()` - 23 edges
 7. `n()` - 18 edges
 8. `n()` - 18 edges
-9. `AdminSidebar()` - 18 edges
-10. `CommunityPost` - 18 edges
+9. `n()` - 18 edges
+10. `AdminSidebar()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `initNativeFeatures()` --references--> `app`  [EXTRACTED]
@@ -233,7 +239,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (270 total, 73 thin omitted)
+## Communities (277 total, 75 thin omitted)
 
 ### Community 0 - "App.jsx"
 Cohesion: 0.17
@@ -245,11 +251,11 @@ Nodes (12): multer, path, storage, upload, ctrl, router, upload, { verifyToken }
 
 ### Community 2 - "dependencies"
 Cohesion: 0.15
-Nodes (13): bcryptjs, dotenv, mammoth, node-cron, dependencies, axios, bcryptjs, dotenv (+5 more)
+Nodes (13): bcryptjs, cors, dotenv, mammoth, dependencies, axios, bcryptjs, cors (+5 more)
 
 ### Community 3 - "communityController.js"
-Cohesion: 0.10
-Nodes (33): addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest, Course, deleteComment(), deleteMessage() (+25 more)
+Cohesion: 0.09
+Nodes (35): addCourseComment(), addPublicComment(), CommunityComment, CommunityPost, ContactRequest, Course, deleteComment(), deleteMessage() (+27 more)
 
 ### Community 4 - "User.js"
 Cohesion: 0.13
@@ -285,7 +291,7 @@ Nodes (31): concurrently, author, dependencies, @capacitor/android, @capacitor/a
 
 ### Community 12 - "dependencies"
 Cohesion: 0.12
-Nodes (17): dependencies, axios, @capacitor/core, @capacitor/push-notifications, react-dom, @testing-library/dom, @testing-library/jest-dom, @testing-library/user-event (+9 more)
+Nodes (17): dependencies, axios, @capacitor/app, @capacitor/core, react-dom, @testing-library/dom, @testing-library/jest-dom, @testing-library/user-event (+9 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.11
@@ -297,7 +303,7 @@ Nodes (52): AcademicCalendarViewPage, AcademicRegistrationPage, AdminAdvisers, A
 
 ### Community 15 - "deadlineReminder.js"
 Cohesion: 0.06
-Nodes (13): TeacherImportBatch, Adviser, CourseImport, deleteTeacher(), getTeacherAcademicYears(), getTeachers(), Payment, Registration (+5 more)
+Nodes (7): Adviser, CourseImport, Payment, Registration, RegistrationCalendar, Student, Teacher
 
 ### Community 16 - "package.json"
 Cohesion: 0.11
@@ -324,12 +330,12 @@ Cohesion: 0.22
 Nodes (5): TeacherHomeDashboard(), TeacherSidebar(), IMPORTANT: URL থেকে আসা courseId ব্যবহার করুন, TeacherExamPage(), api
 
 ### Community 22 - "authMiddleware.js"
-Cohesion: 0.08
-Nodes (18): enrollmentSchema, mongoose, mongoose, registrationSchema, Course, Enrollment, mongoose, Registration (+10 more)
+Cohesion: 0.25
+Nodes (6): Course, Enrollment, mongoose, Registration, Student, User
 
 ### Community 23 - "scripts"
-Cohesion: 0.08
-Nodes (21): mongoose, allowedOrigins, compression, connectDB, cors, dns, express, fs (+13 more)
+Cohesion: 0.11
+Nodes (14): mongoose, allowedOrigins, compression, connectDB, cors, dns, express, fs (+6 more)
 
 ### Community 24 - "seedAdmin.js"
 Cohesion: 0.40
@@ -384,8 +390,8 @@ Cohesion: 0.22
 Nodes (9): createAuditLog(), graduateStudent(), payRetakeFee(), processRetakeRequest(), promoteStudentsBatch(), submitRetakeRequest(), createNotice(), deleteNotice() (+1 more)
 
 ### Community 47 - "deadlineReminder.js"
-Cohesion: 0.11
-Nodes (12): mongoose, User, bcrypt, mongoose, userSchema, mongoose, path, User (+4 more)
+Cohesion: 0.15
+Nodes (8): mongoose, User, bcrypt, mongoose, userSchema, mongoose, path, User
 
 ### Community 48 - "emailService.js"
 Cohesion: 0.20
@@ -408,8 +414,8 @@ Cohesion: 0.17
 Nodes (18): AuthContext, AuthProvider(), getActiveStatusSetting(), getSocketUrl(), CourseListPage(), getCourseBanner(), StudentDashboard(), TeacherAssignmentPage() (+10 more)
 
 ### Community 53 - "test_phase2_flow.js"
-Cohesion: 0.11
-Nodes (14): mongoose, paymentSchema, mongoose, registrationCalendarSchema, Adviser, bcrypt, CourseImport, Enrollment (+6 more)
+Cohesion: 0.17
+Nodes (10): Adviser, bcrypt, CourseImport, Enrollment, mongoose, Payment, Registration, RegistrationCalendar (+2 more)
 
 ### Community 54 - "announcementController.js"
 Cohesion: 0.21
@@ -452,8 +458,8 @@ Cohesion: 0.25
 Nodes (7): background_color, display, icons, name, short_name, start_url, theme_color
 
 ### Community 64 - "Adviser.js"
-Cohesion: 0.19
-Nodes (13): similarityService, calculateSimilarity(), cleanExtractedText(), computeLevenshtein(), extractTextFromFile(), fs, getSentenceSimilarity(), getTrigrams() (+5 more)
+Cohesion: 0.06
+Nodes (36): mongoose, submissionSchema, dns, fs, main(), mongoose, path, recalculateAssignmentSimilarity() (+28 more)
 
 ### Community 65 - "clean_courses_programs.js"
 Cohesion: 0.29
@@ -496,8 +502,8 @@ Cohesion: 0.29
 Nodes (7): deleteDraftUpload(), getAdminResults(), publishResultBatch(), requestCorrectionBatch(), ResultLog, submitResultToAdmin(), verifyResultBatch()
 
 ### Community 78 - "@testing-library/jest-dom"
-Cohesion: 0.22
-Nodes (7): dns, mongoose, Notice, path, Result, ResultUpload, User
+Cohesion: 0.17
+Nodes (9): mongoose, noticeSchema, dns, mongoose, Notice, path, Result, ResultUpload (+1 more)
 
 ### Community 79 - "@testing-library/react"
 Cohesion: 0.25
@@ -508,8 +514,8 @@ Cohesion: 0.25
 Nodes (5): mongoose, retakeRequestSchema, mongoose, path, RetakeRequest
 
 ### Community 81 - "xlsx"
-Cohesion: 0.25
-Nodes (6): Adviser, mongoose, Registration, Student, Teacher, User
+Cohesion: 0.13
+Nodes (10): mongoose, registrationSchema, mongoose, Registration, Adviser, mongoose, Registration, Student (+2 more)
 
 ### Community 85 - "serviceRoutes.js"
 Cohesion: 0.29
@@ -536,8 +542,8 @@ Cohesion: 0.25
 Nodes (6): axios, dns, jwt, mongoose, path, User
 
 ### Community 97 - "StudentExamPage.jsx"
-Cohesion: 0.22
-Nodes (6): mongoose, teacherSchema, dns, mongoose, path, Teacher
+Cohesion: 0.33
+Nodes (4): dns, mongoose, path, Teacher
 
 ### Community 98 - "CGPARecord.js"
 Cohesion: 0.22
@@ -572,8 +578,8 @@ Cohesion: 0.26
 Nodes (12): buildSlideBodyHtml(), extractPptxSlidesArray(), extractPptxSlidesHtml(), extractSlideElements(), formatTableHtml(), formatTextElementHtml(), fs, generatePreviewData() (+4 more)
 
 ### Community 111 - "docx-preview"
-Cohesion: 0.18
-Nodes (10): mongoose, submissionSchema, fs, main(), mongoose, path, recalculateAssignmentSimilarity(), similarityService (+2 more)
+Cohesion: 0.20
+Nodes (24): 1085(), 1352(), 1863(), 4414(), 4517(), 5192(), 5340(), 5788() (+16 more)
 
 ### Community 112 - "courseController.js"
 Cohesion: 0.33
@@ -584,32 +590,28 @@ Cohesion: 0.60
 Nodes (3): ExampleInstrumentedTest, Test, RunWith
 
 ### Community 114 - "test_full_import_teachers.js"
-Cohesion: 0.15
-Nodes (13): importTeachers(), dns, { importTeachers }, mongoose, path, Teacher, testFullImportTeachers(), dns (+5 more)
+Cohesion: 0.25
+Nodes (8): importTeachers(), testFullImportTeachers(), dns, { importTeachers }, mongoose, path, Teacher, testIdCollisionImport()
 
 ### Community 115 - "reset_test_user.js"
 Cohesion: 0.40
 Nodes (3): dns, mongoose, path
-
-### Community 121 - "test_pending_query.js"
-Cohesion: 0.22
-Nodes (6): AcademicProfile, mongoose, Registration, Student, academicProfileSchema, mongoose
 
 ### Community 127 - "CommunityPost.js"
 Cohesion: 0.67
 Nodes (3): analyzeAnswers(), axios, detectAI()
 
 ### Community 130 - "inspect_student_docs.js"
-Cohesion: 0.12
-Nodes (12): mongoose, studentSchema, dns, mongoose, path, Student, Teacher, User (+4 more)
+Cohesion: 0.13
+Nodes (10): AcademicProfile, mongoose, Registration, Student, mongoose, studentSchema, dns, mongoose (+2 more)
 
 ### Community 134 - "docx-preview"
 Cohesion: 0.13
 Nodes (20): GlobalNotificationBell(), useAuth(), AuthPage(), CommentItem(), CommunityHub(), CreatePostModal(), EditPostModal(), getFileUrl() (+12 more)
 
 ### Community 135 - "ResultCorrectionRequest.js"
-Cohesion: 0.22
-Nodes (9): dns, fs, main(), mongoose, path, recalculateAssignmentSimilarity(), similarityService, Submission (+1 more)
+Cohesion: 0.18
+Nodes (8): enrollmentSchema, mongoose, Course, Enrollment, mongoose, Registration, Student, User
 
 ### Community 136 - "ResultLog.js"
 Cohesion: 0.33
@@ -652,20 +654,20 @@ Cohesion: 0.33
 Nodes (4): dns, fs, mongoose, path
 
 ### Community 155 - "Course.js"
-Cohesion: 0.12
-Nodes (12): Course, mongoose, Student, User, courseSchema, mongoose, Course, Enrollment (+4 more)
+Cohesion: 0.22
+Nodes (6): Course, mongoose, Student, User, courseSchema, mongoose
 
 ### Community 156 - "docx-preview"
-Cohesion: 0.33
-Nodes (4): fs, mongoose, path, similarityService
+Cohesion: 0.22
+Nodes (7): contactRequestSchema, mongoose, ContactRequest, initSocket(), onlineUsers, { Server }, User
 
 ### Community 162 - "reset_db.js"
-Cohesion: 0.33
-Nodes (4): dns, mongoose, path, Teacher
+Cohesion: 0.22
+Nodes (6): mongoose, teacherSchema, dns, mongoose, path, Teacher
 
 ### Community 163 - "test_view.js"
-Cohesion: 0.17
-Nodes (9): mongoose, noticeSchema, dns, mongoose, Notice, path, ResultUpload, Teacher (+1 more)
+Cohesion: 0.22
+Nodes (7): dns, mongoose, Notice, path, ResultUpload, Teacher, User
 
 ### Community 164 - "ResultCorrectionRequest"
 Cohesion: 0.50
@@ -707,24 +709,44 @@ Nodes (3): ctrl, router, { verifyToken, checkRole }
 Cohesion: 0.67
 Nodes (3): react, TeacherResultManagementPage(), react
 
+### Community 259 - "@capacitor/app"
+Cohesion: 0.25
+Nodes (6): dns, mongoose, path, Student, Teacher, User
+
+### Community 265 - "node-cron"
+Cohesion: 0.25
+Nodes (6): Course, Enrollment, mongoose, Registration, Student, User
+
+### Community 269 - "cors"
+Cohesion: 0.33
+Nodes (6): TeacherImportBatch, deleteTeacher(), getTeacherAcademicYears(), getTeachers(), syncTeacherCourseAssignments(), updateTeacher()
+
+### Community 270 - "test_full_import_teachers.js"
+Cohesion: 0.33
+Nodes (5): dns, { importTeachers }, mongoose, path, Teacher
+
+### Community 271 - "test_registration.js"
+Cohesion: 0.33
+Nodes (4): dns, mongoose, path, User
+
 ## Knowledge Gaps
 - **883 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin`, `short_name`, `name` (+878 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **73 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **75 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `app` connect `examRoutes.js` to `scripts`?**
-  _High betweenness centrality (0.068) - this node is a cross-community bridge._
-- **Why does `initNativeFeatures()` connect `examRoutes.js` to `previewService.js`?**
+- **Why does `dependencies` connect `dependencies` to `react`, `test_plagiarism_local.js`, `@capacitor/cli`, `@capacitor/status-bar`, `docx-preview`, `jspdf`, `jspdf-autotable`, `jszip`, `react-router-dom`, `socket.io-client`, `@capacitor/android`, `@testing-library/react`, `web-vitals`, `@capacitor/push-notifications`, `authMiddleware.js`, `previewService.js`, `react-dom`?**
+  _High betweenness centrality (0.070) - this node is a cross-community bridge._
+- **Why does `CourseRegistrationPage()` connect `test_assignment_controller.js` to `react-dom`?**
   _High betweenness centrality (0.068) - this node is a cross-community bridge._
 - **What connects `$schema`, `.opencode/plugins/graphify.js`, `@opencode-ai/plugin` to the rest of the system?**
   _885 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `authMiddleware.js` be split into smaller, more focused modules?**
   _Cohesion score 0.125 - nodes in this community are weakly interconnected._
 - **Should `communityController.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08906882591093117 - nodes in this community are weakly interconnected._
 - **Should `User.js` be split into smaller, more focused modules?**
   _Cohesion score 0.12561576354679804 - nodes in this community are weakly interconnected._
 - **Should `assignmentController.js` be split into smaller, more focused modules?**

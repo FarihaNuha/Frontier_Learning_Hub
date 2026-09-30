@@ -28,6 +28,7 @@ jobs:
         run: |
           echo "sdk.dir=${ANDROID_HOME}" > android/local.properties
           cat android/local.properties
+          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" || true
           echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Setup Node.js
@@ -66,7 +67,24 @@ jobs:
 
       - name: Build Debug APK
         working-directory: ./android
-        run: ./gradlew assembleDebug --stacktrace --no-daemon
+        run: |
+          ./gradlew assembleDebug --stacktrace --no-daemon 2>&1 | tee ../gradle-build.log
+
+      - name: Report Build Log on Failure
+        if: failure()
+        run: |
+          echo "### ❌ Gradle Build Failed" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          tail -n 80 gradle-build.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Gradle Failure Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-failure-log
+          path: gradle-build.log
+
 
       - name: Prepare APK Output
         run: |

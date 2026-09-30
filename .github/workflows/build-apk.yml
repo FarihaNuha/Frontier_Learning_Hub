@@ -24,13 +24,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Configure Android SDK Path
+      - name: Configure Android SDK
         run: |
           echo "sdk.dir=${ANDROID_HOME}" > android/local.properties
           cat android/local.properties
+          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -48,6 +46,7 @@ jobs:
         working-directory: ./client
         run: npm run build
         env:
+          CI: "false"
           DISABLE_ESLINT_PLUGIN: "true"
           GENERATE_SOURCEMAP: "false"
 
@@ -72,8 +71,15 @@ jobs:
       - name: Prepare APK Output
         run: |
           mkdir -p release-output
-          cp android/app/build/outputs/apk/debug/app-debug.apk release-output/UniCore-app.apk
-          echo "APK successfully built and copied to release-output/UniCore-app.apk"
+          APK_FILE=$(find android/app/build/outputs/apk -name "*.apk" | head -n 1)
+          if [ -n "$APK_FILE" ]; then
+            cp "$APK_FILE" release-output/UniCore-app.apk
+            echo "Found APK at $APK_FILE, copied to release-output/UniCore-app.apk"
+            ls -lh release-output/UniCore-app.apk
+          else
+            echo "Error: No APK found!"
+            exit 1
+          fi
 
       - name: Upload APK as Workflow Artifact
         uses: actions/upload-artifact@v4
@@ -105,5 +111,7 @@ jobs:
           files: release-output/UniCore-app.apk
           draft: false
           prerelease: false
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

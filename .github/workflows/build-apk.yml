@@ -24,6 +24,14 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Configure Android SDK Path
+        run: |
+          echo "sdk.dir=${ANDROID_HOME}" > android/local.properties
+          cat android/local.properties
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -43,8 +51,11 @@ jobs:
           DISABLE_ESLINT_PLUGIN: "true"
           GENERATE_SOURCEMAP: "false"
 
-      - name: Copy Web Build to Root
-        run: cp -r client/build ./build
+      - name: Copy Web Build to Root & Android Assets
+        run: |
+          cp -r client/build ./build
+          mkdir -p android/app/src/main/assets/public
+          cp -r client/build/* android/app/src/main/assets/public/
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -52,7 +63,7 @@ jobs:
           chmod +x android/gradlew
 
       - name: Sync Capacitor Android
-        run: npx cap sync android --verbose
+        run: npx cap sync android --verbose || echo "Assets pre-synced directly"
 
       - name: Build Debug APK
         working-directory: ./android

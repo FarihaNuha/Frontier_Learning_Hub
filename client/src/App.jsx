@@ -7,7 +7,7 @@ import GlobalNotificationBell from "./components/GlobalNotificationBell";
 import GlobalSettingsPortal from "./components/GlobalSettingsPortal";
 import { initNativeFeatures } from "./services/nativeBridge";
 
-const AuthPage = lazy(() => import("./pages/AuthPage"));
+import AuthPage from "./pages/AuthPage";
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminStudents = lazy(() => import("./pages/AdminStudents"));
@@ -108,16 +108,31 @@ function ProtectedRoute({ children }) {
   return <Navigate to="/auth" replace />;
 }
 
-function RoleRouter() {
+function RootRedirect() {
   const { user, loading } = useAuth();
   const token = localStorage.getItem("token");
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          background: "#E8F4FD",
+          color: "#2C4B66",
+          fontSize: "18px",
+          fontWeight: "600",
+        }}
+      >
+        Loading UniCore...
+      </div>
+    );
   }
 
-  if (!token) {
-    return <Navigate to="/auth" replace />;
+  if (!token || !user) {
+    return <AuthPage />;
   }
 
   if (user?.role === "teacher") {
@@ -132,7 +147,7 @@ function RoleRouter() {
     return <Navigate to="/admin/dashboard" replace />;
   }
 
-  return <Navigate to="/auth" replace />;
+  return <AuthPage />;
 }
 function AppContent() {
   const { user } = useAuth();
@@ -499,15 +514,6 @@ function AppContent() {
             }
           />
           <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <RoleRouter />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
             path="/notifications"
             element={
               <ProtectedRoute>
@@ -736,10 +742,10 @@ function AppContent() {
             }
           />
 
-          {/* Default Routes - RoleRouter handles role-based redirect */}
-          <Route path="/dashboard" element={<RoleRouter />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/auth" replace />} />
+          {/* Default Routes */}
+          <Route path="/dashboard" element={<RootRedirect />} />
+          <Route path="/" element={<RootRedirect />} />
+          <Route path="*" element={<RootRedirect />} />
         </Routes>
       </Suspense>
     </>

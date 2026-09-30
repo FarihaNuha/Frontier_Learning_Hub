@@ -254,5 +254,15 @@
   "252": "cordova.variables.gradle",
   "253": "capacitor.settings.gradle",
   "254": "settings.gradle",
-  "255": "variables.gradle"
+  "255": "variables.gradle",
+  "256": "9172.23445dda.chunk.js",
+  "257": "react",
+  "258": "Result.js",
+  "259": "@capacitor/app",
+  "260": "@capacitor/cli",
+  "261": "docx-preview",
+  "262": "jspdf-autotable",
+  "263": "socket.io-client",
+  "264": "@testing-library/react",
+  "265": "node-cron"
 }

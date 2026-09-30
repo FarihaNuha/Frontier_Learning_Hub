@@ -2937,3 +2937,57 @@ body.dark-theme .inline-comments-list::-webkit-scrollbar-thumb {
 
 
 
+
+/* ==================== MOBILE MESSAGING OPTIMIZATIONS ==================== */
+.mobile-back-to-contacts-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-back-to-contacts-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e8f4fd;
+    border: none;
+    color: #3b8db3;
+    cursor: pointer;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .messages-wrapper {
+    flex-direction: column !important;
+    height: calc(100vh - 120px) !important;
+    min-height: 480px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  /* When a chat conversation is open on mobile: hide the contacts list, expand chat */
+  .messages-wrapper.has-active-chat .users-sidebar {
+    display: none !important;
+  }
+
+  .messages-wrapper.has-active-chat .chat-area {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* When no chat conversation is open on mobile: show contacts full height, hide empty chat */
+  .messages-wrapper:not(.has-active-chat) .users-sidebar {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    border-right: none !important;
+  }
+
+  .messages-wrapper:not(.has-active-chat) .chat-area {
+    display: none !important;
+  }
+}

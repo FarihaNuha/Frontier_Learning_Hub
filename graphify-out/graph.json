@@ -280,7 +280,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "client_package_dependencies_docx_preview",
-      "community": 149,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "docx_preview",
-      "community": 149,
+      "community": 12,
       "norm_label": "docx-preview"
     },
     {
@@ -300,7 +300,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "client_package_dependencies_jspdf",
-      "community": 142,
+      "community": 12,
       "norm_label": "jspdf"
     },
     {
@@ -310,7 +310,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "jspdf",
-      "community": 142,
+      "community": 12,
       "norm_label": "jspdf"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "client_package_dependencies_jspdf_autotable",
-      "community": 12,
+      "community": 147,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -330,7 +330,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "jspdf_autotable",
-      "community": 12,
+      "community": 147,
       "norm_label": "jspdf-autotable"
     },
     {
@@ -340,7 +340,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_dependencies_jszip",
-      "community": 154,
+      "community": 12,
       "norm_label": "jszip"
     },
     {
@@ -350,7 +350,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "client_package_json_jszip",
-      "community": 154,
+      "community": 12,
       "norm_label": "jszip"
     },
     {
@@ -380,7 +380,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "client_package_dependencies_react_dom",
-      "community": 12,
+      "community": 149,
       "norm_label": "react-dom"
     },
     {
@@ -390,7 +390,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "react_dom",
-      "community": 12,
+      "community": 149,
       "norm_label": "react-dom"
     },
     {
@@ -420,7 +420,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "client_package_dependencies_react_icons",
-      "community": 12,
+      "community": 154,
       "norm_label": "react-icons"
     },
     {
@@ -430,7 +430,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "react_icons",
-      "community": 12,
+      "community": 154,
       "norm_label": "react-icons"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "client_package_dependencies_react_router_dom",
-      "community": 161,
+      "community": 12,
       "norm_label": "react-router-dom"
     },
     {
@@ -450,7 +450,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "react_router_dom",
-      "community": 161,
+      "community": 12,
       "norm_label": "react-router-dom"
     },
     {
@@ -460,7 +460,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "client_package_dependencies_react_scripts",
-      "community": 12,
+      "community": 161,
       "norm_label": "react-scripts"
     },
     {
@@ -470,7 +470,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "react_scripts",
-      "community": 12,
+      "community": 161,
       "norm_label": "react-scripts"
     },
     {
@@ -6387,7 +6387,7 @@
       "label": "downloadLecture()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L289",
+      "source_location": "L294",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_downloadlecture",
       "community": 8,
@@ -6397,7 +6397,7 @@
       "label": "deleteLecture()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L326",
+      "source_location": "L331",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_deletelecture",
       "community": 8,
@@ -6407,7 +6407,7 @@
       "label": "shareLecture()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L371",
+      "source_location": "L376",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_sharelecture",
       "community": 8,
@@ -8370,7 +8370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware",
-      "community": 151,
+      "community": 142,
       "norm_label": "authmiddleware.js"
     },
     {
@@ -8380,7 +8380,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_jwt",
-      "community": 151,
+      "community": 142,
       "norm_label": "jwt"
     },
     {
@@ -8390,7 +8390,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_middleware_authmiddleware_user",
-      "community": 151,
+      "community": 142,
       "norm_label": "user"
     },
     {
@@ -10250,7 +10250,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes",
-      "community": 148,
+      "community": 142,
       "norm_label": "academicroutes.js"
     },
     {
@@ -10260,7 +10260,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_academicroutes_router",
-      "community": 148,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -10270,7 +10270,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_academicroutes_verifytoken_checkrole",
-      "community": 148,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10280,7 +10280,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_academicroutes_ctrl",
-      "community": 148,
+      "community": 142,
       "norm_label": "ctrl"
     },
     {
@@ -10330,7 +10330,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 146,
+      "community": 148,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -10340,7 +10340,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 146,
+      "community": 148,
       "norm_label": "router"
     },
     {
@@ -10350,7 +10350,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 146,
+      "community": 148,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10360,7 +10360,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 146,
+      "community": 148,
       "norm_label": "ctrl"
     },
     {
@@ -10470,7 +10470,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes",
-      "community": 78,
+      "community": 146,
       "norm_label": "attendanceroutes.js"
     },
     {
@@ -10480,7 +10480,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_router",
-      "community": 78,
+      "community": 146,
       "norm_label": "router"
     },
     {
@@ -10490,7 +10490,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_verifytoken_checkrole",
-      "community": 78,
+      "community": 146,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10500,7 +10500,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_attendanceroutes_ctrl",
-      "community": 78,
+      "community": 146,
       "norm_label": "ctrl"
     },
     {
@@ -10640,7 +10640,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes",
-      "community": 147,
+      "community": 78,
       "norm_label": "examroutes.js"
     },
     {
@@ -10650,7 +10650,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_examroutes_router",
-      "community": 147,
+      "community": 78,
       "norm_label": "router"
     },
     {
@@ -10660,7 +10660,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_examroutes_verifytoken_checkrole",
-      "community": 147,
+      "community": 78,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -10670,7 +10670,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_examroutes_ctrl",
-      "community": 147,
+      "community": 78,
       "norm_label": "ctrl"
     },
     {
@@ -23433,7 +23433,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/StudentAssignmentPage.jsx",
-      "source_location": "L161",
+      "source_location": "L185",
       "weight": 1.0,
       "source": "client_src_pages_studentassignmentpage_studentassignmentpage",
       "target": "client_src_services_apicache_fetchwithcache"
@@ -23541,7 +23541,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/StudentDashboard.jsx",
-      "source_location": "L187",
+      "source_location": "L231",
       "weight": 1.0,
       "source": "client_src_pages_studentdashboard_studentdashboard",
       "target": "client_src_services_apicache_fetchwithcache"
@@ -23873,7 +23873,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherAssignmentPage.jsx",
-      "source_location": "L158",
+      "source_location": "L182",
       "weight": 1.0,
       "source": "client_src_pages_teacherassignmentpage_teacherassignmentpage",
       "target": "client_src_services_apicache_fetchwithcache"
@@ -23992,7 +23992,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L182",
+      "source_location": "L226",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard_teacherdashboard",
       "target": "client_src_services_apicache_fetchwithcache"
@@ -24003,7 +24003,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/TeacherDashboard.jsx",
-      "source_location": "L304",
+      "source_location": "L348",
       "weight": 1.0,
       "source": "client_src_pages_teacherdashboard_teacherdashboard",
       "target": "client_src_services_apicache_invalidatecache"
@@ -28725,7 +28725,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L379",
+      "source_location": "L384",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_sharelecture",
       "target": "server_controllers_communitycontroller_communitypost"
@@ -29710,7 +29710,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L326",
+      "source_location": "L331",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_deletelecture",
@@ -29720,7 +29720,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L289",
+      "source_location": "L294",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_downloadlecture",
@@ -29830,7 +29830,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L371",
+      "source_location": "L376",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_sharelecture",
@@ -30014,7 +30014,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L328",
+      "source_location": "L333",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_deletelecture",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -30025,7 +30025,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L305",
+      "source_location": "L310",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_downloadlecture",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -30058,7 +30058,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L374",
+      "source_location": "L379",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_sharelecture",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -43448,5 +43448,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1b5b02d81121248eb0043ffbfc30776cb20257a1"
+  "built_at_commit": "c965e5ccba00ebaaf20333685460a7e8d065d96d"
 }

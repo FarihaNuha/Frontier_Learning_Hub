@@ -188,10 +188,10 @@ export default function AdminProgressionPage() {
       : Object.entries(groupedBySession).filter(([sessKey]) => sessKey === selectedSessionFilter);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="admin-container">
       <AdminSidebar />
 
-      <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
+      <div className="admin-main-content" style={{ overflowY: "auto" }}>
         {/* Sub Navigation Bar for Students & Progression */}
         <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "2px solid #e2e8f0", paddingBottom: "12px" }}>
           <Link

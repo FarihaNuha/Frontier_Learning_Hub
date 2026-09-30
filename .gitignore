@@ -2,7 +2,14 @@ node_modules/
 .env
 uploads/
 build/
+client/build/
 dist/
 *.log
 .system_generated/
 .gemini/
+.gradle/
+android/.gradle/
+android/app/build/
+android/build/
+release-output/
+

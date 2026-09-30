@@ -1,0 +1,93 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Root Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Install Client Dependencies
+        working-directory: ./client
+        run: npm install --legacy-peer-deps
+
+      - name: Build Web Application Bundle
+        working-directory: ./client
+        run: npm run build
+        env:
+          DISABLE_ESLINT_PLUGIN: "true"
+          GENERATE_SOURCEMAP: "false"
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK
+        working-directory: ./android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Prepare APK Output
+        run: |
+          mkdir -p release-output
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-output/UniCore-app.apk
+          echo "APK successfully built and copied to release-output/UniCore-app.apk"
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: UniCore-Android-APK
+          path: release-output/UniCore-app.apk
+          retention-days: 30
+
+      - name: Create or Update GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: success()
+        with:
+          tag_name: v1.0.0-apk
+          name: UniCore Mobile App v1.0.0 (Android APK)
+          body: |
+            ### 📱 UniCore Native Android App (v1.0.0)
+            
+            This is the official native Android build for the **Frontier Learning Academy (UniCore)** learning management and community system.
+            
+            #### ✨ Highlights:
+            - **Mobile Responsiveness**: Complete UI responsive optimizations across admin, teacher, student dashboards, and community chat.
+            - **Native Mobile Navigation**: Full support for Android hardware and gesture back buttons (modal closing, drawer toggling, back routing, and app exit).
+            - **Instant Live Updates**: Connected directly to [frontier-learning-academy.vercel.app](https://frontier-learning-academy.vercel.app). When changes are pushed to GitHub, your installed app updates automatically without needing to reinstall the APK!
+            - **Firebase Cloud Messaging (FCM)**: Native push notification support for Community Hub messaging, posts, and announcements.
+            
+            #### 📥 Direct Download:
+            Click the link below to download the APK directly to your phone:
+            **[Download UniCore-app.apk](https://github.com/FarihaNuha/Frontier_Learning_Academy/releases/download/v1.0.0-apk/UniCore-app.apk)**
+          files: release-output/UniCore-app.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

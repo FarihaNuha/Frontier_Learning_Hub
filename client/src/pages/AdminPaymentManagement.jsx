@@ -49,9 +49,9 @@ export default function AdminPaymentManagement() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="admin-container">
       <AdminSidebar />
-      <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
+      <div className="admin-main-content">
         <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Payment Records & Accounts</h1>
         <p style={{ color: "#3B8DB3", fontWeight: 600, margin: "4px 0 32px 0" }}>View student registration tuition fees, due amounts and edit payment status</p>
 

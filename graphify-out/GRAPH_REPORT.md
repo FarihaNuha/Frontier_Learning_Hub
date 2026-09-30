@@ -1,7 +1,7 @@
-# Graph Report - UFTB_Moodle  (2026-09-20)
+# Graph Report - UFTB_Moodle  (2026-09-21)
 
 ## Corpus Check
-- 277 files · ~242,470 words
+- 277 files · ~243,106 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1b5b02d8`
+- Built from commit: `c965e5cc`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -256,7 +256,7 @@ Nodes (18): concurrently, author, dependencies, concurrently, nodemon, descripti
 
 ### Community 12 - "dependencies"
 Cohesion: 0.11
-Nodes (19): dependencies, axios, jspdf-autotable, react-dom, react-icons, react-scripts, socket.io-client, @testing-library/jest-dom (+11 more)
+Nodes (19): dependencies, axios, docx-preview, jspdf, jszip, react-router-dom, socket.io-client, @testing-library/jest-dom (+11 more)
 
 ### Community 13 - "assessmentController.js"
 Cohesion: 0.11
@@ -602,6 +602,10 @@ Nodes (4): PaymentCheckoutModal(), RegistrationInvoiceModal(), FIXED_REGISTRATIO
 Cohesion: 0.04
 Nodes (33): adviserSchema, mongoose, mongoose, retakeRequestSchema, Adviser, mongoose, path, mongoose (+25 more)
 
+### Community 142 - "docx-preview"
+Cohesion: 0.29
+Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
+
 ### Community 144 - "react-scripts"
 Cohesion: 0.33
 Nodes (9): FilePreviewModal(), CommentItem(), CourseCommunity(), CoursePostCard(), EditPostModal(), getFileUrl(), renderAttachments(), renderContentWithLinks() (+1 more)
@@ -614,17 +618,13 @@ Nodes (4): axios, jwt, mongoose, test()
 Cohesion: 0.50
 Nodes (3): ctrl, router, { verifyToken, checkRole }
 
-### Community 147 - "examRoutes.js"
-Cohesion: 0.50
-Nodes (3): ctrl, router, { verifyToken, checkRole }
-
 ### Community 148 - "run_recalculate.js"
 Cohesion: 0.22
 Nodes (7): checkRole(), ctrl, router, { verifyToken, checkRole }, ctrl, router, { verifyToken, checkRole }
 
 ### Community 151 - "test_assignment_controller.js"
-Cohesion: 0.29
-Nodes (5): jwt, User, ctrl, router, { verifyToken, checkRole }
+Cohesion: 0.50
+Nodes (3): ctrl, router, { verifyToken, checkRole }
 
 ### Community 155 - "Course.js"
 Cohesion: 0.22

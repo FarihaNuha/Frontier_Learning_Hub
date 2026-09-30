@@ -17,6 +17,8 @@ import {
   FiCalendar,
   FiChevronDown,
   FiChevronUp,
+  FiMenu,
+  FiX,
 } from "react-icons/fi";
 
 export default function AdminSidebar() {
@@ -41,21 +43,32 @@ export default function AdminSidebar() {
   const [teachersOpen, setTeachersOpen] = useState(isTeachersActive);
   const [registrationOpen, setRegistrationOpen] = useState(isRegistrationActive);
   const [resultsOpen, setResultsOpen] = useState(isResultActive);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="sidebar admin-sidebar" style={{
-      width: "260px",
-      background: "var(--bg-card, #ffffff)",
-      borderRight: "1px solid var(--border-color, #e0e0e0)",
-      height: "100vh",
-      position: "fixed",
-      left: 0,
-      top: 0,
-      display: "flex",
-      flexDirection: "column",
-      zIndex: 100,
-      padding: "20px 0"
-    }}>
+    <>
+      {/* Mobile Header Bar */}
+      <div className="mobile-sidebar-toggle-bar admin-toggle-bar">
+        <button 
+          className="mobile-toggle-btn"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle Menu"
+        >
+          {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+        </button>
+        <span className="mobile-brand-title">UniCore</span>
+        <span className="badge admin">Admin</span>
+      </div>
+
+      {/* Backdrop overlay on mobile */}
+      {mobileOpen && (
+        <div 
+          className="mobile-sidebar-overlay active"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <aside className={`sidebar admin-sidebar ${mobileOpen ? "mobile-open" : ""}`}>
       <div className="sidebar-header" style={{
         padding: "0 24px 20px 24px",
         borderBottom: "1px solid var(--border-color, #e0e0e0)"
@@ -509,6 +522,7 @@ export default function AdminSidebar() {
           <span>Logout</span>
         </button>
       </div>
-    </div>
+      </aside>
+    </>
   );
 }

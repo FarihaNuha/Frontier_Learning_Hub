@@ -69,9 +69,9 @@ export default function AdminRegistrationList() {
   });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="admin-container">
       <AdminSidebar />
-      <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
+      <div className="admin-main-content" style={{ overflowY: "auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>

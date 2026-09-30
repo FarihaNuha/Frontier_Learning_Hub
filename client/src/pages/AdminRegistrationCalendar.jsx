@@ -262,9 +262,9 @@ export default function AdminRegistrationCalendar() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="admin-container">
       <AdminSidebar />
-      <div style={{ marginLeft: "260px", flex: 1, padding: "40px 32px", overflowY: "auto" }}>
+      <div className="admin-main-content" style={{ overflowY: "auto" }}>
         <div style={{ marginBottom: "32px" }}>
           <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Registration Calendar Config</h1>
         </div>

@@ -97,9 +97,9 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="admin-container">
       <AdminSidebar />
-      <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
+      <div className="admin-main-content">
         <div style={{ marginBottom: "32px" }}>
           <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Welcome to Admin Dashboard</h1>
         </div>

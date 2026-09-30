@@ -488,3 +488,18 @@ exports.getBlockedUsers = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Save / update FCM Device Token for Push Notifications
+exports.saveFcmToken = async (req, res) => {
+  try {
+    const { fcmToken } = req.body;
+    if (!fcmToken) {
+      return res.status(400).json({ error: "fcmToken is required" });
+    }
+    await User.findByIdAndUpdate(req.user.uid, { fcmToken });
+    res.json({ success: true, message: "FCM token saved successfully" });
+  } catch (error) {
+    console.error("Save FCM token error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

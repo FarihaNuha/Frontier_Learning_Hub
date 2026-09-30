@@ -530,11 +530,12 @@ export default function AdminResultManagementPage() {
 
   const uniqueSessions = Array.from(new Set(uploads.map((u) => u.session).filter(Boolean)));
   const uniqueLevels = Array.from(new Set(uploads.map((u) => u.level).filter(Boolean)));
-  const uniqueTerms = Array.from(new Set(uploads.map((u) => u.term).filter(Boolean)));  return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+  const uniqueTerms = Array.from(new Set(uploads.map((u) => u.term).filter(Boolean)));
+  return (
+    <div className="admin-container">
       <AdminSidebar />
 
-      <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
+      <div className="admin-main-content">
         {/* Clean Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">UniCore</string>
+    <string name="title_activity_main">UniCore</string>
+    <string name="package_name">com.frontier.learningacademy</string>
+    <string name="custom_url_scheme">com.frontier.learningacademy</string>
+</resources>

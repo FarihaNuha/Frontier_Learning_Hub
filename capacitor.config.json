@@ -1,0 +1,20 @@
+{
+  "appId": "com.frontier.learningacademy",
+  "appName": "UniCore",
+  "webDir": "client/build",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://frontier-learning-academy.vercel.app",
+    "cleartext": true,
+    "allowNavigation": [
+      "frontier-learning-academy.vercel.app",
+      "frontier-learning-academy.onrender.com",
+      "*.vercel.app"
+    ]
+  },
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}

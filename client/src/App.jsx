@@ -1,10 +1,11 @@
 import React, { useEffect, lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import SkeletonLoader from "./components/SkeletonLoader";
 import GlobalNotificationBell from "./components/GlobalNotificationBell";
 import GlobalSettingsPortal from "./components/GlobalSettingsPortal";
+import { initNativeFeatures } from "./services/nativeBridge";
 
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
@@ -136,6 +137,11 @@ function RoleRouter() {
 function AppContent() {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    initNativeFeatures(navigate);
+  }, [navigate]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");

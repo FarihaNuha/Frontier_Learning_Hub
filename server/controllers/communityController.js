@@ -7,6 +7,7 @@ const ContactRequest = require("../models/ContactRequest");
 const { getIO } = require("../socket");
 const Notification = require("../models/Notification");
 const { sendEmail, emailTemplates, queueEmail } = require("../services/emailService");
+const { sendPushNotification } = require("../services/fcmService");
 
 // ==================== PUBLIC/GLOBAL COMMUNITY ====================
 
@@ -63,6 +64,15 @@ exports.createPublicPost = async (req, res) => {
             type: "community_post",
             link: `/community/public/posts/${post._id}`,
           });
+        }
+
+        if (recipient.fcmToken) {
+          sendPushNotification(recipient.fcmToken, {
+            title: "📢 New Community Feed Post!",
+            body: `"${title}" posted by ${post.author.name}`,
+            data: { type: "community_post", postId: String(post._id) },
+            link: `/community/public/posts/${post._id}`,
+          }).catch((e) => console.error("FCM post push error:", e));
         }
       } catch (err) {
         console.error("Failed to create public post notification for user:", recipient._id, err);
@@ -699,17 +709,30 @@ exports.sendMessage = async (req, res) => {
         link: msgLink,
       });
 
-      if (io) {
-        io.to(`user_${receiverId}`).emit("newNotification", {
-          title: `✉️ New Message from ${senderName}`,
-          message: previewContent,
-          type: "chat_message",
-          link: msgLink,
-        });
+        if (io) {
+          io.to(`user_${receiverId}`).emit("newNotification", {
+            title: `✉️ New Message from ${senderName}`,
+            message: previewContent,
+            type: "chat_message",
+            link: msgLink,
+          });
+        }
+
+        if (receiver.fcmToken) {
+          sendPushNotification(receiver.fcmToken, {
+            title: `✉️ New Message from ${senderName}`,
+            body: previewContent,
+            data: {
+              type: "chat_message",
+              senderId: String(req.user.uid),
+              link: msgLink,
+            },
+            link: msgLink,
+          }).catch((e) => console.error("FCM private message push error:", e));
+        }
+      } catch (err) {
+        console.error("Failed to create message notification:", err);
       }
-    } catch (err) {
-      console.error("Failed to create message notification:", err);
-    }
 
     // Send email to receiver via queue if emailNotifications is enabled
     if (receiver.email && receiver.emailNotifications !== false) {

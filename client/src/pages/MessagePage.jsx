@@ -848,7 +848,7 @@ export default function MessagePage() {
 
       {/* ===== MESSAGES TAB ===== */}
       {activeTab === "messages" && (
-        <div className="messages-wrapper">
+        <div className={`messages-wrapper ${userId || selectedUser ? "has-active-chat" : ""}`}>
           {/* Sidebar */}
           <div className="users-sidebar">
             <div className="users-header">
@@ -941,6 +941,16 @@ export default function MessagePage() {
               <>
                 {/* Chat Header */}
                 <div className="chat-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                  <button 
+                    className="mobile-back-to-contacts-btn"
+                    onClick={() => {
+                      setSelectedUser(null);
+                      navigate("/community/messages");
+                    }}
+                    aria-label="Back to conversations"
+                  >
+                    <FiArrowLeft size={20} />
+                  </button>
                   <div className="chat-user" onClick={() => setShowEmail(!showEmail)} style={{ cursor: "pointer" }} title="Click to toggle email address">
                     <div className="chat-user-avatar" style={{ display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                       {selectedUser?.profilePicture ? (

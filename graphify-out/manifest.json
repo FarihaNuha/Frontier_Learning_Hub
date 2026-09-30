@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentAssignmentPage.jsx": {
-    "mtime": 1789852263.5597806,
-    "ast_hash": "19fe4e48aefe8bed7f79296b36c75442",
+    "mtime": 1789928091.0726502,
+    "ast_hash": "52ecfb24f606b75537e68ee617bb69ad",
     "semantic_hash": ""
   },
   "client/src/pages/StudentAttendancePage.jsx": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/StudentDashboard.jsx": {
-    "mtime": 1789484268.2603476,
-    "ast_hash": "811b308fbe5e9816856267c7fe33cc5e",
+    "mtime": 1789928040.0874946,
+    "ast_hash": "13b28faff0b46a0fa8e5dec91cff1ef9",
     "semantic_hash": ""
   },
   "client/src/pages/StudentExamPage.jsx": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAssignmentPage.jsx": {
-    "mtime": 1789483182.0933769,
-    "ast_hash": "3218ddd4fbfecd6754a06ee13fad41f8",
+    "mtime": 1789928100.1412475,
+    "ast_hash": "6dc18d923a4eda5744dee5dd937b23ea",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherAttendancePage.jsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "client/src/pages/TeacherDashboard.jsx": {
-    "mtime": 1789484268.2687917,
-    "ast_hash": "404bf04c7639e94a46c240717009745e",
+    "mtime": 1789928049.3547506,
+    "ast_hash": "b6a51924e9c1e803a310cfd77de77258",
     "semantic_hash": ""
   },
   "client/src/pages/TeacherExamPage.jsx": {
@@ -230,8 +230,8 @@
     "semantic_hash": ""
   },
   "server/controllers/lectureController.js": {
-    "mtime": 1789412043.9584181,
-    "ast_hash": "c37275bde6990ec94950e1a0bc367468",
+    "mtime": 1789928021.9543512,
+    "ast_hash": "8c68abab9182fce57fa43fc278c7c868",
     "semantic_hash": ""
   },
   "server/controllers/notificationController.js": {
@@ -535,8 +535,8 @@
     "semantic_hash": ""
   },
   "client/src/components/FilePreviewModal.jsx": {
-    "mtime": 1789481389.5175512,
-    "ast_hash": "60bca11bfbbd0885c24da5bbe4495962",
+    "mtime": 1789928068.191639,
+    "ast_hash": "47c4e2b81adaaec29ceff815d07cb96a",
     "semantic_hash": ""
   },
   "client/src/pages/NotificationsPage.jsx": {

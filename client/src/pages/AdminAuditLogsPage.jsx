@@ -29,10 +29,10 @@ export default function AdminAuditLogsPage() {
   });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="admin-container">
       <AdminSidebar />
 
-      <div style={{ marginLeft: "260px", flex: 1, padding: "40px" }}>
+      <div className="admin-main-content">
         {/* Header */}
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>

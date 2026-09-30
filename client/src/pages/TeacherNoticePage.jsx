@@ -126,10 +126,10 @@ export default function TeacherNoticePage() {
   const activeNotices = courseIdParam ? courseNotices : filteredAdminNotices;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <TeacherSidebar currentPage="notices" courseId={courseIdParam} courseInfo={courseInfo} />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Page Header */}
         <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
           <div>

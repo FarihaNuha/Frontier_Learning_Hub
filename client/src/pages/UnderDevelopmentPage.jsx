@@ -22,13 +22,13 @@ export default function UnderDevelopmentPage({ moduleName = "Result Management &
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       {/* Sidebar based on user role */}
       {user?.role === "admin" && <AdminSidebar />}
       {user?.role === "teacher" && <TeacherSidebar />}
       {user?.role === "student" && <StudentSidebar currentPage="results" />}
 
-      <div style={{ flex: 1, padding: "40px 32px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div className="main-content" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <div
           style={{
             background: "#ffffff",

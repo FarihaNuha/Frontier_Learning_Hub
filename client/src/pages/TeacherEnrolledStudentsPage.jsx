@@ -102,16 +102,10 @@ export default function TeacherEnrolledStudentsPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <TeacherSidebar currentPage="enrolled-students" courseId={courseIdParam} />
 
-      <div
-        style={{
-          flex: 1,
-          padding: "40px",
-          overflowY: "auto",
-        }}
-      >
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Top Header */}
         <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
@@ -315,7 +309,8 @@ export default function TeacherEnrolledStudentsPage() {
               </p>
             </div>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <table style={{ width: "100%", minWidth: "750px", borderCollapse: "collapse", textAlign: "left" }}>
               <thead>
                 <tr style={{ background: "#e2e8f0", borderBottom: "2px solid #cbd5e1", color: "#0f172a", fontSize: "13px", fontWeight: 700 }}>
                   <th style={{ padding: "14px 20px" }}>Student ID</th>
@@ -412,7 +407,8 @@ export default function TeacherEnrolledStudentsPage() {
                 ))}
               </tbody>
             </table>
-          )}
+          </div>
+        )}
         </div>
       </div>
     </div>

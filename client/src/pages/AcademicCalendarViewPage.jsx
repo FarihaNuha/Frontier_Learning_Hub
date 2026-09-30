@@ -30,14 +30,14 @@ export default function AcademicCalendarViewPage() {
   }, []);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       {user?.role === "teacher" ? (
         <TeacherSidebar currentPage="calendar" />
       ) : (
         <StudentSidebar currentPage="calendar" />
       )}
 
-      <div style={{ flex: 1, padding: "40px 32px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>

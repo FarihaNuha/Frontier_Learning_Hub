@@ -94,10 +94,10 @@ export default function StudentRetakeRegistrationPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <StudentSidebar currentPage="retake-registration" />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
@@ -215,8 +215,8 @@ export default function StudentRetakeRegistrationPage() {
               {existingRetakes.length === 0 ? (
                 <div style={{ padding: "30px", textAlign: "center", color: "#94a3b8" }}>No retake requests submitted yet.</div>
               ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                  <table style={{ width: "100%", minWidth: "550px", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                     <thead>
                       <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700 }}>
                         <th style={{ padding: "10px 14px" }}>Course Code</th>

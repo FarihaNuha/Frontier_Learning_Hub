@@ -91,9 +91,9 @@ export default function StudentNoticePage() {
   const activeNotices = courseIdParam ? courseNotices : filteredAdminNotices;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <StudentSidebar currentPage="notices" courseId={courseIdParam} courseInfo={courseInfo} />
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         
         {/* Page Header */}
         <div style={{ marginBottom: "28px" }}>

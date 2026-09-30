@@ -67,10 +67,10 @@ export default function TeacherRegistrationApprovalPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <TeacherSidebar />
-      <div style={{ flex: 1, padding: "40px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
           <div>
             <h1 style={{ margin: 0, color: "#1e293b", fontSize: "28px" }}>Registration Approval</h1>
             <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600 }}>
@@ -109,94 +109,96 @@ export default function TeacherRegistrationApprovalPage() {
               No pending course registration requests found for your assigned advising batch.
             </div>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-              <thead>
-                <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b" }}>
-                  <th style={{ padding: "12px" }}>Student ID</th>
-                  <th style={{ padding: "12px" }}>Name</th>
-                  <th style={{ padding: "12px" }}>Level & Term</th>
-                  <th style={{ padding: "12px" }}>Total Credits</th>
-                  <th style={{ padding: "12px" }}>Payment Status</th>
-                  <th style={{ padding: "12px" }}>Submitted Date</th>
-                  <th style={{ padding: "12px", textAlign: "center" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.map((reg) => (
-                  <tr key={reg._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                    <td style={{ padding: "12px", fontWeight: "600", color: "#3b8db3" }}>{reg.studentId}</td>
-                    <td style={{ padding: "12px" }}>{reg.user?.name || "Student"}</td>
-                    <td style={{ padding: "12px" }}>{reg.level} {reg.term}</td>
-                    <td style={{ padding: "12px" }}>{reg.totalCredits} Credits</td>
-                    <td style={{ padding: "12px" }}>
-                      <span
-                        style={{
-                          padding: "4px 12px",
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          background: reg.paymentStatus === "Paid" ? "#dcfce7" : "#fef3c7",
-                          color: reg.paymentStatus === "Paid" ? "#15803d" : "#b45309",
-                        }}
-                      >
-                        {reg.paymentStatus === "Paid" ? `Paid (৳${(reg.totalAmount || 3100).toLocaleString()})` : `Pending (Due: ৳${(reg.dueAmount || reg.totalAmount || 3100).toLocaleString()})`}
-                      </span>
-
-                      {reg.hasPreviousDues && (
-                        <div
-                          style={{
-                            marginTop: "6px",
-                            padding: "3px 8px",
-                            borderRadius: "6px",
-                            fontSize: "11px",
-                            fontWeight: "800",
-                            background: "#ffe4e6",
-                            color: "#e11d48",
-                            border: "1px solid #fecdd3",
-                            display: "inline-block",
-                          }}
-                          title={`Previous Dues: ৳${reg.totalPreviousDues.toLocaleString()} BDT`}
-                        >
-                          Previous Dues: ৳{reg.totalPreviousDues.toLocaleString()}
-                        </div>
-                      )}
-                    </td>
-                    <td style={{ padding: "12px" }}>{new Date(reg.createdAt).toLocaleDateString()}</td>
-                    <td style={{ padding: "12px", textAlign: "center" }}>
-                      <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-                        <button
-                          onClick={() => setSelectedReg(reg)}
-                          style={{ background: "#e0f2fe", color: "#0369a1", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
-                        >
-                          <FiEye /> Details
-                        </button>
-                        <button
-                          onClick={() => handleApprove(reg._id)}
-                          style={{ background: "#dcfce7", color: "#15803d", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
-                        >
-                          <FiCheckCircle /> Approve
-                        </button>
-                        <button
-                          onClick={() => handleReject(reg._id)}
-                          style={{ background: "#fee2e2", color: "#b91c1c", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
-                        >
-                          <FiXCircle /> Reject
-                        </button>
-                      </div>
-                    </td>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <table style={{ width: "100%", minWidth: "700px", borderCollapse: "collapse", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #e2e8f0", color: "#64748b" }}>
+                    <th style={{ padding: "12px" }}>Student ID</th>
+                    <th style={{ padding: "12px" }}>Name</th>
+                    <th style={{ padding: "12px" }}>Level & Term</th>
+                    <th style={{ padding: "12px" }}>Total Credits</th>
+                    <th style={{ padding: "12px" }}>Payment Status</th>
+                    <th style={{ padding: "12px" }}>Submitted Date</th>
+                    <th style={{ padding: "12px", textAlign: "center" }}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {requests.map((reg) => (
+                    <tr key={reg._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                      <td style={{ padding: "12px", fontWeight: "600", color: "#3b8db3" }}>{reg.studentId}</td>
+                      <td style={{ padding: "12px" }}>{reg.user?.name || "Student"}</td>
+                      <td style={{ padding: "12px" }}>{reg.level} {reg.term}</td>
+                      <td style={{ padding: "12px" }}>{reg.totalCredits} Credits</td>
+                      <td style={{ padding: "12px" }}>
+                        <span
+                          style={{
+                            padding: "4px 12px",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            background: reg.paymentStatus === "Paid" ? "#dcfce7" : "#fef3c7",
+                            color: reg.paymentStatus === "Paid" ? "#15803d" : "#b45309",
+                          }}
+                        >
+                          {reg.paymentStatus === "Paid" ? `Paid (৳${(reg.totalAmount || 3100).toLocaleString()})` : `Pending (Due: ৳${(reg.dueAmount || reg.totalAmount || 3100).toLocaleString()})`}
+                        </span>
+
+                        {reg.hasPreviousDues && (
+                          <div
+                            style={{
+                              marginTop: "6px",
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              fontSize: "11px",
+                              fontWeight: "800",
+                              background: "#ffe4e6",
+                              color: "#e11d48",
+                              border: "1px solid #fecdd3",
+                              display: "inline-block",
+                            }}
+                            title={`Previous Dues: ৳${reg.totalPreviousDues.toLocaleString()} BDT`}
+                          >
+                            Previous Dues: ৳{reg.totalPreviousDues.toLocaleString()}
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ padding: "12px" }}>{new Date(reg.createdAt).toLocaleDateString()}</td>
+                      <td style={{ padding: "12px", textAlign: "center" }}>
+                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                          <button
+                            onClick={() => setSelectedReg(reg)}
+                            style={{ background: "#e0f2fe", color: "#0369a1", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
+                          >
+                            <FiEye /> Details
+                          </button>
+                          <button
+                            onClick={() => handleApprove(reg._id)}
+                            style={{ background: "#dcfce7", color: "#15803d", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
+                          >
+                            <FiCheckCircle /> Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(reg._id)}
+                            style={{ background: "#fee2e2", color: "#b91c1c", border: "none", borderRadius: "6px", padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
+                          >
+                            <FiXCircle /> Reject
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
         {/* Modal details */}
         {selectedReg && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
-            <div style={{ background: "#ffffff", padding: "32px", borderRadius: "16px", width: "560px", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "16px" }}>
+            <div style={{ background: "#ffffff", padding: "clamp(20px, 4vw, 32px)", borderRadius: "16px", width: "100%", maxWidth: "560px", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 20px 40px rgba(0,0,0,0.2)", boxSizing: "border-box" }}>
               <h2 style={{ margin: "0 0 16px 0", color: "#0f172a" }}>Registration Details</h2>
-              <div style={{ background: "#E8F4FD", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "13.5px" }}>
+              <div style={{ background: "#E8F4FD", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "20px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px", fontSize: "13.5px" }}>
                 <div><strong>Student ID:</strong> {selectedReg.studentId}</div>
                 <div><strong>Department:</strong> {selectedReg.department}</div>
                 <div><strong>Total Credits:</strong> {selectedReg.totalCredits} Credits</div>

@@ -57,10 +57,10 @@ export default function TeacherRetakeApprovalPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <TeacherSidebar currentPage="retake-approval" />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>

@@ -275,5 +275,6 @@
   "273": "Payment.js",
   "274": "RegistrationCalendar.js",
   "275": "@capacitor/push-notifications",
-  "276": "node-cron"
+  "276": "node-cron",
+  "277": "cors"
 }

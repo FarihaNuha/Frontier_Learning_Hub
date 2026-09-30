@@ -84,10 +84,10 @@ export default function StudentRegistrationPaymentPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <StudentSidebar currentPage="payments" />
 
-      <div style={{ flex: 1, padding: "36px 32px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
           <div>
@@ -135,8 +135,8 @@ export default function StudentRegistrationPaymentPage() {
             <h3 style={{ margin: "0 0 16px 0", color: "#0f172a", fontSize: "17px", fontWeight: 800, display: "flex", alignItems: "center", gap: "8px" }}>
               <FiCreditCard style={{ color: "#3b8db3" }} /> Registered Semesters Payment Overview
             </h3>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <table style={{ width: "100%", minWidth: "600px", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
                 <thead>
                   <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700, borderBottom: "1.5px solid #cbd5e1" }}>
                     <th style={{ padding: "12px 16px" }}>Semester (Level & Term)</th>
@@ -329,8 +329,8 @@ export default function StudentRegistrationPaymentPage() {
                   <h4 style={{ margin: "0 0 10px 0", color: "#0f172a", fontSize: "15px", fontWeight: 700 }}>
                     1. Registered Academic Courses Roster
                   </h4>
-                  <div style={{ overflowX: "auto", marginBottom: "20px", border: "1px solid #e2e8f0", borderRadius: "10px" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                  <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", marginBottom: "20px", border: "1px solid #e2e8f0", borderRadius: "10px" }}>
+                    <table style={{ width: "100%", minWidth: "500px", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                       <thead>
                         <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700, borderBottom: "1px solid #e2e8f0" }}>
                           <th style={{ padding: "10px 14px" }}>Code</th>
@@ -379,8 +379,8 @@ export default function StudentRegistrationPaymentPage() {
                   <h4 style={{ margin: "0 0 10px 0", color: "#0f172a", fontSize: "15px", fontWeight: 700 }}>
                     2. Fixed Institutional Fees Schedule
                   </h4>
-                  <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", marginBottom: "20px" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left" }}>
+                  <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflowX: "auto", WebkitOverflowScrolling: "touch", marginBottom: "20px" }}>
+                    <table style={{ width: "100%", minWidth: "450px", borderCollapse: "collapse", fontSize: "12.5px", textAlign: "left" }}>
                       <thead>
                         <tr style={{ background: "#e2e8f0", color: "#0f172a", borderBottom: "1px solid #e2e8f0" }}>
                           <th style={{ padding: "8px 12px", width: "40px" }}>#</th>

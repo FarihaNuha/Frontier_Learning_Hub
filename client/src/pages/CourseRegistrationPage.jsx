@@ -144,10 +144,10 @@ export default function CourseRegistrationPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <StudentSidebar currentPage="course-registration" />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Navigation Back Button */}
         <div style={{ marginBottom: "24px" }}>
           <button
@@ -233,8 +233,8 @@ export default function CourseRegistrationPage() {
             )}
 
             {/* Courses Table */}
-            <div style={{ borderRadius: "14px", border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.03)", marginBottom: "24px" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <div style={{ borderRadius: "14px", border: "1px solid #e2e8f0", overflowX: "auto", WebkitOverflowScrolling: "touch", boxShadow: "0 4px 16px rgba(0,0,0,0.03)", marginBottom: "24px" }}>
+              <table style={{ width: "100%", minWidth: "550px", borderCollapse: "collapse", textAlign: "left" }}>
                 <thead>
                   <tr style={{ background: "#e2e8f0", borderBottom: "2px solid #cbd5e1", color: "#0f172a", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     <th style={{ padding: "14px 16px" }}>
@@ -378,8 +378,8 @@ export default function CourseRegistrationPage() {
                 <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16px", fontWeight: 800 }}>1. Selected Curriculum Courses</h3>
               </div>
 
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflowX: "auto", WebkitOverflowScrolling: "touch", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
+                <table style={{ width: "100%", minWidth: "550px", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
                   <thead>
                     <tr style={{ background: "#e2e8f0", color: "#0f172a", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       <th style={{ padding: "12px 16px", fontWeight: 700 }}>Course Code</th>
@@ -438,8 +438,8 @@ export default function CourseRegistrationPage() {
                     <h3 style={{ margin: 0, color: "#0f172a", fontSize: "16px", fontWeight: 800 }}>2. Fixed Institutional & Administrative Fees</h3>
                   </div>
 
-                  <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden", marginBottom: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                  <div style={{ border: "1px solid #e2e8f0", borderRadius: "14px", overflowX: "auto", WebkitOverflowScrolling: "touch", marginBottom: "28px", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
+                    <table style={{ width: "100%", minWidth: "480px", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                       <thead>
                         <tr style={{ background: "#e2e8f0", color: "#0f172a", borderBottom: "1.5px solid #e2e8f0", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                           <th style={{ padding: "12px 16px", width: "50px", fontWeight: 700 }}>#</th>

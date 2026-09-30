@@ -37,14 +37,14 @@ export default function StudentTranscriptPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <div className="no-print">
         <StudentSidebar currentPage="transcript" />
       </div>
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Printable Header Bar */}
-        <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px" }}>
+        <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
           <div>
             <h1 style={{ color: "#1e293b", margin: 0, fontSize: "26px", fontWeight: 700 }}>
               Official Academic Transcript
@@ -84,19 +84,21 @@ export default function StudentTranscriptPage() {
             style={{
               background: "#ffffff",
               borderRadius: "16px",
-              padding: "40px",
+              padding: "clamp(16px, 4vw, 40px)",
               boxShadow: "0 8px 30px rgba(0,0,0,0.06)",
               border: "1px solid #cbd5e1",
               maxWidth: "900px",
               margin: "0 auto",
+              width: "100%",
+              boxSizing: "border-box",
             }}
           >
             {/* University Letterhead Header */}
             <div style={{ textAlign: "center", borderBottom: "2px solid #2C4B66", paddingBottom: "20px", marginBottom: "24px" }}>
-              <h2 style={{ margin: 0, color: "#2C4B66", fontSize: "22px", letterSpacing: 0.5, textTransform: "uppercase" }}>
+              <h2 style={{ margin: 0, color: "#2C4B66", fontSize: "clamp(18px, 4vw, 22px)", letterSpacing: 0.5, textTransform: "uppercase" }}>
                 University of Frontier Technology, Bangladesh
               </h2>
-              <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", fontWeight: 600 }}>
+              <p style={{ margin: "4px 0 0 0", color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px" }}>
                 OFFICIAL ACADEMIC TRANSCRIPT OF RECORD
               </p>
               <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
@@ -105,8 +107,8 @@ export default function StudentTranscriptPage() {
             </div>
 
             {/* Student Meta Table */}
-            <div style={{ background: "#E8F4FD", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "28px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "13.5px" }}>
+            <div style={{ background: "#E8F4FD", padding: "16px", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "28px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", fontSize: "13.5px" }}>
                 <div><strong>Student Name:</strong> {studentInfo.name}</div>
                 <div><strong>Student ID:</strong> {studentInfo.studentId}</div>
                 <div><strong>Department:</strong> {studentInfo.department}</div>
@@ -127,7 +129,7 @@ export default function StudentTranscriptPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                 {semesterBreakdown.map((sem, idx) => (
                   <div key={idx} style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden" }}>
-                    <div style={{ background: "#f1f5f9", padding: "12px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ background: "#f1f5f9", padding: "12px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                       <span style={{ fontWeight: 700, color: "#0f172a", fontSize: "14px" }}>
                         {sem.semesterName} (Session: {sem.session})
                       </span>
@@ -136,37 +138,39 @@ export default function StudentTranscriptPage() {
                       </span>
                     </div>
 
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
-                      <thead>
-                        <tr style={{ background: "#ffffff", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
-                          <th style={{ padding: "10px 14px" }}>Course Code</th>
-                          <th style={{ padding: "10px 14px" }}>Course Title</th>
-                          <th style={{ padding: "10px 14px" }}>Type</th>
-                          <th style={{ padding: "10px 14px" }}>Credits</th>
-                          <th style={{ padding: "10px 14px" }}>Grade</th>
-                          <th style={{ padding: "10px 14px" }}>Grade Point</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sem.courses.map((c, cIdx) => (
-                          <tr key={c._id || cIdx} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                            <td style={{ padding: "10px 14px", fontWeight: 700, color: "#3b8db3" }}>{c.courseCode}</td>
-                            <td style={{ padding: "10px 14px", fontWeight: 600 }}>{c.courseTitle}</td>
-                            <td style={{ padding: "10px 14px", color: "#64748b" }}>{c.courseType}</td>
-                            <td style={{ padding: "10px 14px" }}>{c.creditHours}</td>
-                            <td style={{ padding: "10px 14px", fontWeight: 700, color: c.letterGrade === "F" ? "#b91c1c" : "#16a34a" }}>{c.letterGrade || "-"}</td>
-                            <td style={{ padding: "10px 14px", fontWeight: 700 }}>{c.gradePoint !== undefined && c.gradePoint !== null ? Number(c.gradePoint).toFixed(2) : "-"}</td>
+                    <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                      <table style={{ width: "100%", minWidth: "560px", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                        <thead>
+                          <tr style={{ background: "#ffffff", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
+                            <th style={{ padding: "10px 14px" }}>Course Code</th>
+                            <th style={{ padding: "10px 14px" }}>Course Title</th>
+                            <th style={{ padding: "10px 14px" }}>Type</th>
+                            <th style={{ padding: "10px 14px" }}>Credits</th>
+                            <th style={{ padding: "10px 14px" }}>Grade</th>
+                            <th style={{ padding: "10px 14px" }}>Grade Point</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {sem.courses.map((c, cIdx) => (
+                            <tr key={c._id || cIdx} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "10px 14px", fontWeight: 700, color: "#3b8db3" }}>{c.courseCode}</td>
+                              <td style={{ padding: "10px 14px", fontWeight: 600 }}>{c.courseTitle}</td>
+                              <td style={{ padding: "10px 14px", color: "#64748b" }}>{c.courseType}</td>
+                              <td style={{ padding: "10px 14px" }}>{c.creditHours}</td>
+                              <td style={{ padding: "10px 14px", fontWeight: 700, color: c.letterGrade === "F" ? "#b91c1c" : "#16a34a" }}>{c.letterGrade || "-"}</td>
+                              <td style={{ padding: "10px 14px", fontWeight: 700 }}>{c.gradePoint !== undefined && c.gradePoint !== null ? Number(c.gradePoint).toFixed(2) : "-"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
 
             {/* Transcript Footer Signatures */}
-            <div style={{ marginTop: "60px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingTop: "20px", borderTop: "1px dashed #cbd5e1" }}>
+            <div style={{ marginTop: "40px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingTop: "20px", borderTop: "1px dashed #cbd5e1", flexWrap: "wrap", gap: "24px" }}>
               <div style={{ textAlign: "center" }}>
                 <div style={{ borderBottom: "1px solid #475569", width: "160px", marginBottom: "4px" }}></div>
                 <span style={{ fontSize: "12px", color: "#64748b" }}>Prepared By</span>

@@ -66,9 +66,9 @@ export default function StudentLevelTermPage() {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+      <div className="dashboard-container">
         <StudentSidebar currentPage="course-registration" />
-        <div style={{ flex: 1, padding: "60px", textAlign: "center", color: "#64748b" }}>
+        <div className="main-content" style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>
           Loading Level-Term Details...
         </div>
       </div>
@@ -95,10 +95,10 @@ export default function StudentLevelTermPage() {
     : (data?.courses || []).reduce((acc, c) => acc + (c.creditHours || 0), 0);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <StudentSidebar currentPage="course-registration" />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Navigation Back Button */}
         <div style={{ marginBottom: "24px" }}>
           <button
@@ -437,8 +437,8 @@ export default function StudentLevelTermPage() {
                 )}
               </div>
             ) : (
-              <div style={{ borderRadius: "14px", border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+              <div style={{ borderRadius: "14px", border: "1px solid #e2e8f0", overflowX: "auto", WebkitOverflowScrolling: "touch", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
+                <table style={{ width: "100%", minWidth: "500px", borderCollapse: "collapse", textAlign: "left" }}>
                   <thead>
                     <tr style={{ background: "#e2e8f0", borderBottom: "2px solid #cbd5e1", color: "#0f172a", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       <th style={{ padding: "14px 16px", fontWeight: 700 }}>Course Code</th>

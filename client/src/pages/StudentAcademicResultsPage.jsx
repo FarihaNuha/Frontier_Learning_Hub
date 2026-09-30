@@ -197,10 +197,10 @@ export default function StudentAcademicResultsPage() {
   const currentSemesterGPA = calculateGPA(resultsByLevelTerm[selectedSemester]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <StudentSidebar currentPage="results" />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Page Header */}
         <div style={{ marginBottom: "24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
@@ -217,7 +217,7 @@ export default function StudentAcademicResultsPage() {
         </div>
 
         {/* Dual Mode Result Tabs: Mid Term Result vs Final Result */}
-        <div style={{ display: "flex", gap: "12px", marginBottom: "28px" }}>
+        <div style={{ display: "flex", gap: "12px", marginBottom: "28px", flexWrap: "wrap" }}>
           <button
             onClick={() => setResultTypeTab("Midterm")}
             style={{
@@ -427,8 +427,8 @@ export default function StudentAcademicResultsPage() {
                     </p>
                   </div>
                 ) : (
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                  <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                    <table style={{ width: "100%", minWidth: "650px", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
                       <thead>
                         <tr style={{ background: "linear-gradient(135deg, #bfe0f4 0%, #d4ebf8 100%)", borderBottom: "2px solid #3B8DB3", color: "#0369a1", fontWeight: 700 }}>
                           <th style={{ padding: "12px 14px", width: "110px" }}>Course Code</th>

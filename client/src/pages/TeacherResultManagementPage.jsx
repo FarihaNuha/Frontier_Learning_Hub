@@ -867,10 +867,10 @@ export default function TeacherResultManagementPage() {
   const isAdminDeadlinePassed = Boolean(dlDate && dlDate < new Date());
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <TeacherSidebar currentPage="results" />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Page Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "24px", flexWrap: "wrap", gap: "16px" }}>
           <div>
@@ -1507,8 +1507,8 @@ export default function TeacherResultManagementPage() {
               </div>
 
               {/* Marksheet Table with Inline Direct Editing */}
-              <div style={{ overflowY: "auto", flex: 1, paddingRight: "4px" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+              <div style={{ overflow: "auto", WebkitOverflowScrolling: "touch", flex: 1, paddingRight: "4px" }}>
+                <table style={{ width: "100%", minWidth: "700px", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                   <thead style={{ position: "sticky", top: 0, background: "#E8F4FD", zIndex: 10 }}>
                     <tr style={{ color: "#334155", fontWeight: 700, borderBottom: "2px solid #cbd5e1" }}>
                       <th style={{ padding: "12px" }}>Student ID</th>

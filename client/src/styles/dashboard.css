@@ -2255,4 +2255,9 @@ body.dark-theme .analytics-gantt-svg rect[fill="rgba(255, 255, 255, 0.04)"] {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  .transcript-document {
+    padding: 16px 12px !important;
+  }
 }
+

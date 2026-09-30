@@ -2990,4 +2990,13 @@ body.dark-theme .inline-comments-list::-webkit-scrollbar-thumb {
   .messages-wrapper:not(.has-active-chat) .chat-area {
     display: none !important;
   }
+
+  .post-detail-container {
+    padding: 16px 12px !important;
+  }
+
+  .post-detail-card {
+    padding: 18px 14px !important;
+  }
 }
+

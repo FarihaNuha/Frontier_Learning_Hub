@@ -74,10 +74,10 @@ export default function StudentAcademicProfilePage() {
   }, [incompleteCourses]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container">
       <StudentSidebar currentPage="academic-profile" />
 
-      <div style={{ flex: 1, padding: "36px 32px", overflowY: "auto" }}>
+      <div className="main-content" style={{ overflowY: "auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
@@ -232,8 +232,8 @@ export default function StudentAcademicProfilePage() {
                   No published course results recorded yet. Completed course grades will appear here as soon as teachers publish results.
                 </div>
               ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
+                <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                  <table style={{ width: "100%", minWidth: "550px", borderCollapse: "collapse", fontSize: "13.5px", textAlign: "left" }}>
                     <thead>
                       <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700, borderBottom: "1.5px solid #cbd5e1" }}>
                         <th style={{ padding: "12px 16px" }}>Course Code</th>
@@ -447,8 +447,8 @@ export default function StudentAcademicProfilePage() {
                 <h3 style={{ margin: "0 0 16px 0", color: "#0f172a", fontSize: "18px", fontWeight: 800, display: "flex", alignItems: "center", gap: "8px" }}>
                   <FiAlertCircle style={{ color: "#ea580c" }} /> Retake & Grade Improvement Log ({retakes.length})
                 </h3>
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+                <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                  <table style={{ width: "100%", minWidth: "500px", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
                     <thead>
                       <tr style={{ background: "#e2e8f0", color: "#0f172a", fontWeight: 700 }}>
                         <th style={{ padding: "10px 14px" }}>Course Code</th>

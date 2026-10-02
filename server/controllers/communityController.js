@@ -209,6 +209,34 @@ exports.toggleLikePublicPost = async (req, res) => {
     }
 
     await post.save();
+
+    // Notify post author if liked and liker is not author
+    if (!hasLiked && post.author && post.author.toString() !== req.user.uid) {
+      try {
+        const liker = await User.findById(req.user.uid).select("name");
+        const likerName = liker?.name || "Someone";
+        const notif = await Notification.create({
+          userId: post.author,
+          title: "❤️ New Reaction on Your Post",
+          message: `${likerName} reacted to your post: "${post.title || 'Community Post'}"`,
+          type: "community_post",
+          link: `/community/public/posts/${post._id}`,
+        });
+        const io = getIO();
+        if (io) {
+          io.to(`user_${post.author}`).emit("newNotification", {
+            _id: notif._id,
+            title: "❤️ New Reaction on Your Post",
+            message: `${likerName} reacted to your post: "${post.title || 'Community Post'}"`,
+            type: "community_post",
+            link: `/community/public/posts/${post._id}`,
+          });
+        }
+      } catch (err) {
+        console.error("Error creating post reaction notification:", err);
+      }
+    }
+
     res.json({
       likes: post.likes.length,
       hasLiked: !hasLiked,
@@ -502,6 +530,34 @@ exports.toggleLikeCoursePost = async (req, res) => {
     }
 
     await post.save();
+
+    // Notify post author if liked and liker is not author
+    if (!hasLiked && post.author && post.author.toString() !== req.user.uid) {
+      try {
+        const liker = await User.findById(req.user.uid).select("name");
+        const likerName = liker?.name || "Someone";
+        const notif = await Notification.create({
+          userId: post.author,
+          title: "❤️ New Reaction on Your Course Post",
+          message: `${likerName} reacted to your post: "${post.title || 'Course Post'}"`,
+          type: "community_post",
+          link: `/community/courses/${courseId}/posts/${post._id}`,
+        });
+        const io = getIO();
+        if (io) {
+          io.to(`user_${post.author}`).emit("newNotification", {
+            _id: notif._id,
+            title: "❤️ New Reaction on Your Course Post",
+            message: `${likerName} reacted to your post: "${post.title || 'Course Post'}"`,
+            type: "community_post",
+            link: `/community/courses/${courseId}/posts/${post._id}`,
+          });
+        }
+      } catch (err) {
+        console.error("Error creating course post reaction notification:", err);
+      }
+    }
+
     res.json({
       likes: post.likes.length,
       hasLiked: !hasLiked,
@@ -854,6 +910,32 @@ exports.toggleReaction = async (req, res) => {
       messageId,
       reactions: message.reactions,
     });
+
+    // If reaction was added (not removed), notify the recipient
+    if (existingIndex === -1 && otherUser) {
+      try {
+        const reactor = await User.findById(userId).select("name");
+        const reactorName = reactor?.name || "Someone";
+        const notif = await Notification.create({
+          userId: otherUser,
+          title: "Reaction on Your Message",
+          message: `${reactorName} reacted ${emoji} to your message`,
+          type: "chat_message",
+          link: "/community/messages",
+        });
+        if (io) {
+          io.to(`user_${otherUser}`).emit("newNotification", {
+            _id: notif._id,
+            title: "Reaction on Your Message",
+            message: `${reactorName} reacted ${emoji} to your message`,
+            type: "chat_message",
+            link: "/community/messages",
+          });
+        }
+      } catch (err) {
+        console.error("Error creating message reaction notification:", err);
+      }
+    }
 
     res.json({ reactions: message.reactions });
   } catch (error) {

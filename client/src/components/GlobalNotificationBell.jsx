@@ -57,22 +57,29 @@ export default function GlobalNotificationBell() {
   useEffect(() => {
     if (socket) {
       const handleNewNotification = (notification) => {
+        if (!notification) return;
         setNotifications((prev) => [notification, ...prev]);
         setUnreadCount((prev) => prev + 1);
-        toast.success(`Notification: ${notification.title}`, {
-          icon: '🔔',
-          duration: 5000,
-          position: "top-right"
-        });
+      };
+
+      const handleNewNoticeNotif = (payload) => {
+        if (!payload) return;
+        const currentUserId = user?._id || user?.id;
+        if (payload.userId && String(payload.userId) !== String(currentUserId)) return;
+        const notif = payload.notif || payload;
+        setNotifications((prev) => [notif, ...prev]);
+        setUnreadCount((prev) => prev + 1);
       };
 
       socket.on("newNotification", handleNewNotification);
+      socket.on("new_notification", handleNewNoticeNotif);
 
       return () => {
         socket.off("newNotification", handleNewNotification);
+        socket.off("new_notification", handleNewNoticeNotif);
       };
     }
-  }, [socket]);
+  }, [socket, user]);
 
   const handleMarkAsRead = async (notificationId) => {
     try {

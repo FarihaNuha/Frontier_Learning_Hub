@@ -2,7 +2,33 @@ import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { PushNotifications } from "@capacitor/push-notifications";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import api from "./api";
+
+let navigateHandler = null;
+
+export const setGlobalNavigate = (nav) => {
+  if (typeof nav === "function") {
+    navigateHandler = nav;
+  }
+};
+
+export const navigateTo = (link) => {
+  if (!link) return;
+  console.log("🚀 Deep linking navigation to:", link);
+  try {
+    if (navigateHandler) {
+      navigateHandler(link);
+    } else if (typeof window !== "undefined") {
+      window.location.href = link;
+    }
+  } catch (err) {
+    console.error("Navigation error:", err);
+    if (typeof window !== "undefined") {
+      window.location.href = link;
+    }
+  }
+};
 
 /**
  * Check if running in a native Capacitor environment (with deferred bridge detection)
@@ -18,12 +44,122 @@ export const isNativePlatform = () => {
 };
 
 /**
+ * Show a native floating heads-up Android notification (like WhatsApp / Messenger / Google Classroom)
+ * or web browser notification fallback
+ */
+export const showNativeNotification = async ({ title, body, link, id }) => {
+  try {
+    if (isNativePlatform()) {
+      const notifId = id
+        ? typeof id === "number"
+          ? id
+          : Math.abs(hashCode(String(id)))
+        : Math.floor(Math.random() * 1000000) + 1;
+
+      // Ensure notification channel exists
+      await ensureHeadsUpChannel();
+
+      // Check and request permission if needed
+      try {
+        const perm = await LocalNotifications.checkPermissions();
+        if (perm.display !== "granted") {
+          await LocalNotifications.requestPermissions();
+        }
+      } catch (permErr) {
+        console.warn("Permission check note:", permErr);
+      }
+
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: notifId,
+            title: title || "UniCore Notification",
+            body: body || "",
+            channelId: "unicore_heads_up_channel",
+            extra: { link: link || "/notifications" },
+            schedule: { at: new Date(Date.now() + 50) },
+          },
+        ],
+      });
+      console.log("🔔 Native heads-up floating notification scheduled:", title);
+    } else {
+      // Standard Web Browser Notification fallback
+      if (typeof window !== "undefined" && "Notification" in window) {
+        if (Notification.permission === "granted") {
+          const n = new Notification(title || "UniCore Notification", {
+            body: body || "",
+            icon: "/logo192.png",
+            badge: "/logo192.png",
+            data: { link: link || "/notifications" },
+          });
+          n.onclick = () => {
+            window.focus();
+            navigateTo(link || "/notifications");
+          };
+        } else if (Notification.permission === "default") {
+          Notification.requestPermission().then((res) => {
+            if (res === "granted") {
+              const n = new Notification(title || "UniCore Notification", {
+                body: body || "",
+                icon: "/logo192.png",
+                data: { link: link || "/notifications" },
+              });
+              n.onclick = () => {
+                window.focus();
+                navigateTo(link || "/notifications");
+              };
+            }
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Notification display error:", err.message);
+  }
+};
+
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
+}
+
+let channelCreated = false;
+const ensureHeadsUpChannel = async () => {
+  if (!isNativePlatform() || channelCreated) return;
+  try {
+    await LocalNotifications.createChannel({
+      id: "unicore_heads_up_channel",
+      name: "UniCore Heads-Up Alerts",
+      description: "High priority alerts for incoming calls, messages, exams, assignments, and lectures",
+      importance: 5,
+      visibility: 1,
+      vibration: true,
+      lights: true,
+      lightColor: "#3B8DB3",
+    });
+    channelCreated = true;
+    console.log("✅ Created Android high-priority channel: unicore_heads_up_channel");
+  } catch (channelErr) {
+    console.warn("Channel create warning:", channelErr.message);
+  }
+};
+
+/**
  * Initialize Capacitor Native Mobile Features
  * - Android Gesture / Hardware Back Button navigation
  * - Status Bar appearance
  * - Firebase Cloud Messaging (FCM) Push Notifications
+ * - Native Heads-up Local Notifications (like WhatsApp / Google Classroom)
  */
 export const initNativeFeatures = (navigate) => {
+  if (navigate) {
+    setGlobalNavigate(navigate);
+  }
+
   let attempts = 0;
   const maxAttempts = 10;
 
@@ -35,6 +171,10 @@ export const initNativeFeatures = (navigate) => {
         return;
       }
       console.log("🌐 Running in standard Web Browser environment.");
+      // Web notification permission request
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().catch(() => {});
+      }
       return;
     }
 
@@ -75,7 +215,7 @@ export const initNativeFeatures = (navigate) => {
           window.location.pathname.includes("/community/messages/") &&
           window.location.pathname !== "/community/messages"
         ) {
-          navigate("/community/messages");
+          navigateTo("/community/messages");
           return;
         }
 
@@ -100,14 +240,41 @@ export const initNativeFeatures = (navigate) => {
       console.warn("Back button listener warning:", e.message);
     }
 
-    // 3. Register for Push Notifications (FCM)
+    // 3. Register for Push Notifications (FCM) & Heads-up Local Notifications
+    initLocalNotifications(navigate);
     initPushNotifications(navigate);
   };
 
   trySetup();
 };
 
+export const initLocalNotifications = async (navigate) => {
+  if (navigate) setGlobalNavigate(navigate);
+  if (!isNativePlatform()) return;
+
+  try {
+    let perm = await LocalNotifications.checkPermissions();
+    if (perm.display !== "granted") {
+      perm = await LocalNotifications.requestPermissions();
+    }
+
+    await ensureHeadsUpChannel();
+
+    // Handle tap on floating local notification banner -> deep link navigate
+    LocalNotifications.addListener("localNotificationActionPerformed", (action) => {
+      console.log("👆 Native local notification tapped:", action);
+      const link = action.notification?.extra?.link;
+      if (link) {
+        navigateTo(link);
+      }
+    });
+  } catch (err) {
+    console.error("Local notifications setup error:", err);
+  }
+};
+
 export const initPushNotifications = async (navigate) => {
+  if (navigate) setGlobalNavigate(navigate);
   if (!isNativePlatform()) return;
 
   try {
@@ -132,7 +299,6 @@ export const initPushNotifications = async (navigate) => {
         description: "Notifications for community messages, exams, assignments, and lectures",
         importance: 5,
         visibility: 1,
-        sound: "default",
         vibration: true,
       });
       console.log("✅ Created Android notification channel: unicore_messages_channel");
@@ -165,13 +331,18 @@ export const initPushNotifications = async (navigate) => {
 
     PushNotifications.addListener("pushNotificationReceived", (notification) => {
       console.log("🔔 Foreground push notification received:", notification);
+      showNativeNotification({
+        title: notification.title,
+        body: notification.body,
+        link: notification.data?.link,
+      });
     });
 
     PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
       console.log("👆 Notification opened by user:", action);
       const link = action.notification?.data?.link;
-      if (link && navigate) {
-        navigate(link);
+      if (link) {
+        navigateTo(link);
       }
     });
   } catch (err) {

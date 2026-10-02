@@ -276,15 +276,5 @@
   "274": "RegistrationCalendar.js",
   "275": "@capacitor/push-notifications",
   "276": "node-cron",
-  "277": "cors",
-  "278": "attendanceRoutes.js",
-  "279": "registrationPaymentRoutes.js",
-  "280": "1801.b1ddf0fc.chunk.js",
-  "281": "5271",
-  "282": "@capacitor/core",
-  "283": "@capacitor/local-notifications",
-  "284": "@capacitor/push-notifications",
-  "285": "@testing-library/dom",
-  "286": "@testing-library/jest-dom",
-  "287": "xlsx"
+  "277": "cors"
 }

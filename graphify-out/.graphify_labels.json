@@ -286,5 +286,13 @@
   "284": "@capacitor/push-notifications",
   "285": "@testing-library/dom",
   "286": "@testing-library/jest-dom",
-  "287": "xlsx"
+  "287": "xlsx",
+  "288": "test_login_activation.js",
+  "289": "test_plagiarism_local.js",
+  "290": "announcementRoutes.js",
+  "291": "umsAdminRoutes.js",
+  "292": "CGPARecord.js",
+  "293": "Notice.js",
+  "294": "axios",
+  "295": "node-cron"
 }

@@ -195,13 +195,13 @@
     "semantic_hash": ""
   },
   "server/controllers/assessmentController.js": {
-    "mtime": 1789853274.7121644,
-    "ast_hash": "9e1d0dce42d9b0b0b9b5d5aef97d3b54",
+    "mtime": 1790952820.5765438,
+    "ast_hash": "0c052fe821b1a7d333d629c90d6f4785",
     "semantic_hash": ""
   },
   "server/controllers/assignmentController.js": {
-    "mtime": 1789851963.065109,
-    "ast_hash": "bd4cdcd4d068baaf0a8a24196353aeca",
+    "mtime": 1790952780.898786,
+    "ast_hash": "5af58229633225c320a5335f9e4a7f91",
     "semantic_hash": ""
   },
   "server/controllers/attendanceController.js": {
@@ -220,18 +220,18 @@
     "semantic_hash": ""
   },
   "server/controllers/courseController.js": {
-    "mtime": 1789759845.0604248,
-    "ast_hash": "32976f758e4e6dceed6440640150f170",
+    "mtime": 1790952873.7304382,
+    "ast_hash": "586f2cb080d1734bd31b8b1c72d7d40f",
     "semantic_hash": ""
   },
   "server/controllers/examController.js": {
-    "mtime": 1789851970.1988227,
-    "ast_hash": "35e6fc657c6ffed780b2aed8e9fff60b",
+    "mtime": 1790952805.322087,
+    "ast_hash": "6edc329f7e5f03fa4b495a6aff719fdb",
     "semantic_hash": ""
   },
   "server/controllers/lectureController.js": {
-    "mtime": 1789929302.100034,
-    "ast_hash": "c37275bde6990ec94950e1a0bc367468",
+    "mtime": 1790952770.1401742,
+    "ast_hash": "5c8b37b143eb7dbe02f9341e7dabb565",
     "semantic_hash": ""
   },
   "server/controllers/notificationController.js": {
@@ -395,8 +395,8 @@
     "semantic_hash": "bd2bf0dd5876045a169c6ece007b094d"
   },
   "server/scheduler/deadlineReminder.js": {
-    "mtime": 1784202481.2939975,
-    "ast_hash": "8762689cf95640b09833ce9fcb02b827",
+    "mtime": 1790952845.967446,
+    "ast_hash": "4cf0a84043cf349b5111612be848d32a",
     "semantic_hash": ""
   },
   "server/scratch/cleanup_teachers_from_students.js": {
@@ -1937,6 +1937,11 @@
   "android/app/src/main/assets/public/static/js/main.9a992739.js": {
     "mtime": 1790947501.7905953,
     "ast_hash": "09ada01935468a2dc4527135f88d440a",
+    "semantic_hash": ""
+  },
+  "server/utils/enrolledStudentsHelper.js": {
+    "mtime": 1790952754.1122034,
+    "ast_hash": "c83c9f8cedec1bc6622625ef389832ab",
     "semantic_hash": ""
   }
 }

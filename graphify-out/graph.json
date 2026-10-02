@@ -4346,7 +4346,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_dependencies_capacitor_android",
-      "community": 268,
+      "community": 12,
       "norm_label": "@capacitor/android"
     },
     {
@@ -4356,7 +4356,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "client_package_json_capacitor_android",
-      "community": 268,
+      "community": 12,
       "norm_label": "@capacitor/android"
     },
     {
@@ -4566,7 +4566,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_package_dependencies_axios",
-      "community": 12,
+      "community": 294,
       "norm_label": "axios"
     },
     {
@@ -4576,7 +4576,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "client_package_json_axios",
-      "community": 12,
+      "community": 294,
       "norm_label": "axios"
     },
     {
@@ -9493,7 +9493,7 @@
       "label": "getStudentAssessments()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L669",
+      "source_location": "L698",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_getstudentassessments",
       "community": 72,
@@ -9503,7 +9503,7 @@
       "label": "getTeacherAssessments()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L791",
+      "source_location": "L820",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_getteacherassessments",
       "community": 72,
@@ -9513,7 +9513,7 @@
       "label": "deleteCourseAssessment()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L809",
+      "source_location": "L838",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_deletecourseassessment",
       "community": 72,
@@ -9523,7 +9523,7 @@
       "label": "deleteSingleAssessment()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L868",
+      "source_location": "L897",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_deletesingleassessment",
       "community": 72,
@@ -9533,7 +9533,7 @@
       "label": "setAssessmentCorrectionDeadline()",
       "file_type": "code",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L902",
+      "source_location": "L931",
       "_origin": "ast",
       "id": "server_controllers_assessmentcontroller_setassessmentcorrectiondeadline",
       "community": 72,
@@ -9673,7 +9673,7 @@
       "label": "getAssignments()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L126",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_getassignments",
       "community": 5,
@@ -9683,7 +9683,7 @@
       "label": "getAssignment()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L154",
+      "source_location": "L153",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_getassignment",
       "community": 5,
@@ -9693,7 +9693,7 @@
       "label": "toggleSubmission()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L169",
+      "source_location": "L168",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_togglesubmission",
       "community": 5,
@@ -9703,7 +9703,7 @@
       "label": "deleteAssignment()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L186",
+      "source_location": "L185",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_deleteassignment",
       "community": 5,
@@ -9713,7 +9713,7 @@
       "label": "resolveServerFilePath()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L212",
+      "source_location": "L211",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_resolveserverfilepath",
       "community": 5,
@@ -9723,7 +9723,7 @@
       "label": "recalculateAssignmentSimilarity()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L246",
+      "source_location": "L245",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_recalculateassignmentsimilarity",
       "community": 5,
@@ -9733,7 +9733,7 @@
       "label": "submitAssignment()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L350",
+      "source_location": "L349",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_submitassignment",
       "community": 5,
@@ -9743,7 +9743,7 @@
       "label": "getSubmissions()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L509",
+      "source_location": "L508",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_getsubmissions",
       "community": 5,
@@ -9753,7 +9753,7 @@
       "label": "getMySubmissions()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L532",
+      "source_location": "L531",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_getmysubmissions",
       "community": 5,
@@ -9763,7 +9763,7 @@
       "label": "deleteSubmission()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L557",
+      "source_location": "L556",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_deletesubmission",
       "community": 5,
@@ -9773,7 +9773,7 @@
       "label": "gradeSubmission()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L593",
+      "source_location": "L592",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_gradesubmission",
       "community": 73,
@@ -9783,7 +9783,7 @@
       "label": "viewAssignmentBase64()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L638",
+      "source_location": "L637",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_viewassignmentbase64",
       "community": 5,
@@ -9793,7 +9793,7 @@
       "label": "viewSubmissionBase64()",
       "file_type": "code",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L709",
+      "source_location": "L708",
       "_origin": "ast",
       "id": "server_controllers_assignmentcontroller_viewsubmissionbase64",
       "community": 5,
@@ -10603,7 +10603,7 @@
       "label": "findAssessmentRecord()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1615",
+      "source_location": "L1617",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_findassessmentrecord",
       "community": 144,
@@ -10613,7 +10613,7 @@
       "label": "getCourseStudentsAnalytics()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1656",
+      "source_location": "L1658",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "community": 144,
@@ -10623,7 +10623,7 @@
       "label": "getStudentAnalytics()",
       "file_type": "code",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1791",
+      "source_location": "L1793",
       "_origin": "ast",
       "id": "server_controllers_coursecontroller_getstudentanalytics",
       "community": 144,
@@ -10713,7 +10713,7 @@
       "label": "getExams()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L123",
+      "source_location": "L127",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_getexams",
       "community": 49,
@@ -10723,7 +10723,7 @@
       "label": "getExam()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L151",
+      "source_location": "L155",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_getexam",
       "community": 49,
@@ -10733,7 +10733,7 @@
       "label": "getExamForTeacher()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L171",
+      "source_location": "L175",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_getexamforteacher",
       "community": 49,
@@ -10743,7 +10743,7 @@
       "label": "submitExam()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L185",
+      "source_location": "L189",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_submitexam",
       "community": 73,
@@ -10753,7 +10753,7 @@
       "label": "analyzeAI()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L314",
+      "source_location": "L318",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_analyzeai",
       "community": 49,
@@ -10763,7 +10763,7 @@
       "label": "getSubmissions()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L323",
+      "source_location": "L327",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_getsubmissions",
       "community": 49,
@@ -10773,7 +10773,7 @@
       "label": "getMySubmissions()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L335",
+      "source_location": "L339",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_getmysubmissions",
       "community": 49,
@@ -10783,7 +10783,7 @@
       "label": "gradeShortAnswer()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L374",
+      "source_location": "L378",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_gradeshortanswer",
       "community": 49,
@@ -10793,7 +10793,7 @@
       "label": "deleteExam()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L409",
+      "source_location": "L413",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_deleteexam",
       "community": 49,
@@ -10803,7 +10803,7 @@
       "label": "toggleExam()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L435",
+      "source_location": "L439",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_toggleexam",
       "community": 49,
@@ -10813,7 +10813,7 @@
       "label": "publishExamResults()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L451",
+      "source_location": "L455",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_publishexamresults",
       "community": 73,
@@ -10823,7 +10823,7 @@
       "label": "updateOverallFeedback()",
       "file_type": "code",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L533",
+      "source_location": "L529",
       "_origin": "ast",
       "id": "server_controllers_examcontroller_updateoverallfeedback",
       "community": 49,
@@ -10953,7 +10953,7 @@
       "label": "getLectureById()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L109",
+      "source_location": "L108",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_getlecturebyid",
       "community": 8,
@@ -10963,7 +10963,7 @@
       "label": "getLectures()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L120",
+      "source_location": "L119",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_getlectures",
       "community": 8,
@@ -10973,7 +10973,7 @@
       "label": "viewLecture()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L145",
+      "source_location": "L144",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_viewlecture",
       "community": 8,
@@ -10983,7 +10983,7 @@
       "label": "viewLectureBase64()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L214",
+      "source_location": "L213",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_viewlecturebase64",
       "community": 8,
@@ -10993,7 +10993,7 @@
       "label": "downloadLecture()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L289",
+      "source_location": "L288",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_downloadlecture",
       "community": 8,
@@ -11003,7 +11003,7 @@
       "label": "deleteLecture()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L326",
+      "source_location": "L325",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_deletelecture",
       "community": 8,
@@ -11013,7 +11013,7 @@
       "label": "shareLecture()",
       "file_type": "code",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L371",
+      "source_location": "L370",
       "_origin": "ast",
       "id": "server_controllers_lecturecontroller_sharelecture",
       "community": 8,
@@ -11446,7 +11446,7 @@
       "source_location": "L691",
       "_origin": "ast",
       "id": "server_controllers_registrationcontroller_approveregistration",
-      "community": 36,
+      "community": 164,
       "norm_label": "approveregistration()"
     },
     {
@@ -11746,7 +11746,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_controllers_resultcontroller_teacherimportbatch",
-      "community": 231,
+      "community": 15,
       "norm_label": "teacherimportbatch"
     },
     {
@@ -12326,7 +12326,7 @@
       "source_location": "L425",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_syncteachercourseassignments",
-      "community": 231,
+      "community": 15,
       "norm_label": "syncteachercourseassignments()"
     },
     {
@@ -12366,7 +12366,7 @@
       "source_location": "L689",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_getteachers",
-      "community": 231,
+      "community": 15,
       "norm_label": "getteachers()"
     },
     {
@@ -12376,7 +12376,7 @@
       "source_location": "L759",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_getteacheracademicyears",
-      "community": 231,
+      "community": 15,
       "norm_label": "getteacheracademicyears()"
     },
     {
@@ -12426,7 +12426,7 @@
       "source_location": "L1011",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_updateteacher",
-      "community": 231,
+      "community": 15,
       "norm_label": "updateteacher()"
     },
     {
@@ -12436,7 +12436,7 @@
       "source_location": "L1082",
       "_origin": "ast",
       "id": "server_controllers_umsadmincontroller_deleteteacher",
-      "community": 231,
+      "community": 15,
       "norm_label": "deleteteacher()"
     },
     {
@@ -13086,7 +13086,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_academiccalendarevent",
-      "community": 207,
+      "community": 59,
       "norm_label": "academiccalendarevent.js"
     },
     {
@@ -13096,7 +13096,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_academiccalendarevent_mongoose",
-      "community": 207,
+      "community": 59,
       "norm_label": "mongoose"
     },
     {
@@ -13106,7 +13106,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_academiccalendarevent_academiccalendareventschema",
-      "community": 207,
+      "community": 59,
       "norm_label": "academiccalendareventschema"
     },
     {
@@ -13146,7 +13146,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_adviser",
-      "community": 167,
+      "community": 68,
       "norm_label": "adviser.js"
     },
     {
@@ -13156,7 +13156,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_adviser_mongoose",
-      "community": 167,
+      "community": 68,
       "norm_label": "mongoose"
     },
     {
@@ -13166,7 +13166,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_adviser_adviserschema",
-      "community": 167,
+      "community": 68,
       "norm_label": "adviserschema"
     },
     {
@@ -13246,7 +13246,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment",
-      "community": 41,
+      "community": 60,
       "norm_label": "assignment.js"
     },
     {
@@ -13256,7 +13256,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_assignment_mongoose",
-      "community": 41,
+      "community": 60,
       "norm_label": "mongoose"
     },
     {
@@ -13266,7 +13266,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_assignment_assignmentschema",
-      "community": 41,
+      "community": 60,
       "norm_label": "assignmentschema"
     },
     {
@@ -13336,7 +13336,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_cgparecord",
-      "community": 66,
+      "community": 292,
       "norm_label": "cgparecord.js"
     },
     {
@@ -13346,7 +13346,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_cgparecord_mongoose",
-      "community": 66,
+      "community": 292,
       "norm_label": "mongoose"
     },
     {
@@ -13356,7 +13356,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_cgparecord_cgparecordschema",
-      "community": 66,
+      "community": 292,
       "norm_label": "cgparecordschema"
     },
     {
@@ -13716,7 +13716,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notice",
-      "community": 78,
+      "community": 293,
       "norm_label": "notice.js"
     },
     {
@@ -13726,7 +13726,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_notice_mongoose",
-      "community": 78,
+      "community": 293,
       "norm_label": "mongoose"
     },
     {
@@ -13736,7 +13736,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_notice_noticeschema",
-      "community": 78,
+      "community": 293,
       "norm_label": "noticeschema"
     },
     {
@@ -13876,7 +13876,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registration",
-      "community": 56,
+      "community": 71,
       "norm_label": "registration.js"
     },
     {
@@ -13886,7 +13886,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_registration_mongoose",
-      "community": 56,
+      "community": 71,
       "norm_label": "mongoose"
     },
     {
@@ -13896,7 +13896,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_registration_registrationschema",
-      "community": 56,
+      "community": 71,
       "norm_label": "registrationschema"
     },
     {
@@ -14146,7 +14146,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission",
-      "community": 64,
+      "community": 136,
       "norm_label": "submission.js"
     },
     {
@@ -14156,7 +14156,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_submission_mongoose",
-      "community": 64,
+      "community": 136,
       "norm_label": "mongoose"
     },
     {
@@ -14166,7 +14166,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_submission_submissionschema",
-      "community": 64,
+      "community": 136,
       "norm_label": "submissionschema"
     },
     {
@@ -14176,7 +14176,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher",
-      "community": 67,
+      "community": 109,
       "norm_label": "teacher.js"
     },
     {
@@ -14186,7 +14186,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_models_teacher_mongoose",
-      "community": 67,
+      "community": 109,
       "norm_label": "mongoose"
     },
     {
@@ -14196,7 +14196,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_models_teacher_teacherschema",
-      "community": 67,
+      "community": 109,
       "norm_label": "teacherschema"
     },
     {
@@ -14686,7 +14686,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "server_package_dependencies_node_cron",
-      "community": 2,
+      "community": 295,
       "norm_label": "node-cron"
     },
     {
@@ -14696,7 +14696,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "node_cron",
-      "community": 2,
+      "community": 295,
       "norm_label": "node-cron"
     },
     {
@@ -14706,7 +14706,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "server_package_dependencies_nodemailer",
-      "community": 242,
+      "community": 2,
       "norm_label": "nodemailer"
     },
     {
@@ -14716,7 +14716,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "nodemailer",
-      "community": 242,
+      "community": 2,
       "norm_label": "nodemailer"
     },
     {
@@ -14926,7 +14926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes",
-      "community": 164,
+      "community": 142,
       "norm_label": "adminroutes.js"
     },
     {
@@ -14936,7 +14936,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_adminroutes_router",
-      "community": 164,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -14946,7 +14946,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_adminroutes_verifytoken_checkrole",
-      "community": 164,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -14956,7 +14956,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_adminroutes_ctrl",
-      "community": 164,
+      "community": 142,
       "norm_label": "ctrl"
     },
     {
@@ -14966,7 +14966,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes",
-      "community": 142,
+      "community": 290,
       "norm_label": "announcementroutes.js"
     },
     {
@@ -14976,7 +14976,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_router",
-      "community": 142,
+      "community": 290,
       "norm_label": "router"
     },
     {
@@ -14986,7 +14986,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_verifytoken_checkrole",
-      "community": 142,
+      "community": 290,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -14996,7 +14996,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_announcementroutes_ctrl",
-      "community": 142,
+      "community": 290,
       "norm_label": "ctrl"
     },
     {
@@ -15406,7 +15406,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes",
-      "community": 279,
+      "community": 142,
       "norm_label": "registrationpaymentroutes.js"
     },
     {
@@ -15416,7 +15416,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_router",
-      "community": 279,
+      "community": 142,
       "norm_label": "router"
     },
     {
@@ -15426,7 +15426,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_verifytoken_checkrole",
-      "community": 279,
+      "community": 142,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -15436,7 +15436,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_registrationpaymentroutes_payctrl",
-      "community": 279,
+      "community": 142,
       "norm_label": "payctrl"
     },
     {
@@ -15606,7 +15606,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes",
-      "community": 142,
+      "community": 291,
       "norm_label": "umsadminroutes.js"
     },
     {
@@ -15616,7 +15616,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_router",
-      "community": 142,
+      "community": 291,
       "norm_label": "router"
     },
     {
@@ -15626,7 +15626,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_verifytoken_checkrole",
-      "community": 142,
+      "community": 291,
       "norm_label": "{ verifytoken, checkrole }"
     },
     {
@@ -15636,7 +15636,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_routes_umsadminroutes_ctrl",
-      "community": 142,
+      "community": 291,
       "norm_label": "ctrl"
     },
     {
@@ -15836,7 +15836,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status",
-      "community": 71,
+      "community": 130,
       "norm_label": "check_registration_status.js"
     },
     {
@@ -15846,7 +15846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status_dns",
-      "community": 71,
+      "community": 130,
       "norm_label": "dns"
     },
     {
@@ -15856,7 +15856,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status_path",
-      "community": 71,
+      "community": 130,
       "norm_label": "path"
     },
     {
@@ -15866,7 +15866,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status_mongoose",
-      "community": 71,
+      "community": 130,
       "norm_label": "mongoose"
     },
     {
@@ -15876,7 +15876,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status_user",
-      "community": 71,
+      "community": 130,
       "norm_label": "user"
     },
     {
@@ -15886,7 +15886,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status_student",
-      "community": 71,
+      "community": 130,
       "norm_label": "student"
     },
     {
@@ -15896,7 +15896,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status_teacher",
-      "community": 71,
+      "community": 130,
       "norm_label": "teacher"
     },
     {
@@ -15906,7 +15906,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_check_registration_status_run",
-      "community": 71,
+      "community": 130,
       "norm_label": "run()"
     },
     {
@@ -16916,7 +16916,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism",
-      "community": 64,
+      "community": 162,
       "norm_label": "recalculate_all_plagiarism.js"
     },
     {
@@ -16926,7 +16926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_mongoose",
-      "community": 64,
+      "community": 162,
       "norm_label": "mongoose"
     },
     {
@@ -16936,7 +16936,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_path",
-      "community": 64,
+      "community": 162,
       "norm_label": "path"
     },
     {
@@ -16946,7 +16946,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_dns",
-      "community": 64,
+      "community": 162,
       "norm_label": "dns"
     },
     {
@@ -16956,7 +16956,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_similarityservice",
-      "community": 64,
+      "community": 162,
       "norm_label": "similarityservice"
     },
     {
@@ -16966,7 +16966,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_submission",
-      "community": 64,
+      "community": 162,
       "norm_label": "submission"
     },
     {
@@ -16976,7 +16976,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_user",
-      "community": 64,
+      "community": 162,
       "norm_label": "user"
     },
     {
@@ -16986,7 +16986,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_fs",
-      "community": 64,
+      "community": 162,
       "norm_label": "fs"
     },
     {
@@ -16996,7 +16996,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_recalculateassignmentsimilarity",
-      "community": 64,
+      "community": 162,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -17006,7 +17006,7 @@
       "source_location": "L134",
       "_origin": "ast",
       "id": "server_scratch_recalculate_all_plagiarism_main",
-      "community": 64,
+      "community": 162,
       "norm_label": "main()"
     },
     {
@@ -17016,7 +17016,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_db",
-      "community": 162,
+      "community": 109,
       "norm_label": "reset_db.js"
     },
     {
@@ -17026,7 +17026,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_db_dns",
-      "community": 162,
+      "community": 109,
       "norm_label": "dns"
     },
     {
@@ -17036,7 +17036,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_reset_db_path",
-      "community": 162,
+      "community": 109,
       "norm_label": "path"
     },
     {
@@ -17046,7 +17046,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_reset_db_mongoose",
-      "community": 162,
+      "community": 109,
       "norm_label": "mongoose"
     },
     {
@@ -17056,7 +17056,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_reset_db_teacher",
-      "community": 162,
+      "community": 109,
       "norm_label": "teacher"
     },
     {
@@ -17066,7 +17066,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_reset_db_resetdb",
-      "community": 162,
+      "community": 109,
       "norm_label": "resetdb()"
     },
     {
@@ -17136,7 +17136,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status",
-      "community": 56,
+      "community": 71,
       "norm_label": "reset_reg_status.js"
     },
     {
@@ -17146,7 +17146,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_mongoose",
-      "community": 56,
+      "community": 71,
       "norm_label": "mongoose"
     },
     {
@@ -17156,7 +17156,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_registration",
-      "community": 56,
+      "community": 71,
       "norm_label": "registration"
     },
     {
@@ -17166,7 +17166,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_reset_reg_status_run",
-      "community": 56,
+      "community": 71,
       "norm_label": "run()"
     },
     {
@@ -17226,7 +17226,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate",
-      "community": 64,
+      "community": 136,
       "norm_label": "run_recalculate.js"
     },
     {
@@ -17236,7 +17236,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_mongoose",
-      "community": 64,
+      "community": 136,
       "norm_label": "mongoose"
     },
     {
@@ -17246,7 +17246,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_path",
-      "community": 64,
+      "community": 136,
       "norm_label": "path"
     },
     {
@@ -17256,7 +17256,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_similarityservice",
-      "community": 64,
+      "community": 136,
       "norm_label": "similarityservice"
     },
     {
@@ -17266,7 +17266,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_submission",
-      "community": 64,
+      "community": 136,
       "norm_label": "submission"
     },
     {
@@ -17276,7 +17276,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_user",
-      "community": 64,
+      "community": 136,
       "norm_label": "user"
     },
     {
@@ -17286,7 +17286,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_fs",
-      "community": 64,
+      "community": 136,
       "norm_label": "fs"
     },
     {
@@ -17296,7 +17296,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_recalculateassignmentsimilarity",
-      "community": 64,
+      "community": 136,
       "norm_label": "recalculateassignmentsimilarity()"
     },
     {
@@ -17306,7 +17306,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "server_scratch_run_recalculate_main",
-      "community": 64,
+      "community": 136,
       "norm_label": "main()"
     },
     {
@@ -17376,7 +17376,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses",
-      "community": 56,
+      "community": 164,
       "norm_label": "setup_asim_courses.js"
     },
     {
@@ -17386,7 +17386,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_mongoose",
-      "community": 56,
+      "community": 164,
       "norm_label": "mongoose"
     },
     {
@@ -17396,7 +17396,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_user",
-      "community": 56,
+      "community": 164,
       "norm_label": "user"
     },
     {
@@ -17406,7 +17406,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_student",
-      "community": 56,
+      "community": 164,
       "norm_label": "student"
     },
     {
@@ -17416,7 +17416,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_registration",
-      "community": 56,
+      "community": 164,
       "norm_label": "registration"
     },
     {
@@ -17426,7 +17426,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_courseimport",
-      "community": 56,
+      "community": 164,
       "norm_label": "courseimport"
     },
     {
@@ -17436,7 +17436,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_approveregistration",
-      "community": 56,
+      "community": 164,
       "norm_label": "{ approveregistration }"
     },
     {
@@ -17446,7 +17446,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_setup_asim_courses_run",
-      "community": 36,
+      "community": 164,
       "norm_label": "run()"
     },
     {
@@ -17566,7 +17566,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses",
-      "community": 22,
+      "community": 71,
       "norm_label": "sync_student_courses.js"
     },
     {
@@ -17576,7 +17576,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_mongoose",
-      "community": 22,
+      "community": 71,
       "norm_label": "mongoose"
     },
     {
@@ -17586,7 +17586,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_user",
-      "community": 22,
+      "community": 71,
       "norm_label": "user"
     },
     {
@@ -17596,7 +17596,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_student",
-      "community": 22,
+      "community": 71,
       "norm_label": "student"
     },
     {
@@ -17606,7 +17606,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_registration",
-      "community": 22,
+      "community": 71,
       "norm_label": "registration"
     },
     {
@@ -17616,7 +17616,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_enrollment",
-      "community": 22,
+      "community": 71,
       "norm_label": "enrollment"
     },
     {
@@ -17626,7 +17626,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_course",
-      "community": 22,
+      "community": 71,
       "norm_label": "course"
     },
     {
@@ -17636,7 +17636,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_sync_student_courses_run",
-      "community": 22,
+      "community": 71,
       "norm_label": "run()"
     },
     {
@@ -18266,7 +18266,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_fee_calc",
-      "community": 136,
+      "community": 47,
       "norm_label": "test_fee_calc.js"
     },
     {
@@ -18276,7 +18276,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_fee_calc_mongoose",
-      "community": 136,
+      "community": 47,
       "norm_label": "mongoose"
     },
     {
@@ -18286,7 +18286,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_fee_calc_path",
-      "community": 136,
+      "community": 47,
       "norm_label": "path"
     },
     {
@@ -18296,7 +18296,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_fee_calc_academicctrl",
-      "community": 136,
+      "community": 47,
       "norm_label": "academicctrl"
     },
     {
@@ -18306,7 +18306,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_fee_calc_user",
-      "community": 136,
+      "community": 47,
       "norm_label": "user"
     },
     {
@@ -18316,7 +18316,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_fee_calc_testfees",
-      "community": 136,
+      "community": 47,
       "norm_label": "testfees()"
     },
     {
@@ -18426,7 +18426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow",
-      "community": 47,
+      "community": 268,
       "norm_label": "test_full_correction_flow.js"
     },
     {
@@ -18436,7 +18436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow_axios",
-      "community": 47,
+      "community": 268,
       "norm_label": "axios"
     },
     {
@@ -18446,7 +18446,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow_mongoose",
-      "community": 47,
+      "community": 268,
       "norm_label": "mongoose"
     },
     {
@@ -18456,7 +18456,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow_jwt",
-      "community": 47,
+      "community": 268,
       "norm_label": "jwt"
     },
     {
@@ -18466,7 +18466,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow_path",
-      "community": 47,
+      "community": 268,
       "norm_label": "path"
     },
     {
@@ -18476,7 +18476,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow_dns",
-      "community": 47,
+      "community": 268,
       "norm_label": "dns"
     },
     {
@@ -18486,7 +18486,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow_user",
-      "community": 47,
+      "community": 268,
       "norm_label": "user"
     },
     {
@@ -18496,7 +18496,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "server_scratch_test_full_correction_flow_testfullflow",
-      "community": 47,
+      "community": 268,
       "norm_label": "testfullflow()"
     },
     {
@@ -18756,7 +18756,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_login_activation",
-      "community": 130,
+      "community": 288,
       "norm_label": "test_login_activation.js"
     },
     {
@@ -18766,7 +18766,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_login_activation_dns",
-      "community": 130,
+      "community": 288,
       "norm_label": "dns"
     },
     {
@@ -18776,7 +18776,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_login_activation_path",
-      "community": 130,
+      "community": 288,
       "norm_label": "path"
     },
     {
@@ -18786,7 +18786,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_login_activation_mongoose",
-      "community": 130,
+      "community": 288,
       "norm_label": "mongoose"
     },
     {
@@ -18796,7 +18796,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_login_activation_user",
-      "community": 130,
+      "community": 288,
       "norm_label": "user"
     },
     {
@@ -18806,7 +18806,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_login_activation_student",
-      "community": 130,
+      "community": 288,
       "norm_label": "student"
     },
     {
@@ -18816,7 +18816,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_login_activation_test",
-      "community": 130,
+      "community": 288,
       "norm_label": "test()"
     },
     {
@@ -19316,7 +19316,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local",
-      "community": 64,
+      "community": 289,
       "norm_label": "test_plagiarism_local.js"
     },
     {
@@ -19326,7 +19326,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_mongoose",
-      "community": 64,
+      "community": 289,
       "norm_label": "mongoose"
     },
     {
@@ -19336,7 +19336,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_path",
-      "community": 64,
+      "community": 289,
       "norm_label": "path"
     },
     {
@@ -19346,7 +19346,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_fs",
-      "community": 64,
+      "community": 289,
       "norm_label": "fs"
     },
     {
@@ -19356,7 +19356,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_similarityservice",
-      "community": 64,
+      "community": 289,
       "norm_label": "similarityservice"
     },
     {
@@ -19366,7 +19366,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_plagiarism_local_run",
-      "community": 64,
+      "community": 289,
       "norm_label": "run()"
     },
     {
@@ -19436,7 +19436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints",
-      "community": 78,
+      "community": 207,
       "norm_label": "test_rabbi_endpoints.js"
     },
     {
@@ -19446,7 +19446,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_dns",
-      "community": 78,
+      "community": 207,
       "norm_label": "dns"
     },
     {
@@ -19456,7 +19456,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_path",
-      "community": 78,
+      "community": 207,
       "norm_label": "path"
     },
     {
@@ -19466,7 +19466,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_mongoose",
-      "community": 78,
+      "community": 207,
       "norm_label": "mongoose"
     },
     {
@@ -19476,7 +19476,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_user",
-      "community": 78,
+      "community": 207,
       "norm_label": "user"
     },
     {
@@ -19486,7 +19486,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_notice",
-      "community": 78,
+      "community": 207,
       "norm_label": "notice"
     },
     {
@@ -19496,7 +19496,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_resultupload",
-      "community": 78,
+      "community": 207,
       "norm_label": "resultupload"
     },
     {
@@ -19506,7 +19506,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_result",
-      "community": 78,
+      "community": 207,
       "norm_label": "result"
     },
     {
@@ -19516,7 +19516,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_rabbi_endpoints_testrabbi",
-      "community": 78,
+      "community": 207,
       "norm_label": "testrabbi()"
     },
     {
@@ -19806,7 +19806,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query",
-      "community": 78,
+      "community": 231,
       "norm_label": "test_teacher_query.js"
     },
     {
@@ -19816,7 +19816,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_dns",
-      "community": 78,
+      "community": 231,
       "norm_label": "dns"
     },
     {
@@ -19826,7 +19826,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_path",
-      "community": 78,
+      "community": 231,
       "norm_label": "path"
     },
     {
@@ -19836,7 +19836,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_mongoose",
-      "community": 78,
+      "community": 231,
       "norm_label": "mongoose"
     },
     {
@@ -19846,7 +19846,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_user",
-      "community": 78,
+      "community": 231,
       "norm_label": "user"
     },
     {
@@ -19856,7 +19856,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_notice",
-      "community": 78,
+      "community": 231,
       "norm_label": "notice"
     },
     {
@@ -19866,7 +19866,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_resultupload",
-      "community": 78,
+      "community": 231,
       "norm_label": "resultupload"
     },
     {
@@ -19876,7 +19876,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_teacher",
-      "community": 78,
+      "community": 231,
       "norm_label": "teacher"
     },
     {
@@ -19886,7 +19886,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "server_scratch_test_teacher_query_test",
-      "community": 78,
+      "community": 231,
       "norm_label": "test()"
     },
     {
@@ -20016,7 +20016,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow",
-      "community": 16,
+      "community": 242,
       "norm_label": "test_ums_flow.js"
     },
     {
@@ -20026,7 +20026,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_mongoose",
-      "community": 16,
+      "community": 242,
       "norm_label": "mongoose"
     },
     {
@@ -20036,7 +20036,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_bcrypt",
-      "community": 16,
+      "community": 242,
       "norm_label": "bcrypt"
     },
     {
@@ -20046,7 +20046,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_user",
-      "community": 16,
+      "community": 242,
       "norm_label": "user"
     },
     {
@@ -20056,7 +20056,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_student",
-      "community": 16,
+      "community": 242,
       "norm_label": "student"
     },
     {
@@ -20066,7 +20066,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_teacher",
-      "community": 16,
+      "community": 242,
       "norm_label": "teacher"
     },
     {
@@ -20076,7 +20076,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_courseimport",
-      "community": 16,
+      "community": 242,
       "norm_label": "courseimport"
     },
     {
@@ -20086,7 +20086,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_adviser",
-      "community": 16,
+      "community": 242,
       "norm_label": "adviser"
     },
     {
@@ -20096,7 +20096,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "server_scratch_test_ums_flow_testums",
-      "community": 16,
+      "community": 242,
       "norm_label": "testums()"
     },
     {
@@ -21418,6 +21418,86 @@
       "id": "server_utils_courseutils_resolvecoursecode",
       "community": 37,
       "norm_label": "resolvecoursecode()"
+    },
+    {
+      "label": "enrolledStudentsHelper.js",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper",
+      "community": 279,
+      "norm_label": "enrolledstudentshelper.js"
+    },
+    {
+      "label": "mongoose",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper_mongoose",
+      "community": 279,
+      "norm_label": "mongoose"
+    },
+    {
+      "label": "Course",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper_course",
+      "community": 279,
+      "norm_label": "course"
+    },
+    {
+      "label": "User",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper_user",
+      "community": 279,
+      "norm_label": "user"
+    },
+    {
+      "label": "Registration",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper_registration",
+      "community": 279,
+      "norm_label": "registration"
+    },
+    {
+      "label": "Enrollment",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper_enrollment",
+      "community": 279,
+      "norm_label": "enrollment"
+    },
+    {
+      "label": "RetakeRequest",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper_retakerequest",
+      "community": 279,
+      "norm_label": "retakerequest"
+    },
+    {
+      "label": "getEnrolledStudents()",
+      "file_type": "code",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "server_utils_enrolledstudentshelper_getenrolledstudents",
+      "community": 279,
+      "norm_label": "getenrolledstudents()"
     },
     {
       "label": "vercel.json",
@@ -37975,7 +38055,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L809",
+      "source_location": "L838",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_deletecourseassessment",
@@ -37985,7 +38065,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L868",
+      "source_location": "L897",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_deletesingleassessment",
@@ -38015,7 +38095,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L669",
+      "source_location": "L698",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_getstudentassessments",
@@ -38025,7 +38105,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L791",
+      "source_location": "L820",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_getteacherassessments",
@@ -38055,7 +38135,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L902",
+      "source_location": "L931",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller",
       "target": "server_controllers_assessmentcontroller_setassessmentcorrectiondeadline",
@@ -38229,7 +38309,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L635",
+      "source_location": "L664",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller_uploadmarksheet",
       "target": "server_services_emailservice_queueemail"
@@ -38240,7 +38320,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/assessmentController.js",
-      "source_location": "L601",
+      "source_location": "L629",
       "weight": 1.0,
       "source": "server_controllers_assessmentcontroller_uploadmarksheet",
       "target": "server_socket_getio"
@@ -38279,7 +38359,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L186",
+      "source_location": "L185",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_deleteassignment",
@@ -38289,7 +38369,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L557",
+      "source_location": "L556",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_deletesubmission",
@@ -38309,7 +38389,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L154",
+      "source_location": "L153",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_getassignment",
@@ -38319,7 +38399,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L126",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_getassignments",
@@ -38339,7 +38419,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L532",
+      "source_location": "L531",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_getmysubmissions",
@@ -38349,7 +38429,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L509",
+      "source_location": "L508",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_getsubmissions",
@@ -38359,7 +38439,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L593",
+      "source_location": "L592",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_gradesubmission",
@@ -38399,7 +38479,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L246",
+      "source_location": "L245",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_recalculateassignmentsimilarity",
@@ -38409,7 +38489,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L212",
+      "source_location": "L211",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_resolveserverfilepath",
@@ -38449,7 +38529,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L350",
+      "source_location": "L349",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_submitassignment",
@@ -38459,7 +38539,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L169",
+      "source_location": "L168",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_togglesubmission",
@@ -38479,7 +38559,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L638",
+      "source_location": "L637",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_viewassignmentbase64",
@@ -38489,7 +38569,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L709",
+      "source_location": "L708",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller",
       "target": "server_controllers_assignmentcontroller_viewsubmissionbase64",
@@ -38666,7 +38746,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L111",
+      "source_location": "L110",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_createassignment",
       "target": "server_services_emailservice_queueemail"
@@ -38677,7 +38757,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L90",
+      "source_location": "L85",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_createassignment",
       "target": "server_socket_getio"
@@ -38687,7 +38767,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L271",
+      "source_location": "L270",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_recalculateassignmentsimilarity",
       "target": "server_controllers_assignmentcontroller_resolveserverfilepath",
@@ -38698,7 +38778,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L443",
+      "source_location": "L442",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_submitassignment",
       "target": "server_controllers_assignmentcontroller_resolveserverfilepath",
@@ -38709,7 +38789,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L644",
+      "source_location": "L643",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_viewassignmentbase64",
       "target": "server_controllers_assignmentcontroller_resolveserverfilepath",
@@ -38720,7 +38800,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L732",
+      "source_location": "L731",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_viewsubmissionbase64",
       "target": "server_controllers_assignmentcontroller_resolveserverfilepath",
@@ -38731,7 +38811,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L584",
+      "source_location": "L583",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_deletesubmission",
       "target": "server_controllers_assignmentcontroller_recalculateassignmentsimilarity",
@@ -38742,7 +38822,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L512",
+      "source_location": "L511",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_getsubmissions",
       "target": "server_controllers_assignmentcontroller_recalculateassignmentsimilarity",
@@ -38753,7 +38833,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L482",
+      "source_location": "L481",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_submitassignment",
       "target": "server_controllers_assignmentcontroller_recalculateassignmentsimilarity",
@@ -38765,7 +38845,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L629",
+      "source_location": "L628",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_gradesubmission",
       "target": "server_services_emailservice_queueemail"
@@ -38776,7 +38856,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/assignmentController.js",
-      "source_location": "L614",
+      "source_location": "L613",
       "weight": 1.0,
       "source": "server_controllers_assignmentcontroller_gradesubmission",
       "target": "server_socket_getio"
@@ -38984,7 +39064,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1686",
+      "source_location": "L1688",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -38995,7 +39075,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1828",
+      "source_location": "L1830",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getstudentanalytics",
       "target": "server_controllers_attendancecontroller_attendance"
@@ -40044,7 +40124,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L379",
+      "source_location": "L378",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_sharelecture",
       "target": "server_controllers_communitycontroller_communitypost"
@@ -40446,7 +40526,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1615",
+      "source_location": "L1617",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -40466,7 +40546,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1656",
+      "source_location": "L1658",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getcoursestudentsanalytics",
@@ -40506,7 +40586,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1791",
+      "source_location": "L1793",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller",
       "target": "server_controllers_coursecontroller_getstudentanalytics",
@@ -40654,7 +40734,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1732",
+      "source_location": "L1734",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getcoursestudentsanalytics",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -40665,7 +40745,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/courseController.js",
-      "source_location": "L1935",
+      "source_location": "L1937",
       "weight": 1.0,
       "source": "server_controllers_coursecontroller_getstudentanalytics",
       "target": "server_controllers_coursecontroller_findassessmentrecord",
@@ -40675,7 +40755,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L314",
+      "source_location": "L318",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_analyzeai",
@@ -40695,7 +40775,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L409",
+      "source_location": "L413",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_deleteexam",
@@ -40725,7 +40805,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L151",
+      "source_location": "L155",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_getexam",
@@ -40735,7 +40815,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L171",
+      "source_location": "L175",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_getexamforteacher",
@@ -40745,7 +40825,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L123",
+      "source_location": "L127",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_getexams",
@@ -40765,7 +40845,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L335",
+      "source_location": "L339",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_getmysubmissions",
@@ -40775,7 +40855,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L323",
+      "source_location": "L327",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_getsubmissions",
@@ -40785,7 +40865,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L374",
+      "source_location": "L378",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_gradeshortanswer",
@@ -40805,7 +40885,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L451",
+      "source_location": "L455",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_publishexamresults",
@@ -40825,7 +40905,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L185",
+      "source_location": "L189",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_submitexam",
@@ -40835,7 +40915,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L435",
+      "source_location": "L439",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_toggleexam",
@@ -40845,7 +40925,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/examController.js",
-      "source_location": "L533",
+      "source_location": "L529",
       "weight": 1.0,
       "source": "server_controllers_examcontroller",
       "target": "server_controllers_examcontroller_updateoverallfeedback",
@@ -40999,7 +41079,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/examController.js",
-      "source_location": "L110",
+      "source_location": "L114",
       "weight": 1.0,
       "source": "server_controllers_examcontroller_createexam",
       "target": "server_services_emailservice_queueemail"
@@ -41021,7 +41101,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/examController.js",
-      "source_location": "L292",
+      "source_location": "L296",
       "weight": 1.0,
       "source": "server_controllers_examcontroller_submitexam",
       "target": "server_services_emailservice_queueemail"
@@ -41032,7 +41112,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/examController.js",
-      "source_location": "L275",
+      "source_location": "L279",
       "weight": 1.0,
       "source": "server_controllers_examcontroller_submitexam",
       "target": "server_socket_getio"
@@ -41043,7 +41123,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/examController.js",
-      "source_location": "L521",
+      "source_location": "L517",
       "weight": 1.0,
       "source": "server_controllers_examcontroller_publishexamresults",
       "target": "server_services_emailservice_queueemail"
@@ -41054,7 +41134,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/examController.js",
-      "source_location": "L501",
+      "source_location": "L497",
       "weight": 1.0,
       "source": "server_controllers_examcontroller_publishexamresults",
       "target": "server_socket_getio"
@@ -41073,7 +41153,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L326",
+      "source_location": "L325",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_deletelecture",
@@ -41083,7 +41163,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L289",
+      "source_location": "L288",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_downloadlecture",
@@ -41113,7 +41193,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L109",
+      "source_location": "L108",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_getlecturebyid",
@@ -41123,7 +41203,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L120",
+      "source_location": "L119",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_getlectures",
@@ -41193,7 +41273,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L371",
+      "source_location": "L370",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_sharelecture",
@@ -41223,7 +41303,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L145",
+      "source_location": "L144",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_viewlecture",
@@ -41233,7 +41313,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L214",
+      "source_location": "L213",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller",
       "target": "server_controllers_lecturecontroller_viewlecturebase64",
@@ -41377,7 +41457,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L328",
+      "source_location": "L327",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_deletelecture",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -41388,7 +41468,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L305",
+      "source_location": "L304",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_downloadlecture",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -41399,7 +41479,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L111",
+      "source_location": "L110",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_getlecturebyid",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -41410,7 +41490,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L133",
+      "source_location": "L132",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_getlectures",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -41421,7 +41501,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L374",
+      "source_location": "L373",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_sharelecture",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -41443,7 +41523,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L159",
+      "source_location": "L158",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_viewlecture",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -41454,7 +41534,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L216",
+      "source_location": "L215",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_viewlecturebase64",
       "target": "server_controllers_lecturecontroller_lecture"
@@ -41487,7 +41567,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L96",
+      "source_location": "L95",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_uploadlecture",
       "target": "server_services_emailservice_queueemail"
@@ -41498,7 +41578,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/controllers/lectureController.js",
-      "source_location": "L76",
+      "source_location": "L71",
       "weight": 1.0,
       "source": "server_controllers_lecturecontroller_uploadlecture",
       "target": "server_socket_getio"
@@ -46416,6 +46496,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_models_course",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/models/CourseImport.js",
@@ -46615,6 +46706,17 @@
       "source_location": "L10",
       "weight": 1.0,
       "source": "server_scratch_test_retake_full_flow",
+      "target": "server_models_enrollment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
       "target": "server_models_enrollment",
       "confidence_score": 1.0
     },
@@ -47080,6 +47182,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_models_registration",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "server/models/RegistrationCalendar.js",
@@ -47348,6 +47461,17 @@
       "source_location": "L8",
       "weight": 1.0,
       "source": "server_scratch_test_retake_full_flow",
+      "target": "server_models_retakerequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
       "target": "server_models_retakerequest",
       "confidence_score": 1.0
     },
@@ -48314,6 +48438,17 @@
       "source_location": "L5",
       "weight": 1.0,
       "source": "server_test_admin_results",
+      "target": "server_models_user",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
       "target": "server_models_user",
       "confidence_score": 1.0
     },
@@ -49637,7 +49772,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/scheduler/deadlineReminder.js",
-      "source_location": "L172",
+      "source_location": "L164",
       "weight": 1.0,
       "source": "server_scheduler_deadlinereminder_startscheduler",
       "target": "server_services_emailservice_queueemail"
@@ -54887,6 +55022,77 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_utils_enrolledstudentshelper_course",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_utils_enrolledstudentshelper_enrollment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "confidence": "INFERRED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L146",
+      "weight": 1.0,
+      "context": "collection",
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_utils_enrolledstudentshelper_getenrolledstudents",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_utils_enrolledstudentshelper_mongoose",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_utils_enrolledstudentshelper_registration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_utils_enrolledstudentshelper_retakerequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/utils/enrolledStudentsHelper.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "server_utils_enrolledstudentshelper",
+      "target": "server_utils_enrolledstudentshelper_user",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "vercel.json",
       "source_location": "L4",
       "weight": 1.0,
@@ -54946,5 +55152,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "11ecc31bd8e29ebe21c44caa2dd5d57b43c77aa3"
+  "built_at_commit": "453f72c2f561a974f29625164f153975358aa269"
 }

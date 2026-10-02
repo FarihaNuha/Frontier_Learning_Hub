@@ -1572,6 +1572,7 @@ exports.handleJoinRequest = async (req, res) => {
             title: "Join Request Approved",
             message: `Your request to join ${request.course.name} has been approved.`,
             type: "join_approved",
+            link: `/course/${request.course._id}`,
           });
         }
       } catch (err) {
@@ -1587,7 +1588,7 @@ exports.handleJoinRequest = async (req, res) => {
         title: "Join Request Rejected",
         message: `Your request to join ${request.course.name} was not approved.`,
         type: "join_rejected",
-        link: null,
+        link: "/courses",
       });
 
       try {
@@ -1597,6 +1598,7 @@ exports.handleJoinRequest = async (req, res) => {
             title: "Join Request Rejected",
             message: `Your request to join ${request.course.name} was not approved.`,
             type: "join_rejected",
+            link: "/courses",
           });
         }
       } catch (err) {

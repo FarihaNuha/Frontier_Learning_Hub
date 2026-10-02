@@ -538,17 +538,28 @@ exports.uploadMarksheet = async (req, res) => {
       const presentation = getNum(presentationColIndex);
       const totalMarks = getNum(totalColIndex);
 
-      // Find matching User model object
-      let studentUser = await User.findOne({ studentId: studentIdNumber, role: "student" });
-      if (!studentUser && studentIdNumber.length >= 5) {
-        const suffix = studentIdNumber.slice(-5);
+      // Find matching User model object robustly (case-insensitive studentId or email prefix)
+      const cleanSid = String(studentIdNumber || "").trim();
+      let studentUser = null;
+      if (cleanSid) {
         studentUser = await User.findOne({
-          studentId: { $regex: new RegExp(`${suffix}$`, "i") },
-          role: "student"
+          $or: [
+            { studentId: new RegExp(`^${cleanSid}$`, "i") },
+            { email: new RegExp(`^${cleanSid}@`, "i") },
+          ],
         });
+        if (!studentUser && cleanSid.length >= 4) {
+          const suffix = cleanSid.slice(-5);
+          studentUser = await User.findOne({
+            $or: [
+              { studentId: { $regex: new RegExp(`${suffix}$`, "i") } },
+              { email: { $regex: new RegExp(`${suffix}@`, "i") } },
+            ],
+          });
+        }
       }
 
-      const finalStudentIdNumber = studentUser ? studentUser.studentId : studentIdNumber;
+      const finalStudentIdNumber = studentUser ? (studentUser.studentId || cleanSid) : cleanSid;
       const studentId = studentUser ? studentUser._id : null;
 
       // Try dropping legacy unique index if still present in MongoDB
@@ -583,6 +594,23 @@ exports.uploadMarksheet = async (req, res) => {
       }
 
       if (studentId) {
+        // Resolve courseId if not provided
+        let resolvedCourseId = courseId;
+        if (!resolvedCourseId && courseCode) {
+          try {
+            const Course = require("../models/Course");
+            const cDoc = await Course.findOne({
+              $or: [
+                { displayCode: new RegExp(`^${courseCode.trim()}$`, "i") },
+                { name: new RegExp(`^${courseCode.trim()}$`, "i") },
+              ],
+            }).select("_id").lean();
+            if (cDoc) resolvedCourseId = cDoc._id;
+          } catch (e) {}
+        }
+
+        const notifLink = resolvedCourseId ? `/student/assessment/${resolvedCourseId}` : `/student/assessment`;
+
         // Delete any existing marksheet notifications for this course to avoid duplicates
         await Notification.deleteMany({
           userId: studentId,
@@ -590,21 +618,22 @@ exports.uploadMarksheet = async (req, res) => {
           message: { $regex: courseCode, $options: "i" }
         });
 
-        await Notification.create({
+        const notif = await Notification.create({
           userId: studentId,
           title: "New Assessment Marks Uploaded",
           message: `Your assessment marks for ${courseCode} have been uploaded. Total Marks: ${totalMarks}`,
           type: "marksheet_upload",
-          link: courseId ? `/student/assessment/${courseId}` : `/student/assessment`,
+          link: notifLink,
         });
 
         const io = getIO();
         if (io) {
           io.to(`user_${studentId}`).emit("newNotification", {
+            _id: notif._id,
             title: "New Assessment Marks Uploaded",
             message: `Your assessment marks for ${courseCode} have been uploaded. Total Marks: ${totalMarks}`,
             type: "marksheet_upload",
-            link: courseId ? `/student/assessment/${courseId}` : `/student/assessment`,
+            link: notifLink,
           });
         }
       }

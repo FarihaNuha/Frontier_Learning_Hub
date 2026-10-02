@@ -10,7 +10,16 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+        configureWebView();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        configureWebView();
+    }
+
+    private void configureWebView() {
         try {
             WebView webView = this.getBridge() != null ? this.getBridge().getWebView() : null;
             if (webView != null) {

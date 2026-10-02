@@ -144,8 +144,10 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     clearAllCache();
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {}
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
 

@@ -51,36 +51,35 @@ exports.uploadLecture = async (req, res) => {
       uploadedBy: req.user.uid,
     });
 
-    // Get enrolled students only (not all department students)
-    let students = [];
-    if (courseId) {
-      const courseData = await Course.findById(courseId);
-      if (courseData) {
-        students = await User.find({
-          _id: { $in: courseData.students },
-          role: "student",
-        });
-      }
-    }
+    // Get enrolled students with fallback to department students
+    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+    const students = await getEnrolledStudents(courseId, course, sanitizedDept);
 
+    console.log(`📢 Notifying ${students.length} students about new lecture: "${title}"`);
+
+    const notifLink = courseId ? `/course/${courseId}` : `/student/dashboard`;
     for (const student of students) {
-      const notifLink = courseId ? `/course/${courseId}` : null;
-      await Notification.create({
-        userId: student._id,
-        title: "New Lecture Uploaded",
-        message: `"${title}" has been uploaded for ${course}`,
-        type: "lecture_upload",
-        link: notifLink,
-      });
-
-      const io = getIO();
-      if (io) {
-        io.to(`user_${student._id}`).emit("newNotification", {
+      try {
+        const notif = await Notification.create({
+          userId: student._id,
           title: "New Lecture Uploaded",
-          message: `"${title}" has been uploaded for ${course}`,
+          message: `"${title}" has been uploaded for ${course || "your course"}`,
           type: "lecture_upload",
           link: notifLink,
         });
+
+        const io = getIO();
+        if (io) {
+          io.to(`user_${student._id}`).emit("newNotification", {
+            _id: notif._id,
+            title: "New Lecture Uploaded",
+            message: `"${title}" has been uploaded for ${course || "your course"}`,
+            type: "lecture_upload",
+            link: notifLink,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to notify student of lecture:", student._id, err.message);
       }
     }
 

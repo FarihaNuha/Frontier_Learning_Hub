@@ -65,36 +65,35 @@ exports.createAssignment = async (req, res) => {
 
     const assignment = await Assignment.create(assignmentData);
 
-    // Get enrolled students only
-    let students = [];
-    if (courseId) {
-      const courseData = await Course.findById(courseId);
-      if (courseData) {
-        students = await User.find({
-          _id: { $in: courseData.students },
-          role: "student",
-        });
-      }
-    }
+    // Get enrolled students with fallback to department students
+    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+    const students = await getEnrolledStudents(courseId, course, department);
 
+    console.log(`📢 Notifying ${students.length} students about new assignment: "${title}"`);
+
+    const notifLink = courseId ? `/student/assignments/${courseId}?assignmentId=${assignment._id}` : `/student/dashboard`;
     for (const student of students) {
-      const notifLink = courseId ? `/student/assignments/${courseId}?assignmentId=${assignment._id}` : null;
-      await Notification.create({
-        userId: student._id,
-        title: "New Assignment",
-        message: `"${title}" has been assigned for ${course}. Due: ${new Date(deadline).toLocaleDateString()}`,
-        type: "assignment_due",
-        link: notifLink,
-      });
-
-      const io = getIO();
-      if (io) {
-        io.to(`user_${student._id}`).emit("newNotification", {
+      try {
+        const notif = await Notification.create({
+          userId: student._id,
           title: "New Assignment",
-          message: `"${title}" has been assigned for ${course}`,
+          message: `"${title}" has been assigned for ${course || "your course"}. Due: ${new Date(deadline).toLocaleDateString()}`,
           type: "assignment_due",
           link: notifLink,
         });
+
+        const io = getIO();
+        if (io) {
+          io.to(`user_${student._id}`).emit("newNotification", {
+            _id: notif._id,
+            title: "New Assignment",
+            message: `"${title}" has been assigned for ${course || "your course"}`,
+            type: "assignment_due",
+            link: notifLink,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to notify student of assignment:", student._id, err.message);
       }
     }
 

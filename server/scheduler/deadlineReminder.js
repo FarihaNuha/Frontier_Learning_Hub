@@ -112,16 +112,8 @@ const startScheduler = () => {
         exam.resultsPublished = true;
         await exam.save();
 
-        const Course = require("../models/Course");
-        const courseData = await Course.findById(exam.courseId);
-        
-        let students = [];
-        if (courseData) {
-          students = await User.find({
-            _id: { $in: courseData.students },
-            role: "student",
-          });
-        }
+        const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+        const students = await getEnrolledStudents(exam.courseId, exam.course, exam.department);
 
         for (const student of students) {
           const submission = await ExamSubmission.findOne({

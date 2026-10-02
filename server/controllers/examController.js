@@ -65,30 +65,34 @@ exports.createExam = async (req, res) => {
       createdBy: req.user.uid,
     });
 
-    const Course = require("../models/Course");
-    const courseData = await Course.findById(courseId);
-    let students = [];
-    if (courseData) {
-      students = await User.find({ _id: { $in: courseData.students }, role: "student" });
-    }
-    for (const student of students) {
-      const notifLink = courseId ? `/student/exams/${courseId}?examId=${exam._id}` : null;
-      await Notification.create({
-        userId: student._id,
-        title: "New Exam Assigned",
-        message: `"${title}" has been assigned for ${course}. Duration: ${duration} minutes`,
-        type: "exam_reminder",
-        link: notifLink,
-      });
+    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+    const students = await getEnrolledStudents(courseId, course, department);
 
-      const io = getIO();
-      if (io) {
-        io.to(`user_${student._id}`).emit("newNotification", {
+    console.log(`📢 Notifying ${students.length} students about new exam: "${title}"`);
+
+    const notifLink = courseId ? `/student/exams/${courseId}?examId=${exam._id}` : `/student/dashboard`;
+    for (const student of students) {
+      try {
+        const notif = await Notification.create({
+          userId: student._id,
           title: "New Exam Assigned",
-          message: `"${title}" has been assigned for ${course}`,
+          message: `"${title}" has been assigned for ${course || "your course"}. Duration: ${duration} minutes`,
           type: "exam_reminder",
           link: notifLink,
         });
+
+        const io = getIO();
+        if (io) {
+          io.to(`user_${student._id}`).emit("newNotification", {
+            _id: notif._id,
+            title: "New Exam Assigned",
+            message: `"${title}" has been assigned for ${course || "your course"}`,
+            type: "exam_reminder",
+            link: notifLink,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to notify student of exam:", student._id, err.message);
       }
     }
 
@@ -464,16 +468,8 @@ exports.publishExamResults = async (req, res) => {
     await exam.save();
 
     // Send notifications to all enrolled students
-    const Course = require("../models/Course");
-    const courseData = await Course.findById(exam.courseId);
-    
-    let students = [];
-    if (courseData) {
-      students = await User.find({
-        _id: { $in: courseData.students },
-        role: "student",
-      });
-    }
+    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+    const students = await getEnrolledStudents(exam.courseId, exam.course, exam.department);
 
     const Notification = require("../models/Notification");
     const { getIO } = require("../socket");

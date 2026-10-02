@@ -11,18 +11,42 @@ const initFCM = () => {
   if (fcmInitialized || !admin) return;
 
   try {
+    const getCertFn = () => {
+      try {
+        const { cert } = require("firebase-admin/app");
+        if (typeof cert === "function") return cert;
+      } catch (e) {}
+      if (typeof admin.cert === "function") return admin.cert;
+      if (admin.credential && typeof admin.credential.cert === "function") return admin.credential.cert;
+      return null;
+    };
+
+    const getAppDefaultFn = () => {
+      try {
+        const { applicationDefault } = require("firebase-admin/app");
+        if (typeof applicationDefault === "function") return applicationDefault;
+      } catch (e) {}
+      if (typeof admin.applicationDefault === "function") return admin.applicationDefault;
+      if (admin.credential && typeof admin.credential.applicationDefault === "function") return admin.credential.applicationDefault;
+      return null;
+    };
+
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
       const serviceAccount = typeof process.env.FIREBASE_SERVICE_ACCOUNT === "string"
         ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
         : process.env.FIREBASE_SERVICE_ACCOUNT;
+      const certFn = getCertFn();
+      if (!certFn) throw new Error("Could not find cert() function in firebase-admin");
       admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+        credential: certFn(serviceAccount),
       });
       fcmInitialized = true;
       console.log("✅ Firebase Admin initialized with FIREBASE_SERVICE_ACCOUNT");
     } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      const appDefaultFn = getAppDefaultFn();
+      if (!appDefaultFn) throw new Error("Could not find applicationDefault() function in firebase-admin");
       admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
+        credential: appDefaultFn(),
       });
       fcmInitialized = true;
       console.log("✅ Firebase Admin initialized with GOOGLE_APPLICATION_CREDENTIALS");

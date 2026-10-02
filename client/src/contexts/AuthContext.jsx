@@ -52,6 +52,12 @@ export function AuthProvider({ children }) {
         setSocket(newSocket);
       }
 
+      // Sync stored native FCM token with server
+      const storedFcmToken = localStorage.getItem("fcm_token");
+      if (storedFcmToken) {
+        api.post("/auth/fcm-token", { fcmToken: storedFcmToken }).catch(() => {});
+      }
+
       // Fresh user profile fetch to sync edits
       api.get("/auth/me")
         .then((res) => {
@@ -107,6 +113,12 @@ export function AuthProvider({ children }) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setUser(user);
 
+      // Sync stored native FCM token with server
+      const storedFcmToken = localStorage.getItem("fcm_token");
+      if (storedFcmToken) {
+        api.post("/auth/fcm-token", { fcmToken: storedFcmToken }).catch(() => {});
+      }
+
       // Connect socket on login
       const newSocket = io(getSocketUrl(), {
         query: { 
@@ -133,6 +145,12 @@ export function AuthProvider({ children }) {
       localStorage.setItem("user", JSON.stringify(user));
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setUser(user);
+
+      // Sync stored native FCM token with server
+      const storedFcmToken = localStorage.getItem("fcm_token");
+      if (storedFcmToken) {
+        api.post("/auth/fcm-token", { fcmToken: storedFcmToken }).catch(() => {});
+      }
 
       // Connect socket on register
       const newSocket = io(getSocketUrl(), {

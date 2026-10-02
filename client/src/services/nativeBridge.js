@@ -291,7 +291,7 @@ export const initPushNotifications = async (navigate) => {
       return;
     }
 
-    // Create high-priority notification channel for Android 8.0+
+    // Create high-priority notification channels for Android 8.0+
     try {
       await PushNotifications.createChannel({
         id: "unicore_messages_channel",
@@ -301,7 +301,15 @@ export const initPushNotifications = async (navigate) => {
         visibility: 1,
         vibration: true,
       });
-      console.log("✅ Created Android notification channel: unicore_messages_channel");
+      await PushNotifications.createChannel({
+        id: "unicore_heads_up_channel",
+        name: "UniCore Heads-Up Alerts",
+        description: "High priority alerts for incoming calls, messages, exams, assignments, and lectures",
+        importance: 5,
+        visibility: 1,
+        vibration: true,
+      });
+      console.log("✅ Created Android notification channels: unicore_messages_channel & unicore_heads_up_channel");
     } catch (channelErr) {
       console.warn("Notification channel creation note:", channelErr.message);
     }

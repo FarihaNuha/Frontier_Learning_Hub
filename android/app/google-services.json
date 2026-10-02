@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "104829104829",
-    "project_id": "frontier-learning-academy",
-    "storage_bucket": "frontier-learning-academy.appspot.com"
+    "project_number": "654746735411",
+    "project_id": "web-app-9f485",
+    "storage_bucket": "web-app-9f485.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:104829104829:android:abcdef0123456789abcdef",
+        "mobilesdk_app_id": "1:654746735411:android:50fcf23d7ecb492d4c6446",
         "android_client_info": {
           "package_name": "com.frontier.learningacademy"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDummyKeyForBuildCompilationFCM123"
+          "current_key": "AIzaSyD9U8WxeiNy8R8Q8C1Bx8xYv8bK59QZ0do"
         }
       ],
       "services": {

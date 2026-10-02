@@ -87,7 +87,7 @@ export const initPushNotifications = async (navigate) => {
 
   try {
     let permStatus = await PushNotifications.checkPermissions();
-    if (permStatus.receive === "prompt") {
+    if (permStatus.receive !== "granted") {
       permStatus = await PushNotifications.requestPermissions();
     }
 

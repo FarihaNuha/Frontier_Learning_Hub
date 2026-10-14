@@ -1,3 +1,4 @@
+import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import * as docx from "docx-preview";
@@ -327,7 +328,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     setShareModalOpen(true);
   };
 
-  const getViewUrl = (id) => `${window.location.origin}/course/${courseId || ""}?lectureId=${id}`;
+  const getViewUrl = (id) => `${PUBLIC_APP_URL}/course/${courseId || ""}?lectureId=${id}`;
 
   // Group lectures by week
   const weeks = Array.from({ length: 14 }, (_, i) => i + 1);

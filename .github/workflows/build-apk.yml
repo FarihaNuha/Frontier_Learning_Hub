@@ -33,7 +33,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Root Dependencies
         run: npm install --legacy-peer-deps
@@ -50,12 +50,6 @@ jobs:
           DISABLE_ESLINT_PLUGIN: "true"
           GENERATE_SOURCEMAP: "false"
 
-      - name: Copy Web Build to Root & Android Assets
-        run: |
-          cp -r client/build ./build
-          mkdir -p android/app/src/main/assets/public
-          cp -r client/build/* android/app/src/main/assets/public/
-
       - name: Make Gradle executable & fix line endings
         run: |
           sed -i 's/\r$//' android/gradlew || true
@@ -64,7 +58,7 @@ jobs:
       - name: Sync Capacitor Android
         run: |
           mkdir -p android/capacitor-cordova-android-plugins
-          npx cap sync android --verbose || echo "Assets pre-synced directly"
+          npx cap sync android
           if [ ! -f android/capacitor-cordova-android-plugins/cordova.variables.gradle ]; then
             cat << 'EOF' > android/capacitor-cordova-android-plugins/cordova.variables.gradle
           // Fallback cordova.variables.gradle
@@ -127,22 +121,21 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.0.0-apk
-          name: UniCore Mobile App v1.0.0 (Android APK)
+          tag_name: v1.1.0-apk
+          name: UniCore Mobile App v1.1.0 (Android test APK)
           body: |
-            ### 📱 UniCore Native Android App (v1.0.0)
-            
-            This is the official native Android build for the **Frontier Learning Academy (UniCore)** learning management and community system.
-            
-            #### ✨ Highlights:
-            - **Mobile Responsiveness**: Complete UI responsive optimizations across admin, teacher, student dashboards, and community chat.
-            - **Native Mobile Navigation**: Full support for Android hardware and gesture back buttons (modal closing, drawer toggling, back routing, and app exit).
-            - **Instant Live Updates**: Connected directly to [frontier-learning-academy.vercel.app](https://frontier-learning-academy.vercel.app). When changes are pushed to GitHub, your installed app updates automatically without needing to reinstall the APK!
-            - **Firebase Cloud Messaging (FCM)**: Native push notification support for Community Hub messaging, posts, and announcements.
-            
-            #### 📥 Direct Download:
-            Click the link below to download the APK directly to your phone:
-            **[Download UniCore-app.apk](https://github.com/FarihaNuha/Frontier_Learning_Hub/releases/download/v1.0.0-apk/UniCore-app.apk)**
+            UniCore Android 1.1.0 includes Android 13 notification permission handling,
+            device registration, notification settings and a self-test button.
+            It also includes native file saving/sharing, printing, camera/microphone
+            permissions and bundled app screens with an offline connection notice.
+
+            Install the updated APK and sign in, then open Settings > App notifications
+            to enable notifications and send a test to your own phone. The updated
+            backend must be deployed for device registration and push delivery.
+
+            App screens are bundled: frontend changes require a new APK installation.
+            This is a debug-signed test build. Delivery and calls need device testing;
+            full native incoming-call ringing/answer controls are not included.
           files: release-output/UniCore-app.apk
           draft: false
           prerelease: false

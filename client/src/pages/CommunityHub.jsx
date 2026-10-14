@@ -1,3 +1,4 @@
+import { PUBLIC_APP_URL, absoluteFileUrl } from "../services/urls";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -299,10 +300,7 @@ const getFileUrl = (url) => {
     return url;
   }
   const cleanUrl = url.startsWith("/") ? url : `/${url}`;
-  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    return `http://${window.location.hostname}:5000${cleanUrl}`;
-  }
-  return `${window.location.origin}${cleanUrl}`;
+  return absoluteFileUrl(cleanUrl);
 };
 
 const renderAttachments = (attachments, onPreview) => {
@@ -817,8 +815,8 @@ function PostCard({ post, getCategoryIcon, onPostDeleted, onPostUpdated }) {
   const canDelete = isOwner || user?.role === "admin" || (user?.role === "teacher" && post.author?.role === "student");
 
   const shareUrl = post.courseId
-    ? `${window.location.origin}/community/courses/${post.courseId}/posts/${post._id}`
-    : `${window.location.origin}/community/public/posts/${post._id}`;
+    ? `${PUBLIC_APP_URL}/community/courses/${post.courseId}/posts/${post._id}`
+    : `${PUBLIC_APP_URL}/community/public/posts/${post._id}`;
   const authorName = post.author?.name || "Deleted User";
   const authorRole = post.author?.role || "";
   const authorPic = post.author?.profilePicture || null;

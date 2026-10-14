@@ -1,3 +1,5 @@
+import { absoluteFileUrl } from "../services/urls";
+import { downloadFile as saveDownload, openFile } from "../services/nativeFiles";
 import { useState, useEffect, useRef, useCallback } from "react";
 import * as docx from "docx-preview";
 import JSZip from "jszip";
@@ -399,10 +401,7 @@ export default function MessagePage() {
   const getFileUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-      return `http://${window.location.hostname}:5000${url}`;
-    }
-    return `${window.location.origin}${url}`;
+    return absoluteFileUrl(url);
   };
 
   const handleFileSelect = (acceptType) => {
@@ -430,13 +429,13 @@ export default function MessagePage() {
     const isVideo = file.fileType?.startsWith("video/") || /\.(mp4|webm|ogg)$/i.test(file.fileName);
     const isAudio = file.fileType?.startsWith("audio/") || /\.(mp3|wav|ogg)$/i.test(file.fileName);
 
-    if (isImage || isVideo || isAudio) { window.open(fileUrl, "_blank"); return; }
+    if (isImage || isVideo || isAudio) { openFile({ url: fileUrl, fileName: file.fileName }); return; }
     if (isPdf) { setPreviewFile({ url: fileUrl, name: file.fileName, type: "pdf" }); return; }
     if (isDocx) {
       try {
         const res = await fetch(fileUrl); const blob = await res.blob();
         setPreviewFile({ url: URL.createObjectURL(blob), name: file.fileName, type: "docx", blob });
-      } catch { window.open(fileUrl, "_blank"); }
+      } catch { openFile({ url: fileUrl, fileName: file.fileName }); }
       return;
     }
     if (isPptx) {
@@ -452,21 +451,13 @@ export default function MessagePage() {
           if (texts.length > 0) slides.push({ name: sf.replace(/^.*\/slide(\d+)\.xml$/, "Slide $1"), texts });
         }
         setPreviewFile({ url: fileUrl, name: file.fileName, type: "pptx", slides });
-      } catch { window.open(fileUrl, "_blank"); }
+      } catch { openFile({ url: fileUrl, fileName: file.fileName }); }
       return;
     }
     setPreviewFile({ url: fileUrl, name: file.fileName, type: "unsupported" });
   };
 
-  const downloadFile = async (fileUrl, fileName) => {
-    try {
-      const res = await fetch(fileUrl); const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a"); a.href = url; a.download = fileName;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch { window.open(fileUrl, "_blank"); }
-  };
+  const downloadFile = (fileUrl, fileName) => saveDownload({ url: fileUrl, fileName });
 
   const handleDeleteMessage = async (messageId) => {
     if (!window.confirm("Delete this message?")) return;
@@ -1071,7 +1062,7 @@ export default function MessagePage() {
                               const fileUrl = getFileUrl(file.fileUrl);
                               if (isImage) return (
                                 <div key={idx} className="msg-attachment-item">
-                                  <img src={fileUrl} alt={file.fileName} className="msg-attachment-image" onClick={() => window.open(fileUrl, "_blank")} />
+                                  <img src={fileUrl} alt={file.fileName} className="msg-attachment-image" onClick={() => openFile({ url: fileUrl, fileName: file.fileName })} />
                                   <div className="msg-attachment-actions">
                                     <button className="msg-attach-action-btn view-btn" onClick={() => openPreview(file)}>👁 View</button>
                                     <button className="msg-attach-action-btn download-btn" onClick={() => downloadFile(fileUrl, file.fileName)}>⬇ Save</button>

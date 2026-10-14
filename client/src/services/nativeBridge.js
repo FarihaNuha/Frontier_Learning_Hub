@@ -5,355 +5,265 @@ import { PushNotifications } from "@capacitor/push-notifications";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import api from "./api";
 
-let navigateHandler = null;
+const CHANNEL_ID = "unicore_messages_channel";
+const STATUS_EVENT = "unicore-notifications-changed";
+let navigateHandler;
+let setupPromise;
+let permissionPromise;
+let syncPromise;
+let syncedKey;
+const listeners = new Map();
+const displayed = new Map();
+let status = { permission: "unknown", registered: false, synced: false, serverConfigured: null, error: null };
 
-export const setGlobalNavigate = (nav) => {
-  if (typeof nav === "function") {
-    navigateHandler = nav;
-  }
+export const isNativePlatform = () => Capacitor.isNativePlatform() || Boolean(window.Capacitor?.isNativePlatform?.());
+export const getNativeNotificationStatus = () => ({ ...status, native: isNativePlatform() });
+const updateStatus = (patch) => {
+  status = { ...status, ...patch };
+  window.dispatchEvent(new CustomEvent(STATUS_EVENT));
+};
+export const subscribeNativeNotificationStatus = (listener) => {
+  window.addEventListener(STATUS_EVENT, listener);
+  return () => window.removeEventListener(STATUS_EVENT, listener);
 };
 
+export const setGlobalNavigate = (navigate) => { if (typeof navigate === "function") navigateHandler = navigate; };
 export const navigateTo = (link) => {
-  if (!link) return;
-  console.log("🚀 Deep linking navigation to:", link);
+  // Notification links must remain inside this app.
+  if (typeof link !== "string" || !link.startsWith("/") || link.startsWith("//") || link.includes("\\")) return;
+  if (!localStorage.getItem("token") && link !== "/auth") {
+    sessionStorage.setItem("notification_link", link);
+    if (navigateHandler) navigateHandler("/auth");
+    return;
+  }
+  if (navigateHandler) navigateHandler(link);
+  else window.location.href = link;
+};
+
+export const restoreNotificationNavigation = () => {
+  const link = sessionStorage.getItem("notification_link");
+  if (link && localStorage.getItem("token")) {
+    sessionStorage.removeItem("notification_link");
+    navigateTo(link);
+  }
+};
+
+const openAppUrl = ({ url }) => {
   try {
-    if (navigateHandler) {
-      navigateHandler(link);
-    } else if (typeof window !== "undefined") {
-      window.location.href = link;
-    }
-  } catch (err) {
-    console.error("Navigation error:", err);
-    if (typeof window !== "undefined") {
-      window.location.href = link;
-    }
-  }
+    const parsed = new URL(url);
+    if (parsed.protocol === "unicore:") navigateTo(`${parsed.hostname ? `/${parsed.hostname}` : ""}${parsed.pathname}${parsed.search}`);
+  } catch { /* Ignore invalid external links. */ }
 };
 
-/**
- * Check if running in a native Capacitor environment (with deferred bridge detection)
- */
-export const isNativePlatform = () => {
-  if (typeof window !== "undefined" && window.Capacitor) {
-    if (typeof window.Capacitor.isNativePlatform === "function") {
-      return window.Capacitor.isNativePlatform();
-    }
-    return window.Capacitor.platform === "android" || window.Capacitor.platform === "ios";
+const addListenerOnce = (key, plugin, event, callback) => {
+  if (!listeners.has(key)) {
+    listeners.set(key, plugin.addListener(event, callback).catch((error) => {
+      listeners.delete(key);
+      throw error;
+    }));
   }
-  return Capacitor.isNativePlatform();
+  return listeners.get(key);
 };
 
-/**
- * Show a native floating heads-up Android notification (like WhatsApp / Messenger / Google Classroom)
- * or web browser notification fallback
- */
+export const notificationId = (value) => {
+  if (Number.isInteger(value) && value > 0 && value <= 2147483647) return value;
+  let hash = 0;
+  for (const char of String(value)) hash = ((hash << 5) - hash + char.charCodeAt(0)) | 0;
+  return (hash >>> 0) % 2147483647 || 1;
+};
+
+const ensureChannel = () => LocalNotifications.createChannel({
+  id: CHANNEL_ID,
+  name: "UniCore notifications",
+  description: "Messages, calls, posts, lectures, assignments and exams",
+  importance: 5, visibility: 0, vibration: true, lights: true,
+});
+
 export const showNativeNotification = async ({ title, body, link, id }) => {
   try {
+    const key = String(id || `${title}|${body}|${link}`);
+    const now = Date.now();
+    for (const [entry, time] of displayed) if (now - time > 60000) displayed.delete(entry);
+    if (displayed.has(key)) return false;
+    displayed.set(key, now);
     if (isNativePlatform()) {
-      const notifId = id
-        ? typeof id === "number"
-          ? id
-          : Math.abs(hashCode(String(id)))
-        : Math.floor(Math.random() * 1000000) + 1;
-
-      // Ensure notification channel exists
-      await ensureHeadsUpChannel();
-
-      // Check and request permission if needed
-      try {
-        const perm = await LocalNotifications.checkPermissions();
-        if (perm.display !== "granted") {
-          await LocalNotifications.requestPermissions();
-        }
-      } catch (permErr) {
-        console.warn("Permission check note:", permErr);
-      }
-
-      await LocalNotifications.schedule({
-        notifications: [
-          {
-            id: notifId,
-            title: title || "UniCore Notification",
-            body: body || "",
-            channelId: "unicore_heads_up_channel",
-            extra: { link: link || "/notifications" },
-            schedule: { at: new Date(Date.now() + 50) },
-          },
-        ],
-      });
-      console.log("🔔 Native heads-up floating notification scheduled:", title);
-    } else {
-      // Standard Web Browser Notification fallback
-      if (typeof window !== "undefined" && "Notification" in window) {
-        if (Notification.permission === "granted") {
-          const n = new Notification(title || "UniCore Notification", {
-            body: body || "",
-            icon: "/logo192.png",
-            badge: "/logo192.png",
-            data: { link: link || "/notifications" },
-          });
-          n.onclick = () => {
-            window.focus();
-            navigateTo(link || "/notifications");
-          };
-        } else if (Notification.permission === "default") {
-          Notification.requestPermission().then((res) => {
-            if (res === "granted") {
-              const n = new Notification(title || "UniCore Notification", {
-                body: body || "",
-                icon: "/logo192.png",
-                data: { link: link || "/notifications" },
-              });
-              n.onclick = () => {
-                window.focus();
-                navigateTo(link || "/notifications");
-              };
-            }
-          });
-        }
+      const permission = await LocalNotifications.checkPermissions();
+      if (permission.display !== "granted") { displayed.delete(key); return false; }
+      await ensureChannel();
+      // Omit schedule: an alert must be shown now, without exact-alarm access.
+      await LocalNotifications.schedule({ notifications: [{
+        id: notificationId(key), title: title || "UniCore", body: body || "",
+        channelId: CHANNEL_ID, smallIcon: "ic_stat_unicore", autoCancel: true,
+        extra: { link: link || "/notifications" },
+      }] });
+      return true;
+    }
+    if ("Notification" in window) {
+      let permission = Notification.permission;
+      if (permission === "default") permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const notification = new Notification(title || "UniCore", { body, icon: "/logo192.png", tag: key });
+        notification.onclick = () => { window.focus(); navigateTo(link || "/notifications"); };
+        return true;
       }
     }
-  } catch (err) {
-    console.warn("Notification display error:", err.message);
+    displayed.delete(key);
+    return false;
+  } catch (error) {
+    displayed.delete(String(id || `${title}|${body}|${link}`));
+    updateStatus({ error: "Could not display notifications. Check UniCore in your phone's notification settings." });
+    console.warn("[Push] Notification display failed:", error.message);
+    return false;
   }
 };
 
-function hashCode(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
+export const syncNativePushToken = async ({ force = false } = {}) => {
+  if (!isNativePlatform()) return false;
+  const token = localStorage.getItem("fcm_token");
+  const auth = localStorage.getItem("token");
+  if (!token || !auth) return false;
+  const key = `${auth}:${token}`;
+  if (!force && syncedKey === key) return true;
+  if (syncPromise) {
+    await syncPromise;
+    if (syncedKey === key) return true;
   }
-  return hash;
-}
+  syncPromise = (async () => {
+    try {
+      const { data } = await api.post("/auth/fcm-token", { fcmToken: token }, { timeout: 10000 });
+      if (localStorage.getItem("token") !== auth) return false;
+      syncedKey = key;
+      updateStatus({ synced: true, serverConfigured: data.push?.configured ?? null,
+        error: data.push?.configured === false ? "The server's app notifications need setup. Please contact the administrator." : null });
+      return true;
+    } catch (error) {
+      updateStatus({ synced: false, error: "Could not connect this phone for notifications. Check your internet and retry." });
+      return false;
+    }
+  })();
+  try { return await syncPromise; } finally { syncPromise = null; }
+};
 
-let channelCreated = false;
-const ensureHeadsUpChannel = async () => {
-  if (!isNativePlatform() || channelCreated) return;
+export const disconnectNativePushToken = async () => {
+  if (syncPromise) await syncPromise;
+  const token = localStorage.getItem("fcm_token");
   try {
-    await LocalNotifications.createChannel({
-      id: "unicore_heads_up_channel",
-      name: "UniCore Heads-Up Alerts",
-      description: "High priority alerts for incoming calls, messages, exams, assignments, and lectures",
-      importance: 5,
-      visibility: 1,
-      vibration: true,
-      lights: true,
-      lightColor: "#3B8DB3",
-    });
-    channelCreated = true;
-    console.log("✅ Created Android high-priority channel: unicore_heads_up_channel");
-  } catch (channelErr) {
-    console.warn("Channel create warning:", channelErr.message);
+    if (token && isNativePlatform()) await api.delete("/auth/fcm-token", { data: { fcmToken: token }, timeout: 5000 });
+  } finally {
+    syncedKey = null;
+    displayed.clear();
+    updateStatus({ synced: false });
   }
 };
 
-/**
- * Initialize Capacitor Native Mobile Features
- * - Android Gesture / Hardware Back Button navigation
- * - Status Bar appearance
- * - Firebase Cloud Messaging (FCM) Push Notifications
- * - Native Heads-up Local Notifications (like WhatsApp / Google Classroom)
- */
+const installNotificationListeners = async () => {
+  await addListenerOnce("registration", PushNotifications, "registration", async ({ value }) => {
+    localStorage.setItem("fcm_token", value);
+    updateStatus({ registered: true, error: null });
+    await syncNativePushToken();
+  });
+  await addListenerOnce("registrationError", PushNotifications, "registrationError", () => {
+    updateStatus({ registered: false, error: "This phone could not register for notifications. Check Google Play services and retry." });
+  });
+  await addListenerOnce("pushReceived", PushNotifications, "pushNotificationReceived", (notification) => {
+    const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+    if (!localStorage.getItem("token")) return;
+    if (notification.data?.recipientId && notification.data.recipientId !== String(currentUser?.id || currentUser?._id)) return;
+    showNativeNotification({ title: notification.title, body: notification.body,
+      link: notification.data?.link, id: notification.data?.notificationId || notification.id });
+  });
+  await addListenerOnce("pushAction", PushNotifications, "pushNotificationActionPerformed", ({ notification }) => {
+    navigateTo(notification.data?.link || "/notifications");
+  });
+  await addListenerOnce("localAction", LocalNotifications, "localNotificationActionPerformed", ({ notification }) => {
+    navigateTo(notification.extra?.link || "/notifications");
+  });
+};
+
+export const enableNativeNotifications = () => {
+  if (!isNativePlatform()) return Promise.resolve(false);
+  if (permissionPromise) return permissionPromise;
+  permissionPromise = (async () => {
+    try {
+      // Register listeners before requesting a token; retain one listener per app lifetime.
+      await installNotificationListeners();
+      let permission = await PushNotifications.checkPermissions();
+      if (permission.receive !== "granted") permission = await PushNotifications.requestPermissions();
+      updateStatus({ permission: permission.receive });
+      if (permission.receive !== "granted") {
+        updateStatus({ error: "Allow notifications for UniCore in your phone's Settings, then return here and retry." });
+        return false;
+      }
+      await ensureChannel();
+      await PushNotifications.register();
+      await syncNativePushToken({ force: true });
+      return true;
+    } catch (error) {
+      updateStatus({ error: "App notifications could not be enabled. Update UniCore and try again." });
+      console.warn("[Push] Setup failed:", error.message);
+      return false;
+    } finally { permissionPromise = null; }
+  })();
+  return permissionPromise;
+};
+
+export const refreshNativeNotificationStatus = async () => {
+  if (!isNativePlatform()) return;
+  const permission = await PushNotifications.checkPermissions();
+  updateStatus({ permission: permission.receive });
+  if (localStorage.getItem("token")) {
+    const { data } = await api.get("/auth/push-status", { timeout: 10000 });
+    updateStatus({ serverConfigured: data.configured });
+  }
+};
+
+export const testNativePushNotification = async () => {
+  await enableNativeNotifications();
+  const token = localStorage.getItem("fcm_token");
+  if (!token || status.permission !== "granted") throw new Error("Enable notifications on this phone first.");
+  await syncNativePushToken({ force: true });
+  const { data } = await api.post("/auth/push-test", { fcmToken: token }, { timeout: 15000 });
+  return data.message;
+};
+
+const handleBack = ({ canGoBack }) => {
+  const modals = document.querySelectorAll(".modal-overlay, .share-modal-overlay, .file-preview-overlay, .file-preview-portal-overlay, .preview-modal-overlay, .notification-drawer-overlay");
+  const modal = modals[modals.length - 1];
+  const close = modal?.querySelector(".modal-close-btn, .share-modal-close, .close-btn, .close-drawer-btn, [aria-label='Close']");
+  if (close) { close.click(); return; }
+  const sidebar = document.querySelector(".mobile-sidebar-overlay.active");
+  if (sidebar) { sidebar.click(); return; }
+  const path = window.location.pathname;
+  if (path.startsWith("/community/messages/")) { navigateTo("/community/messages"); return; }
+  const roots = ["/", "/courses", "/student/dashboard", "/teacher/dashboard", "/admin/dashboard", "/auth"];
+  if (!roots.includes(path) && canGoBack) window.history.back();
+  else App.exitApp();
+};
+
 export const initNativeFeatures = (navigate) => {
-  if (navigate) {
-    setGlobalNavigate(navigate);
-  }
-
-  let attempts = 0;
-  const maxAttempts = 10;
-
-  const trySetup = () => {
-    if (!isNativePlatform()) {
-      if (attempts < maxAttempts) {
-        attempts++;
-        setTimeout(trySetup, 250);
-        return;
-      }
-      console.log("🌐 Running in standard Web Browser environment.");
-      // Web notification permission request
-      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission().catch(() => {});
-      }
-      return;
+  setGlobalNavigate(navigate);
+  if (setupPromise) return setupPromise;
+  setupPromise = (async () => {
+    for (let attempt = 0; attempt < 10 && !isNativePlatform(); attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
     }
-
-    console.log("📱 Running in Native Capacitor Android environment.");
-
-    // 1. Android Status Bar styling
-    try {
-      StatusBar.setStyle({ style: Style.Light });
-      StatusBar.setBackgroundColor({ color: "#2C4B66" });
-    } catch (e) {
-      console.log("StatusBar setup note:", e.message);
-    }
-
-    // 2. Hardware & Gesture Back Button Handler
-    try {
-      App.addListener("backButton", ({ canGoBack }) => {
-        // Priority 1: Close open modals or drawers if any
-        const openModals = document.querySelectorAll(
-          ".modal-overlay, .share-modal-overlay, .file-preview-overlay, .preview-modal-overlay, .notification-drawer-overlay"
-        );
-        if (openModals && openModals.length > 0) {
-          const closeBtn = document.querySelector(".modal-close-btn, .close-btn, .close-drawer-btn");
-          if (closeBtn) {
-            closeBtn.click();
-            return;
-          }
-        }
-
-        // Priority 2: Close active mobile sidebar drawer
-        const mobileOverlay = document.querySelector(".mobile-sidebar-overlay.active");
-        if (mobileOverlay) {
-          mobileOverlay.click();
-          return;
-        }
-
-        // Priority 3: In chat conversation on mobile, go back to conversation list
-        if (
-          window.location.pathname.includes("/community/messages/") &&
-          window.location.pathname !== "/community/messages"
-        ) {
-          navigateTo("/community/messages");
-          return;
-        }
-
-        // Priority 4: Route navigation back if not on home/login page
-        const currentPath = window.location.pathname;
-        const isRootPage =
-          currentPath === "/courses" ||
-          currentPath === "/student/dashboard" ||
-          currentPath === "/teacher/dashboard" ||
-          currentPath === "/admin/dashboard" ||
-          currentPath === "/auth" ||
-          currentPath === "/";
-
-        if (!isRootPage) {
-          window.history.back();
-        } else {
-          // Exit native app
-          App.exitApp();
-        }
-      });
-    } catch (e) {
-      console.warn("Back button listener warning:", e.message);
-    }
-
-    // 3. Register for Push Notifications (FCM) & Heads-up Local Notifications
-    initLocalNotifications(navigate);
-    initPushNotifications(navigate);
-  };
-
-  trySetup();
-};
-
-export const initLocalNotifications = async (navigate) => {
-  if (navigate) setGlobalNavigate(navigate);
-  if (!isNativePlatform()) return;
-
-  try {
-    let perm = await LocalNotifications.checkPermissions();
-    if (perm.display !== "granted") {
-      perm = await LocalNotifications.requestPermissions();
-    }
-
-    await ensureHeadsUpChannel();
-
-    // Handle tap on floating local notification banner -> deep link navigate
-    LocalNotifications.addListener("localNotificationActionPerformed", (action) => {
-      console.log("👆 Native local notification tapped:", action);
-      const link = action.notification?.extra?.link;
-      if (link) {
-        navigateTo(link);
-      }
+    if (!isNativePlatform()) return;
+    await Promise.allSettled([
+      StatusBar.setStyle({ style: Style.Light }),
+      StatusBar.setBackgroundColor({ color: "#2C4B66" }),
+    ]);
+    await addListenerOnce("back", App, "backButton", handleBack);
+    await addListenerOnce("url", App, "appUrlOpen", openAppUrl);
+    const launch = await App.getLaunchUrl();
+    if (launch?.url) openAppUrl(launch);
+    await addListenerOnce("resume", App, "appStateChange", ({ isActive }) => {
+      if (isActive) enableNativeNotifications();
     });
-  } catch (err) {
-    console.error("Local notifications setup error:", err);
-  }
-};
-
-export const initPushNotifications = async (navigate) => {
-  if (navigate) setGlobalNavigate(navigate);
-  if (!isNativePlatform()) return;
-
-  try {
-    let permStatus = await PushNotifications.checkPermissions();
-    console.log("🔔 Initial PushNotification checkPermissions status:", JSON.stringify(permStatus));
-
-    if (permStatus.receive !== "granted") {
-      permStatus = await PushNotifications.requestPermissions();
-      console.log("🔔 After requestPermissions status:", JSON.stringify(permStatus));
-    }
-
-    if (permStatus.receive !== "granted") {
-      console.log("⚠️ Push notification permission not granted:", permStatus.receive);
-      return;
-    }
-
-    // Create high-priority notification channels for Android 8.0+
-    try {
-      await PushNotifications.createChannel({
-        id: "unicore_messages_channel",
-        name: "UniCore Notifications",
-        description: "Notifications for community messages, exams, assignments, and lectures",
-        importance: 5,
-        visibility: 1,
-        vibration: true,
-      });
-      await PushNotifications.createChannel({
-        id: "unicore_heads_up_channel",
-        name: "UniCore Heads-Up Alerts",
-        description: "High priority alerts for incoming calls, messages, exams, assignments, and lectures",
-        importance: 5,
-        visibility: 1,
-        vibration: true,
-      });
-      console.log("✅ Created Android notification channels: unicore_messages_channel & unicore_heads_up_channel");
-    } catch (channelErr) {
-      console.warn("Notification channel creation note:", channelErr.message);
-    }
-
-    await PushNotifications.register();
-
-    // Successfully registered with FCM
-    PushNotifications.addListener("registration", async (token) => {
-      console.log("✅ FCM Native Device Token:", token.value);
-      localStorage.setItem("fcm_token", token.value);
-
-      // If user is currently authenticated, save device token to DB
-      const authToken = localStorage.getItem("token");
-      if (authToken && token.value) {
-        try {
-          await api.post("/auth/fcm-token", { fcmToken: token.value });
-          console.log("✅ FCM Device Token synced with server profile");
-        } catch (err) {
-          console.error("Failed to sync FCM device token:", err);
-        }
-      }
-    });
-
-    PushNotifications.addListener("registrationError", (error) => {
-      console.error("❌ Native FCM registration error:", error);
-    });
-
-    PushNotifications.addListener("pushNotificationReceived", (notification) => {
-      console.log("🔔 Foreground push notification received:", notification);
-      showNativeNotification({
-        title: notification.title,
-        body: notification.body,
-        link: notification.data?.link,
-      });
-    });
-
-    PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
-      console.log("👆 Notification opened by user:", action);
-      const link = action.notification?.data?.link;
-      if (link) {
-        navigateTo(link);
-      }
-    });
-  } catch (err) {
-    console.error("Push notification setup error:", err);
-  }
+    window.addEventListener("online", () => syncNativePushToken({ force: true }));
+    await enableNativeNotifications();
+  })().catch((error) => {
+    setupPromise = null;
+    console.warn("[Push] Native setup failed:", error.message);
+  });
+  return setupPromise;
 };

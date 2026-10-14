@@ -1,3 +1,4 @@
+import { exportWorkbook } from "../services/nativeFiles";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -172,7 +173,7 @@ export default function TeacherAssessmentPage() {
     ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Assessment_Template");
-    XLSX.writeFile(wb, "Assessment_Marksheet_Template.xlsx");
+    exportWorkbook(XLSX, wb, "Assessment_Marksheet_Template.xlsx");
   };
   
   // Deletion UI states

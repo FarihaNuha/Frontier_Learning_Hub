@@ -1,3 +1,4 @@
+import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -176,8 +177,8 @@ export default function PostDetailPage() {
           isOpen={showShareModal}
           onClose={() => setShowShareModal(false)}
           shareUrl={post.courseId
-            ? `${window.location.origin}/community/courses/${post.courseId}/posts/${post._id}`
-            : `${window.location.origin}/community/public/posts/${post._id}`}
+            ? `${PUBLIC_APP_URL}/community/courses/${post.courseId}/posts/${post._id}`
+            : `${PUBLIC_APP_URL}/community/public/posts/${post._id}`}
           postTitle={post.title}
           postId={post._id}
           fileUrl={

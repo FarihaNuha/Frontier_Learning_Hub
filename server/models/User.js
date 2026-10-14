@@ -48,7 +48,9 @@ const userSchema = new mongoose.Schema({
       return s.toUpperCase();
     },
   },
-  fcmToken: String,
+  // Retain legacy registrations while supporting every signed-in phone.
+  fcmToken: { type: String, select: false },
+  fcmTokens: { type: [String], default: [], select: false },
   isBlocked: {
     type: Boolean,
     default: false,

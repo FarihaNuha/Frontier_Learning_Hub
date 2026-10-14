@@ -1,3 +1,4 @@
+import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
@@ -245,7 +246,7 @@ export default function TeacherResultManagementPage() {
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, `${resultTypeTab}_Template`);
-    XLSX.writeFile(wb, `Result_${resultTypeTab}_Image_Template.xlsx`);
+    exportWorkbook(XLSX, wb, `Result_${resultTypeTab}_Image_Template.xlsx`);
   };
 
   // Handle Excel File Selection & Dual-Format Parsing

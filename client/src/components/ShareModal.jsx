@@ -1,8 +1,11 @@
+import { PUBLIC_APP_URL, absoluteFileUrl } from "../services/urls";
 import React, { useState } from "react";
 import { FiX, FiCopy, FiShare2 } from "react-icons/fi";
 import { FaWhatsapp, FaFacebook, FaTwitter, FaFacebookMessenger, FaTelegram, FaInstagram, FaEnvelope } from "react-icons/fa";
 import { communityApi } from "../services/communityApi";
 import api from "../services/api";
+import { Capacitor } from "@capacitor/core";
+import { shareFile as nativeShareFile, shareText as nativeShareText } from "../services/nativeFiles";
 import toast from "react-hot-toast";
 import "../styles/community.css";
 
@@ -18,17 +21,14 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
   // Ensure shareUrl is a clean, public-facing frontend URL
   const cleanShareUrl = (shareUrl && !shareUrl.includes("/api/lectures/"))
     ? shareUrl
-    : (courseId ? `${window.location.origin}/course/${courseId}` : window.location.href);
+    : (courseId ? `${PUBLIC_APP_URL}/course/${courseId}` : `${PUBLIC_APP_URL}${window.location.pathname}${window.location.search}`);
 
   const getAbsoluteFileUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
     }
-    const backendHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? `http://${window.location.hostname}:5000`
-      : window.location.origin;
-    return `${backendHost}${url}`;
+    return absoluteFileUrl(url);
   };
 
   const fileDownloadUrl = fileUrl ? getAbsoluteFileUrl(fileUrl) : "";
@@ -156,6 +156,12 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
         
         toast.dismiss("share-prep");
 
+        if (Capacitor.isNativePlatform()) {
+          await nativeShareFile({ url: absoluteFileUrl, fileName, mimeType: blob.type, title: postTitle });
+          onClose();
+          return;
+        }
+
         if (navigator.canShare && navigator.canShare(shareData)) {
           await navigator.share(shareData);
           toast.success("Document file shared successfully!");
@@ -175,7 +181,10 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
         return;
       }
       
-      if (navigator.share) {
+      if (Capacitor.isNativePlatform()) {
+        await nativeShareText({ title: postTitle, text: defaultText, url: cleanShareUrl });
+        onClose();
+      } else if (navigator.share) {
         await navigator.share({
           title: postTitle,
           text: defaultText + (fileDownloadUrl ? `\n\n📄 Document: ${fileDownloadUrl}` : ""),
@@ -191,6 +200,7 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
       if (err.name === "AbortError") {
         return; // User closed native share window
       }
+      if (Capacitor.isNativePlatform()) { toast.error(err.message || "Could not open sharing. Save the file instead."); return; }
       if (fileUrl) {
         try {
           const absoluteFileUrl = getAbsoluteFileUrl(fileUrl);
@@ -399,7 +409,7 @@ export default function ShareModal({ isOpen, onClose, shareUrl, postTitle, postI
                 )}
               </div>
 
-              {navigator.share && (
+              {(Capacitor.isNativePlatform() || navigator.share) && (
                 <button 
                   className="system-share-btn" 
                   onClick={handleSystemShare}

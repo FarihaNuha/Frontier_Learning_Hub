@@ -1,3 +1,4 @@
+import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as docx from "docx-preview";
@@ -206,7 +207,7 @@ export default function StudentDashboard({
     }
   };
 
-  const getViewUrl = (id) => `${window.location.origin}/course/${finalCourseId || ""}?lectureId=${id}`;
+  const getViewUrl = (id) => `${PUBLIC_APP_URL}/course/${finalCourseId || ""}?lectureId=${id}`;
   const getDownloadUrl = (id) =>
     `${BACKEND_URL}/api/lectures/download/${id}?token=${localStorage.getItem("token")}`;
 

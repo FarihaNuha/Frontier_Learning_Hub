@@ -1,3 +1,4 @@
+import { downloadFile } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
@@ -428,13 +429,7 @@ export default function AdminResultManagementPage() {
     });
 
     const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Result_Report_${batch.courseCode}_${batch.session}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    toast.success("Result report exported to Excel!");
+    downloadFile({ blob, fileName: `Result_Report_${batch.courseCode}_${batch.session}.csv` });
   };
 
   const normSessStr = (s) => {

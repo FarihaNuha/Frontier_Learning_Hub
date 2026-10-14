@@ -1,3 +1,4 @@
+import { PUBLIC_APP_URL, absoluteFileUrl } from "../services/urls";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -463,10 +464,7 @@ const getFileUrl = (url) => {
     return url;
   }
   const cleanUrl = url.startsWith("/") ? url : `/${url}`;
-  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    return `http://${window.location.hostname}:5000${cleanUrl}`;
-  }
-  return `${window.location.origin}${cleanUrl}`;
+  return absoluteFileUrl(cleanUrl);
 };
 
 const renderAttachments = (attachments, onPreview) => {
@@ -998,7 +996,7 @@ function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPo
   const isOwner = post.author?._id === (user?.id || user?._id) || post.author === (user?.id || user?._id);
   const canDelete = isOwner || user?.role === "admin" || (user?.role === "teacher" && post.author?.role === "student");
 
-  const shareUrl = `${window.location.origin}/community/courses/${courseId}/posts/${post._id}`;
+  const shareUrl = `${PUBLIC_APP_URL}/community/courses/${courseId}/posts/${post._id}`;
 
   return (
     <div className="post-card" style={{ cursor: "default" }}>

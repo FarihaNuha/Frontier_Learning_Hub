@@ -3,6 +3,9 @@ import ReactDOM from "react-dom";
 import { FiX, FiDownload, FiFile, FiEye } from "react-icons/fi";
 import * as docx from "docx-preview";
 import JSZip from "jszip";
+import { Capacitor } from "@capacitor/core";
+import { absoluteFileUrl } from "../services/urls";
+import { openFile } from "../services/nativeFiles";
 
 export default function FilePreviewModal({ isOpen, onClose, file }) {
   const [loading, setLoading] = useState(false);
@@ -18,10 +21,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
     if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://") || rawUrl.startsWith("blob:")) {
       return rawUrl;
     }
-    const backendHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : window.location.origin;
-    return `${backendHost}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+    return absoluteFileUrl(rawUrl);
   };
 
   useEffect(() => {
@@ -244,7 +244,10 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
               <p style={{ fontWeight: 600 }}>Loading preview...</p>
             </div>
           ) : fileCategory === "pdf" ? (
-            <iframe
+            Capacitor.isNativePlatform() ? <div style={{ textAlign: "center", padding: 24 }}>
+              <p>Open this PDF with a document viewer on your phone.</p>
+              <button className="btn-primary" onClick={() => openFile({ url: downloadUrl, fileName, mimeType: "application/pdf" })}>Open PDF</button>
+            </div> : <iframe
               src={`${downloadUrl}#toolbar=1`}
               title={fileName}
               style={{ width: "100%", height: "70vh", border: "none", borderRadius: "10px", background: "#ffffff" }}

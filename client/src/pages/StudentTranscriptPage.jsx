@@ -1,3 +1,4 @@
+import { printPage } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -33,7 +34,7 @@ export default function StudentTranscriptPage() {
   const semesterBreakdown = data?.semesterBreakdown || [];
 
   const handlePrint = () => {
-    window.print();
+    printPage();
   };
 
   return (

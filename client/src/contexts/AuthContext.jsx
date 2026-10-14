@@ -3,7 +3,7 @@ import api, { BACKEND_URL } from "../services/api";
 import { clearAllCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
-import { showNativeNotification } from "../services/nativeBridge";
+import { showNativeNotification, isNativePlatform, syncNativePushToken, disconnectNativePushToken } from "../services/nativeBridge";
 
 const AuthContext = createContext();
 
@@ -44,6 +44,7 @@ export function AuthProvider({ children }) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       if (u && (u.id || u._id)) {
         const newSocket = io(getSocketUrl(), {
+          auth: { token },
           query: { 
             userId: u.id || u._id,
             activeStatus: getActiveStatusSetting()
@@ -55,7 +56,7 @@ export function AuthProvider({ children }) {
       // Sync stored native FCM token with server
       const storedFcmToken = localStorage.getItem("fcm_token");
       if (storedFcmToken) {
-        api.post("/auth/fcm-token", { fcmToken: storedFcmToken }).catch(() => {});
+        syncNativePushToken();
       }
 
       // Fresh user profile fetch to sync edits
@@ -116,11 +117,12 @@ export function AuthProvider({ children }) {
       // Sync stored native FCM token with server
       const storedFcmToken = localStorage.getItem("fcm_token");
       if (storedFcmToken) {
-        api.post("/auth/fcm-token", { fcmToken: storedFcmToken }).catch(() => {});
+        syncNativePushToken();
       }
 
       // Connect socket on login
       const newSocket = io(getSocketUrl(), {
+        auth: { token },
         query: { 
           userId: user.id || user._id,
           activeStatus: getActiveStatusSetting()
@@ -149,11 +151,12 @@ export function AuthProvider({ children }) {
       // Sync stored native FCM token with server
       const storedFcmToken = localStorage.getItem("fcm_token");
       if (storedFcmToken) {
-        api.post("/auth/fcm-token", { fcmToken: storedFcmToken }).catch(() => {});
+        syncNativePushToken();
       }
 
       // Connect socket on register
       const newSocket = io(getSocketUrl(), {
+        auth: { token },
         query: { 
           userId: user.id || user._id,
           activeStatus: getActiveStatusSetting()
@@ -169,10 +172,17 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const deviceToken = localStorage.getItem("fcm_token");
+    try {
+      await disconnectNativePushToken();
+    } catch (error) {
+      toast.error("Could not disconnect app alerts. Reconnect to the internet and sign in again to update this phone.");
+    }
     clearAllCache();
     try {
       localStorage.clear();
+      if (deviceToken) localStorage.setItem("fcm_token", deviceToken);
       sessionStorage.clear();
     } catch (e) {}
     delete api.defaults.headers.common["Authorization"];
@@ -265,7 +275,7 @@ export function AuthProvider({ children }) {
       const content = msg.content || (msg.attachments?.length ? "Sent an attachment" : "Sent a message");
       const link = msg.course ? `/community/courses/${msg.course}` : `/community/messages`;
 
-      showNativeNotification({
+      if (!isNativePlatform()) showNativeNotification({
         title: `💬 ${senderName}`,
         body: content,
         link,
@@ -288,7 +298,7 @@ export function AuthProvider({ children }) {
         title: `📞 Incoming Call from ${callerName}`,
         body: `Incoming ${callType} call. Tap to answer now.`,
         link: "/community/messages",
-        id: Date.now(),
+        id: data.callId || Date.now(),
       });
 
       toast.success(`📞 Incoming ${callType} call from ${callerName}!`, {

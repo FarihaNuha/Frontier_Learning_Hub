@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import api from "../services/api";
+import AppNotificationSettings from "../components/AppNotificationSettings";
 import {
   FiArrowLeft,
   FiSun,
@@ -300,6 +301,7 @@ export default function SettingsPage() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "30px", maxWidth: "1200px" }}>
+          <AppNotificationSettings />
           
           {/* Theme Switcher section */}
           <div className="dashboard-card" style={{ padding: "24px", borderRadius: "16px" }}>

@@ -1,6 +1,8 @@
 const { Server } = require("socket.io");
 const User = require("./models/User");
 const ContactRequest = require("./models/ContactRequest");
+const { randomUUID } = require("crypto");
+const { sendIncomingCallPush } = require("./services/callNotifications");
 
 let io;
 const onlineUsers = new Set();
@@ -81,12 +83,18 @@ const initSocket = (server) => {
             return;
           }
         }
+        const callId = randomUUID();
         io.to(`user_${to}`).emit("incoming-call", {
           from: userId,
+          callId,
           callerName,
           callType: callType || "video",
           offer
         });
+        sendIncomingCallPush({
+          authToken: socket.handshake.auth?.token,
+          caller, callee, callType, callId,
+        }).catch((error) => console.error("[Push] Call alert failed:", error.message));
       } catch (err) {
         console.error("Socket call-user error:", err);
         socket.emit("call-error", { error: "Failed to process call." });

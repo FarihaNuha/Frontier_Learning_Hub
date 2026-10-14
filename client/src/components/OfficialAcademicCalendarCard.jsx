@@ -1,3 +1,5 @@
+import { Capacitor } from "@capacitor/core";
+import { printPage } from "../services/nativeFiles";
 import React from "react";
 import { FiDownload, FiFileText, FiCalendar, FiUploadCloud } from "react-icons/fi";
 
@@ -51,6 +53,7 @@ export default function OfficialAcademicCalendarCard({ customData, fileUrl, onUp
   const holidaysList = data.holidays?.length > 0 ? data.holidays : DEFAULT_CALENDAR_DATA.holidays;
 
   const handlePrint = () => {
+    if (Capacitor.isNativePlatform()) { printPage(); return; }
     const cardEl = document.getElementById("official-academic-calendar-card");
     if (!cardEl) {
       window.print();

@@ -1,3 +1,4 @@
+import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
@@ -231,7 +232,7 @@ export default function AdminCalendarManagementPage() {
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Academic_Calendar");
-    XLSX.writeFile(wb, "Academic_Calendar_Template.xlsx");
+    exportWorkbook(XLSX, wb, "Academic_Calendar_Template.xlsx");
   };
 
   return (

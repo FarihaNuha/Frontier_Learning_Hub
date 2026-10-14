@@ -1,3 +1,4 @@
+import { downloadFile } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -92,13 +93,7 @@ export default function TeacherEnrolledStudentsPage() {
       csv += `"${s.studentId}","${s.name}","${s.email}","${s.department}","${s.batch}","${s.session}","${lvlTermStr}","${s.academicStatus}","${s.registrationStatus}"\n`;
     });
     const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Enrolled_Students_Roster.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    toast.success("Enrolled students roster exported!");
+    downloadFile({ blob, fileName: `Enrolled_Students_Roster.csv` });
   };
 
   return (

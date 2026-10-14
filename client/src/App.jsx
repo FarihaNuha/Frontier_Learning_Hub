@@ -5,7 +5,9 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import SkeletonLoader from "./components/SkeletonLoader";
 import GlobalNotificationBell from "./components/GlobalNotificationBell";
 import GlobalSettingsPortal from "./components/GlobalSettingsPortal";
-import { initNativeFeatures } from "./services/nativeBridge";
+import { initNativeFeatures, restoreNotificationNavigation } from "./services/nativeBridge";
+import { installNativeDownloads } from "./services/nativeFiles";
+import { OfflineNotice, AppErrorBoundary } from "./components/AppReliability";
 
 import AuthPage from "./pages/AuthPage";
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
@@ -156,7 +158,10 @@ function AppContent() {
 
   useEffect(() => {
     initNativeFeatures(navigate);
+    installNativeDownloads();
   }, [navigate]);
+
+  useEffect(() => { if (user) restoreNotificationNavigation(); }, [user]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -739,7 +744,7 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
+    <AppErrorBoundary><AuthProvider>
       <BrowserRouter>
         <Toaster
           position="top-right"
@@ -754,8 +759,9 @@ function App() {
           }}
         />
         <AppContent />
+        <OfflineNotice />
       </BrowserRouter>
-    </AuthProvider>
+    </AuthProvider></AppErrorBoundary>
   );
 }
 

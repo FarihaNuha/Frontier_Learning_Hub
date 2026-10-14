@@ -43,6 +43,7 @@ export const BACKEND_URL = getBackendUrl();
 
 const api = axios.create({
   baseURL: `${BACKEND_URL}/api`,
+  timeout: 60000,
 });
 
 // Request interceptor - add token to every request

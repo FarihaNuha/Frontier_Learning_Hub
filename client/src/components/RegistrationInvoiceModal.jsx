@@ -1,3 +1,4 @@
+import { printPage } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -36,7 +37,7 @@ export default function RegistrationInvoiceModal({
   if (!isOpen) return null;
 
   const handlePrint = () => {
-    window.print();
+    printPage();
   };
 
   return (

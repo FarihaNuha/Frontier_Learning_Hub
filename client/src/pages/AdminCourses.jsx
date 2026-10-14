@@ -1,3 +1,4 @@
+import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
@@ -209,7 +210,7 @@ export default function AdminCourses() {
                 const ws = XLSX.utils.json_to_sheet(sampleData);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Courses");
-                XLSX.writeFile(wb, "Course_Import_Template.xlsx");
+                exportWorkbook(XLSX, wb, "Course_Import_Template.xlsx");
               }}
               style={{
                 background: "#ffffff",

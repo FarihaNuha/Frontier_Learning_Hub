@@ -12,4 +12,5 @@ android/.gradle/
 android/app/build/
 android/build/
 release-output/
+scratch/jest-push/
 

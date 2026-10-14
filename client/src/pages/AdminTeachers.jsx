@@ -1,3 +1,4 @@
+import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
@@ -328,7 +329,7 @@ export default function AdminTeachers() {
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Teachers");
-    XLSX.writeFile(wb, `Teachers_Export_${new Date().toISOString().split("T")[0]}.xlsx`);
+    exportWorkbook(XLSX, wb, `Teachers_Export_${new Date().toISOString().split("T")[0]}.xlsx`);
     toast.success("Teacher directory exported to Excel successfully!");
   };
 
@@ -419,7 +420,7 @@ export default function AdminTeachers() {
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Teachers");
-                XLSX.writeFile(wb, "Teacher_Import_Template.xlsx");
+                exportWorkbook(XLSX, wb, "Teacher_Import_Template.xlsx");
               }}
               style={{
                 background: "#ffffff",

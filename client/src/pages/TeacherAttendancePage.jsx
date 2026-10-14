@@ -1,3 +1,4 @@
+import { exportWorkbook, exportPDF } from "../services/nativeFiles";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -922,7 +923,7 @@ export default function TeacherAttendancePage({
     setPreviewPdfTitle(`Attendance_${courseCode}_${gridMonthName}_${gridYear}`);
   };
 
-  const downloadGridPDF = () => {
+  const downloadGridPDF = async () => {
     const doc = generatePDFDoc();
     if (!doc) return;
     const monthNames = [
@@ -930,11 +931,10 @@ export default function TeacherAttendancePage({
       "July", "August", "September", "October", "November", "December"
     ];
     const gridMonthName = monthNames[gridMonth];
-    doc.save(`Attendance_${courseCode}_${gridMonthName}_${gridYear}.pdf`);
-    toast.success("PDF Downloaded!");
+    await exportPDF(doc, `Attendance_${courseCode}_${gridMonthName}_${gridYear}.pdf`);
   };
 
-  const downloadGridExcel = () => {
+  const downloadGridExcel = async () => {
     try {
       if (!gridData || !gridData.students || !gridData.dates) {
         toast.error("No grid data available to export Excel");
@@ -1009,8 +1009,7 @@ export default function TeacherAttendancePage({
       XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Grid");
 
       // Save workbook
-      XLSX.writeFile(workbook, `Attendance_${courseCode}_${gridMonthName}_${gridYear}.xlsx`);
-      toast.success("Excel Sheet Downloaded!");
+      await exportWorkbook(XLSX, workbook, `Attendance_${courseCode}_${gridMonthName}_${gridYear}.xlsx`);
     } catch (error) {
       console.error("Excel download error:", error);
       toast.error(`Excel Error: ${error.message || "Failed to download Excel sheet"}`);

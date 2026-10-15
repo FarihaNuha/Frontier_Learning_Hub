@@ -44,6 +44,12 @@ const privateMessageSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  replyPreview: { senderName: String, content: String },
+  forwarded: { type: Boolean, default: false },
+  deletedFor: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  deletedAt: Date,
+  editedAt: Date,
+  clientMessageId: { type: String, maxlength: 100 },
   reactions: [
     {
       emoji: { type: String, required: true },
@@ -55,5 +61,6 @@ const privateMessageSchema = new mongoose.Schema({
 // Index for faster queries
 privateMessageSchema.index({ sender: 1, receiver: 1, createdAt: -1 });
 privateMessageSchema.index({ receiver: 1, isRead: 1 });
+privateMessageSchema.index({ sender: 1, clientMessageId: 1 }, { unique: true, partialFilterExpression: { clientMessageId: { $type: "string" } } });
 
 module.exports = mongoose.model("PrivateMessage", privateMessageSchema);

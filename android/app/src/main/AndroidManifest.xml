@@ -11,6 +11,15 @@
         android:usesCleartextTraffic="false"
         tools:replace="android:usesCleartextTraffic"
         android:theme="@style/AppTheme">
+        <activity android:name=".IncomingCallActivity" android:exported="false"
+            android:excludeFromRecents="true" android:showWhenLocked="true" android:turnScreenOn="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <receiver android:name=".CallActionReceiver" android:exported="false" />
+        <service android:name=".ScreenShareService" android:exported="false" android:foregroundServiceType="mediaProjection" />
+        <service android:name="com.capacitorjs.plugins.pushnotifications.MessagingService" tools:node="remove" />
+        <service android:name=".UniCoreMessagingService" android:exported="false">
+            <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>
+        </service>
 
         <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="unicore_messages_channel" />
@@ -59,6 +68,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />

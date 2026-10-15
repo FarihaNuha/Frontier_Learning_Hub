@@ -1,3 +1,5 @@
+import { CallProvider } from "./contexts/CallContext";
+import { setChatNotificationContext } from "./services/chatNotifications";
 import React, { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
@@ -161,7 +163,7 @@ function AppContent() {
     installNativeDownloads();
   }, [navigate]);
 
-  useEffect(() => { if (user) restoreNotificationNavigation(); }, [user]);
+  useEffect(() => { setChatNotificationContext(); if (user) restoreNotificationNavigation(); }, [user]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -746,6 +748,7 @@ function App() {
   return (
     <AppErrorBoundary><AuthProvider>
       <BrowserRouter>
+        <CallProvider>
         <Toaster
           position="top-right"
           toastOptions={{
@@ -760,6 +763,7 @@ function App() {
         />
         <AppContent />
         <OfflineNotice />
+        </CallProvider>
       </BrowserRouter>
     </AuthProvider></AppErrorBoundary>
   );

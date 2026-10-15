@@ -683,13 +683,19 @@ exports.deleteComment = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
   try {
-    const { receiverId, subject, content } = req.body;
+    const { receiverId, subject, content, replyTo, forwardOf, clientMessageId } = req.body;
+    if (content && (typeof content !== "string" || content.length > 10000)) return res.status(400).json({ error: "Message is too long" });
+    if (clientMessageId && (typeof clientMessageId !== "string" || clientMessageId.length > 100)) return res.status(400).json({ error: "Invalid message id" });
+    if (clientMessageId) {
+      const existing = await PrivateMessage.findOne({ sender: req.user.uid, clientMessageId });
+      if (existing) return res.json({ message: existing });
+    }
 
     if (!receiverId) {
       return res.status(400).json({ error: "Receiver is required" });
     }
 
-    if (!content && (!req.files || req.files.length === 0)) {
+    if (!content && !forwardOf && (!req.files || req.files.length === 0)) {
       return res.status(400).json({ error: "Message content or file is required" });
     }
 
@@ -726,33 +732,55 @@ exports.sendMessage = async (req, res) => {
       }));
     }
 
+    let quoted = null, original = null;
+    if (replyTo) {
+      quoted = await PrivateMessage.findById(replyTo).populate("sender", "name");
+      const participants = quoted && [String(quoted.sender?._id || quoted.sender), String(quoted.receiver)];
+      if (!quoted || quoted.deletedAt || quoted.deletedFor?.some(id => String(id) === req.user.uid) ||
+        !participants.includes(String(req.user.uid)) || !participants.includes(String(receiverId))) {
+        return res.status(400).json({ error: "Reply must reference a visible message in this conversation" });
+      }
+    }
+    if (forwardOf) {
+      original = await PrivateMessage.findById(forwardOf);
+      if (!original || original.deletedAt || original.deletedFor?.some(id => String(id) === req.user.uid) ||
+        ![String(original.sender), String(original.receiver)].includes(String(req.user.uid))) {
+        return res.status(404).json({ error: "Message to forward was not found" });
+      }
+      attachments = original.attachments.map(file => ({ fileName: file.fileName, fileUrl: file.fileUrl, fileType: file.fileType }));
+    }
     const message = await PrivateMessage.create({
       sender: req.user.uid,
       receiver: receiverId,
       subject: subject || "Message",
-      content: content || "",
+      content: original ? original.content : (content || ""),
+      ...(clientMessageId ? { clientMessageId } : {}),
+      replyTo: quoted?._id || null,
+      replyPreview: quoted ? { senderName: quoted.sender?.name || "Message", content: (quoted.content || "Attachment").slice(0, 300) } : undefined,
+      forwarded: Boolean(original),
       attachments,
     });
 
     await message.populate("sender", "name email");
 
     const io = getIO();
-    io?.to(`user_${receiverId}`).emit("newPrivateMessage", {
+    io?.to(`user_${req.user.uid}`).to(`user_${receiverId}`).emit("newPrivateMessage", {
       message: message,
     });
 
     // Create system notification for receiver
     const senderUser = await User.findById(req.user.uid);
     const senderName = senderUser ? senderUser.name : "A user";
-    const messageContent = content || "";
+    const messageContent = message.content || (attachments.length ? "Sent an attachment" : "Message");
     const previewContent = messageContent.length > 50 ? `${messageContent.substring(0, 50)}...` : messageContent;
     const msgLink = `/community/messages/${req.user.uid}`;
 
     try {
       const notification = await Notification.create({
         userId: receiverId,
-        title: `✉️ New Message from ${senderName}`,
-        message: previewContent,
+        title: senderName,
+        pushData: { threadId: String(req.user.uid), senderName, messageId: String(message._id), timestamp: String(new Date(message.createdAt).getTime()) },
+        message: messageContent.slice(0, 500),
         type: "chat_message",
         link: msgLink,
       });
@@ -790,7 +818,7 @@ exports.sendMessage = async (req, res) => {
 
 exports.getInbox = async (req, res) => {
   try {
-    const messages = await PrivateMessage.find({ receiver: req.user.uid })
+    const messages = await PrivateMessage.find({ receiver: req.user.uid, deletedFor: { $ne: req.user.uid } })
       .populate("sender", "name email role profilePicture")
       .sort({ createdAt: -1 });
 
@@ -805,13 +833,15 @@ exports.getInbox = async (req, res) => {
 exports.getConversation = async (req, res) => {
   try {
     const { userId } = req.params;
-    const targetUser = await User.findById(userId).lean();
+    const targetUser = await User.findById(userId).select("name email role profilePicture").lean();
+    if (!targetUser) return res.status(404).json({ error: "Person not found" });
 
     if (targetUser && (targetUser.role === "admin" || targetUser.role === "superadmin" || (targetUser.name || "").toLowerCase().includes("super admin"))) {
       return res.status(403).json({ error: "Messaging Super Admin is not permitted." });
     }
 
     const messages = await PrivateMessage.find({
+      deletedFor: { $ne: req.user.uid },
       $or: [
         { sender: req.user.uid, receiver: userId },
         { sender: userId, receiver: req.user.uid },
@@ -821,105 +851,28 @@ exports.getConversation = async (req, res) => {
       .populate("receiver", "name email profilePicture")
       .sort({ createdAt: 1 });
 
-    await PrivateMessage.updateMany(
-      { sender: userId, receiver: req.user.uid, isRead: false },
+    const incoming = messages.filter(m => String(m.receiver?._id || m.receiver) === String(req.user.uid));
+    const readThrough = incoming.reduce((last, m) => Math.max(last, new Date(m.createdAt).getTime()), 0);
+    const readResult = await PrivateMessage.updateMany(
+      { _id: { $in: incoming.map(m => m._id) }, receiver: req.user.uid, isRead: false },
       { isRead: true, readAt: new Date() },
     );
 
-    res.json({ messages });
+    const readAt = new Date();
+    if (readResult.modifiedCount) {
+      await Notification.updateMany({ userId: req.user.uid, type: "chat_message", link: `/community/messages/${userId}`, isRead: false }, { isRead: true });
+      require("../services/fcmService").sendUserPushNotification(req.user.uid, {
+        control: true, data: { type: "chat_read", threadId: userId, timestamp: String(readThrough) }, ttl: 60000,
+      }).catch(() => {});
+    }
+    getIO().to(`user_${userId}`).emit("messagesRead", { readerId: req.user.uid, readAt, readThrough });
+    getIO().to(`user_${req.user.uid}`).emit("conversationRead", { threadId: userId, readThrough });
+    res.json({ user: targetUser, readThrough, messages: messages.map(m => {
+      if (String(m.receiver?._id || m.receiver) === String(req.user.uid)) { m.isRead = true; m.readAt = readAt; }
+      return m;
+    }) });
   } catch (error) {
     console.error("Get conversation error:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.deleteMessage = async (req, res) => {
-  try {
-    const { messageId } = req.params;
-    const message = await PrivateMessage.findById(messageId);
-
-    if (!message) {
-      return res.status(404).json({ error: "Message not found" });
-    }
-
-    if (message.sender.toString() !== req.user.uid) {
-      return res.status(403).json({ error: "You can only delete your own messages" });
-    }
-
-    await PrivateMessage.findByIdAndDelete(messageId);
-
-    const io = getIO();
-    io?.to(`user_${message.receiver}`).emit("messageDeleted", {
-      messageId,
-      conversationWith: message.sender,
-    });
-
-    res.json({ message: "Message deleted successfully", messageId });
-  } catch (error) {
-    console.error("Delete message error:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.toggleReaction = async (req, res) => {
-  try {
-    const { messageId } = req.params;
-    const { emoji } = req.body;
-    const userId = req.user.uid;
-
-    const message = await PrivateMessage.findById(messageId);
-    if (!message) {
-      return res.status(404).json({ error: "Message not found" });
-    }
-
-    const existingIndex = message.reactions.findIndex(
-      (r) => r.user.toString() === userId && r.emoji === emoji,
-    );
-
-    if (existingIndex > -1) {
-      message.reactions.splice(existingIndex, 1);
-    } else {
-      message.reactions.push({ emoji, user: userId });
-    }
-
-    await message.save();
-
-    const otherUser = message.sender.toString() === userId ? message.receiver : message.sender;
-    const io = getIO();
-    io?.to(`user_${otherUser}`).emit("messageReaction", {
-      messageId,
-      reactions: message.reactions,
-    });
-
-    // If reaction was added (not removed), notify the recipient
-    if (existingIndex === -1 && otherUser) {
-      try {
-        const reactor = await User.findById(userId).select("name");
-        const reactorName = reactor?.name || "Someone";
-        const notif = await Notification.create({
-          userId: otherUser,
-          title: "Reaction on Your Message",
-          message: `${reactorName} reacted ${emoji} to your message`,
-          type: "chat_message",
-          link: "/community/messages",
-        });
-        if (io) {
-          io.to(`user_${otherUser}`).emit("newNotification", {
-            _id: notif._id,
-            title: "Reaction on Your Message",
-            message: `${reactorName} reacted ${emoji} to your message`,
-            type: "chat_message",
-            link: "/community/messages",
-          });
-        }
-      } catch (err) {
-        console.error("Error creating message reaction notification:", err);
-      }
-    }
-
-    res.json({ reactions: message.reactions });
-  } catch (error) {
-    console.error("Toggle reaction error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -928,7 +881,7 @@ exports.getUnreadMessagesCount = async (req, res) => {
   try {
     const count = await PrivateMessage.countDocuments({
       receiver: req.user.uid,
-      isRead: false,
+      isRead: false, deletedAt: null, deletedFor: { $ne: req.user.uid },
     });
     res.json({ unreadCount: count });
   } catch (error) {
@@ -976,6 +929,7 @@ exports.getUsers = async (req, res) => {
     const usersWithStats = await Promise.all(
       users.map(async (u) => {
         const lastMsg = await PrivateMessage.findOne({
+          deletedFor: { $ne: currentUserId },
           $or: [
             { sender: currentUserId, receiver: u._id },
             { sender: u._id, receiver: currentUserId },
@@ -985,7 +939,7 @@ exports.getUsers = async (req, res) => {
         const unreadCount = await PrivateMessage.countDocuments({
           sender: u._id,
           receiver: currentUserId,
-          isRead: false,
+          isRead: false, deletedAt: null, deletedFor: { $ne: currentUserId },
         });
 
         return {

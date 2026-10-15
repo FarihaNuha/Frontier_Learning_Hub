@@ -1,3 +1,4 @@
+jest.mock("./chatNotifications", () => ({ notificationMode: jest.fn(async () => "native-v2"), setChatNotificationContext: jest.fn(async () => {}) }));
 jest.mock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: jest.fn(() => true) } }));
 jest.mock("@capacitor/app", () => ({ App: { addListener: jest.fn(async () => ({ remove: jest.fn() })), exitApp: jest.fn(), getLaunchUrl: jest.fn(async () => undefined) } }));
 jest.mock("@capacitor/status-bar", () => ({ StatusBar: { setStyle: jest.fn(async () => {}), setBackgroundColor: jest.fn(async () => {}) }, Style: { Light: "LIGHT" } }));
@@ -103,4 +104,11 @@ test("a notification opened before login is restored after sign-in", () => {
   bridge.restoreNotificationNavigation();
   expect(navigate).toHaveBeenLastCalledWith("/student/exams/course-1?examId=exam-1");
   expect(sessionStorage.getItem("notification_link")).toBeNull();
+});
+
+test("push already rendered natively cannot create a second local notification", async () => {
+  await bridge.enableNativeNotifications();
+  const handler = push.addListener.mock.calls.find(([event]) => event === "pushNotificationReceived")[1];
+  handler({ title: "Message", data: { nativeHandled: "true", notificationId: "event-1" } });
+  expect(local.schedule).not.toHaveBeenCalled();
 });

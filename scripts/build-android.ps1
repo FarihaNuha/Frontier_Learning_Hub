@@ -27,6 +27,6 @@ try {
     }
     if ($LASTEXITCODE) { throw 'Android build failed.' }
     New-Item -ItemType Directory -Path 'release-output' -Force | Out-Null
-    Copy-Item -LiteralPath 'android/app/build/outputs/apk/debug/app-debug.apk' -Destination 'release-output/UniCore-1.1.0-debug.apk' -Force
-    Write-Output (Join-Path $projectRoot 'release-output/UniCore-1.1.0-debug.apk')
+    Copy-Item -LiteralPath 'android/app/build/outputs/apk/debug/app-debug.apk' -Destination 'release-output/UniCore-1.2.0-debug.apk' -Force
+    Write-Output (Join-Path $projectRoot 'release-output/UniCore-1.2.0-debug.apk')
 } finally { Pop-Location }

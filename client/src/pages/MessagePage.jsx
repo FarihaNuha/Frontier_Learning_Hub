@@ -1,12 +1,14 @@
 import { absoluteFileUrl } from "../services/urls";
 import { downloadFile as saveDownload, openFile } from "../services/nativeFiles";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as docx from "docx-preview";
 import JSZip from "jszip";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { communityApi } from "../services/communityApi";
 import api from "../services/api";
+import { useCall } from "../contexts/CallContext";
+import { clearChatNotification, setChatNotificationContext } from "../services/chatNotifications";
 import TeacherSidebar from "../components/TeacherSidebar";
 import StudentSidebar from "../components/StudentSidebar";
 import toast from "react-hot-toast";
@@ -23,34 +25,18 @@ import {
   FiCamera,
   FiMic,
   FiX,
-  FiTrash2,
   FiPhone,
   FiVideo,
-  FiPhoneOff,
-  FiPhoneMissed,
   FiClock,
   FiCheck,
   FiAlertCircle,
   FiSend as FiRequestSend,
   FiInbox,
-  FiMonitor,
   FiBookOpen,
   FiCalendar,
 } from "react-icons/fi";
 import "../styles/community.css";
-
-// ========================= WebRTC helpers =========================
-const RTC_CONFIG = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" },
-    { urls: "stun:stun3.l.google.com:19302" },
-    { urls: "stun:stun4.l.google.com:19302" },
-  ],
-};
-
-// ==================================================================
+import "../styles/chat-actions.css";
 
 export default function MessagePage() {
   const { userId } = useParams();
@@ -71,6 +57,25 @@ export default function MessagePage() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showAttachmentPicker, setShowAttachmentPicker] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
+  const [actionMessage, setActionMessage] = useState(null);
+  const [replying, setReplying] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [forwarding, setForwarding] = useState(null);
+  const [forwardTarget, setForwardTarget] = useState("");
+  const sendId = useRef(null);
+  const chatId = userId || selectedUser?._id || selectedUser?.id;
+  const ownMessage = msg => String(msg.sender?._id || msg.sender) === String(user?.id || user?._id);
+  useEffect(() => {
+    setReplying(null); setEditing(null); setActionMessage(null); sendId.current = null;
+    const visible = () => {
+      setChatNotificationContext(document.visibilityState === "visible" ? chatId || "" : "");
+      if (chatId && document.visibilityState === "visible") {
+        communityApi.getConversation(chatId).then(res => { setMessages(res.data.messages || []); clearChatNotification(chatId, res.data.readThrough); }).catch(() => {});
+      }
+    };
+    visible(); document.addEventListener("visibilitychange", visible);
+    return () => { document.removeEventListener("visibilitychange", visible); setChatNotificationContext(""); };
+  }, [chatId]);
 
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -102,27 +107,10 @@ export default function MessagePage() {
   // ---- messaging lock state ----
   const [activeSlot, setActiveSlot] = useState(null); // null = locked, or { scheduleStart, scheduleEnd }
 
-  // ---- WebRTC call state ----
-  const [callState, setCallState] = useState("idle"); // idle | calling | incoming | active
-  const [callType, setCallType] = useState("video"); // video | audio
-  const [incomingCall, setIncomingCall] = useState(null);
-  const [callPartner, setCallPartner] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isCameraOff, setIsCameraOff] = useState(false);
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const screenStreamRef = useRef(null);
-
-  const localVideoRef = useRef(null);
-  const remoteVideoRef = useRef(null);
-  const remoteAudioRef = useRef(null);
-  const peerConnectionRef = useRef(null);
+  const { startCall: beginCall } = useCall();
+  const startCall = type => selectedUser && beginCall(selectedUser, type);
   const messagesEndRef = useRef(null);
   const docxContainerRef = useRef(null);
-  const isCallerRef = useRef(false);
-  const isCallAnsweredRef = useRef(false);
-  const callStartTimeRef = useRef(null);
-  const pendingIceCandidatesRef = useRef([]);
   const quickEmojis = ["❤️", "👍", "😂", "😮", "😢", "😡"];
 
   // ==================================================================
@@ -179,7 +167,9 @@ export default function MessagePage() {
           if (prev.some((m) => m._id === msg._id)) return prev;
           return [...prev, msg];
         });
-        communityApi.getConversation(currentActiveId).catch(console.error);
+        if (document.visibilityState === "visible") {
+          communityApi.getConversation(currentActiveId).then(res => { setMessages(res.data.messages || []); clearChatNotification(currentActiveId, res.data.readThrough); }).catch(console.error);
+        }
       }
     };
 
@@ -192,68 +182,22 @@ export default function MessagePage() {
     const handleNewContactRequest = () => { fetchContactRequests(); };
     const handleContactRequestResponse = () => { fetchContactRequests(); };
 
-    const handleIncomingCall = ({ from, callerName, callType: ct, offer }) => {
-      isCallerRef.current = false;
-      isCallAnsweredRef.current = false;
-      callStartTimeRef.current = null;
-      setIncomingCall({ from, callerName, callType: ct, offer });
-      setCallState("incoming");
-    };
-
-    const handleCallAnswered = async ({ answer }) => {
-      try {
-        if (peerConnectionRef.current) {
-          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
-          isCallAnsweredRef.current = true;
-          callStartTimeRef.current = Date.now();
-          setCallState("active");
-          // Process queued ICE candidates
-          while (pendingIceCandidatesRef.current.length > 0) {
-            const cand = pendingIceCandidatesRef.current.shift();
-            await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(cand)).catch(console.error);
-          }
-        }
-      } catch (err) { console.error("setRemoteDescription error:", err); }
-    };
-
-    const handleIceCandidate = async ({ candidate }) => {
-      try {
-        if (candidate && peerConnectionRef.current) {
-          if (peerConnectionRef.current.remoteDescription && peerConnectionRef.current.remoteDescription.type) {
-            await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
-          } else {
-            pendingIceCandidatesRef.current.push(candidate);
-          }
-        }
-      } catch (err) { console.error("ICE candidate error:", err); }
-    };
-
-    const handleCallEnded = () => { cleanupCall(); toast("Call ended"); };
-    const handleCallError = ({ error }) => {
-      cleanupCall();
-      toast.error(error);
-    };
-
+    const updated = ({ message }) => setMessages(prev => prev.map(m => m._id === message._id ? { ...m, ...message, sender: m.sender, receiver: m.receiver } : m));
+    const hidden = ({ messageId }) => setMessages(prev => prev.filter(m => m._id !== messageId));
+    const read = ({ readerId, readAt, readThrough }) => setMessages(prev => prev.map(m => ownMessage(m) && String(m.receiver?._id || m.receiver) === String(readerId) && new Date(m.createdAt).getTime() <= (readThrough || new Date(readAt).getTime()) ? { ...m, isRead: true, readAt } : m));
+    const cleared = ({ threadId, readThrough }) => clearChatNotification(threadId, readThrough);
+    socket.on("messageUpdated", updated); socket.on("messageHidden", hidden); socket.on("messagesRead", read); socket.on("conversationRead", cleared);
     socket.on("newPrivateMessage", handleNewMessage);
     socket.on("messageReaction", handleReaction);
     socket.on("newContactRequest", handleNewContactRequest);
     socket.on("contactRequestResponse", handleContactRequestResponse);
-    socket.on("incoming-call", handleIncomingCall);
-    socket.on("call-answered", handleCallAnswered);
-    socket.on("ice-candidate", handleIceCandidate);
-    socket.on("call-ended", handleCallEnded);
-    socket.on("call-error", handleCallError);
 
     return () => {
+      socket.off("messageUpdated", updated); socket.off("messageHidden", hidden); socket.off("messagesRead", read); socket.off("conversationRead", cleared);
       socket.off("newPrivateMessage", handleNewMessage);
       socket.off("messageReaction", handleReaction);
       socket.off("newContactRequest", handleNewContactRequest);
       socket.off("contactRequestResponse", handleContactRequestResponse);
-      socket.off("incoming-call", handleIncomingCall);
-      socket.off("call-answered", handleCallAnswered);
-      socket.off("ice-candidate", handleIceCandidate);
-      socket.off("call-ended", handleCallEnded);
-      socket.off("call-error", handleCallError);
     };
   }, [socket, userId, selectedUser]);
 
@@ -293,7 +237,7 @@ export default function MessagePage() {
         res.data.messages[0]?.sender?._id === (user?.id || user?._id)
           ? res.data.messages[0]?.receiver
           : res.data.messages[0]?.sender;
-      setSelectedUser(otherUser);
+      setSelectedUser(otherUser || res.data.user || users.find(u => u._id === id));
     } catch (error) {
       if (error.response?.status === 403) {
         toast.error("Messaging Super Admin is disabled.");
@@ -356,6 +300,7 @@ export default function MessagePage() {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+    if (sending) return;
     if (!newMessage.trim() && selectedFiles.length === 0) return;
     if (!selectedUser && !userId) return;
 
@@ -363,11 +308,18 @@ export default function MessagePage() {
     try {
       const targetId = userId || selectedUser._id;
       const token = localStorage.getItem("token");
-
+      if (editing) {
+        const res = await communityApi.editMessage(editing._id, newMessage);
+        setMessages(prev => prev.map(m => m._id === editing._id ? { ...m, content: res.data.message.content, editedAt: res.data.message.editedAt } : m));
+        setEditing(null); setNewMessage(""); return;
+      }
+      if (!sendId.current) sendId.current = crypto.randomUUID();
       if (selectedFiles.length > 0) {
         const formData = new FormData();
         formData.append("receiverId", targetId);
         formData.append("content", newMessage);
+        formData.append("clientMessageId", sendId.current);
+        if (replying) formData.append("replyTo", replying._id);
         formData.append("subject", subject || "Message");
         selectedFiles.forEach((file) => formData.append("files", file));
 
@@ -382,10 +334,10 @@ export default function MessagePage() {
           throw new Error(errData.error || `HTTP ${res.status}`);
         }
       } else {
-        await communityApi.sendMessage({ receiverId: targetId, subject: subject || "Message", content: newMessage });
+        await communityApi.sendMessage({ receiverId: targetId, subject: subject || "Message", content: newMessage, replyTo: replying?._id, clientMessageId: sendId.current });
       }
 
-      toast.success("Message sent!");
+      sendId.current = null; setReplying(null);
       setNewMessage(""); setSubject(""); setSelectedFiles([]);
       if (!userId) { setShowNewMessage(false); fetchConversation(targetId); }
       else { fetchConversation(userId); }
@@ -459,11 +411,13 @@ export default function MessagePage() {
 
   const downloadFile = (fileUrl, fileName) => saveDownload({ url: fileUrl, fileName });
 
-  const handleDeleteMessage = async (messageId) => {
-    if (!window.confirm("Delete this message?")) return;
+  const handleDeleteMessage = async (messageId, scope = "everyone") => {
+    if (!window.confirm(scope === "me" ? "Hide this message for you?" : "Delete this message for everyone?")) return;
     try {
-      await communityApi.deleteMessage(messageId);
-      setMessages((prev) => prev.filter((m) => m._id !== messageId));
+      const res = await communityApi.deleteMessage(messageId, scope);
+      setActionMessage(null);
+      if (scope === "me") setMessages(prev => prev.filter(m => m._id !== messageId));
+      else setMessages(prev => prev.map(m => m._id === messageId ? { ...m, ...res.data.message, sender: m.sender, receiver: m.receiver } : m));
       toast.success("Message deleted");
     } catch (err) { toast.error(err.response?.data?.error || "Failed to delete message"); }
   };
@@ -472,262 +426,12 @@ export default function MessagePage() {
     try {
       const res = await communityApi.toggleReaction(messageId, emoji);
       setMessages((prev) => prev.map((m) => m._id === messageId ? { ...m, reactions: res.data.reactions } : m));
-    } catch (err) { console.error("Reaction error:", err); }
+    } catch (err) { toast.error(err.response?.data?.error || "Could not react"); }
   };
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
-  // ==================================================================
-  //  WebRTC Call logic
-  // ==================================================================
 
-  const createPeerConnection = useCallback((targetId) => {
-    const pc = new RTCPeerConnection(RTC_CONFIG);
-
-    pc.onicecandidate = (event) => {
-      if (event.candidate && socket) {
-        socket.emit("ice-candidate", { to: targetId, candidate: event.candidate });
-      }
-    };
-
-    pc.ontrack = (event) => {
-      const incomingStream = (event.streams && event.streams[0]) ? event.streams[0] : new MediaStream([event.track]);
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = incomingStream;
-        remoteVideoRef.current.play().catch((e) => console.log("remoteVideo play error:", e));
-      }
-      if (remoteAudioRef.current) {
-        remoteAudioRef.current.srcObject = incomingStream;
-        remoteAudioRef.current.play().catch((e) => console.log("remoteAudio play error:", e));
-      }
-    };
-
-    pc.onconnectionstatechange = () => {
-      if (["disconnected", "failed", "closed"].includes(pc.connectionState)) {
-        cleanupCall();
-      }
-    };
-
-    peerConnectionRef.current = pc;
-    return pc;
-  }, [socket]);
-
-  if (!user) return null;
-
-  const startCall = async (type) => {
-    if (!selectedUser || !socket) return;
-    try {
-      isCallerRef.current = true;
-      isCallAnsweredRef.current = false;
-      callStartTimeRef.current = null;
-      setCallType(type);
-      setCallPartner(selectedUser);
-      setCallState("calling");
-
-      const stream = await navigator.mediaDevices.getUserMedia(
-        type === "video" ? { video: true, audio: true } : { audio: true }
-      );
-      setLocalStream(stream);
-      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-
-      const targetId = selectedUser._id || selectedUser.id;
-      const pc = createPeerConnection(targetId);
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-
-      socket.emit("call-user", {
-        to: targetId,
-        offer,
-        callerName: user?.name,
-        callType: type,
-      });
-    } catch (err) {
-      console.error("Start call error:", err);
-      toast.error("Could not start call. Check camera/mic permissions.");
-      cleanupCall();
-    }
-  };
-
-  const answerCall = async () => {
-    if (!incomingCall || !socket) return;
-    try {
-      isCallerRef.current = false;
-      isCallAnsweredRef.current = true;
-      callStartTimeRef.current = Date.now();
-      setCallType(incomingCall.callType);
-      setCallState("active");
-
-      const stream = await navigator.mediaDevices.getUserMedia(
-        incomingCall.callType === "video" ? { video: true, audio: true } : { audio: true }
-      );
-      setLocalStream(stream);
-      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-
-      const pc = createPeerConnection(incomingCall.from);
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-
-      await pc.setRemoteDescription(new RTCSessionDescription(incomingCall.offer));
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-
-      // Flush queued candidates
-      while (pendingIceCandidatesRef.current.length > 0) {
-        const cand = pendingIceCandidatesRef.current.shift();
-        await pc.addIceCandidate(new RTCIceCandidate(cand)).catch(console.error);
-      }
-
-      socket.emit("answer-call", { to: incomingCall.from, answer });
-
-      const partnerUser = users.find((u) => u._id === incomingCall.from || u.id === incomingCall.from);
-      setCallPartner(partnerUser || { name: incomingCall.callerName });
-      setIncomingCall(null);
-    } catch (err) {
-      console.error("Answer call error:", err);
-      toast.error("Failed to answer call.");
-      cleanupCall();
-    }
-  };
-
-  const rejectCall = () => {
-    if (socket && incomingCall) {
-      socket.emit("end-call", { to: incomingCall.from });
-    }
-    setIncomingCall(null);
-    setCallState("idle");
-  };
-
-  const endCall = () => {
-    const targetId = callPartner?._id || callPartner?.id || incomingCall?.from;
-    if (socket && targetId) {
-      socket.emit("end-call", { to: targetId });
-    }
-    cleanupCall();
-    toast("Call ended");
-  };
-
-  const cleanupCall = () => {
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-      peerConnectionRef.current = null;
-    }
-    if (localStream) {
-      localStream.getTracks().forEach((t) => t.stop());
-      setLocalStream(null);
-    }
-    if (screenStreamRef.current) {
-      screenStreamRef.current.getTracks().forEach((t) => t.stop());
-      screenStreamRef.current = null;
-    }
-    setIsScreenSharing(false);
-
-    if (localVideoRef.current) localVideoRef.current.srcObject = null;
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
-
-    // Calculate and log call details if we were the initiator (caller)
-    if (isCallerRef.current && callPartner) {
-      const partnerId = callPartner._id || callPartner.id;
-      if (isCallAnsweredRef.current && callStartTimeRef.current) {
-        const durationSec = Math.round((Date.now() - callStartTimeRef.current) / 1000);
-        const mins = Math.floor(durationSec / 60).toString().padStart(2, "0");
-        const secs = (durationSec % 60).toString().padStart(2, "0");
-        const durationStr = `${mins}:${secs}`;
-        
-        communityApi.sendMessage({
-          receiverId: partnerId,
-          content: `📞 ${callType === "video" ? "Video" : "Audio"} call - ${durationStr}`
-        }).then((res) => {
-          setMessages((prev) => [...prev, res.data.message]);
-        }).catch(console.error);
-      } else {
-        communityApi.sendMessage({
-          receiverId: partnerId,
-          content: `📞 Missed ${callType} call`
-        }).then((res) => {
-          setMessages((prev) => [...prev, res.data.message]);
-        }).catch(console.error);
-      }
-    }
-
-    // Reset flags
-    isCallerRef.current = false;
-    isCallAnsweredRef.current = false;
-    callStartTimeRef.current = null;
-
-    setCallState("idle");
-    setCallPartner(null);
-    setIncomingCall(null);
-  };
-
-  const toggleMute = () => {
-    if (localStream) {
-      localStream.getAudioTracks().forEach((t) => { t.enabled = isMuted; });
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const toggleCamera = () => {
-    if (localStream) {
-      localStream.getVideoTracks().forEach((t) => { t.enabled = isCameraOff; });
-      setIsCameraOff(!isCameraOff);
-    }
-  };
-
-  const toggleScreenShare = async () => {
-    if (!peerConnectionRef.current) return;
-
-    try {
-      if (!isScreenSharing) {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-        screenStreamRef.current = stream;
-
-        const videoTrack = stream.getVideoTracks()[0];
-        const senders = peerConnectionRef.current.getSenders();
-        const videoSender = senders.find((s) => s.track && s.track.kind === "video");
-        if (videoSender) {
-          await videoSender.replaceTrack(videoTrack);
-        } else {
-          peerConnectionRef.current.addTrack(videoTrack, stream);
-        }
-
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-
-        videoTrack.onended = () => {
-          stopScreenShare();
-        };
-
-        setIsScreenSharing(true);
-      } else {
-        stopScreenShare();
-      }
-    } catch (err) {
-      console.error("Screen share error:", err);
-      toast.error("Failed to share screen.");
-    }
-  };
-
-  const stopScreenShare = () => {
-    if (screenStreamRef.current) {
-      screenStreamRef.current.getTracks().forEach((track) => track.stop());
-      screenStreamRef.current = null;
-    }
-
-    const webcamTrack = localStream ? localStream.getVideoTracks()[0] : null;
-    const senders = peerConnectionRef.current ? peerConnectionRef.current.getSenders() : [];
-    const videoSender = senders.find((s) => s.track && s.track.kind === "video");
-
-    if (videoSender) {
-      videoSender.replaceTrack(webcamTrack || null);
-    }
-
-    if (localVideoRef.current) {
-      localVideoRef.current.srcObject = localStream;
-    }
-    setIsScreenSharing(false);
-  };
 
   // ==================================================================
   //  Derived
@@ -1044,14 +748,13 @@ export default function MessagePage() {
                     <div className="empty-chat"><FiMessageSquare size={48} /><p>No messages yet</p></div>
                   ) : (
                     messages.map((msg) => (
-                      <div key={msg._id} className={`message-bubble ${msg.sender?._id === (user?.id || user?._id) ? "sent" : "received"}`}>
+                      <div key={msg._id} className={`message-bubble ${ownMessage(msg) ? "sent" : "received"}`} onClick={e => { if (!e.target.closest("button,a,audio,video,img")) setActionMessage(msg); }} onContextMenu={e => { e.preventDefault(); setActionMessage(msg); }}>
+                        {msg.forwarded && <small>Forwarded</small>}
+                        {msg.replyPreview && <blockquote className="chat-quote"><strong>{msg.replyPreview.senderName}</strong><p>{msg.replyPreview.content}</p></blockquote>}
+                        {msg.deletedAt && <em>This message was deleted</em>}
                         <div className="message-bubble-header">
                           {msg.content ? <div className="message-content">{msg.content}</div> : null}
-                          {msg.sender?._id === (user?.id || user?._id) && (
-                            <button className="msg-delete-btn" onClick={() => handleDeleteMessage(msg._id)} title="Delete message">
-                              <FiTrash2 size={14} />
-                            </button>
-                          )}
+                          <button className="msg-actions-btn" aria-label="Message actions" onClick={() => setActionMessage(msg)}>•••</button>
                         </div>
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className="message-attachments">
@@ -1114,12 +817,7 @@ export default function MessagePage() {
                             })}
                           </div>
                         )}
-                        <div className="msg-reaction-row">
-                          {quickEmojis.map((emoji) => (
-                            <button key={emoji} className="msg-reaction-btn" onClick={() => handleToggleReaction(msg._id, emoji)} title={emoji}>{emoji}</button>
-                          ))}
-                        </div>
-                        <div className="message-time">{new Date(msg.createdAt).toLocaleTimeString()}</div>
+                        <div className="message-time">{msg.editedAt ? "Edited · " : ""}{new Date(msg.createdAt).toLocaleTimeString()} {ownMessage(msg) && <span aria-label={msg.isRead ? "Seen" : "Sent"}>{msg.isRead ? "✓✓ Seen" : "✓ Sent"}</span>}</div>
                       </div>
                     ))
                   )}
@@ -1129,6 +827,7 @@ export default function MessagePage() {
                 {/* Message input */}
                 {!isMessagingLocked && (
                   <div className="message-input-wrapper">
+                    {(replying || editing) && <div className="chat-composer-context"><span>{editing ? "Editing message" : `Replying to ${replying.sender?.name || "message"}`}: {(editing || replying).content || "Attachment"}</span><button onClick={() => { setReplying(null); if (editing) setNewMessage(""); setEditing(null); }}>Cancel</button></div>}
                     {selectedFiles.length > 0 && (
                       <div className="selected-files-preview">
                         {selectedFiles.map((file, idx) => (
@@ -1157,7 +856,7 @@ export default function MessagePage() {
                       <input
                         type="text"
                         value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
+                        onChange={(e) => { setNewMessage(e.target.value); sendId.current = null; }}
                         placeholder="Type a message..."
                       />
                       <button type="submit" disabled={sending || (!newMessage.trim() && selectedFiles.length === 0)}>
@@ -1591,98 +1290,28 @@ export default function MessagePage() {
         </div>
       )}
 
-      {/* ===== Incoming Call Modal ===== */}
-      {callState === "incoming" && incomingCall && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "var(--bg-card)", borderRadius: "24px", padding: "40px", textAlign: "center", maxWidth: "340px", width: "90%", boxShadow: "0 20px 60px rgba(0,0,0,0.4)", border: "1px solid var(--border-color)" }}>
-            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>
-              {incomingCall.callType === "video" ? "📹" : "📞"}
-            </div>
-            <h3 style={{ margin: "0 0 8px", fontSize: "20px" }}>{incomingCall.callerName}</h3>
-            <p style={{ margin: "0 0 28px", color: "var(--text-secondary)", fontSize: "14px" }}>
-              Incoming {incomingCall.callType} call...
-            </p>
-            <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
-              <button onClick={rejectCall} style={{ width: 60, height: 60, borderRadius: "50%", background: "#ef4444", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(239,68,68,0.5)" }}>
-                <FiPhoneOff size={24} />
-              </button>
-              <button onClick={answerCall} style={{ width: 60, height: 60, borderRadius: "50%", background: "#10b981", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(16,185,129,0.5)" }}>
-                <FiPhone size={24} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* ===== Outgoing Call / Active Call Modal ===== */}
-      {(callState === "calling" || callState === "active") && (
-        <div style={{ position: "fixed", inset: 0, background: "#0a0a1a", zIndex: 9998, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          {/* Always mounted audio element for remote audio playback */}
-          <audio ref={remoteAudioRef} autoPlay playsInline style={{ display: "none" }} />
-
-          {/* Video streams */}
-          {callType === "video" && (
-            <div style={{ position: "relative", width: "100%", maxWidth: "900px", height: "70vh", background: "#111", borderRadius: "20px", overflow: "hidden", marginBottom: "24px" }}>
-              <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <video ref={localVideoRef} autoPlay playsInline muted style={{ position: "absolute", bottom: 16, right: 16, width: 160, height: 120, objectFit: "cover", borderRadius: "12px", border: "2px solid rgba(255,255,255,0.3)" }} />
-              {callState === "calling" && (
-                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#fff", background: "rgba(0,0,0,0.6)" }}>
-                  <div style={{ width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, marginBottom: 16 }}>
-                    {callPartner?.name?.charAt(0).toUpperCase() || "?"}
-                  </div>
-                  <h2 style={{ margin: "0 0 8px" }}>{callPartner?.name}</h2>
-                  <p style={{ color: "#3B8DB3", fontWeight: 600,  margin: 0, opacity: 0.7, fontSize: "14px" }}>Calling...</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {callType === "audio" && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "40px", color: "#fff" }}>
-              <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, marginBottom: 20, boxShadow: "0 0 0 20px rgba(99,102,241,0.15), 0 0 0 40px rgba(99,102,241,0.07)" }}>
-                {callPartner?.name?.charAt(0).toUpperCase() || "?"}
-              </div>
-              <h2 style={{ margin: "0 0 8px", fontSize: "24px" }}>{callPartner?.name}</h2>
-              <p style={{ color: "#3B8DB3", fontWeight: 600,  margin: 0, opacity: 0.6, fontSize: "15px" }}>{callState === "calling" ? "Calling..." : "Call in progress"}</p>
-            </div>
-          )}
-
-          {/* Call controls */}
-          <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-            <button onClick={toggleMute} style={{ width: 56, height: 56, borderRadius: "50%", background: isMuted ? "#ef4444" : "rgba(255,255,255,0.15)", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(8px)", transition: "all 0.2s" }} title={isMuted ? "Unmute" : "Mute"}>
-              <FiMic size={22} />
-            </button>
-            {callType === "video" && (
-              <button onClick={toggleCamera} style={{ width: 56, height: 56, borderRadius: "50%", background: isCameraOff ? "#ef4444" : "rgba(255,255,255,0.15)", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(8px)", transition: "all 0.2s" }} title={isCameraOff ? "Turn camera on" : "Turn camera off"}>
-                <FiVideo size={22} />
-              </button>
-            )}
-            <button 
-              onClick={toggleScreenShare} 
-              style={{ 
-                width: 56, 
-                height: 56, 
-                borderRadius: "50%", 
-                background: isScreenSharing ? "#10b981" : "rgba(255,255,255,0.15)", 
-                border: "none", 
-                color: "#fff", 
-                cursor: "pointer", 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center", 
-                backdropFilter: "blur(8px)", 
-                transition: "all 0.2s" 
-              }} 
-              title={isScreenSharing ? "Stop sharing screen" : "Share screen"}
-            >
-              <FiMonitor size={22} />
-            </button>
-            <button onClick={endCall} style={{ width: 68, height: 68, borderRadius: "50%", background: "#ef4444", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 20px rgba(239,68,68,0.6)" }} title="End call">
-              <FiPhoneOff size={28} />
-            </button>
-          </div>
-        </div>
-      )}
+      {actionMessage && <div className="chat-action-backdrop" onClick={() => setActionMessage(null)}>
+        <section className="chat-action-sheet" role="dialog" aria-modal="true" aria-label="Message actions" onClick={e => e.stopPropagation()}>
+          <button onClick={() => setActionMessage(null)} aria-label="Close message actions">Close</button>
+          {!actionMessage.deletedAt && <>
+            <div className="chat-emoji-actions">{quickEmojis.map(emoji => <button key={emoji} onClick={() => { handleToggleReaction(actionMessage._id, emoji); setActionMessage(null); }}>{emoji}</button>)}</div>
+            <button onClick={() => { setReplying(actionMessage); setEditing(null); setActionMessage(null); }}>Reply</button>
+            <button onClick={() => { setForwarding(actionMessage); setForwardTarget(""); setActionMessage(null); }}>Forward</button>
+            {actionMessage.content && <button onClick={async () => { try { await navigator.clipboard.writeText(actionMessage.content); toast.success("Copied"); setActionMessage(null); } catch { toast.error("Could not copy text"); } }}>Copy text</button>}
+            {ownMessage(actionMessage) && <><button onClick={() => { setEditing(actionMessage); setReplying(null); setNewMessage(actionMessage.content); setSelectedFiles([]); setActionMessage(null); }}>Edit</button><button onClick={() => handleDeleteMessage(actionMessage._id)}>Delete for everyone</button></>}
+          </>}
+          <button onClick={() => handleDeleteMessage(actionMessage._id, "me")}>Delete for me</button>
+        </section>
+      </div>}
+      {forwarding && <div className="chat-action-backdrop"><section className="chat-action-sheet" role="dialog" aria-modal="true" aria-label="Forward message">
+        <h3>Forward message</h3><label>Send to <select value={forwardTarget} onChange={e => setForwardTarget(e.target.value)}><option value="">Choose a person</option>{users.map(u => <option key={u._id} value={u._id}>{u.name}</option>)}</select></label>
+        <button disabled={!forwardTarget || sending} onClick={async () => {
+          setSending(true);
+          try { await communityApi.sendMessage({ receiverId: forwardTarget, forwardOf: forwarding._id, clientMessageId: crypto.randomUUID() }); setForwarding(null); toast.success("Message forwarded"); }
+          catch (error) { toast.error(error.response?.data?.error || "Could not forward"); } finally { setSending(false); }
+        }}>Forward</button><button onClick={() => setForwarding(null)}>Cancel</button>
+      </section></div>}
       </div>
     </div>
   );

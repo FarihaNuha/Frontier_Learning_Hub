@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import api, { BACKEND_URL } from "../services/api";
 import { clearAllCache } from "../services/apiCache";
 import toast from "react-hot-toast";
+import { setChatNotificationContext } from "../services/chatNotifications";
 import { io } from "socket.io-client";
 import { showNativeNotification, isNativePlatform, syncNativePushToken, disconnectNativePushToken } from "../services/nativeBridge";
 
@@ -185,6 +186,7 @@ export function AuthProvider({ children }) {
       if (deviceToken) localStorage.setItem("fcm_token", deviceToken);
       sessionStorage.clear();
     } catch (e) {}
+    await setChatNotificationContext();
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
 
@@ -219,11 +221,12 @@ export function AuthProvider({ children }) {
     const handleNewNotification = (data) => {
       if (!data) return;
       console.log("🔔 [newNotification] socket event received:", data);
+      if (data.type === "chat_message") return; // The private-message event owns chat toasts.
       const title = data.title || "UniCore Notification";
       const body = data.message || data.body || "";
       const link = data.link || "/notifications";
 
-      showNativeNotification({
+      if (!isNativePlatform()) showNativeNotification({
         title,
         body,
         link,
@@ -249,7 +252,7 @@ export function AuthProvider({ children }) {
       const body = notif.message || notif.body || "";
       const link = notif.link || "/notices";
 
-      showNativeNotification({
+      if (!isNativePlatform()) showNativeNotification({
         title,
         body,
         link,
@@ -270,6 +273,7 @@ export function AuthProvider({ children }) {
       const currentUserId = user?._id || user?.id;
       const senderId = msg.sender?._id || msg.sender;
       if (String(senderId) === String(currentUserId)) return;
+      if (document.visibilityState === "visible" && window.location.pathname === `/community/messages/${senderId}`) return;
 
       const senderName = msg.sender?.name || "Direct Message";
       const content = msg.content || (msg.attachments?.length ? "Sent an attachment" : "Sent a message");
@@ -294,7 +298,7 @@ export function AuthProvider({ children }) {
       const callerName = data.callerName || "Someone";
       const callType = data.callType || "audio";
 
-      showNativeNotification({
+      if (!isNativePlatform()) showNativeNotification({
         title: `📞 Incoming Call from ${callerName}`,
         body: `Incoming ${callType} call. Tap to answer now.`,
         link: "/community/messages",
@@ -311,7 +315,7 @@ export function AuthProvider({ children }) {
     // 5. Mentorship Contact Requests
     const handleContactRequest = (request) => {
       if (!request) return;
-      showNativeNotification({
+      if (!isNativePlatform()) showNativeNotification({
         title: "🤝 New Mentorship Request",
         body: "A student sent you a mentorship contact request.",
         link: "/community/messages",
@@ -324,7 +328,7 @@ export function AuthProvider({ children }) {
     const handleContactRequestResponse = (request) => {
       if (!request) return;
       const status = request.status === "approved" ? "Approved" : "Updated";
-      showNativeNotification({
+      if (!isNativePlatform()) showNativeNotification({
         title: `🤝 Contact Request ${status}`,
         body: `Your teacher has responded to your contact request.`,
         link: "/community/messages",
@@ -337,7 +341,7 @@ export function AuthProvider({ children }) {
     const handleNewNotice = (data) => {
       if (!data || !data.notice) return;
       const notice = data.notice;
-      showNativeNotification({
+      if (!isNativePlatform()) showNativeNotification({
         title: `📌 Notice: ${notice.title}`,
         body: notice.content ? (notice.content.slice(0, 100) + "...") : "New campus notice published",
         link: "/notices",

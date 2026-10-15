@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const { verifyToken } = require("../middleware/authMiddleware");
 const ctrl = require("../controllers/communityController");
+const messages = require("../controllers/messageActions");
+router.get("/calls/config", verifyToken, require("../controllers/callConfig").getCallConfig);
+router.post("/calls/:callId/decline", require("../controllers/callActions").declineCall);
 const upload = require("../middleware/upload");
 
 // Public Community Routes
@@ -60,8 +63,9 @@ router.post("/messages", verifyToken, upload.array("files"), ctrl.sendMessage);
 router.get("/inbox", verifyToken, ctrl.getInbox);
 router.get("/conversation/:userId", verifyToken, ctrl.getConversation);
 router.get("/users", verifyToken, ctrl.getUsers);
-router.delete("/messages/:messageId", verifyToken, ctrl.deleteMessage);
-router.post("/messages/:messageId/react", verifyToken, ctrl.toggleReaction);
+router.delete("/messages/:messageId", verifyToken, messages.deleteMessage);
+router.patch("/messages/:messageId", verifyToken, messages.editMessage);
+router.post("/messages/:messageId/react", verifyToken, messages.toggleReaction);
 
 // Student-Teacher Contact Requests
 router.post("/contact-requests", verifyToken, ctrl.createContactRequest);

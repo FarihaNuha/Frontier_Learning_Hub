@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
   // Retain legacy registrations while supporting every signed-in phone.
   fcmToken: { type: String, select: false },
   fcmTokens: { type: [String], default: [], select: false },
+  nativeNotificationTokens: { type: [String], default: [], select: false },
   isBlocked: {
     type: Boolean,
     default: false,

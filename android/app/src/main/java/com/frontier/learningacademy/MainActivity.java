@@ -15,8 +15,12 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(UniCoreFilesPlugin.class);
+        registerPlugin(UniCoreNotificationsPlugin.class);
+        registerPlugin(UniCoreCallsPlugin.class);
+        registerPlugin(UniCoreScreenSharePlugin.class);
         super.onCreate(savedInstanceState);
         createNotificationChannel();
+        UniCoreCallNotifications.channels(this);
         configureWebView();
     }
 
@@ -59,4 +63,7 @@ public class MainActivity extends BridgeActivity {
             e.printStackTrace();
         }
     }
+
+    @Override public void onResume() { super.onResume(); UniCoreNotifications.foreground = true; }
+    @Override public void onPause() { UniCoreNotifications.foreground = false; super.onPause(); }
 }

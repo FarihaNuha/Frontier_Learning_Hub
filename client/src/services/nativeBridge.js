@@ -4,6 +4,7 @@ import { StatusBar, Style } from "@capacitor/status-bar";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import api from "./api";
+import { notificationMode, setChatNotificationContext } from "./chatNotifications";
 
 const CHANNEL_ID = "unicore_messages_channel";
 const STATUS_EVENT = "unicore-notifications-changed";
@@ -130,7 +131,9 @@ export const syncNativePushToken = async ({ force = false } = {}) => {
   }
   syncPromise = (async () => {
     try {
-      const { data } = await api.post("/auth/fcm-token", { fcmToken: token }, { timeout: 10000 });
+      await setChatNotificationContext();
+      const mode = await notificationMode();
+      const { data } = await api.post("/auth/fcm-token", { fcmToken: token, notificationMode: mode }, { timeout: 60000 });
       if (localStorage.getItem("token") !== auth) return false;
       syncedKey = key;
       updateStatus({ synced: true, serverConfigured: data.push?.configured ?? null,
@@ -166,6 +169,7 @@ const installNotificationListeners = async () => {
     updateStatus({ registered: false, error: "This phone could not register for notifications. Check Google Play services and retry." });
   });
   await addListenerOnce("pushReceived", PushNotifications, "pushNotificationReceived", (notification) => {
+    if (notification.data?.nativeHandled === "true") return;
     const currentUser = JSON.parse(localStorage.getItem("user") || "null");
     if (!localStorage.getItem("token")) return;
     if (notification.data?.recipientId && notification.data.recipientId !== String(currentUser?.id || currentUser?._id)) return;

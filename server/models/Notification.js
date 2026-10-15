@@ -35,6 +35,7 @@ const notificationSchema = new mongoose.Schema({
     required: true,
   },
   link: String,
+  pushData: { type: mongoose.Schema.Types.Mixed, select: false },
   isRead: {
     type: Boolean,
     default: false,
@@ -56,7 +57,7 @@ const dispatchPush = async (doc) => {
     await sendUserPushNotification(doc.userId, {
       title: doc.title,
       body: doc.message,
-      data: { notificationId: String(doc._id), type: doc.type || "general" },
+      data: { ...doc.pushData, notificationId: String(doc._id), type: doc.type || "general" },
       link: doc.link || "/notifications",
     });
   } catch (error) {

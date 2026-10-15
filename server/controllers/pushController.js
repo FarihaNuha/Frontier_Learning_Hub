@@ -11,6 +11,10 @@ exports.saveFcmToken = async (req, res) => {
     await User.updateMany({ _id: { $ne: req.user.uid } }, { $pull: { fcmTokens: fcmToken } });
     await User.updateMany({ fcmToken }, { $unset: { fcmToken: "" } });
     await User.updateOne({ _id: req.user.uid }, { $addToSet: { fcmTokens: fcmToken } });
+    await User.updateMany({ _id: { $ne: req.user.uid } }, { $pull: { nativeNotificationTokens: fcmToken } });
+    await User.updateOne({ _id: req.user.uid }, req.body.notificationMode === "native-v2"
+      ? { $addToSet: { nativeNotificationTokens: fcmToken } }
+      : { $pull: { nativeNotificationTokens: fcmToken } });
     res.json({ success: true, push: getFCMStatus() });
   } catch (error) {
     res.status(500).json({ error: "Could not register this phone for notifications." });
@@ -23,6 +27,7 @@ exports.removeFcmToken = async (req, res) => {
   try {
     await User.updateOne({ _id: req.user.uid }, { $pull: { fcmTokens: fcmToken } });
     await User.updateOne({ _id: req.user.uid, fcmToken }, { $unset: { fcmToken: "" } });
+    await User.updateOne({ _id: req.user.uid }, { $pull: { nativeNotificationTokens: fcmToken } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Could not disconnect this phone's notifications." });
@@ -36,7 +41,7 @@ exports.testPushNotification = async (req, res) => {
   const { fcmToken } = req.body;
   if (!validToken(fcmToken)) return res.status(400).json({ error: "Enable notifications on this phone first." });
   try {
-    const user = await User.findById(req.user.uid).select("+fcmTokens +fcmToken");
+    const user = await User.findById(req.user.uid).select("+fcmTokens +fcmToken +nativeNotificationTokens");
     if (!getUserTokens(user).includes(fcmToken)) {
       return res.status(403).json({ error: "This phone is not registered to your account." });
     }
@@ -50,6 +55,7 @@ exports.testPushNotification = async (req, res) => {
       link: "/settings",
       data: { notificationId: `test:${now}`, type: "test", recipientId: req.user.uid },
       ttl: 60000,
+      native: user.nativeNotificationTokens?.includes(fcmToken),
     });
     if (!result.success) return res.status(503).json({ error: "App notifications could not be sent. Please contact the administrator.", code: result.code });
     res.json({ success: true, message: "Test sent. Check your phone's notification panel." });

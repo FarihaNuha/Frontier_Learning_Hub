@@ -41,7 +41,8 @@ export const communityApi = {
   getInbox: () => api.get("/community/inbox"),
   getConversation: (userId) => api.get(`/community/conversation/${userId}`),
   getUsers: (params) => api.get("/community/users", { params }),
-  deleteMessage: (messageId) => api.delete(`/community/messages/${messageId}`),
+  deleteMessage: (messageId, scope = "everyone") => api.delete(`/community/messages/${messageId}`, { params: { scope } }),
+  editMessage: (messageId, content) => api.patch(`/community/messages/${messageId}`, { content }),
   toggleReaction: (messageId, emoji) => api.post(`/community/messages/${messageId}/react`, { emoji }),
 
   // Student-Teacher Contact Requests

@@ -43,12 +43,20 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Build Web Application Bundle
+        # Notification, message and call tests use isolated adapters; no live users.
         working-directory: ./client
         run: npm run build
         env:
           CI: "false"
           DISABLE_ESLINT_PLUGIN: "true"
           GENERATE_SOURCEMAP: "false"
+
+      - name: Test Notification, Chat and Call Flows
+        run: |
+          npm --prefix server ci
+          npm --prefix server run test-push
+          npm --prefix server run test-chat
+          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -121,21 +129,24 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.1.0-apk
-          name: UniCore Mobile App v1.1.0 (Android test APK)
+          tag_name: v1.2.0-apk
+          name: UniCore Mobile App v1.2.0 (Android test APK)
           body: |
-            UniCore Android 1.1.0 includes Android 13 notification permission handling,
-            device registration, notification settings and a self-test button.
-            It also includes native file saving/sharing, printing, camera/microphone
-            permissions and bundled app screens with an offline connection notice.
+            UniCore Android 1.2.0 groups unread messages by conversation and removes
+            duplicate socket/FCM phone alerts. Tap a message or its menu for reply,
+            forward, reactions, copy, edit, delete for me or delete for everyone.
+            Read receipts sync across signed-in devices.
 
-            Install the updated APK and sign in, then open Settings > App notifications
-            to enable notifications and send a test to your own phone. The updated
-            backend must be deployed for device registration and push delivery.
+            Incoming audio/video calls now have a global call screen, queued ICE
+            candidates, busy checks, answer/decline, timeout and media cleanup.
+            Android includes native incoming-call Answer/Decline and screen sharing
+            with a system capture permission dialog. Android controls full-screen UI.
+            Reliable calls across restricted networks still require a configured
+            TURN relay. Calls are not a native foreground calling service.
 
-            App screens are bundled: frontend changes require a new APK installation.
-            This is a debug-signed test build. Delivery and calls need device testing;
-            full native incoming-call ringing/answer controls are not included.
+            Install this APK on both phones and sign in. In Settings > App notifications,
+            tap Enable / reconnect notifications to register the new native renderer.
+            This is a debug-signed test build; frontend changes require a new APK.
           files: release-output/UniCore-app.apk
           draft: false
           prerelease: false

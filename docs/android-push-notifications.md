@@ -1,5 +1,7 @@
 # Android app notifications
 
+For 1.2.0 grouping, message actions and call changes, see [chat-and-calls.md](chat-and-calls.md).
+
 Email and Android push use independent delivery services. Email arriving does not
 confirm that a phone registered with Firebase Cloud Messaging (FCM).
 
@@ -76,7 +78,7 @@ email. A device test and live backend configuration check remain necessary.
 
 The build script requires Java 21 and Android SDK 35, builds bundled web assets,
 syncs Capacitor, and runs `assembleDebug testDebugUnitTest`. It writes
-`release-output/UniCore-1.1.0-debug.apk`. A different debug signing key from an
+`release-output/UniCore-1.2.0-debug.apk`. A different debug signing key from an
 older APK can prevent updating it in place. Preserve any needed local data before
 uninstalling an older build. Production distribution needs a stable signing key.
 

@@ -32,7 +32,7 @@ const initFCM = () => {
 const getFCMStatus = () => ({ configured: initFCM(), error: initializationError || null });
 
 // A notification payload lets Android display alerts even when the WebView is asleep.
-const sendPushNotification = async (token, { title, body, data = {}, link = "", ttl }) => {
+const sendPushNotification = async (token, { title, body, data = {}, link = "", ttl, native = false, control = false, urgent = false }) => {
   if (!token) return { success: false, code: "missing_device_token" };
   if (!initFCM()) {
     console.error(`[Push] Not sent: ${initializationError}. Configure Firebase on the backend.`);
@@ -42,22 +42,23 @@ const sendPushNotification = async (token, { title, body, data = {}, link = "", 
     Object.entries(data).filter(([, value]) => value != null).map(([key, value]) => [key, String(value)]),
   );
   if (link) stringData.link = String(link);
+  if (native) Object.assign(stringData, { nativeHandled: "true", title: title || "UniCore", body: body || "" });
   try {
     const messageId = await getMessaging(firebaseApp).send({
       token,
-      notification: { title: title || "UniCore", body: body || "" },
+      ...(!native ? { notification: { title: title || "UniCore", body: body || "" } } : {}),
       data: stringData,
       android: {
-        priority: "high",
+        priority: control && !urgent ? "normal" : "high",
         ...(ttl != null ? { ttl } : {}),
-        notification: {
+        ...(!native ? { notification: {
           sound: "default",
           channelId: "unicore_messages_channel",
           icon: "ic_stat_unicore",
           color: "#2C4B66",
           priority: "high",
-          ...(stringData.notificationId ? { tag: stringData.notificationId } : {}),
-        },
+          ...(stringData.threadId || stringData.notificationId ? { tag: stringData.threadId || stringData.notificationId } : {}),
+        } } : {}),
       },
     });
     // FCM acceptance is not a device delivery receipt.
@@ -73,11 +74,12 @@ const getUserTokens = (user) => [...new Set([...(user?.fcmTokens || []), user?.f
 
 const sendUserPushNotification = async (userId, payload) => {
   const User = require("../models/User");
-  const user = await User.findById(userId).select("+fcmTokens +fcmToken");
-  const tokens = getUserTokens(user);
+  const user = await User.findById(userId).select("+fcmTokens +fcmToken +nativeNotificationTokens");
+  const tokens = getUserTokens(user).filter(token => !payload.control || user.nativeNotificationTokens?.includes(token));
   const results = await Promise.all(tokens.map(async (token) => {
     const result = await sendPushNotification(token, {
       ...payload,
+      native: user.nativeNotificationTokens?.includes(token),
       data: { ...payload.data, recipientId: String(userId) },
     });
     if (["messaging/registration-token-not-registered", "messaging/invalid-registration-token"].includes(result.code)) {

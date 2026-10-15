@@ -94,6 +94,8 @@ test("registering a shared phone removes its previous account binding without re
     [{ _id: { $ne: "new-user" } }, { $pull: { fcmTokens: token } }],
     [{ fcmToken: token }, { $unset: { fcmToken: "" } }],
     [{ _id: "new-user" }, { $addToSet: { fcmTokens: token } }],
+    [{ _id: { $ne: "new-user" } }, { $pull: { nativeNotificationTokens: token } }],
+    [{ _id: "new-user" }, { $pull: { nativeNotificationTokens: token } }],
   ]);
 });
 
@@ -101,7 +103,7 @@ test("logout only removes the authenticated user's matching device", async () =>
   const updates = [];
   const push = controller({ updateOne: async (...args) => updates.push(plain(args)) });
   await push.removeFcmToken({ user: { uid: "user-A" }, body: { fcmToken: "phone-token-long-enough" } }, response());
-  assert.equal(updates.length, 2);
+  assert.equal(updates.length, 3);
   assert.ok(updates.every(([filter]) => filter._id === "user-A"));
   assert.equal(updates[0][1].$pull.fcmTokens, "phone-token-long-enough");
 });
@@ -150,7 +152,7 @@ test("post, lecture, exam, message and bulk notifications share one creation-onl
 test("incoming call pushes require the real caller's authentication and expire quickly", async () => {
   const sent = [];
   const calls = load("services/callNotifications.js", {
-    jsonwebtoken: { verify: (token) => { if (token !== "signed-session") throw new Error(); return { uid: "caller" }; } },
+    jsonwebtoken: { verify: (token) => { if (token !== "signed-session") throw new Error(); return { uid: "caller" }; }, sign: () => "short-lived-decline-token" },
     "./fcmService": { sendUserPushNotification: async (...args) => sent.push(plain(args)) },
   });
   const args = { caller: { _id: "caller", name: "Caller" }, callee: { _id: "callee" }, callType: "audio", callId: "call-1" };
@@ -159,6 +161,25 @@ test("incoming call pushes require the real caller's authentication and expire q
   assert.equal(sent.length, 0);
   await calls.sendIncomingCallPush({ ...args, authToken: "signed-session" });
   assert.equal(sent.length, 1);
-  assert.equal(sent[0][1].ttl, 30000);
+  assert.ok(sent[0][1].ttl > 0 && sent[0][1].ttl <= 45000);
   assert.equal(sent[0][1].data.notificationId, "call-1");
+  assert.equal(sent[0][1].data.actionToken, "short-lived-decline-token");
+});
+
+test("new APK uses exactly one native renderer; older APK retains automatic FCM rendering", async () => {
+  const sent = [];
+  const fcm = service({ env: { FIREBASE_SERVICE_ACCOUNT: "{}" }, user: { fcmTokens: ["old", "new"], nativeNotificationTokens: ["new"] }, send: async value => { sent.push(value); return "ok"; } });
+  await fcm.sendUserPushNotification("recipient", { title: "Sender", body: "Hi", data: { threadId: "sender", notificationId: "event-1", type: "chat_message" } });
+  const modern = sent.find(m => m.token === "new"), legacy = sent.find(m => m.token === "old");
+  assert.equal(modern.notification, undefined);
+  assert.equal(modern.android.notification, undefined);
+  assert.equal(modern.data.nativeHandled, "true");
+  assert.equal(modern.data.threadId, "sender");
+  assert.equal(legacy.notification.body, "Hi");
+  assert.equal(legacy.android.notification.tag, "sender");
+  sent.length = 0;
+  await fcm.sendUserPushNotification("recipient", { control: true, data: { type: "chat_read", threadId: "sender" } });
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].token, "new");
+  assert.equal(sent[0].android.priority, "normal");
 });

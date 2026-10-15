@@ -13,6 +13,10 @@ jobs:
   build:
     name: Build Android APK
     runs-on: ubuntu-latest
+    env:
+      npm_config_fetch_retries: "5"
+      npm_config_fetch_retry_mintimeout: "20000"
+      npm_config_fetch_retry_maxtimeout: "120000"
 
     steps:
       - name: Checkout Repository
@@ -36,11 +40,17 @@ jobs:
           node-version: '22'
 
       - name: Install Root Dependencies
-        run: npm install --legacy-peer-deps
+        # Client dependencies are installed explicitly in the next step.
+        run: npm ci --ignore-scripts --legacy-peer-deps
 
       - name: Install Client Dependencies
         working-directory: ./client
-        run: npm install --legacy-peer-deps
+        run: |
+          for attempt in 1 2 3; do
+            npm ci --legacy-peer-deps && break
+            if [ "$attempt" -eq 3 ]; then exit 1; fi
+            sleep 5
+          done
 
       - name: Build Web Application Bundle
         # Notification, message and call tests use isolated adapters; no live users.

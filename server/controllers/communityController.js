@@ -779,7 +779,8 @@ exports.sendMessage = async (req, res) => {
       const notification = await Notification.create({
         userId: receiverId,
         title: senderName,
-        pushData: { threadId: String(req.user.uid), senderName, messageId: String(message._id), timestamp: String(new Date(message.createdAt).getTime()) },
+        pushData: { threadId: String(req.user.uid), senderName, messageId: String(message._id), timestamp: String(new Date(message.createdAt).getTime()),
+          chatActionToken: require("../services/chatNotificationActions").createActionToken(receiverId, req.user.uid, message._id) },
         message: messageContent.slice(0, 500),
         type: "chat_message",
         link: msgLink,

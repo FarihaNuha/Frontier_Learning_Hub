@@ -15,6 +15,7 @@
             android:excludeFromRecents="true" android:showWhenLocked="true" android:turnScreenOn="true"
             android:theme="@style/AppTheme.NoActionBar" />
         <receiver android:name=".CallActionReceiver" android:exported="false" />
+        <receiver android:name=".ChatActionReceiver" android:exported="false" />
         <service android:name=".ScreenShareService" android:exported="false" android:foregroundServiceType="mediaProjection" />
         <service android:name="com.capacitorjs.plugins.pushnotifications.MessagingService" tools:node="remove" />
         <service android:name=".UniCoreMessagingService" android:exported="false">

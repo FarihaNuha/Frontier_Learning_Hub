@@ -27,6 +27,8 @@ try {
     }
     if ($LASTEXITCODE) { throw 'Android build failed.' }
     New-Item -ItemType Directory -Path 'release-output' -Force | Out-Null
-    Copy-Item -LiteralPath 'android/app/build/outputs/apk/debug/app-debug.apk' -Destination 'release-output/UniCore-1.2.0-debug.apk' -Force
-    Write-Output (Join-Path $projectRoot 'release-output/UniCore-1.2.0-debug.apk')
+    $appVersion = [regex]::Match((Get-Content 'android/app/build.gradle' -Raw), 'versionName\s+"([^"]+)"').Groups[1].Value
+    $output = "release-output/UniCore-$appVersion-debug.apk"
+    Copy-Item -LiteralPath 'android/app/build/outputs/apk/debug/app-debug.apk' -Destination $output -Force
+    Write-Output (Join-Path $projectRoot $output)
 } finally { Pop-Location }

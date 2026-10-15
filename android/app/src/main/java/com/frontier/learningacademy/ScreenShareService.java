@@ -42,7 +42,7 @@ public class ScreenShareService extends Service {
                 new NotificationChannel("unicore_screen_share", "Screen sharing", NotificationManager.IMPORTANCE_LOW));
             PendingIntent stop = PendingIntent.getService(this, 0, new Intent(this, ScreenShareService.class).setAction("stop"), PendingIntent.FLAG_IMMUTABLE);
             Notification notification = new NotificationCompat.Builder(this, "unicore_screen_share")
-                .setSmallIcon(R.drawable.ic_stat_unicore).setContentTitle("You are sharing your screen")
+                .setSmallIcon(R.drawable.ic_stat_unicore).setLargeIcon(UniCoreNotifications.logo(this)).setColor(0xff123463).setContentTitle("You are sharing your screen")
                 .setContentText("Return to UniCore or tap Stop sharing to finish.").setOngoing(true)
                 .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE))
                 .addAction(R.drawable.ic_stat_unicore, "Stop sharing", stop).build();

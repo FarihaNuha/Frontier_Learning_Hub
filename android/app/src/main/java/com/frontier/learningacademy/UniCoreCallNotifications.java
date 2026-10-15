@@ -60,9 +60,10 @@ final class UniCoreCallNotifications {
                 intent(context, MainActivity.class, data, "answer").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP), flags);
             PendingIntent decline = PendingIntent.getBroadcast(context, 0,
                 intent(context, CallActionReceiver.class, data, "decline"), flags);
-            Person caller = new Person.Builder().setName(data.getOrDefault("callerName", "UniCore caller")).setImportant(true).build();
+            Person caller = new Person.Builder().setName(data.getOrDefault("callerName", "UniCore caller")).setImportant(true)
+                .setIcon(androidx.core.graphics.drawable.IconCompat.createWithBitmap(UniCoreNotifications.logo(context))).build();
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL)
-                .setSmallIcon(R.drawable.ic_stat_unicore).setContentTitle(caller.getName())
+                .setSmallIcon(R.drawable.ic_stat_unicore).setLargeIcon(UniCoreNotifications.logo(context)).setColor(0xff123463).setContentTitle(caller.getName())
                 .setContentText("Incoming " + data.getOrDefault("callType", "audio") + " call")
                 .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, decline, answer))
                 .setCategory(NotificationCompat.CATEGORY_CALL).setPriority(NotificationCompat.PRIORITY_MAX)

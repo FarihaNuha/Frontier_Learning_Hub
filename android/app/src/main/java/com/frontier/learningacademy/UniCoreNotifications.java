@@ -15,6 +15,9 @@ import java.util.Map;
 
 // One renderer for foreground/background FCM. Persist event IDs across process restarts.
 final class UniCoreNotifications {
+    static android.graphics.Bitmap logo(Context context) {
+        return android.graphics.BitmapFactory.decodeResource(context.getResources(), R.drawable.unicore_logo);
+    }
     static volatile boolean foreground;
     static volatile String activeThread = "";
     static SharedPreferences prefs(Context context) { return context.getSharedPreferences("unicore_notifications", Context.MODE_PRIVATE); }
@@ -23,6 +26,9 @@ final class UniCoreNotifications {
         SharedPreferences p = prefs(context);
         if (!owner.equals(p.getString("owner", ""))) {
             NotificationManagerCompat.from(context).cancelAll();
+            java.util.List<String> shortcuts = new java.util.ArrayList<>();
+            for (String key : p.getAll().keySet()) if (key.startsWith("thread:")) shortcuts.add("chat:" + key.substring(7));
+            androidx.core.content.pm.ShortcutManagerCompat.removeLongLivedShortcuts(context, shortcuts);
             p.edit().clear().putString("owner", owner).apply();
             activeThread = "";
         }
@@ -42,7 +48,9 @@ final class UniCoreNotifications {
                 p.edit().remove("thread:" + thread).apply();
                 NotificationManagerCompat.from(context).cancel("chat:" + thread, id(thread));
             } else {
-                history.put("messages", remaining).put("count", remaining.length());
+                int unread = 0;
+                for (int i = 0; i < remaining.length(); i++) if (!remaining.getJSONObject(i).optBoolean("outgoing")) unread++;
+                history.put("messages", remaining).put("count", unread);
                 p.edit().putString("thread:" + thread, history.toString()).apply();
                 renderThread(context, thread, history, false);
             }
@@ -53,21 +61,86 @@ final class UniCoreNotifications {
             .setData(Uri.parse("unicore://" + link)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(context, id(key), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
+    static synchronized void dismiss(Context context, String thread) {
+        try {
+            JSONObject history = new JSONObject(prefs(context).getString("thread:" + thread, "{}"));
+            history.put("dismissed", true);
+            prefs(context).edit().putString("thread:" + thread, history.toString()).apply();
+            NotificationManagerCompat.from(context).cancel("chat:" + thread, id(thread));
+        } catch (Exception ignored) { }
+    }
+    static synchronized void actionStatus(Context context, String thread, String status) {
+        try {
+            JSONObject history = new JSONObject(prefs(context).getString("thread:" + thread, "{}"));
+            if (!history.has("messages")) return;
+            history.put("status", status);
+            prefs(context).edit().putString("thread:" + thread, history.toString()).apply();
+            if (!history.optBoolean("dismissed")) renderThread(context, thread, history, false);
+        } catch (Exception ignored) { }
+    }
+    static synchronized void actionComplete(Context context, String thread, String action, String text, String operation) {
+        try {
+            JSONObject history = new JSONObject(prefs(context).getString("thread:" + thread, "{}"));
+            JSONArray messages = history.optJSONArray("messages");
+            if (messages == null) return;
+            if ("reply".equals(action)) {
+                for (int i = 0; i < messages.length(); i++) if (operation.equals(messages.getJSONObject(i).optString("operation"))) return;
+                messages.put(new JSONObject().put("text", text).put("time", System.currentTimeMillis()).put("outgoing", true).put("operation", operation));
+            }
+            history.put("status", "like".equals(action) ? "Liked 👍" : "Reply sent");
+            prefs(context).edit().putString("thread:" + thread, history.toString()).apply();
+            if (!history.optBoolean("dismissed")) renderThread(context, thread, history, false);
+        } catch (Exception ignored) { }
+    }
+    private static PendingIntent action(Context context, String thread, JSONObject history, String action) {
+        String messageId = history.optString("messageId");
+        Intent intent = new Intent(context, ChatActionReceiver.class).setAction(action)
+            .setData(Uri.parse("unicore-chat-action://" + thread + "/" + messageId + "/" + action))
+            .putExtra("thread", thread).putExtra("owner", prefs(context).getString("owner", ""))
+            .putExtra("messageId", messageId).putExtra("token", history.optString("actionToken"));
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if ("reply".equals(action)) {
+            if (android.os.Build.VERSION.SDK_INT >= 31) flags |= PendingIntent.FLAG_MUTABLE;
+        } else flags |= PendingIntent.FLAG_IMMUTABLE;
+        return PendingIntent.getBroadcast(context, id(thread + action), intent, flags);
+    }
     private static void renderThread(Context context, String thread, JSONObject history, boolean alert) throws Exception {
         JSONArray messages = history.getJSONArray("messages");
         java.util.List<JSONObject> ordered = new java.util.ArrayList<>();
         for (int i = 0; i < messages.length(); i++) ordered.add(messages.getJSONObject(i));
         ordered.sort((a, b) -> Long.compare(a.optLong("time"), b.optLong("time")));
-        Person sender = new Person.Builder().setName(history.optString("sender", "Message")).setKey(thread).build();
+        Person sender = new Person.Builder().setName(history.optString("sender", "Message")).setKey(thread)
+            .setIcon(androidx.core.graphics.drawable.IconCompat.createWithBitmap(logo(context))).build();
         NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(new Person.Builder().setName("You").build());
-        for (JSONObject item : ordered) style.addMessage(item.optString("text"), item.optLong("time"), sender);
+        style.setGroupConversation(false);
+        // Android's MessagingStyle retains at most 25 messages, displayed oldest to newest.
+        for (JSONObject item : ordered.subList(Math.max(0, ordered.size() - 25), ordered.size()))
+            style.addMessage(item.optString("text"), item.optLong("time"), item.optBoolean("outgoing") ? (Person)null : sender);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "unicore_messages_channel")
-            .setSmallIcon(R.drawable.ic_stat_unicore).setContentTitle(history.optString("sender", "Message"))
+            .setSmallIcon(R.drawable.ic_stat_unicore).setLargeIcon(logo(context)).setColor(0xff123463).setContentTitle(history.optString("sender", "Message"))
             .setContentText(ordered.get(ordered.size() - 1).optString("text")).setStyle(style)
             .setContentIntent(tap(context, thread, history.optString("link", "/community/messages")))
-            .setAutoCancel(true).setNumber(history.optInt("count")).setSubText(history.optInt("count") + " unread messages")
+            .setAutoCancel(true).setNumber(history.optInt("count")).setSubText(history.optInt("count") + " unread · " + history.optString("status", "Expand to view messages"))
+            .setDeleteIntent(action(context, thread, history, "dismiss"))
             .setCategory(NotificationCompat.CATEGORY_MESSAGE).setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setSilent(!alert);
+        // Conversation metadata lets Android 11+ recognize this as a chat notification.
+        String shortcutId = "chat:" + thread;
+        Intent chatIntent = new Intent(context, MainActivity.class).setAction(Intent.ACTION_VIEW)
+            .setData(Uri.parse("unicore://" + history.optString("link", "/community/messages")));
+        androidx.core.content.pm.ShortcutInfoCompat shortcut = new androidx.core.content.pm.ShortcutInfoCompat.Builder(context, shortcutId)
+            .setShortLabel(history.optString("sender", "Message")).setIntent(chatIntent).setPerson(sender)
+            .setLongLived(true).setIcon(androidx.core.graphics.drawable.IconCompat.createWithBitmap(logo(context))).build();
+        androidx.core.content.pm.ShortcutManagerCompat.pushDynamicShortcut(context, shortcut);
+        builder.setShortcutId(shortcutId);
+        if (!history.optString("actionToken").isEmpty()) {
+            androidx.core.app.RemoteInput input = new androidx.core.app.RemoteInput.Builder(ChatActionReceiver.REPLY).setLabel("Reply…").build();
+            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_stat_unicore, "Reply", action(context, thread, history, "reply"))
+                .addRemoteInput(input).setAllowGeneratedReplies(true).setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).build());
+            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_stat_unicore, "Like 👍", action(context, thread, history, "like"))
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_THUMBS_UP).build());
+        }
+        builder.addAction(R.drawable.ic_stat_unicore, "Dismiss", action(context, thread, history, "dismiss"));
         if (alert) builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         NotificationManagerCompat.from(context).notify("chat:" + thread, id(thread), builder.build());
     }
@@ -99,7 +172,7 @@ final class UniCoreNotifications {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent tap = PendingIntent.getActivity(context, id(key), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "unicore_messages_channel")
-                .setSmallIcon(R.drawable.ic_stat_unicore).setContentTitle(data.getOrDefault("title", "UniCore"))
+                .setSmallIcon(R.drawable.ic_stat_unicore).setLargeIcon(logo(context)).setColor(0xff123463).setContentTitle(data.getOrDefault("title", "UniCore"))
                 .setContentText(data.getOrDefault("body", "")).setContentIntent(tap).setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH).setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
@@ -109,9 +182,12 @@ final class UniCoreNotifications {
                 if (messages == null) messages = new JSONArray();
                 messages.put(new JSONObject().put("text", data.getOrDefault("body", "")).put("time", time));
                 JSONArray limited = new JSONArray();
-                for (int i = Math.max(0, messages.length() - 20); i < messages.length(); i++) limited.put(messages.getJSONObject(i));
+                for (int i = Math.max(0, messages.length() - 100); i < messages.length(); i++) limited.put(messages.getJSONObject(i));
                 history.put("messages", limited).put("count", history.optInt("count", 0) + 1)
-                    .put("sender", data.getOrDefault("senderName", "Message")).put("link", link);
+                    .put("sender", data.getOrDefault("senderName", "Message")).put("link", link).put("dismissed", false).remove("status");
+                // Late deliveries belong in history but must not change Like/Reply's target.
+                if (time >= history.optLong("actionTime")) history.put("actionTime", time).put("messageId", event)
+                    .put("actionToken", data.getOrDefault("chatActionToken", ""));
                 p.edit().putString("thread:" + thread, history.toString()).apply();
                 renderThread(context, thread, history, true);
                 return;

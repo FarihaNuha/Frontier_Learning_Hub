@@ -1,6 +1,6 @@
-# Android chat 1.2.0
+# Android chat 1.3.0
 
-Install the 1.2.0 APK on both phones. Sign in and use Settings > App notifications
+Install the 1.3.0 APK on both phones. Sign in and use Settings > App notifications
 > Enable / reconnect notifications. New registrations advertise `native-v2`;
 older APKs retain the previous visible Firebase payload until they are upgraded.
 
@@ -12,12 +12,32 @@ Data messages use high priority and display immediately in native code, even
 when the WebView is not running (Android force-stop still blocks delivery).
 
 Unread messages from each sender share one stable notification. Android
-MessagingStyle shows the recent 20 previews and an unread count. Android decides
+MessagingStyle supplies the recent 25 previews in time order and an unread count,
+with a conversation shortcut for Android's conversation section. Native storage
+retains up to 100 recent previews, including sent inline replies. Android decides
 how many lines fit on screen. Event/message IDs are deduplicated across restarts;
 reading a conversation clears its notification. A read timestamp prevents a
 delayed older push from bringing it back, while preserving newer unread messages.
 Logout/account changes clear stored previews and notifications. An open visible
 conversation suppresses new phone alerts for that conversation.
+
+Expand the chat notification (down arrow or swipe down on the notification) to
+view its history and Reply, Like and Dismiss actions. The collapsed view can show
+only the last message depending on the phone. Android limits MessagingStyle to
+25 messages; unlimited unread history remains available in the chat itself.
+Dismiss hides this row without marking messages read or deleting history; the
+next incoming message brings back the unread conversation.
+
+Reply uses Android RemoteInput and sends to the signed conversation recipient.
+Like applies a thumbs-up to the latest received message at the time that action
+was rendered. WorkManager persists pending actions and retries network/server
+failures, with the same reply request ID to avoid duplicate sends. Successful
+replies appear as outgoing messages in the notification. Errors ask the user to
+open the chat; no success is shown until the server acknowledges the action.
+Actions require a newly received push carrying a seven-day, message-scoped
+capability. That token has no login `uid` and cannot authenticate normal API calls.
+Existing contact-hour restrictions and blocked-account checks still apply.
+Both the new backend routes and new APK must be deployed for inline actions.
 
 ## Message actions
 

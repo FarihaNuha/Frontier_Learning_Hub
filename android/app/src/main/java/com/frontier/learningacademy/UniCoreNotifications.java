@@ -47,6 +47,7 @@ final class UniCoreNotifications {
             if (remaining.length() == 0) {
                 p.edit().remove("thread:" + thread).apply();
                 NotificationManagerCompat.from(context).cancel("chat:" + thread, id(thread));
+                androidx.core.content.pm.ShortcutManagerCompat.removeLongLivedShortcuts(context, java.util.Collections.singletonList("chat:" + thread));
             } else {
                 int unread = 0;
                 for (int i = 0; i < remaining.length(); i++) if (!remaining.getJSONObject(i).optBoolean("outgoing")) unread++;

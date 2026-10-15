@@ -40,6 +40,7 @@ export const communityApi = {
   sendMessage: (data) => api.post("/community/messages", data),
   getInbox: () => api.get("/community/inbox"),
   getConversation: (userId) => api.get(`/community/conversation/${userId}`),
+  readMessages: (userId, messageIds) => api.post(`/community/conversation/${userId}/read`, { messageIds }),
   getUsers: (params) => api.get("/community/users", { params }),
   deleteMessage: (messageId, scope = "everyone") => api.delete(`/community/messages/${messageId}`, { params: { scope } }),
   editMessage: (messageId, content) => api.patch(`/community/messages/${messageId}`, { content }),

@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { verifyToken } = require("../middleware/authMiddleware");
 const ctrl = require("../controllers/communityController");
 const messages = require("../controllers/messageActions");
+router.post("/conversation/:userId/read", verifyToken, messages.readMessages);
 router.post("/messages/:messageId/notification-action", require("../controllers/chatNotificationActions").performAction);
 router.get("/calls/config", verifyToken, require("../controllers/callConfig").getCallConfig);
 router.post("/calls/:callId/decline", require("../controllers/callActions").declineCall);

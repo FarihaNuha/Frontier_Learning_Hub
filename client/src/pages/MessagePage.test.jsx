@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useAuth } from "../contexts/AuthContext";
 import MessagePage from "./MessagePage";
 import { communityApi } from "../services/communityApi";
 jest.mock("react-router-dom", () => ({ useParams: () => ({ userId: "friend" }), useNavigate: () => jest.fn(), useSearchParams: () => [new URLSearchParams()] }));
@@ -10,16 +11,18 @@ jest.mock("../services/chatNotifications", () => ({ clearChatNotification: jest.
 jest.mock("../services/nativeFiles", () => ({ downloadFile: jest.fn(), openFile: jest.fn() }));
 jest.mock("../services/urls", () => ({ absoluteFileUrl: value => value }));
 jest.mock("../services/api", () => ({ __esModule: true, default: { defaults: { baseURL: "/api" } } }));
-jest.mock("../services/communityApi", () => ({ communityApi: { getUsers: jest.fn(), getConversation: jest.fn(), getContactRequests: jest.fn(), sendMessage: jest.fn(), toggleReaction: jest.fn() } }));
+jest.mock("../services/communityApi", () => ({ communityApi: { getUsers: jest.fn(), getConversation: jest.fn(), getContactRequests: jest.fn(), sendMessage: jest.fn(), toggleReaction: jest.fn(), readMessages: jest.fn() } }));
 const friend = { _id: "friend", name: "Friend", role: "student" };
 const message = { _id: "message-1", sender: friend, receiver: { _id: "me" }, content: "Question", createdAt: new Date().toISOString() };
 beforeEach(() => {
   jest.clearAllMocks();
+  useAuth().socket = null;
   Element.prototype.scrollIntoView = jest.fn();
   communityApi.getUsers.mockResolvedValue({ data: { users: [friend] } });
   communityApi.getContactRequests.mockResolvedValue({ data: { requests: [] } });
   communityApi.getConversation.mockResolvedValue({ data: { user: friend, messages: [message] } });
   communityApi.sendMessage.mockResolvedValue({ data: { message } });
+  communityApi.readMessages.mockResolvedValue({ data: { readThrough: 1234 } });
   Object.defineProperty(window, "crypto", { configurable: true, value: { randomUUID: () => "request-1" } });
 });
 test("tapping a message offers actions and reply submission retains its original id", async () => {
@@ -37,4 +40,24 @@ test("forward sends the source id to the selected destination", async () => {
   fireEvent.change(screen.getByRole("combobox"), { target: { value: "friend" } });
   fireEvent.click(screen.getByRole("button", { name: "Forward", exact: true }));
   await waitFor(() => expect(communityApi.sendMessage).toHaveBeenCalledWith({ receiverId: "friend", forwardOf: "message-1", clientMessageId: "request-1" }));
+});
+
+test("sending uses the acknowledged message without downloading the conversation again", async () => {
+  communityApi.sendMessage.mockResolvedValue({ data: { message: { _id: "sent-2", content: "Fast reply", sender: { _id: "me" }, receiver: friend, createdAt: new Date().toISOString() } } });
+  render(<MessagePage />); await screen.findByText("Question");
+  fireEvent.change(screen.getByPlaceholderText("Type a message..."), { target: { value: "Fast reply" } });
+  fireEvent.submit(screen.getByPlaceholderText("Type a message...").closest("form"));
+  await screen.findByText("Fast reply");
+  expect(communityApi.getConversation).toHaveBeenCalledTimes(1);
+});
+
+test("socket delivery appends one message and marks its ID read without refetching history", async () => {
+  const handlers = {};
+  useAuth().socket = { on: (event, fn) => { handlers[event] = fn; }, off: jest.fn() };
+  Object.defineProperty(document, "visibilityState", { configurable: true, value: "visible" });
+  render(<MessagePage />); await screen.findByText("Question");
+  await act(async () => handlers.newPrivateMessage({ message: { ...message, _id: "incoming-2", content: "Another question" } }));
+  await screen.findByText("Another question");
+  expect(communityApi.readMessages).toHaveBeenCalledWith("friend", ["incoming-2"]);
+  expect(communityApi.getConversation).toHaveBeenCalledTimes(1);
 });

@@ -769,8 +769,7 @@ exports.sendMessage = async (req, res) => {
     });
 
     // Create system notification for receiver
-    const senderUser = await User.findById(req.user.uid);
-    const senderName = senderUser ? senderUser.name : "A user";
+    const senderName = sender?.name || req.user.name || "A user";
     const messageContent = message.content || (attachments.length ? "Sent an attachment" : "Message");
     const previewContent = messageContent.length > 50 ? `${messageContent.substring(0, 50)}...` : messageContent;
     const msgLink = `/community/messages/${req.user.uid}`;
@@ -916,7 +915,7 @@ exports.getUsers = async (req, res) => {
 
     let users = await User.find(filter).select(
       "name email role department profilePicture isRegistered"
-    );
+    ).lean();
 
     users = users.filter(
       (u) =>
@@ -926,31 +925,30 @@ exports.getUsers = async (req, res) => {
         u.isRegistered !== false
     );
 
-    // Map each user to include their last message and unread count
-    const usersWithStats = await Promise.all(
-      users.map(async (u) => {
-        const lastMsg = await PrivateMessage.findOne({
-          deletedFor: { $ne: currentUserId },
-          $or: [
-            { sender: currentUserId, receiver: u._id },
-            { sender: u._id, receiver: currentUserId },
-          ],
-        }).sort({ createdAt: -1 });
-
-        const unreadCount = await PrivateMessage.countDocuments({
-          sender: u._id,
-          receiver: currentUserId,
-          isRead: false, deletedAt: null, deletedFor: { $ne: currentUserId },
-        });
-
-        return {
-          ...u.toObject(),
-          lastMessageTime: lastMsg ? lastMsg.createdAt : null,
-          lastMessageContent: lastMsg ? lastMsg.content : null,
-          unreadCount,
-        };
-      })
-    );
+    // One grouped query replaces two queries per person on every sidebar refresh.
+    const ObjectId = require("mongoose").Types.ObjectId;
+    const currentId = new ObjectId(currentUserId), peerIds = users.map(u => u._id);
+    const stats = peerIds.length ? await PrivateMessage.aggregate([
+      { $match: { deletedFor: { $ne: currentId }, $or: [
+        { sender: currentId, receiver: { $in: peerIds } },
+        { receiver: currentId, sender: { $in: peerIds } },
+      ] } },
+      { $sort: { createdAt: -1, _id: -1 } },
+      { $group: {
+        _id: { $cond: [{ $eq: ["$sender", currentId] }, "$receiver", "$sender"] },
+        lastMessageTime: { $first: "$createdAt" }, lastMessageContent: { $first: "$content" },
+        unreadCount: { $sum: { $cond: [{ $and: [
+          { $eq: ["$receiver", currentId] }, { $eq: ["$isRead", false] },
+          { $eq: [{ $ifNull: ["$deletedAt", null] }, null] },
+        ] }, 1, 0] } },
+      } },
+    ]) : [];
+    const byPeer = new Map(stats.map(item => [String(item._id), item]));
+    const usersWithStats = users.map(u => {
+      const stat = byPeer.get(String(u._id));
+      return { ...u, lastMessageTime: stat?.lastMessageTime || null,
+        lastMessageContent: stat?.lastMessageContent ?? null, unreadCount: stat?.unreadCount || 0 };
+    });
 
     // Sort: users with messages first (ordered by lastMessageTime DESC), then others alphabetically
     usersWithStats.sort((a, b) => {

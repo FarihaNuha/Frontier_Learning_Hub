@@ -126,13 +126,13 @@ test("test-push endpoint returns failure when Firebase cannot send", async () =>
   assert.equal(res.data.code, "missing_credentials");
 });
 
-test("post, lecture, exam, message and bulk notifications share one creation-only dispatcher", async () => {
+test("post, lecture, exam, message and bulk notifications schedule durable delivery without awaiting Firebase", async () => {
   const pre = {}, post = {}, delivered = [];
-  class Schema { pre(event, fn) { pre[event] = fn; } post(event, fn) { post[event] = fn; } }
+  class Schema { pre(event, fn) { pre[event] = fn; } post(event, fn) { post[event] = fn; } index() {} }
   Schema.Types = { ObjectId: String };
   load("models/Notification.js", {
     mongoose: { Schema, model: () => ({}) },
-    "../services/fcmService": { sendUserPushNotification: async (...args) => delivered.push(plain(args)) },
+    "../services/notificationDelivery": { wake: () => delivered.push("scheduled") },
   });
   for (const type of ["community_post", "lecture_upload", "exam_reminder", "chat_message"]) {
     const doc = { _id: `id-${type}`, userId: "recipient", title: type, message: "Body", type };
@@ -146,7 +146,7 @@ test("post, lecture, exam, message and bulk notifications share one creation-onl
   assert.equal(delivered.length, 4);
   await post.insertMany([{ _id: "bulk-id", userId: "recipient", title: "Announcement", type: "general" }]);
   assert.equal(delivered.length, 5);
-  assert.equal(delivered[0][1].data.notificationId, "id-community_post");
+  assert.equal(delivered[0], "scheduled");
 });
 
 test("incoming call pushes require the real caller's authentication and expire quickly", async () => {

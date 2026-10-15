@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { sendUserPushNotification } = require("../services/fcmService");
 
 const notificationSchema = new mongoose.Schema({
   userId: {
@@ -40,6 +39,10 @@ const notificationSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  pushStatus: { type: String, enum: ["pending", "sending", "delivered", "failed"], default: function () { return this.isNew ? "pending" : undefined; }, select: false },
+  pushNextAttempt: { type: Date, default: Date.now, select: false },
+  pushAttempts: { type: Number, default: 0, select: false },
+  pushPriority: { type: Number, default: function () { return this.type === "chat_message" ? 0 : 10; }, select: false },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -51,27 +54,16 @@ notificationSchema.pre("save", function () {
   this.$locals.sendPush = this.isNew;
 });
 
-const dispatchPush = async (doc) => {
-  try {
-    if (!doc.userId) return;
-    await sendUserPushNotification(doc.userId, {
-      title: doc.title,
-      body: doc.message,
-      data: { ...doc.pushData, notificationId: String(doc._id), type: doc.type || "general" },
-      link: doc.link || "/notifications",
-    });
-  } catch (error) {
-    console.error("[Push] Notification dispatch failed:", error.message);
-  }
-};
-
-notificationSchema.post("save", async function (doc) {
-  if (this.$locals.sendPush) await dispatchPush(doc);
+notificationSchema.post("save", function () {
+  if (this.$locals.sendPush) require("../services/notificationDelivery").wake();
 });
 
-notificationSchema.post("insertMany", async function (docs) {
+notificationSchema.post("insertMany", function (docs) {
   if (!Array.isArray(docs)) return;
-  for (const doc of docs) await dispatchPush(doc);
+  require("../services/notificationDelivery").wake();
 });
+
+notificationSchema.index({ pushStatus: 1, pushPriority: 1, pushNextAttempt: 1 });
+notificationSchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Notification", notificationSchema);

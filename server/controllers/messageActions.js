@@ -52,3 +52,30 @@ exports.toggleReaction = async (req, res) => {
   } catch { res.status(500).json({ error: "Could not update reaction" }); }
 };
 exports.participant = participant;
+
+// Read only the incoming IDs actually displayed by the client; do not reload the
+// entire conversation for every socket message or mark a later unseen message read.
+exports.readMessages = async (req, res) => {
+  const ids = req.body.messageIds;
+  if (!Array.isArray(ids) || !ids.length || ids.length > 100 || ids.some(id => typeof id !== "string" || !/^[a-f0-9]{24}$/i.test(id))) {
+    return res.status(400).json({ error: "Provide up to 100 displayed message IDs" });
+  }
+  try {
+    const incoming = await Message.find({ _id: { $in: ids }, sender: req.params.userId,
+      receiver: req.user.uid, deletedFor: { $ne: req.user.uid } }).select("_id createdAt").lean();
+    if (!incoming.length) return res.json({ readThrough: 0 });
+    const readThrough = Math.max(...incoming.map(m => new Date(m.createdAt).getTime())), readAt = new Date();
+    const result = await Message.updateMany({ _id: { $in: incoming.map(m => m._id) }, receiver: req.user.uid, isRead: false }, { isRead: true, readAt });
+    if (result.modifiedCount) {
+      await require("../models/Notification").updateMany({ userId: req.user.uid, type: "chat_message",
+        link: `/community/messages/${req.params.userId}`, "pushData.messageId": { $in: incoming.map(m => String(m._id)) }, isRead: false }, { isRead: true });
+      require("../services/fcmService").sendUserPushNotification(req.user.uid, {
+        control: true, data: { type: "chat_read", threadId: req.params.userId, timestamp: String(readThrough) }, ttl: 60000,
+      }).catch(() => {});
+    }
+    const io = getIO();
+    io?.to(`user_${req.params.userId}`).emit("messagesRead", { readerId: req.user.uid, readAt, readThrough });
+    io?.to(`user_${req.user.uid}`).emit("conversationRead", { threadId: req.params.userId, readThrough });
+    return res.json({ readThrough });
+  } catch { return res.status(500).json({ error: "Could not mark messages read" }); }
+};

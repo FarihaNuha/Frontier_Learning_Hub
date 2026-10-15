@@ -1,4 +1,6 @@
 const cron = require("node-cron");
+const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+const audience = item => getEnrolledStudents(item.courseId, item.course, item.department).catch(error => { console.warn("[Reminder] Skipped unknown cohort:", item._id, error.message); return []; });
 const Assignment = require("../models/Assignment");
 const Exam = require("../models/Exam");
 const Notification = require("../models/Notification");
@@ -30,17 +32,15 @@ const startScheduler = () => {
       });
 
       for (const assignment of assignments) {
-        const students = await User.find({
-          role: "student",
-          department: assignment.department,
-        });
+        const students = await audience(assignment);
 
         for (const student of students) {
           // Check if already notified
           const existingNotif = await Notification.findOne({
             userId: student._id,
             type: "assignment_due",
-            createdAt: { $gte: now.setHours(0, 0, 0, 0) },
+            link: assignment.courseId ? `/student/assignments/${assignment.courseId}?assignmentId=${assignment._id}` : null,
+            createdAt: { $gte: new Date(new Date(now).setHours(0, 0, 0, 0)) },
           });
 
           if (!existingNotif) {
@@ -71,13 +71,13 @@ const startScheduler = () => {
       });
 
       for (const exam of exams) {
-        const students = await User.find({
-          role: "student",
-          department: exam.department,
-        });
+        const students = await audience(exam);
 
         for (const student of students) {
           const notifLink = exam.courseId ? `/student/exams/${exam.courseId}?examId=${exam._id}` : null;
+          const alreadyNotified = await Notification.exists({ userId: student._id, type: "exam_reminder", link: notifLink,
+            createdAt: { $gte: new Date(new Date(now).setHours(0, 0, 0, 0)) } });
+          if (alreadyNotified) continue;
           const notification = await Notification.create({
             userId: student._id,
             title: "📝 Exam Tomorrow!",
@@ -113,7 +113,7 @@ const startScheduler = () => {
         await exam.save();
 
         const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
-        const students = await getEnrolledStudents(exam.courseId, exam.course, exam.department);
+        const students = await audience(exam);
 
         for (const student of students) {
           const submission = await ExamSubmission.findOne({

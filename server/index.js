@@ -20,6 +20,7 @@ const startScheduler = require("./scheduler/deadlineReminder");
 
 // Connect to MongoDB
 connectDB();
+require("./services/notificationDelivery").start();
 
 const compression = require("compression");
 

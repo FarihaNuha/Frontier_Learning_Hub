@@ -72,6 +72,6 @@ const courseSchema = new mongoose.Schema({
   },
 });
 
-// REMOVED pre-save hook
+courseSchema.index({ displayCode: 1, session: 1, department: 1 });
 
 module.exports = mongoose.model("Course", courseSchema);

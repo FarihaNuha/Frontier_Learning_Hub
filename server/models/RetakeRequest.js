@@ -92,4 +92,5 @@ const retakeRequestSchema = new mongoose.Schema({
   },
 });
 
+retakeRequestSchema.index({ status: 1, courseCode: 1, targetSession: 1 });
 module.exports = mongoose.model("RetakeRequest", retakeRequestSchema);

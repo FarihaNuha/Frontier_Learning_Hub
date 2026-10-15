@@ -67,9 +67,9 @@ export default function MessagePage() {
   const ownMessage = msg => String(msg.sender?._id || msg.sender) === String(user?.id || user?._id);
   useEffect(() => {
     setReplying(null); setEditing(null); setActionMessage(null); sendId.current = null;
-    const visible = () => {
+    const visible = event => {
       setChatNotificationContext(document.visibilityState === "visible" ? chatId || "" : "");
-      if (chatId && document.visibilityState === "visible") {
+      if (event && chatId && document.visibilityState === "visible") {
         communityApi.getConversation(chatId).then(res => { setMessages(res.data.messages || []); clearChatNotification(chatId, res.data.readThrough); }).catch(() => {});
       }
     };
@@ -110,6 +110,8 @@ export default function MessagePage() {
   const { startCall: beginCall } = useCall();
   const startCall = type => selectedUser && beginCall(selectedUser, type);
   const messagesEndRef = useRef(null);
+  const activeChatRef = useRef(null);
+  activeChatRef.current = userId || selectedUser?._id || selectedUser?.id;
   const docxContainerRef = useRef(null);
   const quickEmojis = ["❤️", "👍", "😂", "😮", "😢", "😡"];
 
@@ -155,10 +157,12 @@ export default function MessagePage() {
   // Socket listeners for messages, contact requests, WebRTC
   useEffect(() => {
     if (!socket) return;
+    let usersRefresh;
 
     const handleNewMessage = (data) => {
       const msg = data.message;
-      fetchUsers();
+      clearTimeout(usersRefresh);
+      usersRefresh = setTimeout(fetchUsers, 300);
       const currentActiveId = userId || (selectedUser && (selectedUser._id || selectedUser.id));
       const msgSenderId = msg.sender?._id || msg.sender;
       const msgReceiverId = msg.receiver?._id || msg.receiver;
@@ -167,8 +171,8 @@ export default function MessagePage() {
           if (prev.some((m) => m._id === msg._id)) return prev;
           return [...prev, msg];
         });
-        if (document.visibilityState === "visible") {
-          communityApi.getConversation(currentActiveId).then(res => { setMessages(res.data.messages || []); clearChatNotification(currentActiveId, res.data.readThrough); }).catch(console.error);
+        if (document.visibilityState === "visible" && String(msgReceiverId) === String(user?.id || user?._id)) {
+          communityApi.readMessages(currentActiveId, [msg._id]).then(res => clearChatNotification(currentActiveId, res.data.readThrough)).catch(console.error);
         }
       }
     };
@@ -193,6 +197,7 @@ export default function MessagePage() {
     socket.on("contactRequestResponse", handleContactRequestResponse);
 
     return () => {
+      clearTimeout(usersRefresh);
       socket.off("messageUpdated", updated); socket.off("messageHidden", hidden); socket.off("messagesRead", read); socket.off("conversationRead", cleared);
       socket.off("newPrivateMessage", handleNewMessage);
       socket.off("messageReaction", handleReaction);
@@ -233,6 +238,7 @@ export default function MessagePage() {
       setLoading(true);
       const res = await communityApi.getConversation(id);
       setMessages(res.data.messages || []);
+      clearChatNotification(id, res.data.readThrough);
       const otherUser =
         res.data.messages[0]?.sender?._id === (user?.id || user?._id)
           ? res.data.messages[0]?.receiver
@@ -314,6 +320,7 @@ export default function MessagePage() {
         setEditing(null); setNewMessage(""); return;
       }
       if (!sendId.current) sendId.current = crypto.randomUUID();
+      let savedMessage;
       if (selectedFiles.length > 0) {
         const formData = new FormData();
         formData.append("receiverId", targetId);
@@ -333,14 +340,18 @@ export default function MessagePage() {
           const errData = await res.json().catch(() => ({}));
           throw new Error(errData.error || `HTTP ${res.status}`);
         }
+        savedMessage = (await res.json()).message;
       } else {
-        await communityApi.sendMessage({ receiverId: targetId, subject: subject || "Message", content: newMessage, replyTo: replying?._id, clientMessageId: sendId.current });
+        const response = await communityApi.sendMessage({ receiverId: targetId, subject: subject || "Message", content: newMessage, replyTo: replying?._id, clientMessageId: sendId.current });
+        savedMessage = response.data.message;
       }
 
       sendId.current = null; setReplying(null);
       setNewMessage(""); setSubject(""); setSelectedFiles([]);
       if (!userId) { setShowNewMessage(false); fetchConversation(targetId); }
-      else { fetchConversation(userId); }
+      else if (savedMessage && String(activeChatRef.current) === String(targetId)) {
+        setMessages(prev => prev.some(m => m._id === savedMessage._id) ? prev.map(m => m._id === savedMessage._id ? savedMessage : m) : [...prev, savedMessage]);
+      }
     } catch (error) {
       toast.error(error.response?.data?.error || error.message || "Failed to send message");
     } finally { setSending(false); }

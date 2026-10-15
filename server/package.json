@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-controller": "node scratch/test_exam_controller.js",
     "test-push": "node --test tests/pushNotifications.test.js",
-    "test-chat": "node --test tests/chatAndCalls.test.js tests/chatNotificationActions.test.js",
+    "test-chat": "node --test tests/chatAndCalls.test.js tests/chatNotificationActions.test.js tests/performanceAndAudience.test.js",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },

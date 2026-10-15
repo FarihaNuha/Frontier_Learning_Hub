@@ -40,4 +40,5 @@ const courseImportSchema = new mongoose.Schema({
   },
 });
 
+courseImportSchema.index({ courseCode: 1, department: 1 });
 module.exports = mongoose.model("CourseImport", courseImportSchema);

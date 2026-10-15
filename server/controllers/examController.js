@@ -49,6 +49,9 @@ exports.createExam = async (req, res) => {
       cleanDept = "General";
     }
 
+    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+    const students = await getEnrolledStudents(courseId, course, department);
+
     const exam = await Exam.create({
       title,
       course,
@@ -65,41 +68,21 @@ exports.createExam = async (req, res) => {
       createdBy: req.user.uid,
     });
 
-    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
-    const students = await getEnrolledStudents(courseId, course, department);
 
     console.log(`📢 Notifying ${students.length} students about new exam: "${title}"`);
 
     const notifLink = courseId ? `/student/exams/${courseId}?examId=${exam._id}` : `/student/dashboard`;
-    for (const student of students) {
-      try {
-        const notif = await Notification.create({
-          userId: student._id,
+    await require("../utils/notifyStudents").notifyStudents(students, {
           title: "New Exam Assigned",
           message: `"${title}" has been assigned for ${course || "your course"}. Duration: ${duration} minutes`,
           type: "exam_reminder",
           link: notifLink,
-        });
-
-        const io = getIO();
-        if (io) {
-          io.to(`user_${student._id}`).emit("newNotification", {
-            _id: notif._id,
-            title: "New Exam Assigned",
-            message: `"${title}" has been assigned for ${course || "your course"}`,
-            type: "exam_reminder",
-            link: notifLink,
-          });
-        }
-      } catch (err) {
-        console.error("Failed to notify student of exam:", student._id, err.message);
-      }
-    }
+    });
 
     // Send emails in the background (non-blocking)
     if (students.length > 0) {
       for (const student of students) {
-        if (student.email) {
+        if (student.email && student.emailNotifications !== false) {
           const emailData = emailTemplates.newExam(
             student.name || "Student",
             title,
@@ -119,7 +102,7 @@ exports.createExam = async (req, res) => {
     res.status(201).json({ message: "Exam created successfully", exam });
   } catch (error) {
     console.error("Create exam error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(error.status || 500).json({ error: error.message });
   }
 };
 
@@ -464,12 +447,12 @@ exports.publishExamResults = async (req, res) => {
       return res.status(403).json({ error: "Not authorized" });
     }
 
-    exam.resultsPublished = true;
-    await exam.save();
-
     // Send notifications to all enrolled students
     const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
     const students = await getEnrolledStudents(exam.courseId, exam.course, exam.department);
+
+    exam.resultsPublished = true;
+    await exam.save();
 
     const Notification = require("../models/Notification");
     const { getIO } = require("../socket");
@@ -501,7 +484,7 @@ exports.publishExamResults = async (req, res) => {
       }
 
       // Send email in the background (non-blocking)
-      if (student.email) {
+      if (student.email && student.emailNotifications !== false) {
         const emailScoreText = submission
           ? `${submission.totalMarksObtained}/${exam.totalMarks}`
           : "Not submitted";

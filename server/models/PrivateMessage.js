@@ -60,6 +60,7 @@ const privateMessageSchema = new mongoose.Schema({
 
 // Index for faster queries
 privateMessageSchema.index({ sender: 1, receiver: 1, createdAt: -1 });
+privateMessageSchema.index({ receiver: 1, sender: 1, createdAt: -1 });
 privateMessageSchema.index({ receiver: 1, isRead: 1 });
 privateMessageSchema.index({ sender: 1, clientMessageId: 1 }, { unique: true, partialFilterExpression: { clientMessageId: { $type: "string" } } });
 

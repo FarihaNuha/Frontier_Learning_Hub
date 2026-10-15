@@ -37,6 +37,9 @@ exports.uploadLecture = async (req, res) => {
     const allowedDepts = ["EDTE", "IRE", "Software", "Cyber", "DataScience", "General"];
     const sanitizedDept = allowedDepts.includes(department) ? department : "General";
 
+    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
+    const students = await getEnrolledStudents(courseId, course, sanitizedDept);
+
     const lecture = await Lecture.create({
       title,
       course: course || "",
@@ -51,42 +54,20 @@ exports.uploadLecture = async (req, res) => {
       uploadedBy: req.user.uid,
     });
 
-    // Get enrolled students with fallback to department students
-    const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
-    const students = await getEnrolledStudents(courseId, course, sanitizedDept);
-
     console.log(`📢 Notifying ${students.length} students about new lecture: "${title}"`);
 
     const notifLink = courseId ? `/course/${courseId}` : `/student/dashboard`;
-    for (const student of students) {
-      try {
-        const notif = await Notification.create({
-          userId: student._id,
+    await require("../utils/notifyStudents").notifyStudents(students, {
           title: "New Lecture Uploaded",
           message: `"${title}" has been uploaded for ${course || "your course"}`,
           type: "lecture_upload",
           link: notifLink,
-        });
-
-        const io = getIO();
-        if (io) {
-          io.to(`user_${student._id}`).emit("newNotification", {
-            _id: notif._id,
-            title: "New Lecture Uploaded",
-            message: `"${title}" has been uploaded for ${course || "your course"}`,
-            type: "lecture_upload",
-            link: notifLink,
-          });
-        }
-      } catch (err) {
-        console.error("Failed to notify student of lecture:", student._id, err.message);
-      }
-    }
+    });
 
     // Send emails in the background (non-blocking)
     if (students.length > 0) {
       for (const student of students) {
-        if (student.email) {
+        if (student.email && student.emailNotifications !== false) {
           const { subject, html } = emailTemplates.newLecture(
             student.name || "Student",
             title,
@@ -97,10 +78,10 @@ exports.uploadLecture = async (req, res) => {
       }
     }
 
-    res.status(201).json({ lecture });
+    res.status(201).json({ lecture: { ...(lecture.toObject?.() || lecture), fileData: undefined } });
   } catch (error) {
     console.error("Upload error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(error.status || 500).json({ error: error.message });
   }
 };
 
@@ -129,7 +110,7 @@ exports.getLectures = async (req, res) => {
       if (student) filter.department = student.department;
     }
 
-    const lectures = await Lecture.find(filter)
+    const lectures = await Lecture.find(filter).select("-fileData")
       .populate("uploadedBy", "name email profilePicture department")
       .sort({ createdAt: -1 });
 

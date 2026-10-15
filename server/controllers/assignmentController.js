@@ -63,44 +63,26 @@ exports.createAssignment = async (req, res) => {
       }
     }
 
-    const assignment = await Assignment.create(assignmentData);
-
-    // Get enrolled students with fallback to department students
     const { getEnrolledStudents } = require("../utils/enrolledStudentsHelper");
     const students = await getEnrolledStudents(courseId, course, department);
+
+    const assignment = await Assignment.create(assignmentData);
+
 
     console.log(`📢 Notifying ${students.length} students about new assignment: "${title}"`);
 
     const notifLink = courseId ? `/student/assignments/${courseId}?assignmentId=${assignment._id}` : `/student/dashboard`;
-    for (const student of students) {
-      try {
-        const notif = await Notification.create({
-          userId: student._id,
+    await require("../utils/notifyStudents").notifyStudents(students, {
           title: "New Assignment",
           message: `"${title}" has been assigned for ${course || "your course"}. Due: ${new Date(deadline).toLocaleDateString()}`,
           type: "assignment_due",
           link: notifLink,
-        });
-
-        const io = getIO();
-        if (io) {
-          io.to(`user_${student._id}`).emit("newNotification", {
-            _id: notif._id,
-            title: "New Assignment",
-            message: `"${title}" has been assigned for ${course || "your course"}`,
-            type: "assignment_due",
-            link: notifLink,
-          });
-        }
-      } catch (err) {
-        console.error("Failed to notify student of assignment:", student._id, err.message);
-      }
-    }
+    });
 
     // Send emails in the background (non-blocking)
     if (students.length > 0) {
       for (const student of students) {
-        if (student.email) {
+        if (student.email && student.emailNotifications !== false) {
           const { subject, html } = emailTemplates.newAssignment(
             student.name || "Student",
             title,
@@ -114,10 +96,10 @@ exports.createAssignment = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "Assignment created successfully", assignment });
+      .json({ message: "Assignment created successfully", assignment: { ...(assignment.toObject?.() || assignment), fileData: undefined } });
   } catch (error) {
     console.error("Create assignment error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(error.status || 500).json({ error: error.message });
   }
 };
 
@@ -138,7 +120,7 @@ exports.getAssignments = async (req, res) => {
     if (req.query.department) filter.department = req.query.department;
     if (req.query.course) filter.course = req.query.course;
 
-    const assignments = await Assignment.find(filter)
+    const assignments = await Assignment.find(filter).select("-fileData")
       .populate("createdBy", "name email profilePicture department")
       .sort({ createdAt: -1 });
 

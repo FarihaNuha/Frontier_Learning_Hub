@@ -6,10 +6,6 @@ const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(" ")[1];
 
-  console.log("=== AUTH MIDDLEWARE DEBUG ===");
-  console.log("Request:", req.method, req.originalUrl);
-  console.log("Authorization header exists:", !!authHeader);
-  console.log("Token exists:", !!token);
 
   if (!token) {
     console.log("❌ No token provided");
@@ -22,7 +18,7 @@ const verifyToken = async (req, res, next) => {
       process.env.JWT_SECRET || "your_super_secret_key_change_this",
     );
 
-    const dbUser = await User.findById(decoded.uid);
+    const dbUser = await User.findById(decoded.uid).select("_id email role name department studentId isBlocked").lean();
     if (!dbUser || dbUser.isBlocked) {
       console.log("❌ User is blocked or does not exist");
       return res.status(401).json({ error: "Your account has been suspended." });
@@ -38,12 +34,6 @@ const verifyToken = async (req, res, next) => {
       department: dbUser.department,
       studentId: dbUser.studentId || "",
     };
-    console.log(
-      "✅ Token verified for user:",
-      req.user.email,
-      "Role:",
-      req.user.role,
-    );
     next();
   } catch (error) {
     console.log("❌ Token verification failed:", error.message);

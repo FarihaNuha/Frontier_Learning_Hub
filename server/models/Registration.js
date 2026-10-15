@@ -69,4 +69,5 @@ const registrationSchema = new mongoose.Schema({
   },
 });
 
+registrationSchema.index({ status: 1, session: 1, "selectedCourses.courseCode": 1 });
 module.exports = mongoose.model("Registration", registrationSchema);

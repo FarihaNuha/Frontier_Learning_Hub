@@ -30,7 +30,8 @@ import {
 
 export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const routeNavigate = useNavigate();
+  const navigate = (...args) => { setMobileOpen(false); routeNavigate(...args); };
   const { id: urlParamId } = useParams();
   const cid = courseId || courseInfo?._id || urlParamId;
 
@@ -107,7 +108,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           />
         )}
 
-        <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`} onClick={() => setMobileOpen(false)}>
+        <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`}>
           <div className="sidebar-header">
             <h2>UniCore</h2>
             <span className="badge student">Student</span>
@@ -157,6 +158,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           <div style={{ display: "flex", flexDirection: "column" }}>
             <button
               className={`nav-item ${isRegistrationPage ? "active" : ""}`}
+              aria-expanded={registrationOpen}
               onClick={() => setRegistrationOpen(!registrationOpen)}
               style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}
             >
@@ -227,6 +229,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           <div style={{ display: "flex", flexDirection: "column" }}>
             <button
               className={`nav-item ${currentPage === "community-hub" || currentPage === "community" ? "active" : ""}`}
+              aria-expanded={communityOpen}
               onClick={() => setCommunityOpen(!communityOpen)}
               style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}
             >
@@ -328,7 +331,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
         />
       )}
 
-      <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`} onClick={() => setMobileOpen(false)}>
+      <div className={`sidebar ${mobileOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-header">
           <h2>UniCore</h2>
           <span className="badge student">Student</span>
@@ -423,7 +426,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <button
             className={`nav-item ${currentPage === "community" ? "active" : ""}`}
-            onClick={() => setCommunityOpen(!communityOpen)}
+            aria-expanded={communityOpen}
+              onClick={() => setCommunityOpen(!communityOpen)}
             style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

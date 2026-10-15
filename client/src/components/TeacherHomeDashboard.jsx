@@ -46,10 +46,10 @@ export default function TeacherHomeDashboard() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
+    <div className="dashboard-container" style={{ display: "flex", minHeight: "100vh", background: "#E8F4FD" }}>
       <TeacherSidebar currentPage="dashboard" />
 
-      <div
+      <div className="main-content"
         style={{
           flex: 1,
           padding: "36px 32px",

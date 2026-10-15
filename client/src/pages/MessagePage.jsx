@@ -1,3 +1,5 @@
+import { Capacitor } from "@capacitor/core";
+import FittedDocument from "../components/FittedDocument";
 import { absoluteFileUrl } from "../services/urls";
 import { downloadFile as saveDownload, openFile } from "../services/nativeFiles";
 import { useState, useEffect, useRef } from "react";
@@ -393,17 +395,18 @@ export default function MessagePage() {
     const isAudio = file.fileType?.startsWith("audio/") || /\.(mp3|wav|ogg)$/i.test(file.fileName);
 
     if (isImage || isVideo || isAudio) { openFile({ url: fileUrl, fileName: file.fileName }); return; }
+    if (isPdf && Capacitor.isNativePlatform()) { openFile({ url: fileUrl, fileName: file.fileName, mimeType: "application/pdf" }); return; }
     if (isPdf) { setPreviewFile({ url: fileUrl, name: file.fileName, type: "pdf" }); return; }
     if (isDocx) {
       try {
-        const res = await fetch(fileUrl); const blob = await res.blob();
+        const res = await fetch(fileUrl); if (!res.ok) throw new Error("File unavailable"); const blob = await res.blob();
         setPreviewFile({ url: URL.createObjectURL(blob), name: file.fileName, type: "docx", blob });
       } catch { openFile({ url: fileUrl, fileName: file.fileName }); }
       return;
     }
     if (isPptx) {
       try {
-        const res = await fetch(fileUrl); const blob = await res.blob();
+        const res = await fetch(fileUrl); if (!res.ok) throw new Error("File unavailable"); const blob = await res.blob();
         const zip = await JSZip.loadAsync(blob);
         const slideFiles = Object.keys(zip.files).filter((name) => name.match(/^ppt\/slides\/slide\d+\.xml$/)).sort();
         const slides = [];
@@ -894,10 +897,10 @@ export default function MessagePage() {
 
       {/* ===== CONTACT REQUESTS TAB ===== */}
       {activeTab === "requests" && (
-        <div style={{ padding: "28px", maxWidth: "920px", margin: "0 auto", width: "100%" }}>
+        <div className="contact-requests-panel" style={{ padding: "28px", maxWidth: "920px", margin: "0 auto", width: "100%" }}>
           {/* STUDENT: Send request form */}
           {user?.role === "student" && (
-            <div
+            <div className="contact-request-card"
               style={{
                 background: "linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%)",
                 borderRadius: "20px",
@@ -1275,7 +1278,7 @@ export default function MessagePage() {
               {previewFile.type === "pdf" ? (
                 <embed src={previewFile.url} type="application/pdf" style={{ width: "100%", height: "70vh", borderRadius: "8px" }} />
               ) : previewFile.type === "docx" ? (
-                <div ref={docxContainerRef} className="docx-preview-container" />
+                <FittedDocument><div ref={docxContainerRef} className="docx-preview-container" /></FittedDocument>
               ) : previewFile.type === "pptx" && previewFile.slides ? (
                 <div className="pptx-preview-container">
                   {previewFile.slides.map((slide, i) => (

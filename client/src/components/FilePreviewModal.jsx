@@ -1,3 +1,4 @@
+import FittedDocument from "./FittedDocument";
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { FiX, FiDownload, FiFile, FiEye } from "react-icons/fi";
@@ -9,6 +10,7 @@ import { openFile } from "../services/nativeFiles";
 
 export default function FilePreviewModal({ isOpen, onClose, file }) {
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [blobUrl, setBlobUrl] = useState("");
   const [textContent, setTextContent] = useState("");
   const [fileCategory, setFileCategory] = useState("other");
@@ -16,13 +18,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
   const [pptxSlides, setPptxSlides] = useState([]);
   const docxRef = useRef(null);
 
-  const getAbsoluteFileUrl = (rawUrl) => {
-    if (!rawUrl) return "";
-    if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://") || rawUrl.startsWith("blob:")) {
-      return rawUrl;
-    }
-    return absoluteFileUrl(rawUrl);
-  };
+  const getAbsoluteFileUrl = absoluteFileUrl;
 
   useEffect(() => {
     if (!file || !isOpen) {
@@ -55,6 +51,11 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
     }
     setFileCategory(category);
 
+    let active = true;
+    let objectUrl;
+    const controller = new AbortController();
+    setLoadError("");
+    setDocxBuffer(null);
     const loadContent = async () => {
       setLoading(true);
       try {
@@ -68,10 +69,12 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
           return;
         }
 
-        const res = await fetch(fullFileUrl);
+        const res = await fetch(fullFileUrl, { signal: controller.signal });
+        if (!res.ok) throw new Error(res.status === 404 ? "This file is no longer available. Please ask the uploader to upload it again." : "Could not load this file. Please try again.");
         const blob = await res.blob();
-        const createdUrl = URL.createObjectURL(blob);
-        setBlobUrl(createdUrl);
+        if (!active) return;
+        objectUrl = URL.createObjectURL(blob);
+        setBlobUrl(objectUrl);
 
         if (category === "docx") {
           const buffer = await blob.arrayBuffer();
@@ -119,18 +122,18 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
           setTextContent(text);
         }
       } catch (err) {
-        console.error("Preview load error:", err);
+        if (active && err.name !== "AbortError") setLoadError(err.message || "Could not load this file.");
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
     loadContent();
 
     return () => {
-      if (blobUrl && blobUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(blobUrl);
-      }
+      active = false;
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [file, isOpen]);
 
@@ -143,7 +146,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
         inWrapper: true,
         ignoreWidth: false,
         ignoreHeight: false,
-      }).catch((err) => console.error("Docx renderAsync error:", err));
+      }).catch(() => setLoadError("Could not preview this document. Download it to open in a document viewer."));
     }
   }, [docxBuffer, fileCategory, loading]);
 
@@ -156,6 +159,9 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
   const modalContent = (
     <div
       className="file-preview-portal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="File preview"
       onClick={onClose}
       style={{
         position: "fixed",
@@ -176,10 +182,11 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
       }}
     >
       <div
-        className="share-modal-content"
+        className="file-preview-content"
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "#ffffff",
+          boxSizing: "border-box",
           borderRadius: "20px",
           width: "100%",
           maxWidth: "850px",
@@ -209,6 +216,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
           </div>
           <button
             onClick={onClose}
+            aria-label="Close preview"
             style={{
               background: "#e2e8f0",
               border: "none",
@@ -227,6 +235,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
 
         {/* Body */}
         <div
+          className="file-preview-body"
           style={{
             flex: 1,
             padding: "20px",
@@ -234,7 +243,9 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            minHeight: "350px",
+            minHeight: "200px",
+            minWidth: 0,
+            alignSelf: "stretch",
             background: "#fafafa"
           }}
         >
@@ -243,6 +254,8 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
               <div className="spinner" style={{ margin: "0 auto 12px" }}></div>
               <p style={{ fontWeight: 600 }}>Loading preview...</p>
             </div>
+          ) : loadError ? (
+            <p role="alert" style={{ padding: 20, color: "#b91c1c" }}>{loadError}</p>
           ) : fileCategory === "pdf" ? (
             Capacitor.isNativePlatform() ? <div style={{ textAlign: "center", padding: 24 }}>
               <p>Open this PDF with a document viewer on your phone.</p>
@@ -253,13 +266,13 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
               style={{ width: "100%", height: "70vh", border: "none", borderRadius: "10px", background: "#ffffff" }}
             />
           ) : fileCategory === "image" ? (
-            <img src={downloadUrl || blobUrl} alt={fileName} style={{ maxWidth: "100%", maxHeight: "70vh", objectFit: "contain", borderRadius: "10px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+            <img src={blobUrl || downloadUrl} alt={fileName} style={{ maxWidth: "100%", maxHeight: "70vh", objectFit: "contain", borderRadius: "10px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
           ) : fileCategory === "video" ? (
-            <video src={downloadUrl || blobUrl} controls style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: "10px" }} />
+            <video src={blobUrl || downloadUrl} controls style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: "10px" }} />
           ) : fileCategory === "audio" ? (
-            <audio src={downloadUrl || blobUrl} controls style={{ width: "100%" }} />
+            <audio src={blobUrl || downloadUrl} controls style={{ width: "100%" }} />
           ) : fileCategory === "docx" ? (
-            <div ref={docxRef} style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", background: "#ffffff", padding: "20px", borderRadius: "10px" }} />
+            <FittedDocument><div ref={docxRef} style={{ width: "100%", background: "#ffffff" }} /></FittedDocument>
           ) : fileCategory === "pptx" ? (
             <div style={{ width: "100%", maxHeight: "70vh", overflowY: "auto", padding: "12px", background: "#ffffff", borderRadius: "10px" }}>
               <h4 style={{ margin: "0 0 16px", color: "#2c4b66", fontSize: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>

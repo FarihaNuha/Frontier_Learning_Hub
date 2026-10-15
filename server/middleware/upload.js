@@ -1,8 +1,10 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("node:fs");
+const { persistFile, bucket } = require("../services/uploadStore");
 
 // Local storage configuration
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, "../../uploads"));
   },
@@ -15,6 +17,27 @@ const storage = multer.diskStorage({
     cb(null, uniqueName);
   },
 });
+
+// An upload succeeds only after its durable MongoDB copy is complete. Local
+// files remain a cache for previews; Render redeploys can safely discard them.
+const storage = {
+  _handleFile(req, file, callback) {
+    diskStorage._handleFile(req, file, async (error, info) => {
+      if (error) return callback(error);
+      try {
+        const storedId = await persistFile(info.path, info.filename, file.mimetype);
+        callback(null, { ...info, storedId });
+      } catch (failure) {
+        await fs.promises.unlink(info.path).catch(() => {});
+        callback(failure);
+      }
+    });
+  },
+  _removeFile(req, file, callback) {
+    const remove = Promise.resolve().then(() => file.storedId ? bucket().delete(file.storedId) : undefined);
+    remove.then(() => diskStorage._removeFile(req, file, callback), callback);
+  },
+};
 
 // File type filter - accepts all common document, video, and audio types
 const fileFilter = (req, file, cb) => {

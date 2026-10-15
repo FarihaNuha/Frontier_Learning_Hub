@@ -1,4 +1,4 @@
-import { printPage } from "../services/nativeFiles";
+import { downloadTranscript } from "../services/academicPDF";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -33,8 +33,9 @@ export default function StudentTranscriptPage() {
   const studentInfo = data?.studentInfo || {};
   const semesterBreakdown = data?.semesterBreakdown || [];
 
-  const handlePrint = () => {
-    printPage();
+  const handlePrint = async () => {
+    if (!data || loading) return;
+    try { await downloadTranscript(data); } catch (error) { toast.error("Could not create transcript PDF. Please try again."); }
   };
 
   return (
@@ -72,7 +73,7 @@ export default function StudentTranscriptPage() {
               boxShadow: "0 4px 12px rgba(59,141,179,0.25)",
             }}
           >
-            <FiPrinter size={16} /> Print / Download PDF Transcript
+            <FiPrinter size={16} /> Download PDF Transcript
           </button>
         </div>
 

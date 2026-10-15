@@ -1,3 +1,4 @@
+const { ensureLocalFile } = require("../services/uploadStore");
 const Lecture = require("../models/Lecture");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
@@ -146,6 +147,7 @@ exports.viewLecture = async (req, res) => {
     );
 
     // Auto-restore physical file from DB if missing on local disk
+    await ensureLocalFile(filePath);
     if (!fs.existsSync(filePath) && lecture.fileData) {
       try {
         fs.writeFileSync(filePath, Buffer.from(lecture.fileData, "base64"));
@@ -154,6 +156,7 @@ exports.viewLecture = async (req, res) => {
       }
     }
 
+    await ensureLocalFile(filePath);
     if (!fs.existsSync(filePath))
       return res.status(404).json({ error: "File not found on server" });
 
@@ -203,6 +206,7 @@ exports.viewLectureBase64 = async (req, res) => {
     );
 
     // Auto-restore physical file from DB if missing on local disk
+    await ensureLocalFile(filePath);
     if (!fs.existsSync(filePath) && lecture.fileData) {
       try {
         fs.writeFileSync(filePath, Buffer.from(lecture.fileData, "base64"));
@@ -290,6 +294,7 @@ exports.downloadLecture = async (req, res) => {
       "../../uploads",
       lecture.fileURL.replace("/uploads/", ""),
     );
+    await ensureLocalFile(filePath);
     if (!fs.existsSync(filePath))
       return res.status(404).json({ error: "File not found on server" });
 

@@ -206,7 +206,7 @@ export default function StudentAttendancePage({
 
   if (loading && !courseInfo) {
     return (
-      <div className="dashboard-container">
+      <div className="dashboard-container student-attendance">
         <StudentSidebar
           currentPage="attendance"
           courseInfo={null}
@@ -223,7 +223,7 @@ export default function StudentAttendancePage({
 
   if (loading) {
     return (
-      <div className="dashboard-container">
+      <div className="dashboard-container student-attendance">
         <StudentSidebar
           currentPage="attendance"
           courseInfo={courseInfo}
@@ -241,7 +241,7 @@ export default function StudentAttendancePage({
 
   if (!courseInfo) {
     return (
-      <div className="dashboard-container">
+      <div className="dashboard-container student-attendance">
         <StudentSidebar
           currentPage="attendance"
           courseInfo={null}
@@ -264,7 +264,7 @@ export default function StudentAttendancePage({
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container student-attendance">
       <StudentSidebar
         currentPage="attendance"
         courseInfo={courseInfo}

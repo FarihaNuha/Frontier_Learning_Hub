@@ -1,3 +1,7 @@
+import { createPortal } from "react-dom";
+import { Capacitor } from "@capacitor/core";
+import { openFile } from "../services/nativeFiles";
+import FittedDocument from "../components/FittedDocument";
 import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -612,7 +616,7 @@ export default function StudentDashboard({
       )}
 
       {/* File Preview Modal */}
-      {previewFile && (
+      {previewFile && createPortal(
         <div className="preview-modal-overlay" onClick={() => setPreviewFile(null)}>
           <div className="preview-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="preview-modal-header" style={{ padding: "10px 20px" }}>
@@ -714,18 +718,21 @@ export default function StudentDashboard({
                   </a>
                 </div>
               ) : previewType === "docx" ? (
-                <div 
+                <FittedDocument><div
                   ref={docContainerRef} 
                   style={{ 
-                    width: "100%", 
-                    maxHeight: "70vh", 
-                    overflowY: "auto", 
+                    width: "100%",
                     background: "#ffffff", 
                     padding: "20px",
                     borderRadius: "8px",
                     boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)"
                   }} 
-                />
+                /></FittedDocument>
+              ) : previewType === "pdf" && Capacitor.isNativePlatform() ? (
+                <div style={{ padding: 24, textAlign: "center" }}>
+                  <p>Open this PDF with a document viewer on your phone.</p>
+                  <button className="btn-primary" onClick={() => openFile({ blob: previewBlob, fileName: previewFile.originalName || `${previewFile.title || "Lecture"}.pdf`, mimeType: "application/pdf" })}>Open PDF</button>
+                </div>
               ) : previewType === "pdf" ? (
                 <iframe
                   src={previewBlobUrl}
@@ -758,7 +765,7 @@ export default function StudentDashboard({
                         display: "flex", 
                         flexDirection: "column", 
                         justifyContent: "flex-start", 
-                        padding: "28px 40px", 
+                        padding: "8px",
                         color: "#2C4B66", 
                         overflowY: "auto", 
                         background: "#ffffff",
@@ -768,11 +775,11 @@ export default function StudentDashboard({
                         boxShadow: "0 6px 24px rgba(0,0,0,0.25)",
                         minHeight: 0
                       }}>
-                        <div style={{ width: "100%", minHeight: "100%", overflowY: "auto" }} dangerouslySetInnerHTML={{ __html: previewSlides[currentSlideIndex] }} />
+                        <FittedDocument width={960} height={600}><div style={{ width: "100%", height: "100%" }} dangerouslySetInnerHTML={{ __html: previewSlides[currentSlideIndex] }} /></FittedDocument>
                       </div>
 
                       {/* Control Panel */}
-                      <div style={{ 
+                      <div className="slide-controls" style={{
                         display: "flex", 
                         justifyContent: "space-between", 
                         alignItems: "center", 
@@ -795,7 +802,7 @@ export default function StudentDashboard({
                             transition: "background 0.2s"
                           }}
                         >
-                          ΓåÉ Previous Slide
+                          Previous
                         </button>
                         
                         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
@@ -834,24 +841,23 @@ export default function StudentDashboard({
                             transition: "background 0.2s"
                           }}
                         >
-                          Next Slide ΓåÆ
+                          Next
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div 
+                    <FittedDocument width={960}><div
                       dangerouslySetInnerHTML={{ __html: previewHtml }} 
                       style={{ 
                         flex: 1,
                         width: "100%", 
-                        overflowY: "auto", 
                         background: "#ffffff", 
-                        padding: "24px 32px",
+                        padding: "12px",
                         borderRadius: "8px",
                         boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)",
                         minHeight: 0
                       }} 
-                    />
+                    /></FittedDocument>
                   )}
                 </div>
               ) : previewType === "html" ? (
@@ -947,7 +953,7 @@ export default function StudentDashboard({
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 }

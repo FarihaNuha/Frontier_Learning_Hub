@@ -294,14 +294,13 @@ export default function CommunityHub() {
   );
 }
 
-const getFileUrl = (url) => {
-  if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
-    return url;
-  }
-  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
-  return absoluteFileUrl(cleanUrl);
-};
+const getFileUrl = absoluteFileUrl;
+
+function AttachmentImage({ url, name }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [url]);
+  return failed ? <div role="status" style={{ padding: 20, color: "#64748b", background: "#f1f5f9" }}>Image unavailable. Try View / Download, or ask the uploader to upload it again.</div> : <img src={url} alt={name} className="attachment-image" onError={() => setFailed(true)} />;
+}
 
 const renderAttachments = (attachments, onPreview) => {
   if (!attachments || attachments.length === 0) return null;
@@ -318,7 +317,7 @@ const renderAttachments = (attachments, onPreview) => {
         if (isImage) {
           return (
             <div key={idx} className="attachment-preview-wrapper image-preview" style={{ cursor: "pointer" }} onClick={() => onPreview && onPreview(fileObj)}>
-              <img src={absoluteUrl} alt={file.fileName} className="attachment-image" />
+              <AttachmentImage url={absoluteUrl} name={file.fileName} />
               <div className="attachment-file-info" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>🖼️ {file.fileName}</span>
                 <div style={{ display: "flex", gap: "6px" }} onClick={(e) => e.stopPropagation()}>

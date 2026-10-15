@@ -1,4 +1,5 @@
-import { printPage } from "../services/nativeFiles";
+import { createPortal } from "react-dom";
+import { downloadInvoice } from "../services/academicPDF";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -36,11 +37,12 @@ export default function RegistrationInvoiceModal({
 
   if (!isOpen) return null;
 
-  const handlePrint = () => {
-    printPage();
+  const handlePrint = async () => {
+    if (!invoice) return;
+    try { await downloadInvoice(invoice); } catch (error) { toast.error("Could not create invoice PDF. Please try again."); }
   };
 
-  return (
+  return createPortal(
     <>
       <style>{`
         @media print {
@@ -100,7 +102,7 @@ export default function RegistrationInvoiceModal({
       `}</style>
 
       <div
-        className="invoice-modal-overlay"
+        className="invoice-modal-overlay" role="dialog" aria-modal="true" aria-label="Registration invoice"
         style={{
           position: "fixed",
           top: 0,
@@ -163,10 +165,11 @@ export default function RegistrationInvoiceModal({
                   gap: "6px",
                 }}
               >
-                <FiDownload size={14} /> Print / Save PDF (1 Page)
+                <FiDownload size={14} /> Download PDF
               </button>
               <button
                 onClick={onClose}
+                aria-label="Close invoice"
                 style={{
                   background: "#334155",
                   color: "#94a3b8",
@@ -189,7 +192,7 @@ export default function RegistrationInvoiceModal({
           ) : !invoice ? (
             <div style={{ padding: "50px", textAlign: "center", color: "#ef4444" }}>Invoice details unavailable.</div>
           ) : (
-            <div style={{ padding: "24px 28px" }}>
+            <div className="invoice-document" style={{ padding: "24px 28px" }}>
               {/* Document Header */}
               <div style={{ borderBottom: "2px solid #0f172a", paddingBottom: "14px", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>
@@ -357,6 +360,6 @@ export default function RegistrationInvoiceModal({
           )}
         </div>
       </div>
-    </>
+    </>, document.body
   );
 }

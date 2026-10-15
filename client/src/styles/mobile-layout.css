@@ -1,0 +1,85 @@
+/* Narrow screens keep overflow inside the document/table, never the app shell. */
+.dashboard-container > .main-content { min-width: 0; }
+.preview-modal-content, .invoice-printable-container { box-sizing: border-box; min-width: 0; }
+.preview-modal-header { gap: 8px; flex-wrap: wrap; }
+.preview-modal-header h3 { min-width: 0; overflow-wrap: anywhere; flex: 1 1 180px; }
+.preview-modal-header button { flex-shrink: 0; }
+.preview-modal-body { min-height: 0; overflow: auto; }
+.fitted-document .docx-wrapper { padding: 0 !important; background: white !important; }
+.contact-request-card input, .contact-request-card select, .contact-request-card textarea { box-sizing: border-box; width: 100%; min-width: 0; }
+.post-card { min-width: 0; }
+.post-card img { max-width: 100%; object-fit: contain; }
+.post-card a, .post-card span { overflow-wrap: anywhere; }
+.post-stats, .post-actions { flex-wrap: wrap; gap: 10px; }
+@media screen and (max-width: 1024px) {
+  .dashboard-container { width: 100%; min-width: 0; }
+  .dashboard-container > .main-content { width: 100% !important; margin-left: 0 !important; box-sizing: border-box; padding: 20px 14px !important; }
+  .sidebar.mobile-open { overflow-y: auto !important; overscroll-behavior: contain; max-height: calc(100dvh - 56px - env(safe-area-inset-top)); }
+  .sidebar .sidebar-header, .sidebar .user-info { flex-shrink: 0; }
+  .sidebar .user-info { padding: 16px !important; }
+  .sidebar .sidebar-nav-scrollable { min-height: 140px; }
+}
+@media screen and (max-width: 600px) {
+  .contact-request-card { padding: 18px !important; margin-bottom: 20px !important; }
+  .contact-request-card > div:first-child { align-items: flex-start !important; gap: 12px !important; }
+  .contact-request-card > div:first-child > div:first-child { flex-shrink: 0; width: 40px !important; height: 40px !important; }
+  .contact-request-card h3 { font-size: 20px !important; }
+  .preview-modal-overlay, .invoice-modal-overlay { padding: 8px !important; box-sizing: border-box; }
+  .preview-modal-content { width: 100% !important; max-width: 100% !important; max-height: 94dvh !important; padding: 0 !important; }
+  .preview-modal-header { padding: 12px !important; }
+  .preview-modal-header h3 { flex-basis: 100%; font-size: 16px !important; }
+  .preview-modal-body { padding: 6px !important; }
+  .slide-controls { flex-wrap: wrap; gap: 8px; padding: 10px !important; }
+  .slide-controls button { padding: 10px !important; font-size: 12px !important; }
+  .invoice-printable-container { max-height: 94dvh !important; overflow-x: hidden; }
+  .invoice-printable-container > .no-print { padding: 12px !important; flex-wrap: wrap; gap: 10px; }
+  .invoice-document { padding: 16px !important; }
+  .invoice-document > div:first-child { flex-wrap: wrap; gap: 12px; }
+  .invoice-document > div:first-child > div { min-width: 0 !important; max-width: 100% !important; }
+  .invoice-document table { table-layout: fixed; font-size: 10px !important; }
+  .invoice-document th, .invoice-document td { padding: 6px 3px !important; overflow-wrap: anywhere; }
+  .invoice-document [style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 8px !important; }
+  .invoice-document h1, .invoice-document h2 { font-size: 18px !important; }
+  .data-table tfoot td { white-space: normal !important; overflow-wrap: anywhere; padding: 12px 6px !important; }
+  #official-academic-calendar-card { padding: 16px !important; box-sizing: border-box; min-width: 0; }
+  #official-academic-calendar-card > div[style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+  #official-academic-calendar-card table { table-layout: fixed; width: 100% !important; }
+  #official-academic-calendar-card td, #official-academic-calendar-card th { overflow-wrap: anywhere; padding: 6px !important; font-size: 12px !important; }
+  #official-academic-calendar-card h1 { font-size: 22px !important; }
+  #official-academic-calendar-card h2 { font-size: 18px !important; }
+  .post-card { padding: 18px !important; }
+  .post-header { flex-wrap: wrap; gap: 10px; }
+  .file-preview-portal-overlay { padding: 8px !important; }
+  .file-preview-body { padding: 10px !important; }
+}
+
+.attachment-file-info { flex-wrap: wrap; gap: 8px; min-width: 0; }
+.attachment-file-info > span { flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere; }
+.attachment-file-info > div { flex-wrap: wrap; }
+@media screen and (max-width: 600px) {
+ .invoice-document [style*="grid-column"] { grid-column: 1 !important; flex-wrap: wrap; gap: 8px; }
+ .invoice-document > div:last-child { flex-wrap: wrap; gap: 24px; }
+ .student-attendance .table-container table { min-width: 0 !important; table-layout: fixed; }
+ .student-attendance .data-table td, .student-attendance .data-table th { padding: 10px 5px !important; overflow-wrap: anywhere; }
+ .student-attendance .data-table tfoot td { text-align: left !important; }
+}
+
+@media screen and (max-width: 600px) {
+ .invoice-document th:nth-child(1) { width: 14%; }
+ .invoice-document th:nth-child(2) { width: 36%; }
+ .invoice-document th:nth-child(3) { width: 16%; }
+ .invoice-document th:nth-child(4) { width: 10%; }
+ .invoice-document th:nth-child(5) { width: 24%; }
+ .invoice-document > div:first-child > div:last-child { text-align: left !important; }
+}
+
+@media screen and (max-width: 600px) {
+ .contact-requests-panel { padding: 12px 0 !important; box-sizing: border-box; }
+ .contact-request-card form > div[style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+.document-zoom-controls button { padding: 6px 12px; border: 1px solid #b1d4e5; border-radius: 6px; background: #f1f5f9; color: #1e3a5f; cursor: pointer; }
+@media screen and (max-width: 600px) {
+ .preview-modal-header > div:first-child { min-width: 0; flex: 1 1 100%; flex-wrap: wrap; gap: 8px !important; }
+ .preview-modal-header > div:last-child { gap: 8px; flex-wrap: wrap; }
+}

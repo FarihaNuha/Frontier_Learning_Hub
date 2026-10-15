@@ -66,7 +66,8 @@ jobs:
           npm --prefix server ci
           npm --prefix server run test-push
           npm --prefix server run test-chat
-          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx
+          npm --prefix server run test-files
+          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -139,31 +140,19 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.3.1-apk
-          name: UniCore Mobile App v1.3.1 (Android test APK)
+          tag_name: v1.4.0-apk
+          name: UniCore Mobile App v1.4.0 (Android test APK)
           body: |
-            UniCore Android 1.3.1 reduces chat reloads and database queries and limits
-            lecture, assignment and exam notifications to the selected course cohort.
-            Push delivery runs through a durable background outbox without blocking API responses.
-            The app includes the supplied UniCore logo and groups unread messages by conversation and removes
-            duplicate socket/FCM phone alerts. Tap a message or its menu for reply,
-            forward, reactions, copy, edit, delete for me or delete for everyone.
-            Read receipts sync across signed-in devices.
+            UniCore Android 1.4.0 fixes mobile sidebar expansion, teacher dashboard
+            layout, calendar, attendance, community attachment controls and invoice views.
+            Word pages and lecture slides fit the screen without squeezing their layout.
+            Transcript and invoice buttons export real PDFs through Android's save picker.
+            Uploads are durably stored in MongoDB GridFS and restored after server restarts.
+            Includes the newly supplied circular UniCore emblem.
 
-            Expand a chat notification to see up to 25 recent messages, Reply,
-            Like and Dismiss. Inline replies retry connection failures without
-            sending duplicate messages. Dismiss does not mark the chat read.
-
-            Incoming audio/video calls now have a global call screen, queued ICE
-            candidates, busy checks, answer/decline, timeout and media cleanup.
-            Android includes native incoming-call Answer/Decline and screen sharing
-            with a system capture permission dialog. Android controls full-screen UI.
-            Reliable calls across restricted networks still require a configured
-            TURN relay. Calls are not a native foreground calling service.
-
-            Install this APK on both phones and sign in. In Settings > App notifications,
-            tap Enable / reconnect notifications to register the new native renderer.
-            This is a debug-signed test build; frontend changes require a new APK.
+            Install over the previous APK using the same signing key to keep app data.
+            Files already lost without any stored copy must be uploaded again.
+            This is a debug-signed test build; frontend/icon changes require an APK update.
           files: release-output/UniCore-app.apk
           draft: false
           prerelease: false

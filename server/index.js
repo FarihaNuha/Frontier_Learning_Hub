@@ -79,6 +79,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Auto-restore missing files from DB helper
 const restoreMissingFileFromDB = async (filename, targetFilePath) => {
+  const filenamePattern = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   try {
     const Assignment = require("./models/Assignment");
     const Submission = require("./models/Submission");
@@ -88,8 +89,8 @@ const restoreMissingFileFromDB = async (filename, targetFilePath) => {
     // 1. Check Assignment
     const assignmentDoc = await Assignment.findOne({
       $or: [
-        { fileURL: { $regex: filename, $options: "i" } },
-        { fileName: { $regex: filename, $options: "i" } }
+        { fileURL: { $regex: filenamePattern, $options: "i" } },
+        { fileName: { $regex: filenamePattern, $options: "i" } }
       ]
     }).lean();
 
@@ -101,10 +102,10 @@ const restoreMissingFileFromDB = async (filename, targetFilePath) => {
     // 2. Check Submission
     const subDoc = await Submission.findOne({
       $or: [
-        { fileURL: { $regex: filename, $options: "i" } },
-        { originalName: { $regex: filename, $options: "i" } },
-        { "files.fileURL": { $regex: filename, $options: "i" } },
-        { "files.originalName": { $regex: filename, $options: "i" } }
+        { fileURL: { $regex: filenamePattern, $options: "i" } },
+        { originalName: { $regex: filenamePattern, $options: "i" } },
+        { "files.fileURL": { $regex: filenamePattern, $options: "i" } },
+        { "files.originalName": { $regex: filenamePattern, $options: "i" } }
       ]
     }).lean();
 
@@ -123,8 +124,8 @@ const restoreMissingFileFromDB = async (filename, targetFilePath) => {
     // 3. Check Lecture
     const lecDoc = await Lecture.findOne({
       $or: [
-        { fileURL: { $regex: filename, $options: "i" } },
-        { originalName: { $regex: filename, $options: "i" } }
+        { fileURL: { $regex: filenamePattern, $options: "i" } },
+        { originalName: { $regex: filenamePattern, $options: "i" } }
       ]
     }).lean();
 
@@ -136,8 +137,8 @@ const restoreMissingFileFromDB = async (filename, targetFilePath) => {
     // 4. Check CommunityPost
     const commDoc = await CommunityPost.findOne({
       $or: [
-        { fileUrl: { $regex: filename, $options: "i" } },
-        { "attachments.fileUrl": { $regex: filename, $options: "i" } }
+        { fileUrl: { $regex: filenamePattern, $options: "i" } },
+        { "attachments.fileUrl": { $regex: filenamePattern, $options: "i" } }
       ]
     }).lean();
 
@@ -150,6 +151,23 @@ const restoreMissingFileFromDB = async (filename, targetFilePath) => {
   }
   return false;
 };
+
+// Restore durable uploads before the static handler (including range requests).
+const uploadStore = require("./services/uploadStore");
+app.use("/uploads", async (req, res, next) => {
+  const filename = req.path.slice(1);
+  if (!uploadStore.validFilename(filename)) return res.status(400).json({ error: "Invalid filename" });
+  try {
+    await uploadStore.ensureLocalFile(path.join(uploadsDir, filename));
+    next();
+  } catch (error) {
+    console.error("Upload storage unavailable:", error.message);
+    res.status(503).json({ error: "File storage temporarily unavailable. Please retry." });
+  }
+});
+require("mongoose").connection.once("open", () => {
+  uploadStore.backupLocalUploads().catch(error => console.error("Upload backup failed:", error.message));
+});
 
 // Static files - uploads folder (with inline Content-Disposition for browser preview & 1 day cache)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
@@ -172,7 +190,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
 app.use("/uploads", async (req, res, next) => {
   try {
     const filename = req.path.replace(/^\//, "");
-    if (!filename) return next();
+    if (!uploadStore.validFilename(filename)) return res.status(400).json({ error: "Invalid filename" });
 
     const uploadsDir = path.join(__dirname, "../uploads");
     const filePath = path.join(uploadsDir, filename);

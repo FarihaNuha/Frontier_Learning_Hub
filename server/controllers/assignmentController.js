@@ -1,3 +1,4 @@
+const { ensureLocalFile } = require("../services/uploadStore");
 const Assignment = require("../models/Assignment");
 const Submission = require("../models/Submission");
 const Notification = require("../models/Notification");
@@ -623,6 +624,7 @@ exports.viewAssignmentBase64 = async (req, res) => {
     if (!assignment.fileURL) return res.status(404).json({ error: "No file attached to this assignment" });
 
     let filePath = resolveServerFilePath(assignment.fileURL);
+    if (filePath) await ensureLocalFile(filePath);
     
     // Auto-restore from DB fileData if physical file is missing from local disk
     if ((!filePath || !fs.existsSync(filePath)) && assignment.fileData) {
@@ -711,6 +713,7 @@ exports.viewSubmissionBase64 = async (req, res) => {
     if (!fileURL) return res.status(404).json({ error: "No file attached to this submission" });
 
     let filePath = resolveServerFilePath(fileURL);
+    if (filePath) await ensureLocalFile(filePath);
 
     // Auto-restore from DB fileData if physical file is missing from local disk
     if ((!filePath || !fs.existsSync(filePath)) && fileDataB64) {

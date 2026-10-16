@@ -67,7 +67,7 @@ jobs:
           npm --prefix server run test-push
           npm --prefix server run test-chat
           npm --prefix server run test-files
-          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js
+          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/chatState.test.js
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -140,19 +140,20 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.0-apk
-          name: UniCore Mobile App v1.4.0 (Android test APK)
+          tag_name: v1.4.1-apk
+          name: UniCore Mobile App v1.4.1 (Android test APK)
           body: |
-            UniCore Android 1.4.0 fixes mobile sidebar expansion, teacher dashboard
-            layout, calendar, attendance, community attachment controls and invoice views.
-            Word pages and lecture slides fit the screen without squeezing their layout.
-            Transcript and invoice buttons export real PDFs through Android's save picker.
-            Uploads are durably stored in MongoDB GridFS and restored after server restarts.
-            Includes the newly supplied circular UniCore emblem.
+            UniCore 1.4.1 adds paged chat history, people search and community feeds,
+            account-scoped read caching and deduplicated requests. Document parsers
+            load on demand. Messages appear immediately as Sending, with safe Retry
+            on failure and no duplicate bubble when the server confirms delivery.
+            Notification replies start a fresh unread batch without older replies.
+            Mobile menus lock background scrolling; material actions use compact,
+            accessible icons while keeping the material title and metadata visible.
+            Includes the circular UniCore logo and real invoice/transcript PDF export.
 
-            Install over the previous APK using the same signing key to keep app data.
-            Files already lost without any stored copy must be uploaded again.
-            This is a debug-signed test build; frontend/icon changes require an APK update.
+            Use UniCore-1.4.1.apk for the same local signing key as prior app updates.
+            Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false
           prerelease: false

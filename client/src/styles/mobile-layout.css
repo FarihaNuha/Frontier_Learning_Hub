@@ -83,3 +83,29 @@
  .preview-modal-header > div:first-child { min-width: 0; flex: 1 1 100%; flex-wrap: wrap; gap: 8px !important; }
  .preview-modal-header > div:last-child { gap: 8px; flex-wrap: wrap; }
 }
+
+@media screen and (max-width: 1024px) {
+ .dashboard-container:has(.mobile-sidebar-toggle-bar) { padding-top: calc(56px + env(safe-area-inset-top, 0px)); box-sizing: border-box; }
+ .mobile-sidebar-toggle-bar { position: fixed !important; top: 0 !important; left: 0; right: 0; z-index: 1100 !important; }
+ body.mobile-drawer-open .main-content { overflow: hidden !important; touch-action: none; }
+ .mobile-sidebar-overlay.active { touch-action: none; overscroll-behavior: none; }
+ .sidebar.mobile-open { overscroll-behavior: contain; touch-action: pan-y; }
+}
+@media screen and (max-width: 600px) {
+ .materials-table-wrapper { padding: 0 !important; overflow: visible !important; background: transparent !important; box-shadow: none !important; }
+ .materials-table-wrapper table.materials-table { display: block; min-width: 0 !important; width: 100%; max-width: 100%; }
+ .materials-table thead { display: none; }
+ .materials-table tbody { display: grid; gap: 12px; }
+ .materials-table tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 16px; background: white; border: 1px solid #dbe7ee; border-radius: 12px; gap: 6px 12px; }
+ .materials-table tbody td { display: block !important; padding: 0 !important; border: 0; overflow-wrap: anywhere; min-width: 0; }
+ .materials-table .title-cell { grid-column: 1 / -1; font-size: 16px; font-weight: 700; }
+ .materials-table tbody td:nth-child(2), .materials-table tbody td:nth-child(3) { font-size: 12px; color: #64748b; }
+ .materials-table tbody td:nth-child(4) { grid-column: 1 / -1; font-size: 12px; color: #64748b; }
+ .materials-table .actions-cell { grid-column: 1 / -1; display: flex !important; flex-direction: row !important; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+ .materials-table .actions-cell .btn-toggle { width: 40px; height: 40px; padding: 0 !important; justify-content: center; border: 1px solid #dbe7ee !important; border-radius: 8px; background: #f8fafc !important; }
+ .materials-table .action-label { display: none; }
+}
+
+@media screen and (max-width: 600px) {
+ .materials-table tbody td { max-width: none !important; white-space: normal !important; }
+}

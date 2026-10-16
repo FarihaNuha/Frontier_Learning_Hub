@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
@@ -20,14 +20,8 @@ import StudentSidebar from "../components/StudentSidebar";
 import TeacherSidebar from "../components/TeacherSidebar";
 
 // Import existing pages
-import TeacherDashboard from "./TeacherDashboard";
-import StudentDashboard from "./StudentDashboard";
-import StudentAssignmentPage from "./StudentAssignmentPage";
-import TeacherAssignmentPage from "./TeacherAssignmentPage";
-import StudentExamPage from "./StudentExamPage";
-import TeacherExamPage from "./TeacherExamPage";
-import StudentAttendancePage from "./StudentAttendancePage";
-import TeacherAttendancePage from "./TeacherAttendancePage";
+const TeacherDashboard = lazy(() => import("./TeacherDashboard"));
+const StudentDashboard = lazy(() => import("./StudentDashboard"));
 
 export default function CourseDashboard() {
   const { id } = useParams();
@@ -54,7 +48,7 @@ export default function CourseDashboard() {
     if (user) {
       fetchCourse();
     }
-  }, [id, user]);
+  }, [id, user?.id, user?._id]);
 
   if (!user) return null;
 
@@ -110,6 +104,7 @@ export default function CourseDashboard() {
       )}
 
       <div className="main-content" style={{ padding: "0" }}>
+        <Suspense fallback={<p role="status" style={{ padding: 24 }}>Loading materials…</p>}>
         {activeTab === "lectures" && (
           <div className="course-tab-content">
             {user?.role === "teacher" ? (
@@ -119,6 +114,7 @@ export default function CourseDashboard() {
             )}
           </div>
         )}
+        </Suspense>
       </div>
     </div>
   );

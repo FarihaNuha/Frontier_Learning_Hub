@@ -1,9 +1,8 @@
+import { renderWordPreview } from "../services/wordPreview";
 import FittedDocument from "./FittedDocument";
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { FiX, FiDownload, FiFile, FiEye } from "react-icons/fi";
-import * as docx from "docx-preview";
-import JSZip from "jszip";
 import { Capacitor } from "@capacitor/core";
 import { absoluteFileUrl } from "../services/urls";
 import { openFile } from "../services/nativeFiles";
@@ -82,6 +81,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
         } else if (category === "pptx") {
           try {
             const buffer = await blob.arrayBuffer();
+            const { default: JSZip } = await import("jszip");
             const zip = await JSZip.loadAsync(buffer);
             const slideFiles = Object.keys(zip.files).filter((name) => {
               const n = name.toLowerCase();
@@ -137,16 +137,9 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
     };
   }, [file, isOpen]);
 
-  // Render docx asynchronously once docxRef is mounted in the DOM
   useEffect(() => {
     if (fileCategory === "docx" && docxBuffer && docxRef.current) {
-      docxRef.current.innerHTML = "";
-      docx.renderAsync(docxBuffer, docxRef.current, null, {
-        className: "docx-preview",
-        inWrapper: true,
-        ignoreWidth: false,
-        ignoreHeight: false,
-      }).catch(() => setLoadError("Could not preview this document. Download it to open in a document viewer."));
+      return renderWordPreview(docxBuffer, docxRef.current, () => setLoadError("Could not preview this document. Download it to open in a document viewer."));
     }
   }, [docxBuffer, fileCategory, loading]);
 

@@ -25,6 +25,8 @@ export default function GlobalNotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [sidebarNavEl, setSidebarNavEl] = useState(null);
 
+  useEffect(() => { setUnreadCount(notifications.filter(notification => !notification.isRead).length); }, [notifications]);
+
   const fetchNotifications = async () => {
     try {
       const res = await api.get("/notifications");
@@ -71,10 +73,13 @@ export default function GlobalNotificationBell() {
         setUnreadCount((prev) => prev + 1);
       };
 
+      const handleConversationRead = ({ threadId, readThrough }) => setNotifications(previous => previous.map(notification => notification.type === "chat_message" && notification.link === `/community/messages/${threadId}` && new Date(notification.createdAt).getTime() <= readThrough ? { ...notification, isRead: true } : notification));
+      socket.on("conversationRead", handleConversationRead);
       socket.on("newNotification", handleNewNotification);
       socket.on("new_notification", handleNewNoticeNotif);
 
       return () => {
+        socket.off("conversationRead", handleConversationRead);
         socket.off("newNotification", handleNewNotification);
         socket.off("new_notification", handleNewNoticeNotif);
       };

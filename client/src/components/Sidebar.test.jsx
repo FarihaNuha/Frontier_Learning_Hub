@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import StudentSidebar from "./StudentSidebar";
 import TeacherSidebar from "./TeacherSidebar";
 const mockNavigate = jest.fn();
+beforeEach(() => { window.scrollTo = jest.fn(); });
 jest.mock("react-router-dom", () => ({ useNavigate: () => mockNavigate, useParams: () => ({}) }));
 jest.mock("../contexts/AuthContext", () => ({ useAuth: () => ({ user: { name: "Fixture", role: "student" }, logout: jest.fn() }) }));
 jest.mock("../services/api", () => ({ __esModule: true, default: { get: jest.fn(async () => ({ data: { course: { title: "Course" } } })) } }));

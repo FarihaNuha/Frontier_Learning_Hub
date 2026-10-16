@@ -7,7 +7,7 @@
     "test-controller": "node scratch/test_exam_controller.js",
     "test-files": "node --test tests/uploadStore.test.js",
     "test-push": "node --test tests/pushNotifications.test.js",
-    "test-chat": "node --test tests/chatAndCalls.test.js tests/chatNotificationActions.test.js tests/performanceAndAudience.test.js",
+    "test-chat": "node --test tests/chatAndCalls.test.js tests/chatNotificationActions.test.js tests/performanceAndAudience.test.js tests/pagination.test.js",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },

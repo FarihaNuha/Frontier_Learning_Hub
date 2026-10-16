@@ -1,3 +1,4 @@
+import useMobileDrawer from "../hooks/useMobileDrawer";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -37,6 +38,7 @@ export default function TeacherSidebar({ currentPage, courseInfo, courseId }) {
 
   const [course, setCourse] = useState(courseInfo || null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  useMobileDrawer(mobileOpen);
 
   const isRegistrationPage =
     currentPage === "registration-approval" ||

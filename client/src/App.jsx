@@ -164,6 +164,13 @@ function AppContent() {
   }, [navigate]);
 
   useEffect(() => { setChatNotificationContext(); if (user) restoreNotificationNavigation(); }, [user]);
+  useEffect(() => {
+    if (!user || !["student", "teacher"].includes(user.role)) return;
+    const warm = () => { Promise.allSettled([import("./pages/MessagePage"), import("./pages/CourseListPage")]); };
+    const idle = window.requestIdleCallback ? window.requestIdleCallback(warm, { timeout: 2500 }) : setTimeout(warm, 1500);
+    return () => { if (window.cancelIdleCallback) window.cancelIdleCallback(idle); else clearTimeout(idle); };
+  }, [user?.id, user?._id, user?.role]);
+
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");

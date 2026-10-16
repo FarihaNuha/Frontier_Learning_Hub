@@ -41,7 +41,7 @@ final class UniCoreNotifications {
             JSONArray source = history.optJSONArray("messages"), remaining = new JSONArray();
             if (source != null) for (int i = 0; i < source.length(); i++) {
                 JSONObject item = source.getJSONObject(i);
-                if (item.optLong("time") > cutoff) remaining.put(item);
+                if (ChatReplyBoundary.retain(item.optLong("time"), item.optBoolean("outgoing"), cutoff)) remaining.put(item);
             }
             p.edit().putLong("read:" + thread, cutoff).apply();
             if (remaining.length() == 0) {
@@ -51,7 +51,7 @@ final class UniCoreNotifications {
             } else {
                 int unread = 0;
                 for (int i = 0; i < remaining.length(); i++) if (!remaining.getJSONObject(i).optBoolean("outgoing")) unread++;
-                history.put("messages", remaining).put("count", unread);
+                history.put("messages", remaining).put("count", unread).remove("status");
                 p.edit().putString("thread:" + thread, history.toString()).apply();
                 renderThread(context, thread, history, false);
             }
@@ -79,14 +79,15 @@ final class UniCoreNotifications {
             if (!history.optBoolean("dismissed")) renderThread(context, thread, history, false);
         } catch (Exception ignored) { }
     }
-    static synchronized void actionComplete(Context context, String thread, String action, String text, String operation) {
+    static synchronized void actionComplete(Context context, String thread, String action, String text, String operation, long readThrough) {
         try {
             JSONObject history = new JSONObject(prefs(context).getString("thread:" + thread, "{}"));
             JSONArray messages = history.optJSONArray("messages");
             if (messages == null) return;
             if ("reply".equals(action)) {
-                for (int i = 0; i < messages.length(); i++) if (operation.equals(messages.getJSONObject(i).optString("operation"))) return;
-                messages.put(new JSONObject().put("text", text).put("time", System.currentTimeMillis()).put("outgoing", true).put("operation", operation));
+                NotificationManagerCompat.from(context).cancel("chat:" + thread, id(thread));
+                clear(context, thread, readThrough);
+                return;
             }
             history.put("status", "like".equals(action) ? "Liked 👍" : "Reply sent");
             prefs(context).edit().putString("thread:" + thread, history.toString()).apply();
@@ -98,7 +99,8 @@ final class UniCoreNotifications {
         Intent intent = new Intent(context, ChatActionReceiver.class).setAction(action)
             .setData(Uri.parse("unicore-chat-action://" + thread + "/" + messageId + "/" + action))
             .putExtra("thread", thread).putExtra("owner", prefs(context).getString("owner", ""))
-            .putExtra("messageId", messageId).putExtra("token", history.optString("actionToken"));
+            .putExtra("messageId", messageId).putExtra("token", history.optString("actionToken"))
+            .putExtra("readThrough", history.optLong("actionTime"));
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
         if ("reply".equals(action)) {
             if (android.os.Build.VERSION.SDK_INT >= 31) flags |= PendingIntent.FLAG_MUTABLE;
@@ -119,7 +121,7 @@ final class UniCoreNotifications {
             style.addMessage(item.optString("text"), item.optLong("time"), item.optBoolean("outgoing") ? (Person)null : sender);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "unicore_messages_channel")
             .setSmallIcon(R.drawable.ic_stat_unicore).setLargeIcon(logo(context)).setColor(0xff123463).setContentTitle(history.optString("sender", "Message"))
-            .setContentText(ordered.get(ordered.size() - 1).optString("text")).setStyle(style)
+            .setContentText(ordered.get(ordered.size() - 1).optString("text")).setStyle(style).setRemoteInputHistory(null)
             .setContentIntent(tap(context, thread, history.optString("link", "/community/messages")))
             .setAutoCancel(true).setNumber(history.optInt("count")).setSubText(history.optInt("count") + " unread · " + history.optString("status", "Expand to view messages"))
             .setDeleteIntent(action(context, thread, history, "dismiss"))

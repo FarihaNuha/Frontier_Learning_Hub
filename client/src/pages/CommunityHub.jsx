@@ -1,12 +1,12 @@
 import { PUBLIC_APP_URL, absoluteFileUrl } from "../services/urls";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { communityApi } from "../services/communityApi";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import ShareModal from "../components/ShareModal";
-import FilePreviewModal from "../components/FilePreviewModal";
+const FilePreviewModal = lazy(() => import("../components/FilePreviewModal"));
 import {
   FiMessageSquare,
   FiMail,
@@ -64,6 +64,10 @@ export default function CommunityHub() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("feed");
   const [posts, setPosts] = useState([]);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMorePosts, setHasMorePosts] = useState(false);
+  const [loadingMorePosts, setLoadingMorePosts] = useState(false);
+  const feedRequest = useRef(0);
   const [inbox, setInbox] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -106,20 +110,18 @@ export default function CommunityHub() {
 
   if (!user) return null;
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (append = false) => {
+    const requestId = ++feedRequest.current;
+    if (append) setLoadingMorePosts(true); else setLoading(true);
     try {
-      setLoading(true);
-      const res = await communityApi.getPublicPosts({
-        category: selectedCategory,
-      });
-      setPosts(res.data.posts);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load posts");
-    } finally {
-      setLoading(false);
-    }
+      const res = await communityApi.getPublicPosts({ category: selectedCategory, limit: 20, ...(append ? { cursor: nextCursor } : {}) });
+      if (requestId !== feedRequest.current) return;
+      setPosts(previous => append ? [...previous, ...(res.data.posts || []).filter(post => !previous.some(item => item._id === post._id))] : res.data.posts || []);
+      setHasMorePosts(Boolean(res.data.hasMore)); setNextCursor(res.data.nextCursor || null);
+    } catch { toast.error("Failed to load discussions"); }
+    finally { if (requestId === feedRequest.current) { setLoading(false); setLoadingMorePosts(false); } }
   };
+
 
   const fetchInbox = async () => {
     try {
@@ -278,6 +280,7 @@ export default function CommunityHub() {
                     }}
                   />
                 ))}
+                {hasMorePosts && <button className="btn-secondary" disabled={loadingMorePosts} onClick={() => fetchPosts(true)}>{loadingMorePosts ? "Loading…" : "Load more discussions"}</button>}
               </div>
             )}
           </>
@@ -1090,11 +1093,11 @@ function PostCard({ post, getCategoryIcon, onPostDeleted, onPostUpdated }) {
           null
         }
       />
-      <FilePreviewModal
+      {previewModalFile && <Suspense fallback={<p>Loading viewer…</p>}><FilePreviewModal
         isOpen={!!previewModalFile}
         onClose={() => setPreviewModalFile(null)}
         file={previewModalFile}
-      />
+      /></Suspense>}
     </div>
   );
 }

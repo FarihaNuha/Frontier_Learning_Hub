@@ -270,10 +270,11 @@ export function AuthProvider({ children }) {
     const handleNewPrivateMessage = (payload) => {
       if (!payload || !payload.message) return;
       const msg = payload.message;
+      api.invalidateReadCache?.("/community/users");
       const currentUserId = user?._id || user?.id;
       const senderId = msg.sender?._id || msg.sender;
       if (String(senderId) === String(currentUserId)) return;
-      if (document.visibilityState === "visible" && window.location.pathname === `/community/messages/${senderId}`) return;
+      if (document.visibilityState === "visible" && window.location.pathname.endsWith(`/messages/${senderId}`)) return;
 
       const senderName = msg.sender?.name || "Direct Message";
       const content = msg.content || (msg.attachments?.length ? "Sent an attachment" : "Sent a message");

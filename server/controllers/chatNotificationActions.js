@@ -38,7 +38,8 @@ exports.performAction = async (req, res) => {
       return res.status(400).json({ error: "Enter a reply up to 1000 characters" });
     }
     // Reuse contact-hour, receiver, quote and duplicate-message validation.
-    req.user = { uid: String(user._id), role: user.role };
+    req.user = { uid: String(user._id), role: user.role, name: user.name, email: user.email };
+    req.notificationReplyThrough = new Date(message.createdAt);
     req.body = { receiverId: action.peerId, content, replyTo: action.messageId,
       clientMessageId: `notification:${requestId}` };
     req.files = [];

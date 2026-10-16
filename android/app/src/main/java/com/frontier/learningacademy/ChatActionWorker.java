@@ -25,7 +25,7 @@ public class ChatActionWorker extends Worker {
             int status = connection.getResponseCode();
             if (!owner.equals(UniCoreNotifications.prefs(context).getString("owner", ""))) return Result.failure();
             if (status >= 200 && status < 300) {
-                UniCoreNotifications.actionComplete(context, thread, data.getString("action"), data.getString("content"), data.getString("operation"));
+                UniCoreNotifications.actionComplete(context, thread, data.getString("action"), data.getString("content"), data.getString("operation"), data.getLong("readThrough", 0));
                 return Result.success();
             }
             if (status != 408 && status != 429 && status < 500) {

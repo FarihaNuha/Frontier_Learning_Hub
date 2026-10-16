@@ -77,6 +77,18 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// Expose server work separately from device/network latency for JSON APIs.
+app.use("/api", (req, res, next) => {
+  const started = performance.now(), json = res.json;
+  res.json = function(body) {
+    const elapsed = performance.now() - started;
+    if (!res.headersSent) res.setHeader("Server-Timing", `app;dur=${elapsed.toFixed(1)}`);
+    if (elapsed > 1000) console.log(JSON.stringify({ event: "slow_api", method: req.method, route: req.baseUrl + (req.route?.path || ""), durationMs: Math.round(elapsed) }));
+    return json.call(this, body);
+  };
+  next();
+});
+
 // Auto-restore missing files from DB helper
 const restoreMissingFileFromDB = async (filename, targetFilePath) => {
   const filenamePattern = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

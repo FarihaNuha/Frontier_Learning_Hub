@@ -1,12 +1,12 @@
 import { PUBLIC_APP_URL, absoluteFileUrl } from "../services/urls";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
 import { communityApi } from "../services/communityApi";
 import toast from "react-hot-toast";
 import ShareModal from "../components/ShareModal";
-import FilePreviewModal from "../components/FilePreviewModal";
+const FilePreviewModal = lazy(() => import("../components/FilePreviewModal"));
 import {
   FiMessageSquare,
   FiPlus,
@@ -64,6 +64,10 @@ export default function CourseCommunity() {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMorePosts, setHasMorePosts] = useState(false);
+  const [loadingMorePosts, setLoadingMorePosts] = useState(false);
+  const feedRequest = useRef(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -115,20 +119,18 @@ export default function CourseCommunity() {
     }
   };
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (append = false) => {
+    const requestId = ++feedRequest.current;
+    if (append) setLoadingMorePosts(true); else setLoading(true);
     try {
-      setLoading(true);
-      const res = await api.get(
-        `/community/courses/${courseId}/posts?category=${selectedCategory}`,
-      );
-      setPosts(res.data.posts);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load discussions");
-    } finally {
-      setLoading(false);
-    }
+      const res = await communityApi.getCoursePosts(courseId, { category: selectedCategory, limit: 20, ...(append ? { cursor: nextCursor } : {}) });
+      if (requestId !== feedRequest.current) return;
+      setPosts(previous => append ? [...previous, ...(res.data.posts || []).filter(post => !previous.some(item => item._id === post._id))] : res.data.posts || []);
+      setHasMorePosts(Boolean(res.data.hasMore)); setNextCursor(res.data.nextCursor || null);
+    } catch { toast.error("Failed to load discussions"); }
+    finally { if (requestId === feedRequest.current) { setLoading(false); setLoadingMorePosts(false); } }
   };
+
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
@@ -312,6 +314,7 @@ export default function CourseCommunity() {
                 }}
               />
             ))}
+                {hasMorePosts && <button className="btn-secondary" disabled={loadingMorePosts} onClick={() => fetchPosts(true)}>{loadingMorePosts ? "Loading…" : "Load more discussions"}</button>}
           </div>
         )}
       </div>
@@ -1272,11 +1275,11 @@ function CoursePostCard({ post, user, courseId, onlineUsers, onPostDeleted, onPo
           null
         }
       />
-      <FilePreviewModal
+      {previewModalFile && <Suspense fallback={<p>Loading viewer…</p>}><FilePreviewModal
         isOpen={!!previewModalFile}
         onClose={() => setPreviewModalFile(null)}
         file={previewModalFile}
-      />
+      /></Suspense>}
     </div>
   );
 }

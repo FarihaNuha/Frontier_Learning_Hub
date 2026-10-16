@@ -1,3 +1,4 @@
+import { createReadCache } from "./requestCache";
 import axios from "axios";
 import { Capacitor } from "@capacitor/core";
 import { invalidateCache } from "./apiCache";
@@ -46,6 +47,11 @@ const api = axios.create({
   timeout: 60000,
 });
 
+const reads = createReadCache(axios.getAdapter(api.defaults.adapter), () => localStorage.getItem("token") || "anonymous");
+api.defaults.adapter = reads.request;
+api.clearReadCache = reads.clear;
+api.invalidateReadCache = reads.invalidate;
+
 // Request interceptor - add token to every request
 api.interceptors.request.use(
   (config) => {
@@ -64,6 +70,8 @@ api.interceptors.response.use(
     const method = response.config?.method?.toLowerCase();
     if (["post", "put", "delete", "patch"].includes(method)) {
       const url = response.config?.url || "";
+      if (url.includes("lectures")) invalidateCache("lectures");
+      if (url.includes("community")) invalidateCache("community");
       if (url.includes("assignments")) invalidateCache("assignments");
       if (url.includes("assessments")) invalidateCache("assessments");
       if (url.includes("exams")) invalidateCache("exams");

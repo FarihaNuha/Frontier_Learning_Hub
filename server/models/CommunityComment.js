@@ -36,4 +36,6 @@ const communityCommentSchema = new mongoose.Schema({
   },
 });
 
+communityCommentSchema.index({ postId: 1, createdAt: -1 });
+
 module.exports = mongoose.model("CommunityComment", communityCommentSchema);

@@ -1,3 +1,4 @@
+import { renderWordPreview } from "../services/wordPreview";
 import { createPortal } from "react-dom";
 import { Capacitor } from "@capacitor/core";
 import { openFile } from "../services/nativeFiles";
@@ -5,7 +6,6 @@ import FittedDocument from "../components/FittedDocument";
 import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import * as docx from "docx-preview";
 import { useAuth } from "../contexts/AuthContext";
 import api, { BACKEND_URL } from "../services/api";
 import { fetchWithCache } from "../services/apiCache";
@@ -137,14 +137,7 @@ export default function StudentDashboard({
 
   useEffect(() => {
     if (previewType === "docx" && previewBlob && docContainerRef.current) {
-      docContainerRef.current.innerHTML = "";
-      docx.renderAsync(previewBlob, docContainerRef.current)
-        .catch(err => {
-          console.error("Error rendering docx:", err);
-          if (docContainerRef.current) {
-            docContainerRef.current.innerHTML = `<div style="padding: 20px; color: #ef4444; text-align: center;">Failed to render Word document layout.</div>`;
-          }
-        });
+      return renderWordPreview(previewBlob, docContainerRef.current, () => toast.error("Could not preview this document. Download it to open."));
     }
   }, [previewType, previewBlob]);
 
@@ -183,7 +176,7 @@ export default function StudentDashboard({
     } else {
       navigate("/courses");
     }
-  }, [finalCourseId, user]);
+  }, [finalCourseId, user?.id, user?._id]);
 
   if (!user) return null;
 

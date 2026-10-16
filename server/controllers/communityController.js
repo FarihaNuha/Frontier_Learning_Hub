@@ -1,3 +1,4 @@
+const { pageSize, cursorFilter, pageResult } = require("../utils/pagination");
 const CommunityPost = require("../models/CommunityPost");
 const CommunityComment = require("../models/CommunityComment");
 const PrivateMessage = require("../models/PrivateMessage");
@@ -95,39 +96,25 @@ exports.createPublicPost = async (req, res) => {
 
 exports.getPublicPosts = async (req, res) => {
   try {
-    const { category } = req.query;
+    const { category, cursor, limit: requestedLimit } = req.query || {};
+    const limit = pageSize(requestedLimit);
     const filter = { courseId: null };
-
-    if (category && category !== "all") {
-      filter.category = category;
-    }
-
-    const posts = await CommunityPost.find(filter)
+    if (category && category !== "all") filter.category = category;
+    const before = cursorFilter(cursor);
+    const rows = await CommunityPost.find(before ? { $and: [filter, before] } : filter)
       .populate("author", "name email role profilePicture")
-      .populate("lecture")
-      .populate({
-        path: "sharedPostId",
-        populate: [
-          { path: "author", select: "name role email" },
-          { path: "lecture" }
-        ]
-      })
-      .sort({ createdAt: -1 });
-
-    const postsWithCounts = await Promise.all(
-      posts.map(async (post) => {
-        const commentCount = await CommunityComment.countDocuments({
-          postId: post._id,
-        });
-        return { ...post.toObject(), commentCount };
-      }),
-    );
-
-    res.json({ posts: postsWithCounts });
-  } catch (error) {
-    console.error("Get public posts error:", error);
-    res.status(500).json({ error: error.message });
-  }
+      .populate("lecture", "-fileData")
+      .populate({ path: "sharedPostId", populate: [
+        { path: "author", select: "name role email" }, { path: "lecture", select: "-fileData" }
+      ] }).sort({ createdAt: -1, _id: -1 }).limit(limit + 1).lean();
+    const { items, hasMore, nextCursor } = pageResult(rows, limit);
+    const counts = items.length ? await CommunityComment.aggregate([
+      { $match: { postId: { $in: items.map(post => post._id) } } },
+      { $group: { _id: "$postId", count: { $sum: 1 } } }
+    ]) : [];
+    const byPost = new Map(counts.map(row => [String(row._id), row.count]));
+    res.json({ posts: items.map(post => ({ ...post, commentCount: byPost.get(String(post._id)) || 0 })), hasMore, nextCursor });
+  } catch (error) { res.status(error.status || 500).json({ error: error.message }); }
 };
 
 exports.getPublicPost = async (req, res) => {
@@ -139,12 +126,12 @@ exports.getPublicPost = async (req, res) => {
       courseId: null,
     })
       .populate("author", "name email role profilePicture")
-      .populate("lecture")
+      .populate("lecture", "-fileData")
       .populate({
         path: "sharedPostId",
         populate: [
           { path: "author", select: "name role email" },
-          { path: "lecture" }
+          { path: "lecture", select: "-fileData" }
         ]
       });
 
@@ -415,40 +402,25 @@ exports.createCoursePost = async (req, res) => {
 
 exports.getCoursePosts = async (req, res) => {
   try {
-    const { courseId } = req.params;
-    const { category } = req.query;
-
-    const filter = { courseId };
-    if (category && category !== "all") {
-      filter.category = category;
-    }
-
-    const posts = await CommunityPost.find(filter)
+    const { category, cursor, limit: requestedLimit } = req.query || {};
+    const limit = pageSize(requestedLimit);
+    const filter = { courseId: req.params.courseId };
+    if (category && category !== "all") filter.category = category;
+    const before = cursorFilter(cursor);
+    const rows = await CommunityPost.find(before ? { $and: [filter, before] } : filter)
       .populate("author", "name email role profilePicture")
-      .populate("lecture")
-      .populate({
-        path: "sharedPostId",
-        populate: [
-          { path: "author", select: "name role email" },
-          { path: "lecture" }
-        ]
-      })
-      .sort({ createdAt: -1 });
-
-    const postsWithCounts = await Promise.all(
-      posts.map(async (post) => {
-        const commentCount = await CommunityComment.countDocuments({
-          postId: post._id,
-        });
-        return { ...post.toObject(), commentCount };
-      }),
-    );
-
-    res.json({ posts: postsWithCounts });
-  } catch (error) {
-    console.error("Get course posts error:", error);
-    res.status(500).json({ error: error.message });
-  }
+      .populate("lecture", "-fileData")
+      .populate({ path: "sharedPostId", populate: [
+        { path: "author", select: "name role email" }, { path: "lecture", select: "-fileData" }
+      ] }).sort({ createdAt: -1, _id: -1 }).limit(limit + 1).lean();
+    const { items, hasMore, nextCursor } = pageResult(rows, limit);
+    const counts = items.length ? await CommunityComment.aggregate([
+      { $match: { postId: { $in: items.map(post => post._id) } } },
+      { $group: { _id: "$postId", count: { $sum: 1 } } }
+    ]) : [];
+    const byPost = new Map(counts.map(row => [String(row._id), row.count]));
+    res.json({ posts: items.map(post => ({ ...post, commentCount: byPost.get(String(post._id)) || 0 })), hasMore, nextCursor });
+  } catch (error) { res.status(error.status || 500).json({ error: error.message }); }
 };
 
 exports.getCoursePost = async (req, res) => {
@@ -460,12 +432,12 @@ exports.getCoursePost = async (req, res) => {
       courseId,
     })
       .populate("author", "name email role profilePicture")
-      .populate("lecture")
+      .populate("lecture", "-fileData")
       .populate({
         path: "sharedPostId",
         populate: [
           { path: "author", select: "name role email" },
-          { path: "lecture" }
+          { path: "lecture", select: "-fileData" }
         ]
       });
 
@@ -681,16 +653,24 @@ exports.deleteComment = async (req, res) => {
 
 // ==================== PRIVATE MESSAGES ====================
 
+async function acknowledgeInlineReply(req, peerId) {
+  const cutoff = req.notificationReplyThrough;
+  if (!(cutoff instanceof Date) || !Number.isFinite(cutoff.getTime())) return;
+  await Promise.all([
+    PrivateMessage.updateMany({ sender: peerId, receiver: req.user.uid, isRead: false, createdAt: { $lte: cutoff }, deletedFor: { $ne: req.user.uid } }, { isRead: true, readAt: new Date() }),
+    Notification.updateMany({ userId: req.user.uid, type: "chat_message", link: `/community/messages/${peerId}`, isRead: false, createdAt: { $lte: cutoff } }, { isRead: true })
+  ]);
+  const readThrough = cutoff.getTime(), io = getIO();
+  io?.to(`user_${peerId}`).emit("messagesRead", { readerId: req.user.uid, readAt: new Date(), readThrough });
+  io?.to(`user_${req.user.uid}`).emit("conversationRead", { threadId: String(peerId), readThrough });
+  require("../services/fcmService").sendUserPushNotification(req.user.uid, { control: true, data: { type: "chat_read", threadId: String(peerId), timestamp: String(readThrough) }, ttl: 60000 }).catch(() => {});
+}
+
 exports.sendMessage = async (req, res) => {
   try {
     const { receiverId, subject, content, replyTo, forwardOf, clientMessageId } = req.body;
     if (content && (typeof content !== "string" || content.length > 10000)) return res.status(400).json({ error: "Message is too long" });
     if (clientMessageId && (typeof clientMessageId !== "string" || clientMessageId.length > 100)) return res.status(400).json({ error: "Invalid message id" });
-    if (clientMessageId) {
-      const existing = await PrivateMessage.findOne({ sender: req.user.uid, clientMessageId });
-      if (existing) return res.json({ message: existing });
-    }
-
     if (!receiverId) {
       return res.status(400).json({ error: "Receiver is required" });
     }
@@ -699,7 +679,11 @@ exports.sendMessage = async (req, res) => {
       return res.status(400).json({ error: "Message content or file is required" });
     }
 
-    const receiver = await User.findById(receiverId);
+    const [existing, receiver] = await Promise.all([
+      clientMessageId ? PrivateMessage.findOne({ sender: req.user.uid, clientMessageId }) : null,
+      User.findById(receiverId, "name email role emailNotifications isBlocked")
+    ]);
+    if (existing) { await acknowledgeInlineReply(req, existing.receiver); return res.json({ message: existing }); }
     if (!receiver) {
       return res.status(404).json({ error: "Receiver not found" });
     }
@@ -708,7 +692,7 @@ exports.sendMessage = async (req, res) => {
       return res.status(403).json({ error: "Messaging Super Admin is not permitted." });
     }
 
-    const sender = await User.findById(req.user.uid);
+    const sender = req.user.name && req.user.role ? req.user : await User.findById(req.user.uid);
     if (sender && sender.role === "student" && receiver.role === "teacher") {
       const now = new Date();
       const activeRequest = await ContactRequest.findOne({
@@ -761,11 +745,11 @@ exports.sendMessage = async (req, res) => {
       attachments,
     });
 
-    await message.populate("sender", "name email");
+    const wireMessage = { ...(message.toObject?.() || message), sender: { _id: req.user.uid, name: sender?.name || req.user.name, email: sender?.email || req.user.email }, receiver: receiverId };
 
     const io = getIO();
     io?.to(`user_${req.user.uid}`).to(`user_${receiverId}`).emit("newPrivateMessage", {
-      message: message,
+      message: wireMessage,
     });
 
     // Create system notification for receiver
@@ -787,7 +771,7 @@ exports.sendMessage = async (req, res) => {
 
       if (io) {
         io.to(`user_${receiverId}`).emit("newNotification", {
-          _id: notification._id,
+          _id: notification._id, createdAt: notification.createdAt,
           title: `✉️ New Message from ${senderName}`,
           message: previewContent,
           type: "chat_message",
@@ -809,7 +793,8 @@ exports.sendMessage = async (req, res) => {
       queueEmail(receiver.email, emailData.subject, emailData.html);
     }
 
-    res.status(201).json({ message });
+    await acknowledgeInlineReply(req, receiverId);
+    res.status(201).json({ message: wireMessage });
   } catch (error) {
     console.error("Send message error:", error);
     res.status(500).json({ error: error.message });
@@ -833,48 +818,42 @@ exports.getInbox = async (req, res) => {
 exports.getConversation = async (req, res) => {
   try {
     const { userId } = req.params;
-    const targetUser = await User.findById(userId).select("name email role profilePicture").lean();
+    const limit = pageSize(req.query?.limit, 40), before = cursorFilter(req.query?.cursor);
+    const filter = { deletedFor: { $ne: req.user.uid }, $or: [
+      { sender: req.user.uid, receiver: userId }, { sender: userId, receiver: req.user.uid }
+    ] };
+    const [targetUser, rows] = await Promise.all([
+      User.findById(userId).select("name email role profilePicture").lean(),
+      PrivateMessage.find(before ? { $and: [filter, before] } : filter)
+        .sort({ createdAt: -1, _id: -1 }).limit(limit + 1).lean()
+    ]);
     if (!targetUser) return res.status(404).json({ error: "Person not found" });
-
-    if (targetUser && (targetUser.role === "admin" || targetUser.role === "superadmin" || (targetUser.name || "").toLowerCase().includes("super admin"))) {
-      return res.status(403).json({ error: "Messaging Super Admin is not permitted." });
-    }
-
-    const messages = await PrivateMessage.find({
-      deletedFor: { $ne: req.user.uid },
-      $or: [
-        { sender: req.user.uid, receiver: userId },
-        { sender: userId, receiver: req.user.uid },
-      ],
-    })
-      .populate("sender", "name email profilePicture")
-      .populate("receiver", "name email profilePicture")
-      .sort({ createdAt: 1 });
-
-    const incoming = messages.filter(m => String(m.receiver?._id || m.receiver) === String(req.user.uid));
-    const readThrough = incoming.reduce((last, m) => Math.max(last, new Date(m.createdAt).getTime()), 0);
-    const readResult = await PrivateMessage.updateMany(
-      { _id: { $in: incoming.map(m => m._id) }, receiver: req.user.uid, isRead: false },
-      { isRead: true, readAt: new Date() },
-    );
-
+    if (["admin", "superadmin"].includes(targetUser.role) || /super admin/i.test(targetUser.name || "")) return res.status(403).json({ error: "Messaging Super Admin is not permitted." });
+    const { items, hasMore, nextCursor } = pageResult(rows, limit);
+    const messages = items.reverse();
+    const readThrough = messages.reduce((last, message) => Math.max(last, new Date(message.createdAt).getTime()), 0);
     const readAt = new Date();
-    if (readResult.modifiedCount) {
-      await Notification.updateMany({ userId: req.user.uid, type: "chat_message", link: `/community/messages/${userId}`, isRead: false }, { isRead: true });
-      require("../services/fcmService").sendUserPushNotification(req.user.uid, {
-        control: true, data: { type: "chat_read", threadId: userId, timestamp: String(readThrough) }, ttl: 60000,
-      }).catch(() => {});
+    if (readThrough && !req.query?.cursor) {
+      const result = await PrivateMessage.updateMany({ sender: userId, receiver: req.user.uid, isRead: false,
+        deletedFor: { $ne: req.user.uid }, createdAt: { $lte: new Date(readThrough) } }, { isRead: true, readAt });
+      if (result.modifiedCount) {
+        await Notification.updateMany({ userId: req.user.uid, type: "chat_message", link: `/community/messages/${userId}`, isRead: false, createdAt: { $lte: new Date(readThrough) } }, { isRead: true });
+        require("../services/fcmService").sendUserPushNotification(req.user.uid, {
+          control: true, data: { type: "chat_read", threadId: userId, timestamp: String(readThrough) }, ttl: 60000
+        }).catch(() => {});
+      }
+      const io = getIO();
+      io?.to(`user_${userId}`).emit("messagesRead", { readerId: req.user.uid, readAt, readThrough });
+      io?.to(`user_${req.user.uid}`).emit("conversationRead", { threadId: userId, readThrough });
     }
-    getIO().to(`user_${userId}`).emit("messagesRead", { readerId: req.user.uid, readAt, readThrough });
-    getIO().to(`user_${req.user.uid}`).emit("conversationRead", { threadId: userId, readThrough });
-    res.json({ user: targetUser, readThrough, messages: messages.map(m => {
-      if (String(m.receiver?._id || m.receiver) === String(req.user.uid)) { m.isRead = true; m.readAt = readAt; }
-      return m;
-    }) });
-  } catch (error) {
-    console.error("Get conversation error:", error);
-    res.status(500).json({ error: error.message });
-  }
+    const me = { _id: req.user.uid, name: req.user.name, email: req.user.email };
+    const peer = { _id: targetUser._id, name: targetUser.name, email: targetUser.email };
+    res.json({ user: targetUser, hasMore, nextCursor, readThrough, messages: messages.map(message => ({ ...message,
+      sender: String(message.sender) === String(req.user.uid) ? me : peer,
+      receiver: String(message.receiver) === String(req.user.uid) ? me : peer,
+      ...(String(message.receiver) === String(req.user.uid) ? { isRead: true, readAt } : {})
+    })) });
+  } catch (error) { res.status(error.status || 500).json({ error: error.message }); }
 };
 
 exports.getUnreadMessagesCount = async (req, res) => {
@@ -893,7 +872,9 @@ exports.getUnreadMessagesCount = async (req, res) => {
 exports.getUsers = async (req, res) => {
   try {
     const currentUserId = req.user.uid;
-    const { courseId } = req.query;
+    const { courseId, limit: requestedLimit, offset = 0, q = "", role } = req.query;
+    const paginated = Boolean(requestedLimit), limit = pageSize(requestedLimit, 40);
+    const start = Math.min(100000, Math.max(0, Number.parseInt(offset, 10) || 0));
 
     let filter = {
       _id: { $ne: currentUserId },
@@ -901,6 +882,9 @@ exports.getUsers = async (req, res) => {
       name: { $not: /super admin/i },
       isRegistered: true,
     };
+
+    if (["teacher", "student"].includes(role)) filter.role = role;
+    if (q) { const escaped = String(q).slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); filter.$or = [{ name: new RegExp(escaped, "i") }, { email: new RegExp(escaped, "i") }]; }
 
     if (courseId) {
       const Course = require("../models/Course");
@@ -914,7 +898,7 @@ exports.getUsers = async (req, res) => {
     }
 
     let users = await User.find(filter).select(
-      "name email role department profilePicture isRegistered"
+      paginated ? "name email role department isRegistered" : "name email role department profilePicture isRegistered"
     ).lean();
 
     users = users.filter(
@@ -960,7 +944,12 @@ exports.getUsers = async (req, res) => {
       return a.name.localeCompare(b.name);
     });
 
-    res.json({ users: usersWithStats });
+    if (!paginated) return res.json({ users: usersWithStats });
+    const page = usersWithStats.slice(start, start + limit);
+    const avatars = page.length ? await User.find({ _id: { $in: page.map(person => person._id) } }).select("profilePicture").lean() : [];
+    const byId = new Map(avatars.map(person => [String(person._id), person.profilePicture]));
+    const hasMore = start + limit < usersWithStats.length;
+    res.json({ users: page.map(person => ({ ...person, profilePicture: byId.get(String(person._id)) })), hasMore, nextOffset: hasMore ? start + limit : null });
   } catch (error) {
     console.error("Get users error:", error);
     res.status(500).json({ error: error.message });
@@ -994,7 +983,7 @@ exports.sharePost = async (req, res) => {
       path: "sharedPostId",
       populate: [
         { path: "author", select: "name role email" },
-        { path: "lecture" }
+        { path: "lecture", select: "-fileData" }
       ]
     });
 

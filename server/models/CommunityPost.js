@@ -72,4 +72,7 @@ const communityPostSchema = new mongoose.Schema({
   },
 });
 
+communityPostSchema.index({ courseId: 1, createdAt: -1, _id: -1 });
+communityPostSchema.index({ courseId: 1, category: 1, createdAt: -1, _id: -1 });
+
 module.exports = mongoose.model("CommunityPost", communityPostSchema);

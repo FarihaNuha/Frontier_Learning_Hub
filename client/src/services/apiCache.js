@@ -1,3 +1,4 @@
+import { clearConversations } from "./chatState";
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "./api";
 
@@ -27,6 +28,8 @@ const getUserScopedKey = (key) => {
  */
 export const clearAllCache = () => {
   memoryCache.clear();
+  clearConversations();
+  api.clearReadCache?.();
   try {
     const keysToRemove = [];
     for (let i = 0; i < sessionStorage.length; i++) {
@@ -143,7 +146,7 @@ export const fetchWithCache = async (url, options = {}) => {
     }
   }
 
-  const res = await api.get(url);
+  const res = await api.get(url, { cache: !forceRefresh });
   setCachedData(url, res.data);
   return res.data;
 };

@@ -1,3 +1,4 @@
+import { renderWordPreview } from "../services/wordPreview";
 import { createPortal } from "react-dom";
 import { Capacitor } from "@capacitor/core";
 import { openFile } from "../services/nativeFiles";
@@ -5,7 +6,6 @@ import FittedDocument from "../components/FittedDocument";
 import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import * as docx from "docx-preview";
 import { useAuth } from "../contexts/AuthContext";
 import api, { BACKEND_URL } from "../services/api";
 import { fetchWithCache, invalidateCache } from "../services/apiCache";
@@ -133,14 +133,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
 
   useEffect(() => {
     if (previewType === "docx" && previewBlob && docContainerRef.current) {
-      docContainerRef.current.innerHTML = "";
-      docx.renderAsync(previewBlob, docContainerRef.current)
-        .catch(err => {
-          console.error("Error rendering docx:", err);
-          if (docContainerRef.current) {
-            docContainerRef.current.innerHTML = `<div style="padding: 20px; color: #ef4444; text-align: center;">Failed to render Word document layout.</div>`;
-          }
-        });
+      return renderWordPreview(previewBlob, docContainerRef.current, () => toast.error("Could not preview this document. Download it to open."));
     }
   }, [previewType, previewBlob]);
 
@@ -195,7 +188,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
     if (user) {
       fetchLectures();
     }
-  }, [user]);
+  }, [user?.id, user?._id, courseId]);
 
   useEffect(() => {
     if (selectedWeek) {
@@ -774,8 +767,8 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                     <p style={{ color: "#3B8DB3", fontWeight: 600, fontSize: "14.5px", marginTop: "4px" }}>No {categoryConfig[selectedCategory]?.label?.toLowerCase()} in Week {selectedWeek}.</p>
                   </div>
                 ) : (
-                  <div className="table-container">
-                    <table className="data-table">
+                  <div className="table-container materials-table-wrapper">
+                    <table className="data-table materials-table">
                       <thead>
                         <tr>
                           <th>Title</th>
@@ -790,8 +783,8 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                           .filter((l) => getLectureCategory(l.fileType) === selectedCategory)
                           .map((lecture) => (
                             <tr key={lecture._id}>
-                              <td className="title-cell">{lecture.title}</td>
-                              <td className="course-cell">{lecture.course}</td>
+                              <td className="title-cell">{lecture.title || lecture.originalName || "Material"}</td>
+                              <td className="course-cell">{lecture.course || courseCode || ""}</td>
                               <td>{lecture.topic || "-"}</td>
                               <td>{new Date(lecture.createdAt).toLocaleDateString()}</td>
                               <td className="actions-cell">
@@ -803,14 +796,14 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                                     title: lecture.title,
                                     fileType: lecture.fileType
                                   })}
-                                  className="btn-toggle"
+                                  className="btn-toggle" aria-label={`View ${lecture.title}`} title="View"
                                   style={{ color: "#3b8db3", display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer" }}
                                 >
-                                  <FiEye size={16} /> View
+                                  <FiEye size={18} aria-hidden="true" /> <span className="action-label">View</span>
                                 </button>
                                 <a
                                   href={`${BACKEND_URL}/api/lectures/download/${lecture._id}?token=${localStorage.getItem("token")}`}
-                                  className="btn-toggle"
+                                  className="btn-toggle" aria-label={`Download ${lecture.title}`} title="Download"
                                   style={{ 
                                     cursor: "pointer", 
                                     border: "none", 
@@ -823,21 +816,21 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                                   }}
                                   download
                                 >
-                                  <FiDownload size={16} /> Download
+                                  <FiDownload size={18} aria-hidden="true" /> <span className="action-label">Download</span>
                                 </a>
                                 <button
-                                  className="btn-toggle"
+                                  className="btn-toggle" aria-label={`Delete ${lecture.title}`} title="Delete"
                                   style={{ color: "#ef4444", display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer" }}
                                   onClick={() => handleDelete(lecture._id)}
                                 >
-                                  <FiTrash2 size={16} /> Delete
+                                  <FiTrash2 size={18} aria-hidden="true" /> <span className="action-label">Delete</span>
                                 </button>
                                 <button
-                                  className="btn-toggle"
+                                  className="btn-toggle" aria-label={`Share ${lecture.title}`} title="Share"
                                   style={{ color: "#a78bfa", display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer" }}
                                   onClick={() => handleShareLecture(lecture)}
                                 >
-                                  <FiShare2 size={16} /> Share
+                                  <FiShare2 size={18} aria-hidden="true" /> <span className="action-label">Share</span>
                                 </button>
                               </td>
                             </tr>
@@ -1183,7 +1176,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
                     }}
                     download
                   >
-                    <FiDownload size={16} /> Download File
+                    <FiDownload size={18} aria-hidden="true" /> <span className="action-label">Download</span> File
                   </a>
                 </div>
               )}

@@ -1,10 +1,10 @@
+import { renderWordPreview } from "../services/wordPreview";
+import { mergeMessages, cachedConversation, rememberConversation } from "../services/chatState";
 import { Capacitor } from "@capacitor/core";
 import FittedDocument from "../components/FittedDocument";
 import { absoluteFileUrl } from "../services/urls";
 import { downloadFile as saveDownload, openFile } from "../services/nativeFiles";
 import { useState, useEffect, useRef } from "react";
-import * as docx from "docx-preview";
-import JSZip from "jszip";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { communityApi } from "../services/communityApi";
@@ -15,6 +15,8 @@ import TeacherSidebar from "../components/TeacherSidebar";
 import StudentSidebar from "../components/StudentSidebar";
 import toast from "react-hot-toast";
 import {
+  FiDownload,
+  FiEye,
   FiArrowLeft,
   FiSend,
   FiUser,
@@ -47,6 +49,12 @@ export default function MessagePage() {
 
   // ---- messaging state ----
   const [users, setUsers] = useState([]);
+  const [hasMoreUsers, setHasMoreUsers] = useState(false);
+  const [usersOffset, setUsersOffset] = useState(0);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [contactTeachers, setContactTeachers] = useState([]);
+  const usersRequest = useRef(0);
+  const firstSearch = useRef(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -65,6 +73,14 @@ export default function MessagePage() {
   const [forwarding, setForwarding] = useState(null);
   const [forwardTarget, setForwardTarget] = useState("");
   const sendId = useRef(null);
+  const pendingSends = useRef(new Map());
+  const deliveredEvents = useRef(new Set());
+  const conversationRequest = useRef(0);
+  const [olderCursor, setOlderCursor] = useState(null);
+  const [hasOlder, setHasOlder] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const preserveScroll = useRef(false);
+  const lastRenderedMessage = useRef(null);
   const chatId = userId || selectedUser?._id || selectedUser?.id;
   const ownMessage = msg => String(msg.sender?._id || msg.sender) === String(user?.id || user?._id);
   useEffect(() => {
@@ -72,7 +88,7 @@ export default function MessagePage() {
     const visible = event => {
       setChatNotificationContext(document.visibilityState === "visible" ? chatId || "" : "");
       if (event && chatId && document.visibilityState === "visible") {
-        communityApi.getConversation(chatId).then(res => { setMessages(res.data.messages || []); clearChatNotification(chatId, res.data.readThrough); }).catch(() => {});
+        fetchConversation(chatId);
       }
     };
     visible(); document.addEventListener("visibilitychange", visible);
@@ -126,16 +142,36 @@ export default function MessagePage() {
       fetchUsers();
       fetchContactRequests();
     }
-  }, [user]);
+  }, [user?.id, user?._id]);
 
   useEffect(() => {
     if (user && userId) {
       fetchConversation(userId);
       setShowNewMessage(false);
     }
-  }, [userId, user]);
+  }, [userId, user?.id, user?._id]);
 
-  useEffect(() => { scrollToBottom(); }, [messages]);
+  useEffect(() => { lastRenderedMessage.current = null; }, [chatId]);
+  useEffect(() => {
+    const last = messages.at(-1), previousId = lastRenderedMessage.current;
+    lastRenderedMessage.current = last?._id;
+    if (preserveScroll.current) { preserveScroll.current = false; return; }
+    const box = document.querySelector(".chat-messages");
+    const nearBottom = !box || box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+    if (last && last._id !== previousId && (!previousId || ownMessage(last) || nearBottom)) scrollToBottom();
+  }, [messages]);
+  useEffect(() => {
+    if (chatId && selectedUser && String(selectedUser._id || selectedUser.id) === String(chatId)) rememberConversation(user?.id || user?._id, chatId, { user: selectedUser, messages, nextCursor: olderCursor, hasMore: hasOlder });
+  }, [messages, selectedUser, chatId, olderCursor, hasOlder, user?.id, user?._id]);
+
+  useEffect(() => {
+    if (firstSearch.current) { firstSearch.current = false; return; }
+    const timer = setTimeout(() => fetchUsers(), 250);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+  useEffect(() => {
+    if (activeTab === "requests" && user?.role === "student") communityApi.getUsers({ role: "teacher" }).then(res => setContactTeachers(res.data.users || [])).catch(console.error);
+  }, [activeTab, user?.role]);
 
   // Check active slot whenever selectedUser or contactRequests changes
   useEffect(() => {
@@ -163,16 +199,16 @@ export default function MessagePage() {
 
     const handleNewMessage = (data) => {
       const msg = data.message;
-      clearTimeout(usersRefresh);
-      usersRefresh = setTimeout(fetchUsers, 300);
+      if (deliveredEvents.current.has(msg._id)) return;
+      deliveredEvents.current.add(msg._id);
+      if (deliveredEvents.current.size > 200) deliveredEvents.current.delete(deliveredEvents.current.values().next().value);
+      const peerId = String(msg.sender?._id || msg.sender) === String(user?.id || user?._id) ? String(msg.receiver?._id || msg.receiver) : String(msg.sender?._id || msg.sender);
+      setUsers(previous => previous.map(person => String(person._id) === peerId ? { ...person, lastMessageTime: msg.createdAt, lastMessageContent: msg.content, unreadCount: peerId === String(activeChatRef.current) ? 0 : (person.unreadCount || 0) + (String(msg.receiver?._id || msg.receiver) === String(user?.id || user?._id) ? 1 : 0) } : person).sort((a, b) => new Date(b.lastMessageTime || 0) - new Date(a.lastMessageTime || 0)));
       const currentActiveId = userId || (selectedUser && (selectedUser._id || selectedUser.id));
       const msgSenderId = msg.sender?._id || msg.sender;
       const msgReceiverId = msg.receiver?._id || msg.receiver;
       if ((msgSenderId === currentActiveId) || (msgReceiverId === currentActiveId)) {
-        setMessages((prev) => {
-          if (prev.some((m) => m._id === msg._id)) return prev;
-          return [...prev, msg];
-        });
+        setMessages(previous => mergeMessages(previous, [{ ...msg, delivery: undefined }]));
         if (document.visibilityState === "visible" && String(msgReceiverId) === String(user?.id || user?._id)) {
           communityApi.readMessages(currentActiveId, [msg._id]).then(res => clearChatNotification(currentActiveId, res.data.readThrough)).catch(console.error);
         }
@@ -210,7 +246,7 @@ export default function MessagePage() {
 
   useEffect(() => {
     if (previewFile?.type === "docx" && docxContainerRef.current && previewFile.blob) {
-      docx.renderAsync(previewFile.blob, docxContainerRef.current).catch(console.error);
+      return renderWordPreview(previewFile.blob, docxContainerRef.current, () => toast.error("Could not preview this document. Download it to open."));
     }
   }, [previewFile]);
 
@@ -218,43 +254,47 @@ export default function MessagePage() {
   //  Data fetching
   // ==================================================================
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (append = false) => {
+    const request = ++usersRequest.current;
+    setLoadingUsers(true);
     try {
       const courseId = new URLSearchParams(window.location.search).get("courseId");
-      const params = courseId ? { courseId } : {};
-      const res = await communityApi.getUsers(params);
-      setUsers(
-        (res.data.users || []).filter(
-          (u) =>
-            u._id !== (user?.id || user?._id) &&
-            u.role !== "admin" &&
-            u.role !== "superadmin" &&
-            !String(u.name || "").toLowerCase().includes("super admin")
-        )
-      );
+      const res = await communityApi.getUsers({ limit: 40, offset: append ? usersOffset : 0, q: searchTerm.trim(), ...(courseId ? { courseId } : {}) });
+      if (request !== usersRequest.current) return;
+      const people = (res.data.users || []).filter(person => String(person._id) !== String(user?.id || user?._id) && !["admin", "superadmin"].includes(person.role));
+      setUsers(previous => append ? [...previous, ...people.filter(person => !previous.some(item => item._id === person._id))] : people);
+      setHasMoreUsers(Boolean(res.data.hasMore)); setUsersOffset(res.data.nextOffset || 0);
     } catch (error) { console.error(error); }
+    finally { if (request === usersRequest.current) setLoadingUsers(false); }
   };
 
-  const fetchConversation = async (id) => {
+  const fetchConversation = async (id, older = false) => {
+    const requestId = ++conversationRequest.current;
+    const owner = user?.id || user?._id;
+    const cached = older ? null : cachedConversation(owner, id);
+    if (cached) { setMessages(cached.messages); setSelectedUser(cached.user); setHasOlder(cached.hasMore); setOlderCursor(cached.nextCursor); }
+    if (older) setLoadingOlder(true); else setLoading(!cached);
+    const scrollBox = document.querySelector(".chat-messages");
+    const oldHeight = scrollBox?.scrollHeight || 0;
     try {
-      setLoading(true);
-      const res = await communityApi.getConversation(id);
-      setMessages(res.data.messages || []);
-      clearChatNotification(id, res.data.readThrough);
-      const otherUser =
-        res.data.messages[0]?.sender?._id === (user?.id || user?._id)
-          ? res.data.messages[0]?.receiver
-          : res.data.messages[0]?.sender;
-      setSelectedUser(otherUser || res.data.user || users.find(u => u._id === id));
-    } catch (error) {
-      if (error.response?.status === 403) {
-        toast.error("Messaging Super Admin is disabled.");
-        navigate("/community/messages");
-        setSelectedUser(null);
+      const res = await communityApi.getConversation(id, { limit: 40, ...(older ? { cursor: olderCursor } : {}) });
+      if (requestId !== conversationRequest.current) return;
+      if (older) {
+        preserveScroll.current = true;
+        setMessages(previous => mergeMessages(res.data.messages || [], previous));
+        requestAnimationFrame(() => { if (scrollBox) scrollBox.scrollTop += scrollBox.scrollHeight - oldHeight; });
       } else {
-        console.error(error);
+        setMessages(previous => mergeMessages(res.data.messages || [], previous.filter(message => message.delivery && String(message.receiver?._id || message.receiver) === String(id))));
+        clearChatNotification(id, res.data.readThrough);
+        setUsers(previous => previous.map(person => String(person._id) === String(id) ? { ...person, unreadCount: 0 } : person));
+        api.invalidateReadCache?.("/community/users");
       }
-    } finally { setLoading(false); }
+      setHasOlder(Boolean(res.data.hasMore)); setOlderCursor(res.data.nextCursor || null);
+      setSelectedUser(res.data.user || users.find(person => String(person._id) === String(id)));
+    } catch (error) {
+      if (error.response?.status === 403) { toast.error("Messaging is not permitted."); navigate("/community/messages"); setSelectedUser(null); }
+      else console.error(error);
+    } finally { if (requestId === conversationRequest.current) { setLoading(false); setLoadingOlder(false); } }
   };
 
   const fetchContactRequests = async () => {
@@ -306,57 +346,49 @@ export default function MessagePage() {
   //  Messaging
   // ==================================================================
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (sending) return;
-    if (!newMessage.trim() && selectedFiles.length === 0) return;
-    if (!selectedUser && !userId) return;
-
-    setSending(true);
+  const deliverMessage = async draft => {
+    if (draft.files.length) setSending(true);
     try {
-      const targetId = userId || selectedUser._id;
-      const token = localStorage.getItem("token");
-      if (editing) {
-        const res = await communityApi.editMessage(editing._id, newMessage);
-        setMessages(prev => prev.map(m => m._id === editing._id ? { ...m, content: res.data.message.content, editedAt: res.data.message.editedAt } : m));
-        setEditing(null); setNewMessage(""); return;
-      }
-      if (!sendId.current) sendId.current = crypto.randomUUID();
-      let savedMessage;
-      if (selectedFiles.length > 0) {
-        const formData = new FormData();
-        formData.append("receiverId", targetId);
-        formData.append("content", newMessage);
-        formData.append("clientMessageId", sendId.current);
-        if (replying) formData.append("replyTo", replying._id);
-        formData.append("subject", subject || "Message");
-        selectedFiles.forEach((file) => formData.append("files", file));
-
-        const baseUrl = api.defaults.baseURL || "http://localhost:5000/api";
-        const res = await fetch(`${baseUrl}/community/messages`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        });
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error || `HTTP ${res.status}`);
-        }
-        savedMessage = (await res.json()).message;
+      let saved;
+      if (draft.files.length) {
+        const body = new FormData();
+        for (const [key, value] of Object.entries({ receiverId: draft.targetId, content: draft.content, subject: draft.subject, clientMessageId: draft.id, ...(draft.reply ? { replyTo: draft.reply._id } : {}) })) body.append(key, value);
+        draft.files.forEach(file => body.append("files", file));
+        saved = (await api.post("/community/messages", body)).data.message;
       } else {
-        const response = await communityApi.sendMessage({ receiverId: targetId, subject: subject || "Message", content: newMessage, replyTo: replying?._id, clientMessageId: sendId.current });
-        savedMessage = response.data.message;
+        saved = (await communityApi.sendMessage({ receiverId: draft.targetId, subject: draft.subject, content: draft.content, replyTo: draft.reply?._id, clientMessageId: draft.id })).data.message;
       }
-
-      sendId.current = null; setReplying(null);
-      setNewMessage(""); setSubject(""); setSelectedFiles([]);
-      if (!userId) { setShowNewMessage(false); fetchConversation(targetId); }
-      else if (savedMessage && String(activeChatRef.current) === String(targetId)) {
-        setMessages(prev => prev.some(m => m._id === savedMessage._id) ? prev.map(m => m._id === savedMessage._id ? savedMessage : m) : [...prev, savedMessage]);
-      }
+      pendingSends.current.delete(draft.id);
+      if (saved && String(activeChatRef.current) === String(draft.targetId)) setMessages(previous => mergeMessages(previous, [{ ...saved, clientMessageId: draft.id, delivery: undefined }]));
     } catch (error) {
-      toast.error(error.response?.data?.error || error.message || "Failed to send message");
-    } finally { setSending(false); }
+      if (String(activeChatRef.current) === String(draft.targetId)) setMessages(previous => previous.map(message => message.clientMessageId === draft.id ? { ...message, delivery: "failed" } : message));
+      toast.error(error.response?.data?.error || "Message not sent. Tap Retry.");
+    } finally { if (draft.files.length) setSending(false); }
+  };
+  const retryMessage = message => {
+    const draft = pendingSends.current.get(message.clientMessageId);
+    if (!draft) return;
+    setMessages(previous => previous.map(item => item.clientMessageId === draft.id ? { ...item, delivery: "sending" } : item));
+    deliverMessage(draft);
+  };
+  const handleSendMessage = async e => {
+    e.preventDefault();
+    if (sending || (!newMessage.trim() && !selectedFiles.length) || (!selectedUser && !userId)) return;
+    if (editing) {
+      try {
+        const res = await communityApi.editMessage(editing._id, newMessage);
+        setMessages(previous => previous.map(message => message._id === editing._id ? { ...message, content: res.data.message.content, editedAt: res.data.message.editedAt } : message));
+        setEditing(null); setNewMessage("");
+      } catch { toast.error("Could not edit message"); }
+      return;
+    }
+    const draft = { id: crypto.randomUUID(), targetId: userId || selectedUser._id || selectedUser.id, content: newMessage.trim(), subject: subject || "Message", reply: replying, files: selectedFiles };
+    pendingSends.current.set(draft.id, draft);
+    setMessages(previous => mergeMessages(previous, [{ _id: `pending:${draft.id}`, clientMessageId: draft.id, sender: { _id: user?.id || user?._id }, receiver: draft.targetId,
+      content: draft.content || `Uploading ${draft.files.length} attachment(s)…`, createdAt: new Date().toISOString(), delivery: "sending",
+      replyPreview: draft.reply ? { senderName: draft.reply.sender?.name || "Message", content: draft.reply.content } : null }]));
+    setNewMessage(""); setSubject(""); setSelectedFiles([]); setReplying(null); setShowNewMessage(false);
+    await deliverMessage(draft);
   };
 
   // ==================================================================
@@ -407,7 +439,8 @@ export default function MessagePage() {
     if (isPptx) {
       try {
         const res = await fetch(fileUrl); if (!res.ok) throw new Error("File unavailable"); const blob = await res.blob();
-        const zip = await JSZip.loadAsync(blob);
+        const { default: JSZip } = await import("jszip");
+            const zip = await JSZip.loadAsync(blob);
         const slideFiles = Object.keys(zip.files).filter((name) => name.match(/^ppt\/slides\/slide\d+\.xml$/)).sort();
         const slides = [];
         for (const sf of slideFiles) {
@@ -457,7 +490,7 @@ export default function MessagePage() {
       u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const teachers = users.filter((u) => u.role === "teacher");
+  const teachers = contactTeachers.length ? contactTeachers : users.filter((u) => u.role === "teacher");
 
   const isMessagingLocked =
     user?.role === "student" &&
@@ -640,6 +673,7 @@ export default function MessagePage() {
                   </div>
                 </div>
               ))}
+              {hasMoreUsers && <button className="btn-secondary" disabled={loadingUsers} onClick={() => fetchUsers(true)}>{loadingUsers ? "Loading…" : "Load more people"}</button>}
               {filteredUsers.length === 0 && <div className="no-users"><p>No users found</p></div>}
             </div>
           </div>
@@ -756,19 +790,20 @@ export default function MessagePage() {
 
                 {/* Messages list */}
                 <div className="chat-messages">
+                  {hasOlder && <button className="btn-secondary" disabled={loadingOlder} onClick={() => fetchConversation(chatId, true)}>{loadingOlder ? "Loading…" : "Load earlier messages"}</button>}
                   {loading ? (
                     <div className="loading-state"><div className="loading-spinner"></div></div>
                   ) : messages.length === 0 ? (
                     <div className="empty-chat"><FiMessageSquare size={48} /><p>No messages yet</p></div>
                   ) : (
                     messages.map((msg) => (
-                      <div key={msg._id} className={`message-bubble ${ownMessage(msg) ? "sent" : "received"}`} onClick={e => { if (!e.target.closest("button,a,audio,video,img")) setActionMessage(msg); }} onContextMenu={e => { e.preventDefault(); setActionMessage(msg); }}>
+                      <div key={msg._id} className={`message-bubble ${ownMessage(msg) ? "sent" : "received"}`} onClick={e => { if (!msg.delivery && !e.target.closest("button,a,audio,video,img")) setActionMessage(msg); }} onContextMenu={e => { e.preventDefault(); if (!msg.delivery) setActionMessage(msg); }}>
                         {msg.forwarded && <small>Forwarded</small>}
                         {msg.replyPreview && <blockquote className="chat-quote"><strong>{msg.replyPreview.senderName}</strong><p>{msg.replyPreview.content}</p></blockquote>}
                         {msg.deletedAt && <em>This message was deleted</em>}
                         <div className="message-bubble-header">
                           {msg.content ? <div className="message-content">{msg.content}</div> : null}
-                          <button className="msg-actions-btn" aria-label="Message actions" onClick={() => setActionMessage(msg)}>•••</button>
+                          <button className="msg-actions-btn" aria-label="Message actions" disabled={Boolean(msg.delivery)} onClick={() => setActionMessage(msg)}>•••</button>
                         </div>
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className="message-attachments">
@@ -781,7 +816,7 @@ export default function MessagePage() {
                                 <div key={idx} className="msg-attachment-item">
                                   <img src={fileUrl} alt={file.fileName} className="msg-attachment-image" onClick={() => openFile({ url: fileUrl, fileName: file.fileName })} />
                                   <div className="msg-attachment-actions">
-                                    <button className="msg-attach-action-btn view-btn" onClick={() => openPreview(file)}>👁 View</button>
+                                    <button className="msg-attach-action-btn view-btn" onClick={() => openPreview(file)}><FiEye size={16} aria-hidden="true" /> View</button>
                                     <button className="msg-attach-action-btn download-btn" onClick={() => downloadFile(fileUrl, file.fileName)}>⬇ Save</button>
                                   </div>
                                 </div>
@@ -810,7 +845,7 @@ export default function MessagePage() {
                                     <span className="msg-file-type">{(file.fileType || "document").split("/").pop()}</span>
                                   </div>
                                   <div className="msg-attachment-actions">
-                                    <button className="msg-attach-action-btn view-btn" onClick={() => openPreview(file)}>👁 View</button>
+                                    <button className="msg-attach-action-btn view-btn" onClick={() => openPreview(file)}><FiEye size={16} aria-hidden="true" /> View</button>
                                     <button className="msg-attach-action-btn download-btn" onClick={() => downloadFile(fileUrl, file.fileName)}>⬇ Save</button>
                                   </div>
                                 </div>
@@ -831,7 +866,7 @@ export default function MessagePage() {
                             })}
                           </div>
                         )}
-                        <div className="message-time">{msg.editedAt ? "Edited · " : ""}{new Date(msg.createdAt).toLocaleTimeString()} {ownMessage(msg) && <span aria-label={msg.isRead ? "Seen" : "Sent"}>{msg.isRead ? "✓✓ Seen" : "✓ Sent"}</span>}</div>
+                        <div className="message-time">{msg.delivery === "failed" && <button type="button" onClick={() => retryMessage(msg)}>Retry</button>} {msg.editedAt ? "Edited · " : ""}{new Date(msg.createdAt).toLocaleTimeString()} {ownMessage(msg) && <span aria-label={msg.isRead ? "Seen" : "Sent"}>{msg.delivery === "sending" ? "◷ Sending…" : msg.delivery === "failed" ? "Not sent" : msg.isRead ? "✓✓ Seen" : "✓ Sent"}</span>}</div>
                       </div>
                     ))
                   )}
@@ -1297,7 +1332,7 @@ export default function MessagePage() {
               )}
             </div>
             <div className="modal-actions" style={{ padding: "0 16px 16px" }}>
-              {previewFile.url && <button className="btn-primary" onClick={() => downloadFile(previewFile.url, previewFile.name)}>⬇ Download</button>}
+              {previewFile.url && <button className="btn-primary" onClick={() => downloadFile(previewFile.url, previewFile.name)}><FiDownload size={16} aria-hidden="true" /> Download</button>}
               <button className="btn-secondary" onClick={() => { setPreviewFile(null); if (previewFile.url?.startsWith("blob:")) URL.revokeObjectURL(previewFile.url); }}>Close</button>
             </div>
           </div>

@@ -25,11 +25,17 @@ public class ChatActionReceiver extends BroadcastReceiver {
         String operation = UUID.randomUUID().toString();
         Data data = new Data.Builder().putString("thread", thread).putString("owner", owner)
             .putString("messageId", messageId).putString("token", token).putString("action", action)
-            .putString("content", reply).putString("operation", operation).build();
+            .putString("content", reply).putString("operation", operation)
+            .putLong("readThrough", intent.getLongExtra("readThrough", replyBoundary(context, thread))).build();
         OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(ChatActionWorker.class).setInputData(data)
             .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS).build();
         WorkManager.getInstance(context).enqueueUniqueWork("chat-action:" + operation, ExistingWorkPolicy.KEEP, work);
         UniCoreNotifications.actionStatus(context, thread, "reply".equals(action) ? "Sending reply…" : "Sending Like…");
     }
+    private static long replyBoundary(Context context, String thread) {
+        try { return new org.json.JSONObject(UniCoreNotifications.prefs(context).getString("thread:" + thread, "{}")).optLong("actionTime"); }
+        catch (Exception ignored) { return 0; }
+    }
+
 }

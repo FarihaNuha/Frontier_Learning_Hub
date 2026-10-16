@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import api from "../services/api";
 import AppNotificationSettings from "../components/AppNotificationSettings";
+import { AboutUniCore } from "../components/DeveloperCredits";
 import {
   FiArrowLeft,
   FiSun,
@@ -295,9 +296,10 @@ export default function SettingsPage() {
 
       {/* Main settings area */}
       <div className="main-content" style={{ padding: "40px", overflowY: "auto" }}>
-        <div style={{ marginBottom: "30px", display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{ marginBottom: "30px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px" }}>
           <FiSettings size={28} color="var(--pastel-blue-deep)" />
           <h1 style={{ fontSize: "28px", color: "var(--text-dark)", margin: 0 }}>System Settings</h1>
+          <a className="about-settings-link" href="#about-unicore">About UniCore</a>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "30px", maxWidth: "1200px" }}>
@@ -1148,6 +1150,7 @@ export default function SettingsPage() {
             )}
           </div>
 
+          <AboutUniCore />
         </div>
       </div>
     </div>

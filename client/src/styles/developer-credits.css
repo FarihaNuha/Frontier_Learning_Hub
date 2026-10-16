@@ -1,0 +1,33 @@
+.auth-developer-credit {
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light, #dce6ed);
+  color: var(--text-gray, #64748b);
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.auth-developer-credit span { color: var(--text-dark, #17334a); font-weight: 600; }
+.about-settings-link { margin-left: auto; color: var(--pastel-blue-deep, #087b98); font-size: 13px; font-weight: 600; text-underline-offset: 4px; white-space: nowrap; }
+.about-unicore { padding: 24px; border-radius: 16px; scroll-margin-top: 85px; }
+.about-unicore header { padding-bottom: 22px; border-bottom: 1px solid var(--border-light, #dce6ed); }
+.about-unicore h2 { margin: 0 0 8px; color: var(--text-dark, #17334a); font-size: 22px; }
+.about-unicore header p { margin: 0; color: var(--text-gray, #64748b); font-size: 14px; line-height: 1.6; }
+.about-unicore .about-team-heading { margin: 24px 0 14px; font-size: 15px; color: var(--text-dark, #17334a); }
+.about-developers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 0; margin: 0; list-style: none; }
+.about-developers li { min-width: 0; padding: 22px; border: 1px solid var(--border-light, #dce6ed); border-radius: 12px; background: var(--bg-white, #fff); }
+.about-developer-role { display: inline-block; color: var(--pastel-blue-deep, #087b98); font-size: 12px; font-weight: 600; }
+.about-developers h4 { margin: 9px 0 16px; color: var(--text-dark, #17334a); font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+.about-developers p { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 0; font-size: 13px; color: var(--text-gray, #64748b); }
+.about-developers strong { color: var(--text-dark, #17334a); font-weight: 600; font-variant-numeric: tabular-nums; }
+.about-academic-details { display: grid; grid-template-columns: .55fr 1.2fr 1.4fr; gap: 20px; margin: 24px 0 0; padding-top: 22px; border-top: 1px solid var(--border-light, #dce6ed); }
+.about-academic-details div { min-width: 0; }
+.about-academic-details dt { margin-bottom: 7px; color: var(--text-gray, #64748b); font-size: 12px; }
+.about-academic-details dd { margin: 0; color: var(--text-dark, #17334a); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .about-unicore { padding: 20px; }
+  .about-developers, .about-academic-details { grid-template-columns: minmax(0, 1fr); }
+  .about-developers li { padding: 18px; }
+  .about-academic-details { gap: 16px; }
+}

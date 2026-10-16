@@ -140,15 +140,14 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.9-apk
-          name: UniCore Mobile App v1.4.9 (Android test APK)
+          tag_name: v1.4.10-apk
+          name: UniCore Mobile App v1.4.10 (Android test APK)
           body: |
-            Restores visited sections from IndexedDB before the app renders after restart.
-            Keeps bounded read snapshots for seven days and refreshes them in the background.
-            Notification invalidation preserves displayable snapshots. Recent confirmed chat
-            history also survives restart; logout clears saved account data.
+            Adds developer credit to the login screen and an About UniCore section
+            in Settings with both developers, student IDs and shared academic details.
+            Includes the persistent restart-cache and previous app improvements.
 
-            Use UniCore-1.4.9.apk for the same local signing key as prior updates.
+            Use UniCore-1.4.10.apk for the same local signing key as prior updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

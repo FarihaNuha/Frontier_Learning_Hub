@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import "../styles/auth.css";
 import { useLaunchReady } from "../services/launchScreen";
+import { DeveloperCredit } from "../components/DeveloperCredits";
 
 export default function AuthPage() {
   useLaunchReady(true);
@@ -368,6 +369,7 @@ export default function AuthPage() {
                 <span onClick={() => { setIsLogin(false); setError(""); }}>Sign Up</span>
               </p>
             </div>
+            <DeveloperCredit />
           </form>
         </div>
 

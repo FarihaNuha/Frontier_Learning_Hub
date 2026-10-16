@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import StudentSidebar from "../components/StudentSidebar";
@@ -33,15 +34,15 @@ const FIXED_REGISTRATION_FEES = [
 const FIXED_FEES_TOTAL = 3100;
 
 export default function StudentRegistrationPaymentPage() {
-  const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [payments, setPayments] = useReadState("/registration-payments/history", data => data.payments || [], []);
+  const [loading, setLoading] = useState(() => !hasCachedReads(["/registration-payments/history"]));
   const [selectedPaymentForModal, setSelectedPaymentForModal] = useState(null);
   const [selectedRegIdForInvoice, setSelectedRegIdForInvoice] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   const fetchPayments = async () => {
-    setLoading(true);
+    setLoading(!hasCachedReads(["/registration-payments/history"]));
     try {
       const res = await api.get("/registration-payments/history");
       setPayments(res.data.payments || []);

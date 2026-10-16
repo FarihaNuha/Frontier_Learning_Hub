@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -36,10 +37,10 @@ export default function StudentAttendancePage({
   console.log("Props Course ID:", propCourseId);
   console.log("Final Course ID:", finalCourseCode);
 
-  const [courseInfo, setCourseInfo] = useState(null);
-  const [attendance, setAttendance] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [courseInfo, setCourseInfo] = useReadState(`/courses/${finalCourseId}`, data => data.course, null);
+  const [attendance, setAttendance] = useReadState(`/attendance?courseId=${finalCourseId}`, data => data.attendance || [], []);
+  const [stats, setStats] = useReadState(`/attendance/stats?courseId=${finalCourseId}&month=${new Date().getMonth()}&year=${new Date().getFullYear()}`, data => data, null);
+  const [loading, setLoading] = useState(() => !hasCachedReads([`/attendance?courseId=${finalCourseId}`]));
   const [viewMode, setViewMode] = useState("list");
   const [classType, setClassType] = useState("theory");
   const [gridMonth, setGridMonth] = useState(new Date().getMonth());
@@ -88,7 +89,7 @@ export default function StudentAttendancePage({
     if (!id || id === "undefined" || id === "null") return;
 
     try {
-      setLoading(true);
+      setLoading(!hasCachedReads([`/attendance?courseId=${id}`]));
       // Fetch courseInfo and attendance data together in Promise.all to prevent flickering
       const [courseRes, attRes, statsRes] = await Promise.all([
         api.get(`/courses/${id}`).catch(() => null),
@@ -150,7 +151,7 @@ export default function StudentAttendancePage({
     if (!finalCourseId) return;
 
     try {
-      setLoading(true);
+      setLoading(!hasCachedReads([`/attendance?courseId=${finalCourseId}`]));
       const res = await api.get(`/attendance?courseId=${finalCourseId}`);
       const allAttendance = (res.data.attendance || []).filter((a) => {
         const d = new Date(a.date);

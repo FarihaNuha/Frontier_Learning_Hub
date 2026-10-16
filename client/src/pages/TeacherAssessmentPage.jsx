@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook } from "../services/nativeFiles";
 import { useState, useEffect } from "react";
@@ -39,7 +40,7 @@ export default function TeacherAssessmentPage() {
   const navigate = useNavigate();
   const { id: courseId } = useParams(); // Selected course context if navigated from course dashboard
 
-  const [assessments, setAssessments] = useState([]);
+  const [assessments, setAssessments] = useReadState("/assessments/teacher", data => data.assessments || [], []);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,13 +53,13 @@ export default function TeacherAssessmentPage() {
   const [uploadError, setUploadError] = useState(null);
 
   // Correction Requests state
-  const [teacherRequests, setTeacherRequests] = useState([]);
+  const [teacherRequests, setTeacherRequests] = useReadState("/results/teacher/correction-requests", data => data.requests || [], []);
   const [viewRequestsModalGroup, setViewRequestsModalGroup] = useState(null);
   const [replyTextMap, setReplyTextMap] = useState({});
   const [submittingReplyId, setSubmittingReplyId] = useState(null);
   const [timerValues, setTimerValues] = useState({});
 
-  const [currentCourseInfo, setCurrentCourseInfo] = useState(null);
+  const [currentCourseInfo, setCurrentCourseInfo] = useReadState(`/courses/${courseId}`, data => data.course, null);
 
   useEffect(() => {
     if (courseId) {
@@ -242,7 +243,7 @@ export default function TeacherAssessmentPage() {
   }, [courseId]);
 
   const fetchAssessments = async () => {
-    setLoading(true);
+    setLoading(!hasCachedReads(["/assessments/teacher"]));
     try {
       const res = await api.get("/assessments/teacher");
       setAssessments(res.data.assessments);

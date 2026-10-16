@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,19 +27,19 @@ export default function StudentAssessmentPage() {
   const navigate = useNavigate();
   const { id: courseId } = useParams(); // Selected course context if navigated from course dashboard
 
-  const [assessments, setAssessments] = useState([]);
-  const [courseInfo, setCourseInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [courseLoading, setCourseLoading] = useState(Boolean(courseId));
+  const [assessments, setAssessments] = useReadState("/assessments/student", data => data.assessments || [], []);
+  const [courseInfo, setCourseInfo] = useReadState(`/courses/${courseId}`, data => data.course, null);
+  const [loading, setLoading] = useState(() => !hasCachedReads(["/assessments/student"]));
+  const [courseLoading, setCourseLoading] = useState(() => Boolean(courseId) && !hasCachedReads([`/courses/${courseId}`]));
   const [showRules, setShowRules] = useState(false);
 
-  const [studentInfo, setStudentInfo] = useState(null);
+  const [studentInfo, setStudentInfo] = useReadState("/registration/my-status", data => data, null);
   const [selectedLevelTerm, setSelectedLevelTerm] = useState("All");
 
   const [selectedRecordForIssue, setSelectedRecordForIssue] = useState(null);
   const [issueMessage, setIssueMessage] = useState("");
   const [submittingIssue, setSubmittingIssue] = useState(false);
-  const [myRequests, setMyRequests] = useState([]);
+  const [myRequests, setMyRequests] = useReadState("/results/student/correction-requests", data => data.requests || [], []);
 
   const levelTermSemesters = [
     "Level 1 - Term 1",
@@ -75,7 +76,7 @@ export default function StudentAssessmentPage() {
     fetchAssessments();
     fetchMyRequests();
     if (courseId) {
-      setCourseLoading(true);
+      setCourseLoading(!hasCachedReads([`/courses/${courseId}`]));
       api.get(`/courses/${courseId}`)
         .then((res) => {
           setCourseInfo(res.data.course);
@@ -91,7 +92,7 @@ export default function StudentAssessmentPage() {
   }, [courseId]);
 
   const fetchAssessments = async () => {
-    setLoading(true);
+    setLoading(!hasCachedReads(["/assessments/student"]));
     try {
       const res = await api.get("/assessments/student");
       setAssessments(res.data.assessments);

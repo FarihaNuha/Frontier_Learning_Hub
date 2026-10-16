@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -7,13 +8,13 @@ import { FiCheckCircle, FiXCircle, FiList, FiEye, FiFileText } from "react-icons
 import RegistrationInvoiceModal from "../components/RegistrationInvoiceModal";
 
 export default function TeacherRegistrationApprovalPage() {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [requests, setRequests] = useReadState("/registration/adviser/pending", data => Array.isArray(data) ? data : data.pendingRegistrations || [], []);
+  const [loading, setLoading] = useState(() => !hasCachedReads(["/registration/adviser/pending"]));
   const [selectedReg, setSelectedReg] = useState(null);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   const fetchPending = async () => {
-    setLoading(true);
+    setLoading(!hasCachedReads(["/registration/adviser/pending"]));
     try {
       const res = await api.get("/registration/adviser/pending");
       const reqList = Array.isArray(res.data)

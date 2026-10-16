@@ -82,3 +82,26 @@ test("live conversations, read receipts and binary previews always bypass cached
   }
   expect(adapter).toHaveBeenCalledTimes(6);
 });
+
+test("query-string and Axios params share the same saved section", async () => {
+  const adapter = jest.fn(async () => response({ posts: [{ _id: "p1" }] }));
+  const cache = createReadCache(adapter, () => "a");
+  await cache.request({ url: "/community/public/posts", params: { limit: 20, category: "all" } });
+  expect(cache.peek({ url: "/community/public/posts?category=all&limit=20" }).posts[0]._id).toBe("p1");
+  await cache.request({ url: "/community/public/posts?limit=20&category=all" });
+  expect(adapter).toHaveBeenCalledTimes(1);
+});
+
+test("metadata over the old 1 MB cutoff stays cached, including after app restart", async () => {
+  const storage = memoryStorage();
+  const data = { courses: [{ _id: "c", name: "Large course", teacher: { profilePicture: "x".repeat(1100000) } }] };
+  const adapter = jest.fn(async () => response(JSON.stringify(data)));
+  const cache = createReadCache(adapter, () => "a", Date.now, { storage });
+  await cache.request({ url: "/courses/my" });
+  expect(cache.has({ url: "/courses/my" })).toBe(true);
+  await cache.request({ url: "/courses/my" });
+  const restarted = createReadCache(adapter, () => "a", Date.now, { storage });
+  expect(restarted.peek({ url: "/courses/my" }).courses[0].name).toBe("Large course");
+  await restarted.request({ url: "/courses/my" });
+  expect(adapter).toHaveBeenCalledTimes(1);
+});

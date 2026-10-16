@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
@@ -29,9 +30,10 @@ import "../styles/dashboard.css";
 
 export default function TeacherResultManagementPage() {
   const navigate = useNavigate();
-  const [uploads, setUploads] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [resultTypeTab, setResultTypeTab] = useState("Midterm"); // "Midterm" or "Final"
+  const [resultTypeTab, setResultTypeTab] = useState("Midterm");
+  const [uploads, setUploads] = useReadState(`/results/teacher?resultType=${resultTypeTab}`, data => data.uploads || [], []);
+  const [loading, setLoading] = useState(() => !hasCachedReads([`/results/teacher?resultType=${resultTypeTab}`]));
+
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [parsedData, setParsedData] = useState([]);
@@ -60,7 +62,7 @@ export default function TeacherResultManagementPage() {
 
   const [activeStatusTab, setActiveStatusTab] = useState("all");
   const [viewBatch, setViewBatch] = useState(null);
-  const [teacherRequests, setTeacherRequests] = useState([]);
+  const [teacherRequests, setTeacherRequests] = useReadState("/results/teacher/correction-requests", data => data.requests || [], []);
   const [viewRequestsBatch, setViewRequestsBatch] = useState(null);
   const [replyTextMap, setReplyTextMap] = useState({});
   const [editableRowMarks, setEditableRowMarks] = useState({});
@@ -68,7 +70,7 @@ export default function TeacherResultManagementPage() {
 
   // Admin-set deadlines
   const [deadlines, setDeadlines] = useState({ midtermDeadline: null, finalDeadline: null });
-  const [assignedCourses, setAssignedCourses] = useState([]);
+  const [assignedCourses, setAssignedCourses] = useReadState("/courses/teacher-summary", data => data.courses || [], []);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Live timer for precise countdown (hours, minutes, seconds)
@@ -208,7 +210,7 @@ export default function TeacherResultManagementPage() {
   };
 
   const fetchResults = async () => {
-    setLoading(true);
+    setLoading(!hasCachedReads([`/results/teacher?resultType=${resultTypeTab}`]));
     try {
       const res = await api.get(`/results/teacher?resultType=${resultTypeTab}`);
       setUploads(res.data.uploads || []);

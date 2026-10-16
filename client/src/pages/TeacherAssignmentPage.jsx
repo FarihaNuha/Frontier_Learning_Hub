@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -45,7 +46,7 @@ export default function TeacherAssignmentPage({
   console.log("Props Course ID:", propCourseId);
   console.log("Final Course ID:", finalCourseId);
 
-  const [assignments, setAssignments] = useState([]);
+  const [assignments, setAssignments] = useReadState(`/assignments?courseId=${finalCourseId}`, data => data.assignments || [], []);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [viewSubmissions, setViewSubmissions] = useState(null);
@@ -63,7 +64,7 @@ export default function TeacherAssignmentPage({
     deadline: "",
     totalMarks: 100,
   });
-  const [courseInfo, setCourseInfo] = useState(null);
+  const [courseInfo, setCourseInfo] = useReadState(`/courses/${finalCourseId}`, data => data.course, null);
   const [previewFile, setPreviewFile] = useState(null);
   const [previewBlobUrl, setPreviewBlobUrl] = useState(null);
   const [previewBlob, setPreviewBlob] = useState(null);

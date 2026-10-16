@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { downloadFile } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
@@ -21,10 +22,10 @@ export default function TeacherEnrolledStudentsPage() {
   const { id: courseIdParam } = useParams();
   const navigate = useNavigate();
 
-  const [courses, setCourses] = useState([]);
-  const [selectedCourseId, setSelectedCourseId] = useState(courseIdParam || "");
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useReadState("/courses/my", data => Array.isArray(data) ? data : data.courses || [], []);
+  const [selectedCourseId, setSelectedCourseId] = useState(() => courseIdParam || api.peekReadCache?.("/courses/my")?.courses?.[0]?._id || "");
+  const [students, setStudents] = useReadState(`/courses/${selectedCourseId}/enrolled-students`, data => data.students || [], []);
+  const [loading, setLoading] = useState(() => !hasCachedReads([`/courses/${selectedCourseId}/enrolled-students`]));
   const [searchTerm, setSearchTerm] = useState("");
   const [batchFilter, setBatchFilter] = useState("all");
   const [sessionFilter, setSessionFilter] = useState("all");
@@ -51,7 +52,7 @@ export default function TeacherEnrolledStudentsPage() {
       return;
     }
 
-    setLoading(true);
+    setLoading(!hasCachedReads([`/courses/${selectedCourseId}/enrolled-students`]));
     api
       .get(`/courses/${selectedCourseId}/enrolled-students`)
       .then((res) => {

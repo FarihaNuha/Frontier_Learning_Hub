@@ -1,5 +1,15 @@
 // Shared, bounded read-through cache. Live actions and document binaries bypass it.
 const PREFIX = 'unicore_reads_v3:';
+export const readAddress = ({ url = '', params = {} }) => {
+  const [path, query = ''] = url.split('?');
+  const search = new URLSearchParams(query);
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) search.set(key, String(value));
+  });
+  search.sort();
+  const queryString = search.toString();
+  return path + (queryString ? `?${queryString}` : '');
+};
 const eligible = url => {
   const path = (url || '').split('?')[0];
   if (/view-base64|download|export|\/auth\/|\/conversation\/|\/inbox|unread|\/exams\/[a-f0-9]{24}$|\/attempt|\/answers/.test(path) || /(?:token|password)=/i.test(url || '')) return false;
@@ -23,7 +33,7 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
     }
     entries.set(key, entry);
   };
-  const keyFor = config => `${PREFIX}${owner()}:${config.baseURL || ''}:${config.url}:${JSON.stringify(config.params || {})}`;
+  const keyFor = config => `${PREFIX}${owner()}:${config.baseURL || ''}:${readAddress(config)}`;
   const index = () => { try { return JSON.parse(storage?.getItem(PREFIX + 'index') || '[]'); } catch { return []; } };
   const removeDisk = predicate => {
     if (!storage) return;
@@ -33,7 +43,7 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
     if (!storage) return;
     try {
       const encoded = JSON.stringify(entry);
-      if (encoded.length > 300000) return;
+      if (encoded.length > 1500000) { removeDisk(candidate => candidate === key); return; }
       let items = index().filter(item => item.key !== key);
       let bytes = items.reduce((sum, item) => sum + item.bytes, 0);
       while (items.length >= 50 || bytes + encoded.length > 2000000) {
@@ -81,8 +91,8 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
     if (pending.has(key)) return pending.get(key);
     const promise = adapter({ ...config, signal: undefined, cancelToken: undefined }).then(response => {
       if (epoch === generation && scope === owner() && response.status === 200) {
-        const entry = { data: clone(response.data), savedAt: now() };
-        if (JSON.stringify(entry.data)?.length < 1000000) {
+        const entry = { data: clone(decode(response.data)), savedAt: now() };
+        if (JSON.stringify(entry.data)?.length < 5000000) {
           remember(key, entry); persist(key, entry);
         } else {
           entries.delete(key); removeDisk(candidate => candidate === key);
@@ -118,6 +128,7 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
   };
   return {
     request, clear, invalidate,
+    has: config => owner() !== 'anonymous' && eligible(config.url) && read(config) !== null,
     peek: config => { if (owner() === 'anonymous' || !eligible(config.url)) return null; const entry = read(config); return entry ? clone(decode(entry.data)) : null; },
     subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); },
   };

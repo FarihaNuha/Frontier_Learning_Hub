@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -35,10 +36,11 @@ export default function StudentExamPage({
   // Get course ID from props (CourseDashboard) or URL
   const finalCourseId = propCourseId || urlCourseId;
 
-  const [courseInfo, setCourseInfo] = useState(null);
-  const [exams, setExams] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courseInfo, setCourseInfo] = useReadState(`/courses/${finalCourseId}`, data => data.course, null);
+  const [exams, setExams] = useReadState(`/exams?courseId=${finalCourseId}`, data => data.exams || [], []);
+  const [submissions, setSubmissions] = useReadState("/exams/my-submissions", data => data.submissions || [], []);
+  const cachedExamReads = () => hasCachedReads([`/exams?courseId=${finalCourseId}`, "/exams/my-submissions"]);
+  const [loading, setLoading] = useState(() => !cachedExamReads());
   const [activeExam, setActiveExam] = useState(null);
   const [answers, setAnswers] = useState({});
   const [examStarted, setExamStarted] = useState(false);
@@ -128,7 +130,7 @@ export default function StudentExamPage({
 
   const fetchData = async () => {
     try {
-      setLoading(true);
+      setLoading(!cachedExamReads());
       // Get exams and courseInfo for THIS SPECIFIC COURSE together
       const [courseRes, examsRes, subsRes] = await Promise.all([
         api.get(`/courses/${finalCourseId}`).catch(() => null),

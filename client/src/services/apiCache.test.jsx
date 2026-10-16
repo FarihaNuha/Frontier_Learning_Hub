@@ -26,3 +26,31 @@ test("saved content renders immediately; stale responses cannot overwrite a newe
   await act(async () => { publish({ owner: "me", url: "/courses/a", params: {}, data: { name: "fresh" } }); reply({ data: { name: "cached" } }); });
   await waitFor(() => expect(view.result.current.data.name).toBe("fresh"));
 });
+
+test("legacy section state hydrates on its first render and again after returning", () => {
+  const { useReadState, hasCachedReads } = require("./apiCache");
+  api.peekReadCache.mockReturnValue({ attendance: [{ _id: "saved" }] });
+  const section = () => {
+    const [rows] = useReadState("/attendance?courseId=c", data => data.attendance, []);
+    return { rows, loading: !hasCachedReads(["/attendance?courseId=c"]) };
+  };
+  const first = renderHook(section);
+  expect(first.result.current).toEqual({ rows: [{ _id: "saved" }], loading: false });
+  first.unmount();
+  const returned = renderHook(section);
+  expect(returned.result.current).toEqual({ rows: [{ _id: "saved" }], loading: false });
+});
+
+test("background metadata refresh updates legacy sections and late setters cannot cross courses", () => {
+  const { useReadState } = require("./apiCache");
+  let publish;
+  api.subscribeReads.mockImplementation(listener => { publish = listener; return () => {}; });
+  api.peekReadCache.mockImplementation(url => ({ name: url.endsWith("b") ? "B" : "A" }));
+  const view = renderHook(({ url }) => useReadState(url, data => data.name, ""), { initialProps: { url: "/courses/a" } });
+  const oldSetter = view.result.current[1];
+  view.rerender({ url: "/courses/b" });
+  act(() => oldSetter("late A"));
+  expect(view.result.current[0]).toBe("B");
+  act(() => publish({ owner: "me", url: "/courses/b", data: { name: "Fresh B" } }));
+  expect(view.result.current[0]).toBe("Fresh B");
+});

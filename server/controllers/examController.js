@@ -126,7 +126,7 @@ exports.getExams = async (req, res) => {
     }
 
     const exams = await Exam.find(filter)
-      .populate("createdBy", "name email profilePicture department")
+      .populate("createdBy", "name email department")
       .sort({ createdAt: -1 });
     res.json({ exams });
   } catch (error) {

@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -38,9 +39,9 @@ const FIXED_FEES_TOTAL = 3100;
 export default function CourseRegistrationPage() {
   const { level, term } = useParams();
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
+  const [data, setData] = useReadState(`/registration/available-courses?level=Level-${level}&term=Term-${term}`, data => data, null);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !hasCachedReads([`/registration/available-courses?level=Level-${level}&term=Term-${term}`]));
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(1); // 1 = select, 2 = summary
   const [showPaymentModal, setShowPaymentModal] = useState(false);

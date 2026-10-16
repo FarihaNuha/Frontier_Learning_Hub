@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { PUBLIC_APP_URL, absoluteFileUrl } from "../services/urls";
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
@@ -64,16 +65,18 @@ export default function CommunityHub() {
   const { user, socket, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("feed");
-  const [posts, setPosts] = useState([]);
-  const [nextCursor, setNextCursor] = useState(null);
-  const [hasMorePosts, setHasMorePosts] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const feedUrl = `/community/public/posts?category=${selectedCategory}&limit=20`;
+  const [posts, setPosts] = useReadState(feedUrl, data => data.posts || [], []);
+  const [nextCursor, setNextCursor] = useReadState(feedUrl, data => data.nextCursor || null, null);
+  const [hasMorePosts, setHasMorePosts] = useReadState(feedUrl, data => Boolean(data.hasMore), false);
   const [loadingMorePosts, setLoadingMorePosts] = useState(false);
   const feedRequest = useRef(0);
   const [inbox, setInbox] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState(() => !hasCachedReads([feedUrl]));
 
   const fetchUnreadMessageCount = async () => {
     try {
@@ -113,7 +116,7 @@ export default function CommunityHub() {
 
   const fetchPosts = async (append = false) => {
     const requestId = ++feedRequest.current;
-    if (append) setLoadingMorePosts(true); else setLoading(true);
+    if (append) setLoadingMorePosts(true); else setLoading(!hasCachedReads([feedUrl]));
     try {
       const res = await communityApi.getPublicPosts({ category: selectedCategory, limit: 20, ...(append ? { cursor: nextCursor } : {}) });
       if (requestId !== feedRequest.current) return;

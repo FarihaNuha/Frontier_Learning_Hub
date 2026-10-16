@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,9 +10,9 @@ import "../styles/dashboard.css";
 
 export default function AcademicRegistrationPage() {
   const navigate = useNavigate();
-  const [studentData, setStudentData] = useState(null);
-  const [registrations, setRegistrations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [studentData, setStudentData] = useReadState("/registration/my-status", data => data.student, null);
+  const [registrations, setRegistrations] = useReadState("/registration/my-status", data => data.registrations || [], []);
+  const [loading, setLoading] = useState(() => !hasCachedReads(["/registration/my-status"]));
 
   useEffect(() => {
     const fetchStatus = async () => {

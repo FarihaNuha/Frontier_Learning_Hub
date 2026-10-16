@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook, exportPDF } from "../services/nativeFiles";
 import { useState, useEffect } from "react";
@@ -40,15 +41,17 @@ export default function TeacherAttendancePage({
   const { id: urlCourseId } = useParams();
 
   // Direct course info - NO DROPDOWN
-  const [courseId, setCourseId] = useState("");
-  const [courseName, setCourseName] = useState("");
-  const [courseCode, setCourseCode] = useState("");
-  const [loadingCourse, setLoadingCourse] = useState(true);
+  const courseReadUrl = (propCourseId || urlCourseId) ? `/courses/${propCourseId || urlCourseId}` : "/attendance/courses/my";
+  const cachedCourse = data => data.course || data.courses?.[0];
+  const [courseId, setCourseId] = useReadState(courseReadUrl, data => cachedCourse(data)?._id || "", propCourseId || urlCourseId || "");
+  const [courseName, setCourseName] = useReadState(courseReadUrl, data => cachedCourse(data)?.name || "", "");
+  const [courseCode, setCourseCode] = useReadState(courseReadUrl, data => cachedCourse(data)?.displayCode || "", "");
+  const [loadingCourse, setLoadingCourse] = useState(() => !hasCachedReads([courseReadUrl]));
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [records, setRecords] = useState([]);
-  const [attendanceHistory, setAttendanceHistory] = useState([]);
+  const [attendanceHistory, setAttendanceHistory] = useReadState(`/attendance?courseId=${courseId}`, data => data.attendance || [], []);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState("mark");
   const [classType, setClassType] = useState("theory");
@@ -289,7 +292,7 @@ export default function TeacherAttendancePage({
 
   const loadCourseDirectly = async (id) => {
     try {
-      setLoadingCourse(true);
+      setLoadingCourse(!hasCachedReads([`/courses/${id}`]));
       console.log("Loading course with ID:", id);
 
       const res = await api.get(`/courses/${id}`);
@@ -311,7 +314,7 @@ export default function TeacherAttendancePage({
       setTheoryTotalClasses(course.theoryTotalClasses !== undefined ? course.theoryTotalClasses : 28);
       setLabTotalClasses(course.labTotalClasses !== undefined ? course.labTotalClasses : 14);
 
-      toast.success(`Managing: ${course.displayCode} - ${course.name}`);
+      // Course navigation should not interrupt the screen with a success toast.
     } catch (error) {
       console.error(error);
       toast.error("Course not found");
@@ -323,7 +326,7 @@ export default function TeacherAttendancePage({
 
   const loadTeacherFirstCourse = async () => {
     try {
-      setLoadingCourse(true);
+      setLoadingCourse(!hasCachedReads(["/attendance/courses/my"]));
       const res = await api.get("/attendance/courses/my");
       const courses = res.data.courses;
 

@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -22,14 +23,14 @@ export default function TeacherNoticePage() {
   const { id: courseIdParam } = useParams();
 
   // Admin / Global Notices state
-  const [adminNotices, setAdminNotices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [adminNotices, setAdminNotices] = useReadState("/service/notices", data => (data.notices || []).filter(n => n.status === "Published" || !n.status), []);
+  const [loading, setLoading] = useState(() => !hasCachedReads([courseIdParam ? `/service/notices/course/${courseIdParam}` : "/service/notices"]));
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   // Course-specific state
-  const [courseInfo, setCourseInfo] = useState(null);
-  const [courseNotices, setCourseNotices] = useState([]);
+  const [courseInfo, setCourseInfo] = useReadState(`/courses/${courseIdParam}`, data => data.course, null);
+  const [courseNotices, setCourseNotices] = useReadState(`/service/notices/course/${courseIdParam}`, data => data.notices || [], []);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [courseNoticeTitle, setCourseNoticeTitle] = useState("");
   const [courseNoticeContent, setCourseNoticeContent] = useState("");
@@ -37,7 +38,7 @@ export default function TeacherNoticePage() {
 
   // Fetch Global Admin Notices (for overall /teacher/notices)
   const fetchAdminNotices = async () => {
-    setLoading(true);
+    setLoading(!hasCachedReads(["/service/notices"]));
     try {
       const res = await api.get("/service/notices");
       const allNotices = res.data.notices || [];
@@ -52,7 +53,7 @@ export default function TeacherNoticePage() {
 
   // Fetch Course Notices & Course Details (for /teacher/course/:id/notice)
   const fetchCourseNotices = async (cid) => {
-    setLoading(true);
+    setLoading(!hasCachedReads([`/service/notices/course/${cid}`]));
     try {
       const [cRes, nRes] = await Promise.all([
         api.get(`/courses/${cid}`).catch(() => null),

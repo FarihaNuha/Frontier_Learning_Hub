@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
@@ -14,14 +15,14 @@ import TeacherSidebar from "../components/TeacherSidebar";
 import "../styles/dashboard.css";
 
 export default function TeacherRetakeApprovalPage() {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [requests, setRequests] = useReadState("/academic/teacher/retakes", data => data.requests || [], []);
+  const [loading, setLoading] = useState(() => !hasCachedReads(["/academic/teacher/retakes"]));
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [comment, setComment] = useState("");
   const [processing, setProcessing] = useState(false);
 
   const fetchRetakeRequests = async () => {
-    setLoading(true);
+    setLoading(!hasCachedReads(["/academic/teacher/retakes"]));
     try {
       const res = await api.get("/academic/teacher/retakes");
       setRequests(res.data.requests || []);

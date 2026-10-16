@@ -122,7 +122,7 @@ exports.getAssignments = async (req, res) => {
     if (req.query.course) filter.course = req.query.course;
 
     const assignments = await Assignment.find(filter).select("-fileData")
-      .populate("createdBy", "name email profilePicture department")
+      .populate("createdBy", "name email department")
       .sort({ createdAt: -1 });
 
     res.json({ assignments });

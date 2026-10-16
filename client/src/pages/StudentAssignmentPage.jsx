@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -44,10 +45,11 @@ export default function StudentAssignmentPage({
   const finalCourseId = propCourseId || urlCourseId;
   const finalCourseCode = propCourseCode || "";
 
-  const [courseInfo, setCourseInfo] = useState(null);
-  const [assignments, setAssignments] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courseInfo, setCourseInfo] = useReadState(`/courses/${finalCourseId}`, data => data.course, null);
+  const [assignments, setAssignments] = useReadState(`/assignments?courseId=${finalCourseId}`, data => (data.assignments || []).filter(a => a.courseId === finalCourseId || a.course === finalCourseCode), []);
+  const [submissions, setSubmissions] = useReadState("/assignments/my-submissions", data => (data.submissions || []).filter(s => assignments.some(a => String(a._id) === String(s.assignmentId?._id || s.assignmentId)) && (!user || String(s.studentId?._id || s.studentId) === String(user.id || user._id))), []);
+  const cachedAssignmentReads = () => hasCachedReads([`/assignments?courseId=${finalCourseId}`, "/assignments/my-submissions"]);
+  const [loading, setLoading] = useState(() => !cachedAssignmentReads());
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [file, setFile] = useState(null);
   const [files, setFiles] = useState([]);
@@ -168,7 +170,7 @@ export default function StudentAssignmentPage({
 
   const fetchData = async (forceRefresh = false) => {
     try {
-      setLoading(true);
+      setLoading(!cachedAssignmentReads());
       const [courseData, assignData, subData] = await Promise.all([
         fetchWithCache(`/courses/${finalCourseId}`, { forceRefresh }).catch(() => null),
         fetchWithCache(`/assignments?courseId=${finalCourseId}`, { forceRefresh }),

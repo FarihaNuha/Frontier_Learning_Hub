@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
@@ -14,9 +15,10 @@ import StudentSidebar from "../components/StudentSidebar";
 import "../styles/dashboard.css";
 
 export default function StudentRetakeRegistrationPage() {
-  const [failedCourses, setFailedCourses] = useState([]);
-  const [existingRetakes, setExistingRetakes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [failedCourses, setFailedCourses] = useReadState("/academic/student/failed-courses", data => data.failedCourses || [], []);
+  const [existingRetakes, setExistingRetakes] = useReadState("/academic/student/profile", data => data.retakes || [], []);
+  const cachedRetakeReads = () => hasCachedReads(["/academic/student/failed-courses", "/academic/student/profile"]);
+  const [loading, setLoading] = useState(() => !cachedRetakeReads());
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [targetSession, setTargetSession] = useState("2023-24");
@@ -33,7 +35,7 @@ export default function StudentRetakeRegistrationPage() {
   };
 
   const fetchRetakeData = async () => {
-    setLoading(true);
+    setLoading(!cachedRetakeReads());
     try {
       const [fRes, pRes] = await Promise.all([
         api.get("/academic/student/failed-courses"),

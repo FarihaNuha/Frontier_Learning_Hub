@@ -1,3 +1,4 @@
+import { useReadState, hasCachedReads } from "../services/apiCache";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -43,7 +44,7 @@ export default function TeacherExamPage({
   console.log("Final Course Code:", finalCourseCode);
   console.log("User:", user?.email);
 
-  const [exams, setExams] = useState([]);
+  const [exams, setExams] = useReadState(`/exams?courseId=${finalCourseId}`, data => data.exams || [], []);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [viewSubmissions, setViewSubmissions] = useState(null);
@@ -70,7 +71,7 @@ export default function TeacherExamPage({
     options: ["", "", "", ""],
     correctAnswer: 0,
   });
-  const [courseInfo, setCourseInfo] = useState(null);
+  const [courseInfo, setCourseInfo] = useReadState(`/courses/${finalCourseId}`, data => data.course, null);
 
   // Use finalCourseId in useEffect
   useEffect(() => {

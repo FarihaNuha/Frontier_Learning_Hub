@@ -112,7 +112,7 @@ exports.getLectures = async (req, res) => {
     }
 
     const lectures = await Lecture.find(filter).select("-fileData")
-      .populate("uploadedBy", "name email profilePicture department")
+      .populate("uploadedBy", "name email department")
       .sort({ createdAt: -1 });
 
     res.json({ lectures });

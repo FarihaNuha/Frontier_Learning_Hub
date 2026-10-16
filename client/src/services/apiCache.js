@@ -2,6 +2,7 @@ import { clearConversations } from './chatState';
 import { clearHomeSnapshots } from './homeSnapshot';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import api from './api';
+import { readAddress } from './requestCache';
 
 export const clearAllCache = () => {
   clearConversations(); clearHomeSnapshots(); api.clearReadCache?.();
@@ -9,6 +10,32 @@ export const clearAllCache = () => {
   try { Object.keys(sessionStorage).filter(key => key.startsWith('uftb_swr_cache_')).forEach(key => sessionStorage.removeItem(key)); } catch { }
 };
 export const getCachedData = (url, params) => api.peekReadCache?.(url, params) ?? null;
+export const hasCachedReads = urls => urls.every(url => api.hasReadCache ? api.hasReadCache(url) : getCachedData(url) !== null);
+
+// Legacy sections still load through effects. Hydrate their display state before
+// the first paint, and consume the adapter's background refreshes after that.
+export function useReadState(url, select, initialValue) {
+  const owner = api.readOwner?.() || '';
+  const identity = `${owner}:${url}`;
+  const currentIdentity = useRef(identity); currentIdentity.current = identity;
+  const selectRef = useRef(select); selectRef.current = select;
+  const initialRef = useRef(initialValue); initialRef.current = initialValue;
+  const snapshot = () => {
+    const saved = getCachedData(url);
+    return saved === null ? initialRef.current : selectRef.current(saved);
+  };
+  const [state, update] = useState(() => ({ identity, value: snapshot() }));
+  useEffect(() => {
+    update(previous => previous.identity === identity ? previous : { identity, value: snapshot() });
+    return api.subscribeReads?.(event => {
+      if (event.owner === owner && readAddress(event) === readAddress({ url })) {
+        update({ identity, value: selectRef.current(event.data) });
+      }
+    });
+  }, [identity, url, owner]);
+  const setValue = useCallback(value => { if (currentIdentity.current === identity) update(previous => ({ identity, value: typeof value === 'function' ? value(previous.identity === identity ? previous.value : snapshot()) : value })); }, [identity]);
+  return [state.identity === identity ? state.value : snapshot(), setValue];
+}
 export const setCachedData = () => { /* Successful reads are stored by the API adapter. */ };
 export const invalidateCache = pattern => {
   if (!pattern) return;
@@ -41,7 +68,7 @@ export function useCachedFetch(url, { enabled = true, initialData = null, params
     setState({ url, paramsKey, owner, data: saved ?? initialData, loading: saved === null && initialData === null, error: null });
     const unsubscribe = api.subscribeReads?.(event => {
       if (event.owner !== owner) return;
-      if (event.url === url && JSON.stringify(event.params || {}) === paramsKey) {
+      if (readAddress(event) === readAddress({ url, params: paramsRef.current })) {
         published.current++;
         setState({ url, paramsKey, owner, data: event.data, loading: false, error: null });
       } else if (event.invalidated !== undefined && (!event.invalidated || url.includes(event.invalidated))) run(true);

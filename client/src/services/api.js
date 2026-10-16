@@ -1,4 +1,4 @@
-import { createReadCache } from "./requestCache";
+import { createReadCache, readAddress } from "./requestCache";
 import axios from "axios";
 import { Capacitor } from "@capacitor/core";
 
@@ -59,8 +59,10 @@ api.defaults.adapter = reads.request;
 api.clearReadCache = reads.clear;
 api.invalidateReadCache = reads.invalidate;
 api.peekReadCache = (url, params) => reads.peek({ baseURL: api.defaults.baseURL, url, params });
+api.hasReadCache = (url, params) => reads.has({ baseURL: api.defaults.baseURL, url, params });
 api.subscribeReads = reads.subscribe;
 api.readOwner = readOwner;
+api.sameRead = (event, url, params) => readAddress(event) === readAddress({ url, params });
 
 // Request interceptor - add token to every request
 api.interceptors.request.use(

@@ -1,3 +1,5 @@
+import { useCachedFetch } from "../services/apiCache";
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -23,53 +25,23 @@ import PaymentCheckoutModal from "../components/PaymentCheckoutModal";
 export default function StudentLevelTermPage() {
   const { level, term } = useParams();
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [paymentInfo, setPaymentInfo] = useState(null);
+  const courseRead = useCachedFetch(`/registration/available-courses?level=Level-${level}&term=Term-${term}`);
+  const statusRead = useCachedFetch("/registration/my-status");
+  const currentReg = (statusRead.data?.registrations || []).find(r => r.level.includes(level) && r.term.includes(term));
+  const invoiceRead = useCachedFetch(`/registration-payments/invoice/${currentReg?._id}`, { enabled: !!currentReg?._id });
+  const data = courseRead.data ? { ...courseRead.data, registration: currentReg } : null;
+  const loading = courseRead.loading || statusRead.loading;
+  const paymentInfo = invoiceRead.data?.invoice;
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-
-  useEffect(() => {
-    const fetchLevelTermDetails = async () => {
-      try {
-        const res = await api.get(`/registration/available-courses?level=Level-${level}&term=Term-${term}`);
-        const regStatusRes = await api.get("/registration/my-status");
-
-        const currentReg = (regStatusRes.data.registrations || []).find(
-          (r) => r.level.includes(level) && r.term.includes(term)
-        );
-
-        setData({
-          student: res.data.student,
-          courses: res.data.courses || [],
-          calendar: res.data.calendar,
-          registration: currentReg,
-        });
-
-        if (currentReg && currentReg._id) {
-          try {
-            const invRes = await api.get(`/registration-payments/invoice/${currentReg._id}`);
-            setPaymentInfo(invRes.data?.invoice);
-          } catch (pErr) {
-            console.error("Failed to load payment invoice:", pErr);
-          }
-        }
-      } catch (err) {
-        toast.error("Failed to load Level-Term details.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLevelTermDetails();
-  }, [level, term]);
+  useEffect(() => { if (courseRead.error || statusRead.error) toast.error("Failed to load Level-Term details."); }, [courseRead.error, statusRead.error]);
 
   if (loading) {
     return (
       <div className="dashboard-container">
         <StudentSidebar currentPage="course-registration" />
         <div className="main-content" style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>
-          Loading Level-Term Details...
+          <SkeletonLoader type="section" />
         </div>
       </div>
     );
@@ -538,7 +510,7 @@ export default function StudentLevelTermPage() {
         registrationId={reg?._id}
         onPaymentSuccess={() => {
           setShowInvoiceModal(false);
-          window.location.reload();
+          statusRead.refetch(); invoiceRead.refetch();
         }}
       />
 
@@ -558,7 +530,7 @@ export default function StudentLevelTermPage() {
         onPaymentSuccess={() => {
           setShowPaymentModal(false);
           toast.success("Payment completed successfully!");
-          window.location.reload();
+          statusRead.refetch(); invoiceRead.refetch();
         }}
       />
     </div>

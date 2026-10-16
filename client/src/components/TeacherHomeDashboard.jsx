@@ -17,18 +17,22 @@ import {
 } from "react-icons/fi";
 import TeacherSidebar from "./TeacherSidebar";
 import "../styles/dashboard.css";
+import { useLaunchReady } from "../services/launchScreen";
+import { readHomeSnapshot, saveHomeSnapshot } from "../services/homeSnapshot";
 
 export default function TeacherHomeDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(() => readHomeSnapshot(user, "teacher"));
+  const [loading, setLoading] = useState(() => readHomeSnapshot(user, "teacher") === null);
+  useLaunchReady(!loading);
 
   useEffect(() => {
     const fetchSummary = async () => {
       try {
         const res = await api.get("/courses/teacher-summary");
         setData(res.data);
+        saveHomeSnapshot(user, "teacher", res.data);
       } catch (err) {
         toast.error("Failed to load teacher dashboard data.");
       } finally {

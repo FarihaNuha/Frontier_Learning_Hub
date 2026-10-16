@@ -1,45 +1,41 @@
 package com.frontier.learningacademy;
 
 import android.animation.ValueAnimator;
-import android.graphics.Color;
-import android.graphics.Typeface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.ImageView;
 import androidx.core.splashscreen.SplashScreenViewProvider;
+import java.util.function.BooleanSupplier;
 
-/** Reveals the app name beneath the existing native splash icon. */
+/** Uses the supplied wordmark, preserving its exact lettering and gold/navy colors. */
 final class UniCoreLaunchAnimation {
     private UniCoreLaunchAnimation() { }
 
-    static void showName(SplashScreenViewProvider provider) {
+    static void showName(SplashScreenViewProvider provider, long started, BooleanSupplier ready) {
         View splashView = provider.getView();
-        if (!(splashView instanceof FrameLayout)) {
-            splashView.animate().alpha(0f).setDuration(200).withEndAction(provider::remove).start();
+        if (!(splashView instanceof FrameLayout)
+            || (Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) {
+            finishWhenReady(provider, started, ready);
             return;
         }
         FrameLayout splash = (FrameLayout) splashView;
-        // Respect the phone's accessibility setting for disabled animations.
-        if (Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled()) {
-            provider.remove();
-            return;
-        }
         float density = splash.getResources().getDisplayMetrics().density;
-        TextView name = new TextView(splash.getContext());
-        name.setText(R.string.app_name);
-        name.setTextSize(30);
-        name.setTextColor(Color.rgb(10, 45, 83));
-        name.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        name.setLetterSpacing(0.06f);
-        name.setGravity(Gravity.CENTER);
+        ImageView name = new ImageView(splash.getContext());
+        Bitmap reference = BitmapFactory.decodeResource(splash.getResources(), R.drawable.unicore_wordmark);
+        // Crop only while displaying: omit the emblem fragment above the supplied name.
+        name.setImageBitmap(Bitmap.createBitmap(reference, 42, 28, 313, 66));
+        name.setContentDescription(splash.getResources().getString(R.string.app_name));
+        name.setScaleType(ImageView.ScaleType.FIT_CENTER);
         name.setAlpha(0f);
-        name.setTranslationY(12 * density);
-        FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+        name.setTranslationY(6 * density);
+        int width = Math.min(Math.round(340 * density), Math.round(splash.getResources().getDisplayMetrics().widthPixels * 0.8f));
+        FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(width, Math.round(width * 66f / 313f), Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         splash.addView(name, layout);
         splash.post(() -> {
             if (!splash.isAttachedToWindow()) { provider.remove(); return; }
@@ -47,17 +43,25 @@ final class UniCoreLaunchAnimation {
             int[] iconPosition = new int[2], splashPosition = new int[2];
             icon.getLocationOnScreen(iconPosition);
             splash.getLocationOnScreen(splashPosition);
-            name.measure(View.MeasureSpec.makeMeasureSpec(splash.getWidth(), View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-            // Follow the actual system icon position in portrait and landscape.
             layout.topMargin = Math.max(0, Math.min(
-                iconPosition[1] - splashPosition[1] + icon.getHeight() + Math.round(8 * density),
-                splash.getHeight() - name.getMeasuredHeight() - Math.round(24 * density)));
+                iconPosition[1] - splashPosition[1] + icon.getHeight() + Math.round(6 * density),
+                splash.getHeight() - layout.height - Math.round(20 * density)));
             name.setLayoutParams(layout);
-            name.animate().alpha(1f).translationY(0f).setStartDelay(100).setDuration(900)
+            name.animate().alpha(1f).translationY(0f)
+                .setStartDelay(LaunchTiming.nameDelay(SystemClock.elapsedRealtime() - started)).setDuration(240)
                 .setInterpolator(new DecelerateInterpolator())
-                .withEndAction(() -> splash.animate().alpha(0f).setStartDelay(220).setDuration(200)
-                    .withEndAction(provider::remove).start()).start();
+                .withEndAction(() -> splash.postDelayed(() -> finishWhenReady(provider, started, ready), 2000))
+                .start();
         });
+    }
+
+    private static void finishWhenReady(SplashScreenViewProvider provider, long started, BooleanSupplier ready) {
+        View view = provider.getView();
+        if (!view.isAttachedToWindow()) { provider.remove(); return; }
+        if (LaunchTiming.canExit(ready.getAsBoolean(), SystemClock.elapsedRealtime() - started)) {
+            view.animate().alpha(0f).setDuration(180).withEndAction(provider::remove).start();
+        } else {
+            view.postDelayed(() -> finishWhenReady(provider, started, ready), 100);
+        }
     }
 }

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
+import { useLaunchReady } from "../services/launchScreen";
+import { readHomeSnapshot, saveHomeSnapshot } from "../services/homeSnapshot";
 import { fetchWithCache, invalidateCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import {
@@ -95,8 +97,9 @@ const getCourseBanner = (course) => {
 export default function CourseListPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState(() => readHomeSnapshot(user, "courses") || []);
+  const [loading, setLoading] = useState(() => readHomeSnapshot(user, "courses") === null);
+  useLaunchReady(!loading);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [formData, setFormData] = useState({
@@ -208,7 +211,7 @@ export default function CourseListPage() {
         })
         .catch(() => {});
     }
-  }, [user]);
+  }, [user?.id, user?._id]);
 
   const assignedGroups = useMemo(() => {
     const map = new Map();
@@ -268,7 +271,7 @@ export default function CourseListPage() {
     if (user) {
       fetchCourses();
     }
-  }, [user]);
+  }, [user?.id, user?._id]);
 
   if (!user) return null;
 
@@ -353,9 +356,10 @@ export default function CourseListPage() {
 
   const fetchCourses = async (forceRefresh = false) => {
     try {
-      const res = await api.get("/courses/my");
+      const res = await api.get("/courses/my", { cache: !forceRefresh });
       const list = Array.isArray(res.data) ? res.data : (res.data?.courses || []);
       setCourses(list);
+      saveHomeSnapshot(user, "courses", list);
     } catch (error) {
       console.error(error);
     } finally {

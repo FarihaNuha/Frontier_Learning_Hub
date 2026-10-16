@@ -5,8 +5,10 @@ import api from "../services/api";
 import toast from "react-hot-toast";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import "../styles/auth.css";
+import { useLaunchReady } from "../services/launchScreen";
 
 export default function AuthPage() {
+  useLaunchReady(true);
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);

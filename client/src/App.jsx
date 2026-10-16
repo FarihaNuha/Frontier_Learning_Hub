@@ -12,21 +12,22 @@ import { installNativeDownloads } from "./services/nativeFiles";
 import { OfflineNotice, AppErrorBoundary } from "./components/AppReliability";
 
 import AuthPage from "./pages/AuthPage";
-const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
+import { loadTeacherHome, loadCourseHome } from "./services/startup";
+import { useLaunchReady } from "./services/launchScreen";
+const TeacherHomeDashboard = lazy(loadTeacherHome);
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminStudents = lazy(() => import("./pages/AdminStudents"));
 const AdminTeachers = lazy(() => import("./pages/AdminTeachers"));
 const AdminCourses = lazy(() => import("./pages/AdminCourses"));
 const AdminAdvisers = lazy(() => import("./pages/AdminAdvisers"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
-const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
 const StudentAssignmentPage = lazy(() => import("./pages/StudentAssignmentPage"));
 const TeacherAssignmentPage = lazy(() => import("./pages/TeacherAssignmentPage"));
 const TeacherAttendancePage = lazy(() => import("./pages/TeacherAttendancePage"));
 const StudentAttendancePage = lazy(() => import("./pages/StudentAttendancePage"));
 const TeacherExamPage = lazy(() => import("./pages/TeacherExamPage"));
 const StudentExamPage = lazy(() => import("./pages/StudentExamPage"));
-const CourseListPage = lazy(() => import("./pages/CourseListPage"));
+const CourseListPage = lazy(loadCourseHome);
 const CourseDashboard = lazy(() => import("./pages/CourseDashboard"));
 const CommunityHub = lazy(() => import("./pages/CommunityHub"));
 const PublicPostDetailPage = lazy(() => import("./pages/PublicPostDetailPage"));
@@ -198,7 +199,7 @@ function AppContent() {
             path="/teacher/dashboard"
             element={
               <ProtectedRoute>
-                <TeacherDashboard />
+                <TeacherHomeDashboard />
               </ProtectedRoute>
             }
           />
@@ -746,9 +747,19 @@ function AppContent() {
           <Route path="/" element={<RootRedirect />} />
           <Route path="*" element={<RootRedirect />} />
         </Routes>
+        <DestinationReady />
       </Suspense>
     </>
   );
+}
+
+function DestinationReady() {
+  const { loading } = useAuth();
+  const { pathname } = useLocation();
+  // Home pages signal only after their initial data (or cached view) is ready.
+  const homes = ["/", "/dashboard", "/auth", "/teacher/dashboard", "/student/dashboard", "/courses", "/admin/dashboard"];
+  useLaunchReady(!loading && !homes.includes(pathname));
+  return null;
 }
 
 function App() {

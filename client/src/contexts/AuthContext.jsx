@@ -4,6 +4,7 @@ import { clearAllCache } from "../services/apiCache";
 import toast from "react-hot-toast";
 import { setChatNotificationContext, getChatNotificationSettings } from "../services/chatNotifications";
 import { io } from "socket.io-client";
+import { prepareHome } from "../services/startup";
 import { showNativeNotification, isNativePlatform, syncNativePushToken, disconnectNativePushToken } from "../services/nativeBridge";
 
 const AuthContext = createContext();
@@ -43,6 +44,7 @@ export function AuthProvider({ children }) {
 
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      prepareHome(u);
       if (u && (u.id || u._id)) {
         const newSocket = io(getSocketUrl(), {
           auth: { token },

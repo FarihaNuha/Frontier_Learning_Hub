@@ -67,7 +67,7 @@ jobs:
           npm --prefix server run test-push
           npm --prefix server run test-chat
           npm --prefix server run test-files
-          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/chatState.test.js src/services/chatNotifications.test.js
+          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/chatState.test.js src/services/chatNotifications.test.js src/services/homeSnapshot.test.js src/services/launchScreen.test.jsx
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -140,17 +140,19 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.4-apk
-          name: UniCore Mobile App v1.4.4 (Android test APK)
+          tag_name: v1.4.5-apk
+          name: UniCore Mobile App v1.4.5 (Android test APK)
           body: |
-            Chat notification actions now show Reply, Like and Mute.
-            Mute stops this person's message notifications on this phone until
-            unmuted from the bell button in the conversation header. Messages
-            remain available in the app. Preferences are stored separately per
-            signed-in account and survive restarting the app or signing out.
-            Includes the animated UniCore splash and previous performance fixes.
+            Uses the supplied navy/gold UniCore wordmark beneath the existing icon.
+            The name begins appearing one second after launch, fades in over 240ms,
+            and remains for two seconds before the splash fades into the ready screen.
+            Home screens prepare underneath the animation; recent account-scoped
+            snapshots render immediately while fresh data loads in the background.
+            Removes an unnecessary external startup font request and loads the
+            teacher overview directly without loading the material editor first.
+            Includes the previous Like/Mute notification actions and chat fixes.
 
-            Use UniCore-1.4.4.apk for the same local signing key as prior updates.
+            Use UniCore-1.4.5.apk for the same local signing key as prior updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

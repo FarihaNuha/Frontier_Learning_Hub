@@ -1,4 +1,5 @@
 import { clearConversations } from "./chatState";
+import { clearHomeSnapshots } from "./homeSnapshot";
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "./api";
 
@@ -29,6 +30,7 @@ const getUserScopedKey = (key) => {
 export const clearAllCache = () => {
   memoryCache.clear();
   clearConversations();
+  clearHomeSnapshots();
   api.clearReadCache?.();
   try {
     const keysToRemove = [];

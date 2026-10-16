@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
+import { useLaunchReady } from "../services/launchScreen";
 import {
   FiUsers,
   FiBookOpen,
@@ -25,6 +26,7 @@ export default function AdminDashboard() {
     sessionStudentCounts: {},
   });
   const [loading, setLoading] = useState(true);
+  useLaunchReady(!loading);
 
   useEffect(() => {
     api

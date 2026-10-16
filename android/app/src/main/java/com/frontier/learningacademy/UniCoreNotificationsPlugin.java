@@ -8,6 +8,13 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 
 @CapacitorPlugin(name = "UniCoreNotifications")
 public class UniCoreNotificationsPlugin extends Plugin {
+    @PluginMethod public void appReady(PluginCall call) {
+        if (getActivity() instanceof MainActivity) {
+            MainActivity activity = (MainActivity) getActivity();
+            activity.runOnUiThread(activity::markLaunchReady);
+        }
+        call.resolve();
+    }
     private boolean validThreadOwner(PluginCall call) {
         String owner = call.getString("userId", ""), thread = call.getString("threadId", "");
         if (owner.isEmpty() || thread.isEmpty() || !owner.equals(UniCoreNotifications.prefs(getContext()).getString("owner", ""))) {

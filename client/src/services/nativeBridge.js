@@ -165,7 +165,7 @@ const installNotificationListeners = async () => {
   await addListenerOnce("registration", PushNotifications, "registration", async ({ value }) => {
     localStorage.setItem("fcm_token", value);
     updateStatus({ registered: true, error: null });
-    await syncNativePushToken();
+    await syncNativePushToken({ force: true });
   });
   await addListenerOnce("registrationError", PushNotifications, "registrationError", () => {
     updateStatus({ registered: false, error: "This phone could not register for notifications. Check Google Play services and retry." });
@@ -241,7 +241,12 @@ const handleBack = ({ canGoBack }) => {
   const sidebar = document.querySelector(".mobile-sidebar-overlay.active");
   if (sidebar) { sidebar.click(); return; }
   const path = window.location.pathname;
-  if (path.startsWith("/community/messages/")) { navigateTo("/community/messages"); return; }
+  if (path.startsWith("/community/messages/")) {
+    const conversations = document.querySelector(".mobile-back-to-contacts-btn");
+    if (conversations) conversations.click(); else navigateTo("/community/messages");
+    return;
+  }
+  if (path === "/community/messages") { navigateTo("/community"); return; }
   const roots = ["/", "/courses", "/student/dashboard", "/teacher/dashboard", "/admin/dashboard", "/auth"];
   if (!roots.includes(path) && canGoBack) window.history.back();
   else App.exitApp();
@@ -255,19 +260,24 @@ export const initNativeFeatures = (navigate) => {
       await new Promise((resolve) => setTimeout(resolve, 250));
     }
     if (!isNativePlatform()) return;
-    await Promise.allSettled([
+    // Navigation must work even if a vendor's status-bar bridge hangs/fails.
+    await addListenerOnce("back", App, "backButton", handleBack);
+    Promise.allSettled([
       StatusBar.setStyle({ style: Style.Light }),
       StatusBar.setBackgroundColor({ color: "#2C4B66" }),
     ]);
-    await addListenerOnce("back", App, "backButton", handleBack);
-    await addListenerOnce("url", App, "appUrlOpen", openAppUrl);
-    const launch = await App.getLaunchUrl();
-    if (launch?.url) openAppUrl(launch);
-    await addListenerOnce("resume", App, "appStateChange", ({ isActive }) => {
-      if (isActive) enableNativeNotifications();
-    });
     window.addEventListener("online", () => syncNativePushToken({ force: true }));
-    await enableNativeNotifications();
+    await Promise.allSettled([
+      (async () => {
+        await addListenerOnce("url", App, "appUrlOpen", openAppUrl);
+        const launch = await App.getLaunchUrl();
+        if (launch?.url) openAppUrl(launch);
+      })(),
+      addListenerOnce("resume", App, "appStateChange", ({ isActive }) => {
+        if (isActive) enableNativeNotifications();
+      }),
+      enableNativeNotifications(),
+    ]);
   })().catch((error) => {
     setupPromise = null;
     console.warn("[Push] Native setup failed:", error.message);

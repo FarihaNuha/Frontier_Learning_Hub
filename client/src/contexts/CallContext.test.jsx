@@ -6,6 +6,7 @@ import { captureScreen, listenForNativeAnswer } from "../services/callBridge";
 jest.mock("./AuthContext", () => ({ useAuth: jest.fn() }));
 jest.mock("../services/api", () => ({ __esModule: true, default: { get: jest.fn() } }));
 jest.mock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: () => false } }));
+jest.mock("@capacitor/app", () => ({ App: { addListener: jest.fn() } }));
 jest.mock("../services/callBridge", () => ({ dismissNativeCall: jest.fn(), setNativeCallContext: jest.fn(), listenForNativeAnswer: jest.fn(async () => () => {}), captureScreen: jest.fn() }));
 jest.mock("react-hot-toast", () => { const toast = jest.fn(); toast.error = jest.fn(); return { __esModule: true, default: toast }; });
 let handlers, socket, pc, stream;
@@ -73,4 +74,39 @@ test("audio calls reserve a video sender and replace it for screen sharing", asy
   fireEvent.click(screen.getByText("Stop sharing"));
   await waitFor(() => expect(stopCapture).toHaveBeenCalled());
   expect(sender.replaceTrack).toHaveBeenLastCalledWith(null);
+});
+
+test("answer binds microphone and camera to the offered transceivers", async () => {
+  const audioSender = { replaceTrack: jest.fn(async () => {}) }, videoSender = { replaceTrack: jest.fn(async () => {}) };
+  pc.getTransceivers = () => [{ receiver: { track: { kind: "audio" } }, sender: audioSender }, { receiver: { track: { kind: "video" } }, sender: videoSender }];
+  render(<CallProvider>Dashboard</CallProvider>);
+  act(() => handlers["incoming-call"]({ callId: "offered", from: "a", callType: "audio", offer: { type: "offer", sdp: "offer" } }));
+  fireEvent.click(screen.getByText("Answer"));
+  await waitFor(() => expect(audioSender.replaceTrack).toHaveBeenCalledWith(stream.getAudioTracks()[0]));
+  expect(pc.setRemoteDescription.mock.invocationCallOrder[0]).toBeLessThan(audioSender.replaceTrack.mock.invocationCallOrder[0]);
+  expect(pc.addTransceiver).not.toHaveBeenCalled();
+  expect(videoSender.replaceTrack).toHaveBeenCalledWith(null);
+});
+
+test("returning to the app recovers pending ringing; expired calls are ignored", () => {
+  render(<CallProvider>Dashboard</CallProvider>);
+  const before = socket.emit.mock.calls.filter(([event]) => event === "call-ready").length;
+  Object.defineProperty(document, "visibilityState", { configurable: true, value: "visible" });
+  act(() => document.dispatchEvent(new Event("visibilitychange")));
+  expect(socket.emit.mock.calls.filter(([event]) => event === "call-ready")).toHaveLength(before + 1);
+  act(() => handlers["incoming-call"]({ callId: "expired", expiresAt: Date.now() - 100 }));
+  expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+test("a temporary signalling disconnect preserves an active media call", async () => {
+  jest.useFakeTimers();
+  const view = render(<CallProvider>Dashboard</CallProvider>);
+  act(() => handlers["incoming-call"]({ callId: "recover", from: "a", callType: "audio", offer: { type: "offer", sdp: "sdp" } }));
+  fireEvent.click(screen.getByText("Answer"));
+  await act(async () => { await Promise.resolve(); await Promise.resolve(); });
+  act(() => { pc.connectionState = "connected"; pc.onconnectionstatechange(); socket.connected = false; handlers.disconnect(); });
+  expect(pc.close).not.toHaveBeenCalled();
+  act(() => { jest.advanceTimersByTime(1000); socket.connected = true; handlers.connect(); jest.advanceTimersByTime(16000); });
+  expect(pc.close).not.toHaveBeenCalled();
+  view.unmount(); jest.useRealTimers();
 });

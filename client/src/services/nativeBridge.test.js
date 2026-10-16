@@ -112,3 +112,20 @@ test("push already rendered natively cannot create a second local notification",
   handler({ title: "Message", data: { nativeHandled: "true", notificationId: "event-1" } });
   expect(local.schedule).not.toHaveBeenCalled();
 });
+
+test("system Back uses the conversation close action even without WebView history", async () => {
+  window.history.replaceState({}, "", "/community/messages/friend");
+  document.body.innerHTML = '<button class="mobile-back-to-contacts-btn">Back</button>';
+  const close = jest.fn(); document.querySelector("button").onclick = close;
+  await bridge.initNativeFeatures(jest.fn());
+  app.addListener.mock.calls.find(([event]) => event === "backButton")[1]({ canGoBack: false });
+  expect(close).toHaveBeenCalledTimes(1); expect(app.exitApp).not.toHaveBeenCalled();
+  document.body.innerHTML = ""; window.history.replaceState({}, "", "/");
+});
+
+test("a stalled status-bar bridge cannot block Back or push registration", async () => {
+  require("@capacitor/status-bar").StatusBar.setStyle.mockImplementation(() => new Promise(() => {}));
+  await bridge.initNativeFeatures(jest.fn());
+  expect(app.addListener.mock.calls.some(([event]) => event === "backButton")).toBe(true);
+  expect(push.register).toHaveBeenCalled();
+});

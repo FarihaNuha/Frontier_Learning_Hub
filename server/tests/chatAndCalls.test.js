@@ -1,11 +1,11 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const vm = require("node:vm"), fs = require("node:fs"), path = require("node:path");
-const load = (file, dependencies) => {
+const load = (file, dependencies, globals = {}) => {
   const module = { exports: {} };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "..", file), "utf8"), {
     module, exports: module.exports, require: name => dependencies[name] ?? require(name),
-    process: { env: {} }, console, setTimeout, clearTimeout,
+    process: { env: {} }, console, setTimeout, clearTimeout, ...globals,
   });
   return module.exports;
 };
@@ -65,6 +65,16 @@ test("call sessions reject busy participants, isolate outsiders and release both
   assert.ok(calls.createCall({ callerId: "a", calleeId: "b" }));
 });
 
+test("TURN credentials cover the supported call duration without exposing the signing secret", () => {
+  const controller = load("controllers/callConfig.js", {}, { process: { env: { TURN_URLS: "turn:relay.example:3478", TURN_SECRET: "backend-only-secret" } } });
+  const res = response(); res.set = () => res;
+  controller.getCallConfig({ user: { uid: "fixture-user" } }, res);
+  const relay = res.body.iceServers[1];
+  assert.equal(res.body.relayConfigured, true);
+  assert.ok(Number(relay.username.split(":")[0]) - Date.now() / 1000 > 7200);
+  assert.equal(JSON.stringify(res.body).includes("backend-only-secret"), false);
+});
+
 test("signaling authenticates socket identity and rejects answers/ICE from outsiders", async () => {
   const events = []; let connect, authorize;
   const calls = load("services/callSessions.js", {});
@@ -104,6 +114,42 @@ test("signaling authenticates socket identity and rejects answers/ICE from outsi
   assert.equal(answerResult.success, true);
   caller.handlers["end-call"]({ callId: accepted.callId });
   assert.equal(calls.currentCall("b"), undefined);
+});
+
+test("sleeping recipients retain the ringing deadline and recover signalling on resume", async () => {
+  let connect; const timers = [];
+  const calls = load("services/callSessions.js", {});
+  class Server {
+    constructor() { this.sockets = { adapter: { rooms: new Map() } }; }
+    use() {} on(name, fn) { if (name === "connection") connect = fn; }
+    to() { return this; } emit() {}
+  }
+  const signaling = load("socket.js", {
+    "socket.io": { Server }, "./services/callSessions": calls,
+    "./models/User": { findById: async id => ({ _id: id, role: "student", name: id }) },
+    "./models/ContactRequest": {}, jsonwebtoken: {},
+    "./services/callNotifications": { sendIncomingCallPush: async () => {}, sendCallDismissPush: async () => {} },
+  }, { setTimeout: (fn, ms) => { const timer = { fn, ms, unref() {} }; timers.push(timer); return timer; }, clearTimeout: timer => { if (timer) timer.cleared = true; } });
+  signaling.initSocket({});
+  const make = uid => {
+    const handlers = {}, events = [];
+    const socket = { data: { userId: uid }, handshake: { auth: { token: "fixture" }, query: {} }, join() {}, on: (name, fn) => { handlers[name] = fn; }, emit: (event, data) => events.push({ event, data }), to() { return this; } };
+    connect(socket); return { handlers, events };
+  };
+  const caller = make("a"), callee = make("b"); let started;
+  await caller.handlers["call-user"]({ to: "b", offer: { type: "offer", sdp: "offer" }, callType: "audio" }, result => { started = result; });
+  caller.handlers["ice-candidate"]({ callId: started.callId, candidate: { candidate: "candidate:queued" } });
+  callee.handlers.disconnect();
+  assert.equal(timers.filter(timer => timer.ms === 15000).length, 0);
+  assert.equal(calls.currentCall("b").state, "ringing");
+  callee.handlers["call-ready"]();
+  assert.equal(callee.events.find(item => item.event === "incoming-call").data.callId, started.callId);
+  assert.equal(callee.events.find(item => item.event === "ice-candidate").data.candidate.candidate, "candidate:queued");
+  callee.handlers["answer-call"]({ callId: started.callId, answer: { type: "answer", sdp: "answer" } });
+  caller.handlers.disconnect(); assert.equal(timers.filter(timer => timer.ms === 15000).length, 1);
+  caller.handlers["call-ready"]();
+  assert.equal(caller.events.find(item => item.event === "call-answered").data.answer.sdp, "answer");
+  caller.handlers["end-call"]({ callId: started.callId });
 });
 
 const sendFixture = ({ source, existing } = {}) => {

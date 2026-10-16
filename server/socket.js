@@ -86,6 +86,9 @@ const initSocket = (server) => {
       if (call?.state === "ringing" && call.calleeId === userId) {
         socket.emit("incoming-call", incoming(call));
         for (const item of call.candidates) if (item.from !== userId) socket.emit("ice-candidate", { callId: call.callId, candidate: item.candidate });
+      } else if (call?.state === "active") {
+        if (call.callerId === userId && call.answer) socket.emit("call-answered", { callId: call.callId, answer: call.answer });
+        for (const item of call.candidates) if (item.from !== userId) socket.emit("ice-candidate", { callId: call.callId, candidate: item.candidate });
       }
     });
     socket.on("call-user", async ({ to, offer, callType }, ack = () => {}) => {
@@ -110,7 +113,7 @@ const initSocket = (server) => {
     socket.on("answer-call", ({ callId, answer }, ack = () => {}) => {
       const call = calls.memberCall(userId, callId);
       if (!call || call.calleeId !== userId || call.state !== "ringing" || !answer || answer.type !== "answer" || typeof answer.sdp !== "string" || answer.sdp.length > 100000) return ack({ error: "Call is no longer available" });
-      call.state = "active"; clearTimeout(call.timer);
+      call.state = "active"; call.answer = answer; clearTimeout(call.timer);
       call.timer = setTimeout(() => endSession(callId, "Call duration limit reached"), 2 * 60 * 60 * 1000); call.timer.unref?.();
       io.to(`user_${call.callerId}`).emit("call-answered", { callId, answer });
       socket.to(`user_${userId}`).emit("call-ended", { callId, reason: "Answered on another device" });
@@ -141,7 +144,9 @@ const initSocket = (server) => {
         if (!remaining?.size) {
           onlineUsers.delete(userId);
           const call = calls.currentCall(userId);
-          if (call) { const grace = setTimeout(() => { if (!io.sockets.adapter.rooms.get(`user_${userId}`)?.size) endSession(call.callId, "Connection lost"); }, 15000); grace.unref?.(); }
+          // Ringing has its own 45s expiry. Sleeping Android WebViews must not
+          // cancel it before the push notification can wake the recipient.
+          if (call?.state === "active") { const grace = setTimeout(() => { if (!io.sockets.adapter.rooms.get(`user_${userId}`)?.size) endSession(call.callId, "Connection lost"); }, 15000); grace.unref?.(); }
         }
         console.log(`❌ User disconnected: ${userId}`);
         io.emit("online_users", Array.from(onlineUsers));

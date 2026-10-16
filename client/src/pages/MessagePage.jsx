@@ -175,6 +175,13 @@ export default function MessagePage() {
     if (user && userId) {
       fetchConversation(userId);
       setShowNewMessage(false);
+    } else if (!userId) {
+      // Router/hardware Back keeps this component mounted. Invalidate an older
+      // request as well, so its response cannot reopen the conversation.
+      conversationRequest.current++;
+      setSelectedUser(null); setMessages([]); setLoading(false);
+      setLoadingOlder(false); setHasOlder(false); setOlderCursor(null);
+      setActionMessage(null); setForwarding(null); setPreviewFile(null);
     }
   }, [userId, user?.id, user?._id]);
 

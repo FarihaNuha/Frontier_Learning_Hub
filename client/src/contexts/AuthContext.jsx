@@ -30,6 +30,17 @@ export function AuthProvider({ children }) {
   });
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
+  const userId = user?.id || user?._id;
+  const authToken = localStorage.getItem("token");
+  useEffect(() => {
+    if (!userId || !authToken) { setSocket(null); return; }
+    const connection = io(getSocketUrl(), {
+      auth: { token: authToken },
+      query: { userId, activeStatus: getActiveStatusSetting() },
+    });
+    setSocket(connection);
+    return () => connection.close();
+  }, [userId, authToken]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -48,16 +59,6 @@ export function AuthProvider({ children }) {
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       prepareHome(u);
-      if (u && (u.id || u._id)) {
-        const newSocket = io(getSocketUrl(), {
-          auth: { token },
-          query: { 
-            userId: u.id || u._id,
-            activeStatus: getActiveStatusSetting()
-          },
-        });
-        setSocket(newSocket);
-      }
 
       // Sync stored native FCM token with server
       const storedFcmToken = localStorage.getItem("fcm_token");
@@ -97,7 +98,6 @@ export function AuthProvider({ children }) {
       }
       if (e.key === "token" && !e.newValue) {
         setUser(null);
-        if (socket) socket.close();
         setSocket(null);
       }
     };
@@ -105,7 +105,6 @@ export function AuthProvider({ children }) {
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
-      if (socket) socket.close();
     };
   }, []);
 
@@ -126,15 +125,6 @@ export function AuthProvider({ children }) {
         syncNativePushToken();
       }
 
-      // Connect socket on login
-      const newSocket = io(getSocketUrl(), {
-        auth: { token },
-        query: { 
-          userId: user.id || user._id,
-          activeStatus: getActiveStatusSetting()
-        },
-      });
-      setSocket(newSocket);
 
       toast.success(`Welcome back, ${user.name}!`);
       return res.data;
@@ -160,15 +150,6 @@ export function AuthProvider({ children }) {
         syncNativePushToken();
       }
 
-      // Connect socket on register
-      const newSocket = io(getSocketUrl(), {
-        auth: { token },
-        query: { 
-          userId: user.id || user._id,
-          activeStatus: getActiveStatusSetting()
-        },
-      });
-      setSocket(newSocket);
 
       toast.success("Account created successfully!");
       return res.data;

@@ -4,7 +4,8 @@ import { useAuth } from "../contexts/AuthContext";
 import MessagePage from "./MessagePage";
 import { communityApi } from "../services/communityApi";
 import { getChatNotificationSettings, setChatMuted } from "../services/chatNotifications";
-jest.mock("react-router-dom", () => ({ useParams: () => ({ userId: "friend" }), useNavigate: () => jest.fn(), useSearchParams: () => [new URLSearchParams()] }));
+import { useParams } from "react-router-dom";
+jest.mock("react-router-dom", () => ({ useParams: jest.fn(() => ({ userId: "friend" })), useNavigate: () => jest.fn(), useSearchParams: () => [new URLSearchParams()] }));
 jest.mock("../contexts/AuthContext", () => { const auth = { user: { id: "me", role: "student", name: "Me" }, socket: null, onlineUsers: [] }; return { useAuth: () => auth }; });
 jest.mock("../contexts/CallContext", () => ({ useCall: () => ({ startCall: jest.fn() }) }));
 jest.mock("../components/TeacherSidebar", () => () => null);
@@ -19,6 +20,7 @@ const message = { _id: "message-1", sender: friend, receiver: { _id: "me" }, con
 beforeEach(() => {
   clearConversations();
   jest.clearAllMocks();
+  useParams.mockReturnValue({ userId: "friend" });
   getChatNotificationSettings.mockResolvedValue({ supported: false, muted: false });
   setChatMuted.mockResolvedValue(undefined);
   useAuth().socket = null;
@@ -29,6 +31,18 @@ beforeEach(() => {
   communityApi.sendMessage.mockResolvedValue({ data: { message: { ...message, _id: "sent-ack", sender: { _id: "me" }, receiver: friend } } });
   communityApi.readMessages.mockResolvedValue({ data: { readThrough: 1234 } });
   Object.defineProperty(window, "crypto", { configurable: true, value: { randomUUID: () => "request-1" } });
+});
+
+test("hardware/router Back clears the conversation and ignores its late response", async () => {
+  const view = render(<MessagePage />); await screen.findByText("Question");
+  let finish;
+  communityApi.getConversation.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  await act(async () => document.dispatchEvent(new Event("visibilitychange")));
+  useParams.mockReturnValue({}); view.rerender(<MessagePage />);
+  await waitFor(() => expect(screen.queryByLabelText("Back to conversations")).toBeNull());
+  await act(async () => finish({ data: { user: friend, messages: [message] } }));
+  expect(screen.queryByLabelText("Back to conversations")).toBeNull();
+  expect(screen.queryByPlaceholderText("Type a message...")).toBeNull();
 });
 test("a muted conversation can be unmuted and muted again without hiding messages", async () => {
   getChatNotificationSettings.mockResolvedValue({ supported: true, muted: true });

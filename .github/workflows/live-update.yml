@@ -25,6 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: node --test scripts/ota-runtime.test.cjs
       - run: npm ci --ignore-scripts --legacy-peer-deps
       - run: npm --prefix client ci --legacy-peer-deps
       - run: npm --prefix client test -- --watchAll=false --runInBand

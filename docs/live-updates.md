@@ -14,6 +14,9 @@ not a guarantee against application logic errors occurring later in a session.
 configuration and installed Capacitor plugin versions. Native changes produce a
 different feed; old APKs do not receive incompatible bundles. Native plugins,
 permissions, launcher icons and native splash changes require another APK.
+Generated Cordova `res/xml/config.xml` is excluded from the source fingerprint.
+The exact original 1.4.11 source fingerprint retains its shipped compatibility
+ID so clean CI checkouts can update the already released APK.
 
 Every envelope uses ECDSA P-256/SHA-256 with a public key shipped in the APK.
 The signed payload binds the runtime, app ID, sequence, download URL, size and

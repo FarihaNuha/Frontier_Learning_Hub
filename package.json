@@ -23,6 +23,7 @@
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/push-notifications": "^8.1.2",
     "@capacitor/status-bar": "^8.0.3",
+    "@capgo/capacitor-updater": "8.53.0",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.14"
   }

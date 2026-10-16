@@ -4,6 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'android/**'
+      - 'capacitor.config.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'client/package.json'
+      - 'client/package-lock.json'
+      - 'scripts/build-android.ps1'
+      - '.github/workflows/build-apk.yml'
   workflow_dispatch:
 
 permissions:
@@ -33,6 +42,7 @@ jobs:
           echo "sdk.dir=${ANDROID_HOME}" > android/local.properties
           cat android/local.properties
           echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "platforms;android-36"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -67,7 +77,7 @@ jobs:
           npm --prefix server run test-push
           npm --prefix server run test-chat
           npm --prefix server run test-files
-          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/persistentReads.test.js src/services/apiCache.test.jsx src/pages/CachedNavigation.test.jsx src/services/chatState.test.js src/services/chatNotifications.test.js src/services/homeSnapshot.test.js src/services/launchScreen.test.jsx
+          npm --prefix client test -- --watchAll=false --runInBand
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -140,14 +150,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.10-apk
-          name: UniCore Mobile App v1.4.10 (Android test APK)
+          tag_name: v1.4.11-apk
+          name: UniCore Mobile App v1.4.11 (Android test APK)
           body: |
-            Adds developer credit to the login screen and an About UniCore section
-            in Settings with both developers, student IDs and shared academic details.
-            Includes the persistent restart-cache and previous app improvements.
+            Enables signed, self-hosted live UI updates through GitHub Releases.
+            Downloads compatible updates in the background and activates on process
+            restart, with native startup rollback protection. Includes App Updates
+            in Settings, developer credits and persistent restart caching.
 
-            Use UniCore-1.4.10.apk for the same local signing key as prior updates.
+            Use UniCore-1.4.11.apk for the same local signing key as prior updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

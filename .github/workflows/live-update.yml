@@ -1,0 +1,32 @@
+name: Publish signed UI update
+on:
+  # Automatic publishing can be enabled after the repository signing secret
+  # has been explicitly authorized and configured. Local signing works now.
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: unicore-live-update
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --legacy-peer-deps
+      - run: npm --prefix client ci --legacy-peer-deps
+      - run: npm --prefix client test -- --watchAll=false --runInBand
+        env:
+          CI: 'true'
+      - run: npm --prefix client run build
+        env:
+          CI: 'false'
+          DISABLE_ESLINT_PLUGIN: 'true'
+          GENERATE_SOURCEMAP: 'false'
+      - run: node scripts/publish-live-update.cjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UNICORE_OTA_SIGNING_KEY: ${{ secrets.UNICORE_OTA_SIGNING_KEY }}

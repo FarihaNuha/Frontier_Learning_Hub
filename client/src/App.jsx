@@ -1,5 +1,6 @@
 import { loadRouteModule, warmRoutes } from "./services/routeModules";
 import RouteSkeleton from "./components/RouteSkeleton";
+import { LiveUpdateLifecycle } from "./components/AppUpdates";
 import { CallProvider } from "./contexts/CallContext";
 import { setChatNotificationContext } from "./services/chatNotifications";
 import React, { useEffect, lazy, Suspense } from "react";
@@ -740,6 +741,7 @@ function DestinationReady() {
 function App() {
   return (
     <AppErrorBoundary><AuthProvider>
+      <LiveUpdateLifecycle />
       <BrowserRouter>
         <CallProvider>
         <Toaster

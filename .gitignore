@@ -9,8 +9,10 @@ dist/
 .gemini/
 .gradle/
 android/.gradle/
+android/.kotlin/
 android/app/build/
 android/build/
 release-output/
 scratch/jest-push/
+client/src/generated/otaRuntime.json
 

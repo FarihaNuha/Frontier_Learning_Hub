@@ -10,6 +10,7 @@
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/push-notifications": "^8.1.2",
     "@capacitor/status-bar": "^8.0.3",
+    "@capgo/capacitor-updater": "8.53.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -33,7 +34,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prebuild": "node ../scripts/ota-runtime.cjs",
+    "pretest": "node ../scripts/ota-runtime.cjs"
   },
   "eslintConfig": {
     "extends": [

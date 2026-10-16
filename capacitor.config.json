@@ -3,6 +3,19 @@
   "appName": "UniCore",
   "webDir": "client/build",
   "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": "off",
+      "updateUrl": "",
+      "statsUrl": "",
+      "channelUrl": "",
+      "allowModifyUrl": false,
+      "appReadyTimeout": 15000,
+      "resetWhenUpdate": true,
+      "autoDeleteFailed": false,
+      "autoDeletePrevious": true,
+      "shakeMenu": false,
+      "responseTimeout": 30
+    },
     "PushNotifications": {
       "presentationOptions": []
     },

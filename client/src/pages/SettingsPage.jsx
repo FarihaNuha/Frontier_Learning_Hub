@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import api from "../services/api";
 import AppNotificationSettings from "../components/AppNotificationSettings";
 import { AboutUniCore } from "../components/DeveloperCredits";
+import AppUpdates from "../components/AppUpdates";
 import {
   FiArrowLeft,
   FiSun,
@@ -1150,6 +1151,7 @@ export default function SettingsPage() {
             )}
           </div>
 
+          <AppUpdates />
           <AboutUniCore />
         </div>
       </div>

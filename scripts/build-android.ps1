@@ -8,7 +8,7 @@ try {
     if ($localJdk) { $env:JAVA_HOME = $localJdk.FullName }
     $localSdk = Join-Path $toolsRoot 'sdk'
     if (Test-Path -LiteralPath $localSdk) { $env:ANDROID_HOME = $localSdk }
-    if (!$env:JAVA_HOME -or !$env:ANDROID_HOME) { throw 'Install Java 21 and Android SDK 35, then set JAVA_HOME and ANDROID_HOME.' }
+    if (!$env:JAVA_HOME -or !$env:ANDROID_HOME) { throw 'Install Java 21 and Android SDK 36, then set JAVA_HOME and ANDROID_HOME.' }
     $env:ANDROID_USER_HOME = Join-Path $toolsRoot 'android-user'
     $env:GRADLE_USER_HOME = Join-Path $toolsRoot 'gradle'
 

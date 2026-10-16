@@ -80,7 +80,7 @@ const initSocket = (server) => {
 
     // ===== WebRTC Signaling Relays =====
 
-    const incoming = call => ({ from: call.callerId, callId: call.callId, callerName: call.callerName, callType: call.callType, offer: call.offer, expiresAt: call.createdAt + 45000 });
+    const incoming = call => ({ from: call.callerId, callId: call.callId, callerName: call.callerName, callType: call.callType, offer: call.offer, expiresAt: call.createdAt + 45000, serverTime: Date.now(), ringForMs: Math.max(0, call.createdAt + 45000 - Date.now()) });
     socket.on("call-ready", () => {
       const call = calls.currentCall(userId);
       if (call?.state === "ringing" && call.calleeId === userId) {

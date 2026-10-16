@@ -4,6 +4,8 @@ import api from "../services/api";
 import toast from "react-hot-toast";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
+import { createPortal } from "react-dom";
+import { incomingLifetime } from "../services/callTiming";
 import { captureScreen, dismissNativeCall, listenForNativeAnswer, setNativeCallContext } from "../services/callBridge";
 import "../styles/calls.css";
 
@@ -110,11 +112,12 @@ export function CallProvider({ children }) {
       if (socket.connected) ready(); else socket.connect?.();
     };
     const incoming = data => {
-      if (data.expiresAt && data.expiresAt <= Date.now()) return;
+      const remaining = incomingLifetime(data);
+      if (!remaining) return;
       if (session.current?.callId === data.callId) return;
       if (session.current) return;
       update({ state: "incoming", callId: data.callId, type: data.callType, name: data.callerName, from: data.from, offer: data.offer });
-      timer.current = setTimeout(() => { clean(); }, Math.max(0, (data.expiresAt || Date.now() + 45000) - Date.now()));
+      timer.current = setTimeout(() => { clean(); }, remaining);
     };
     const answered = async data => {
       if (data.callId !== session.current?.callId || !peer.current) return;
@@ -231,7 +234,7 @@ export function CallProvider({ children }) {
   };
   return <Context.Provider value={{ startCall, callState: view.state }}>
     {children}
-    {view.state !== "idle" && <div className="call-overlay" role="dialog" aria-modal="true" aria-label="Audio or video call">
+    {view.state !== "idle" && createPortal(<div className="unicore-call-overlay" role="dialog" aria-modal="true" aria-label="Audio or video call">
       <h2>{view.name}</h2><p role="status">{view.state === "incoming" ? `Incoming ${view.type} call` : view.state}</p>
       {(view.type === "video" || remoteSharing || sharing) && view.state !== "incoming" && <div className="call-video-area"><video ref={remoteVideo} autoPlay playsInline muted /><video ref={localVideo} autoPlay playsInline muted className="call-self-video" /></div>}
       <audio ref={audio} autoPlay playsInline />
@@ -244,7 +247,7 @@ export function CallProvider({ children }) {
         </>}
         <button className="call-hangup" onClick={() => end(view.state === "incoming" ? "declined" : "ended")}>{view.state === "incoming" ? "Decline" : "End call"}</button>
       </div>
-    </div>}
+    </div>, document.body)}
   </Context.Provider>;
 }
 export const useCall = () => useContext(Context);

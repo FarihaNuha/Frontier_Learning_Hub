@@ -21,6 +21,7 @@ test("strict remount and profile refresh retain exactly one signalling socket", 
   expect(connections.filter(socket => socket.close.mock.calls.length === 0)).toHaveLength(1);
   const count = connections.length; fireEvent.click(screen.getByText("Refresh profile"));
   expect(connections).toHaveLength(count);
+  expect(connections.flatMap(socket => socket.on.mock.calls).some(([event]) => event === "incoming-call")).toBe(false);
   view.unmount(); expect(connections.every(socket => socket.close.mock.calls.length === 1)).toBe(true);
   localStorage.clear();
 });

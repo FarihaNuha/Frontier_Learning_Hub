@@ -98,6 +98,17 @@ test("returning to the app recovers pending ringing; expired calls are ignored",
   expect(screen.queryByRole("dialog")).toBeNull();
 });
 
+test("duplicate ringing with clock skew shows one answerable portal outside the page", () => {
+  const view = render(<div style={{ transform: "translateZ(0)" }}><CallProvider>Courses</CallProvider></div>);
+  const call = { callId: "clock-skew", callerName: "Friend", callType: "audio", expiresAt: 1045000, serverTime: 1000000, ringForMs: 45000, offer: { type: "offer", sdp: "offer" } };
+  act(() => { handlers["incoming-call"](call); handlers["incoming-call"](call); });
+  expect(screen.getAllByRole("dialog")).toHaveLength(1);
+  expect(view.container.querySelector('[role="dialog"]')).toBeNull();
+  expect(screen.getByRole("button", { name: "Answer", exact: true })).toBeTruthy();
+  fireEvent.click(screen.getByText("Decline"));
+  expect(socket.emit).toHaveBeenCalledWith("end-call", { callId: "clock-skew", reason: "declined" });
+});
+
 test("a temporary signalling disconnect preserves an active media call", async () => {
   jest.useFakeTimers();
   const view = render(<CallProvider>Dashboard</CallProvider>);

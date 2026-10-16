@@ -281,26 +281,6 @@ export function AuthProvider({ children }) {
       });
     };
 
-    // 4. Audio / Video Calling Alerts
-    const handleIncomingCall = (data) => {
-      if (!data) return;
-      const callerName = data.callerName || "Someone";
-      const callType = data.callType || "audio";
-
-      if (!isNativePlatform()) showNativeNotification({
-        title: `📞 Incoming Call from ${callerName}`,
-        body: `Incoming ${callType} call. Tap to answer now.`,
-        link: "/community/messages",
-        id: data.callId || Date.now(),
-      });
-
-      toast.success(`📞 Incoming ${callType} call from ${callerName}!`, {
-        icon: "📞",
-        duration: 8000,
-        position: "top-center",
-      });
-    };
-
     // 5. Mentorship Contact Requests
     const handleContactRequest = (request) => {
       if (!request) return;
@@ -341,7 +321,7 @@ export function AuthProvider({ children }) {
     socket.on("newNotification", handleNewNotification);
     socket.on("new_notification", handleNewNoticeNotif);
     socket.on("newPrivateMessage", handleNewPrivateMessage);
-    socket.on("incoming-call", handleIncomingCall);
+
     socket.on("newContactRequest", handleContactRequest);
     socket.on("contactRequestResponse", handleContactRequestResponse);
     socket.on("new_notice", handleNewNotice);
@@ -352,7 +332,7 @@ export function AuthProvider({ children }) {
       socket.off("newNotification", handleNewNotification);
       socket.off("new_notification", handleNewNoticeNotif);
       socket.off("newPrivateMessage", handleNewPrivateMessage);
-      socket.off("incoming-call", handleIncomingCall);
+
       socket.off("newContactRequest", handleContactRequest);
       socket.off("contactRequestResponse", handleContactRequestResponse);
       socket.off("new_notice", handleNewNotice);

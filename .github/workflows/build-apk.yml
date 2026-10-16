@@ -140,16 +140,16 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.2-apk
-          name: UniCore Mobile App v1.4.2 (Android test APK)
+          tag_name: v1.4.3-apk
+          name: UniCore Mobile App v1.4.3 (Android test APK)
           body: |
-            UniCore 1.4.2 adds a native launch splash screen with the current
-            UniCore emblem on a clean white background and a short fade into the app.
-            The splash follows local page readiness with an error/timeout fallback;
-            it does not add a fixed startup delay or wait for the backend.
+            UniCore 1.4.3 adds a native launch splash screen with the current
+            UniCore emblem on a clean white background. The app name gently fades and
+            slides into view below the icon before fading into the app.
+            Respects disabled system animations and does not wait for the backend.
             Includes all 1.4.1 performance, notification and mobile layout fixes.
 
-            Use UniCore-1.4.2.apk for the same local signing key as prior app updates.
+            Use UniCore-1.4.3.apk for the same local signing key as prior app updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

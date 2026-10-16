@@ -29,8 +29,7 @@ public class MainActivity extends BridgeActivity {
             @Override public void onPageLoaded(WebView view) { launchContentReady = true; }
             @Override public void onReceivedError(WebView view) { launchContentReady = true; }
         });
-        splash.setOnExitAnimationListener(provider -> provider.getView().animate()
-            .alpha(0f).setDuration(180).withEndAction(provider::remove).start());
+        splash.setOnExitAnimationListener(UniCoreLaunchAnimation::showName);
         registerPlugin(UniCoreFilesPlugin.class);
         registerPlugin(UniCoreNotificationsPlugin.class);
         registerPlugin(UniCoreCallsPlugin.class);

@@ -4,14 +4,17 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class LaunchTimingTest {
-    @Test public void nameAppearsOneSecondFromLaunchWithoutRepeatingElapsedTime() {
-        assertEquals(1000, LaunchTiming.nameDelay(0));
-        assertEquals(600, LaunchTiming.nameDelay(400));
-        assertEquals(0, LaunchTiming.nameDelay(1700));
+    @Test public void nameRevealsImmediatelyThenHoldsForOnlyOneSecond() {
+        assertEquals(1000, LaunchTiming.HOLD_MS);
+        assertTrue(LaunchTiming.REVEAL_MS + LaunchTiming.HOLD_MS + LaunchTiming.FADE_MS <= 1500);
     }
-    @Test public void waitForTheMainScreenButAllowAnOfflineTimeout() {
-        assertFalse(LaunchTiming.canExit(false, 3300));
-        assertTrue(LaunchTiming.canExit(true, 3300));
-        assertTrue(LaunchTiming.canExit(false, 8000));
+    @Test public void wordmarkIsSmallerThanLogoAndWholeGroupFitsNarrowAndLandscapeScreens() {
+        for (int[] screen : new int[][] { {360, 800}, {320, 640}, {640, 320}, {240, 160} }) {
+            LaunchLayout layout = new LaunchLayout(screen[0], screen[1], 1);
+            assertTrue(layout.nameWidth < layout.logoWidth);
+            assertTrue(layout.gap > 0);
+            assertTrue(layout.logoHeight + layout.gap + layout.nameHeight < screen[1]);
+            assertTrue(layout.logoWidth < screen[0]);
+        }
     }
 }

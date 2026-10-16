@@ -2,7 +2,7 @@ package com.frontier.learningacademy;
 
 final class LaunchTiming {
     private LaunchTiming() { }
-    static long nameDelay(long elapsed) { return Math.max(0, 1000 - elapsed); }
-    // An unreachable backend or broken page must never trap the user indefinitely.
-    static boolean canExit(boolean ready, long elapsed) { return ready || elapsed >= 8000; }
+    static final long REVEAL_MS = 220;
+    static final long HOLD_MS = 1000;
+    static final long FADE_MS = 160;
 }

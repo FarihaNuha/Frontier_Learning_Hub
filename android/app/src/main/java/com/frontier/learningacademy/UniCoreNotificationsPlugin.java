@@ -9,10 +9,8 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 @CapacitorPlugin(name = "UniCoreNotifications")
 public class UniCoreNotificationsPlugin extends Plugin {
     @PluginMethod public void appReady(PluginCall call) {
-        if (getActivity() instanceof MainActivity) {
-            MainActivity activity = (MainActivity) getActivity();
-            activity.runOnUiThread(activity::markLaunchReady);
-        }
+        // Retain compatibility with the web bundle; the splash no longer waits
+        // for network readiness or extends its one-second hold.
         call.resolve();
     }
     private boolean validThreadOwner(PluginCall call) {

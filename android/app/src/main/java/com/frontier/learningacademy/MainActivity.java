@@ -11,19 +11,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import com.getcapacitor.BridgeActivity;
 import androidx.core.splashscreen.SplashScreen;
-import android.os.SystemClock;
 
 public class MainActivity extends BridgeActivity {
-    private boolean launchContentReady;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         SplashScreen splash = SplashScreen.installSplashScreen(this);
-        long launchStarted = SystemClock.elapsedRealtime();
-        // Let the WebView draw and fetch data underneath the splash animation.
-        // React signals when the first destination screen has actually rendered.
-        splash.setOnExitAnimationListener(provider -> UniCoreLaunchAnimation.showName(
-            provider, launchStarted, () -> launchContentReady));
+        // Prepare the WebView under a short, fixed-duration brand transition.
+        splash.setOnExitAnimationListener(provider -> UniCoreLaunchAnimation.showName(this, provider));
         registerPlugin(UniCoreFilesPlugin.class);
         registerPlugin(UniCoreNotificationsPlugin.class);
         registerPlugin(UniCoreCallsPlugin.class);
@@ -33,8 +27,6 @@ public class MainActivity extends BridgeActivity {
         UniCoreCallNotifications.channels(this);
         configureWebView();
     }
-
-    void markLaunchReady() { launchContentReady = true; }
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

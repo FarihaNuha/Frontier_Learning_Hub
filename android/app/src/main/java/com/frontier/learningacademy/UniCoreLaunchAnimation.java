@@ -1,67 +1,73 @@
 package com.frontier.learningacademy;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Build;
-import android.os.SystemClock;
 import android.view.Gravity;
-import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import androidx.core.splashscreen.SplashScreenViewProvider;
-import java.util.function.BooleanSupplier;
 
-/** Uses the supplied wordmark, preserving its exact lettering and gold/navy colors. */
+/** Own the brand layout instead of adding children to Android's managed splash view. */
 final class UniCoreLaunchAnimation {
     private UniCoreLaunchAnimation() { }
 
-    static void showName(SplashScreenViewProvider provider, long started, BooleanSupplier ready) {
-        View splashView = provider.getView();
-        if (!(splashView instanceof FrameLayout)
-            || (Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) {
-            finishWhenReady(provider, started, ready);
+    static void showName(Activity activity, SplashScreenViewProvider provider) {
+        FrameLayout host = activity.findViewById(android.R.id.content);
+        if (host == null || (Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) {
+            provider.remove();
             return;
         }
-        FrameLayout splash = (FrameLayout) splashView;
-        float density = splash.getResources().getDisplayMetrics().density;
-        ImageView name = new ImageView(splash.getContext());
-        Bitmap reference = BitmapFactory.decodeResource(splash.getResources(), R.drawable.unicore_wordmark);
-        // Crop only while displaying: omit the emblem fragment above the supplied name.
-        name.setImageBitmap(Bitmap.createBitmap(reference, 42, 28, 313, 66));
-        name.setContentDescription(splash.getResources().getString(R.string.app_name));
+        float density = activity.getResources().getDisplayMetrics().density;
+        FrameLayout overlay = new FrameLayout(activity);
+        overlay.setBackgroundColor(Color.WHITE);
+        overlay.setClickable(true);
+        LinearLayout brand = new LinearLayout(activity);
+        brand.setOrientation(LinearLayout.VERTICAL);
+        brand.setGravity(Gravity.CENTER_HORIZONTAL);
+        Bitmap logoSource = BitmapFactory.decodeResource(activity.getResources(), R.drawable.unicore_logo);
+        Bitmap nameSource = BitmapFactory.decodeResource(activity.getResources(), R.drawable.unicore_wordmark);
+        ImageView logo = new ImageView(activity);
+        // Trim only the source's blank margins; preserve the original emblem.
+        logo.setImageBitmap(Bitmap.createBitmap(logoSource, 36, 28, 184, 192));
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        logo.setContentDescription(activity.getString(R.string.app_name));
+        ImageView name = new ImageView(activity);
+        name.setImageBitmap(Bitmap.createBitmap(nameSource, 42, 28, 313, 66));
         name.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        name.setImportantForAccessibility(ImageView.IMPORTANT_FOR_ACCESSIBILITY_NO);
         name.setAlpha(0f);
-        name.setTranslationY(6 * density);
-        int width = Math.min(Math.round(340 * density), Math.round(splash.getResources().getDisplayMetrics().widthPixels * 0.8f));
-        FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(width, Math.round(width * 66f / 313f), Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-        splash.addView(name, layout);
-        splash.post(() -> {
-            if (!splash.isAttachedToWindow()) { provider.remove(); return; }
-            View icon = provider.getIconView();
-            int[] iconPosition = new int[2], splashPosition = new int[2];
-            icon.getLocationOnScreen(iconPosition);
-            splash.getLocationOnScreen(splashPosition);
-            layout.topMargin = Math.max(0, Math.min(
-                iconPosition[1] - splashPosition[1] + icon.getHeight() + Math.round(6 * density),
-                splash.getHeight() - layout.height - Math.round(20 * density)));
-            name.setLayoutParams(layout);
-            name.animate().alpha(1f).translationY(0f)
-                .setStartDelay(LaunchTiming.nameDelay(SystemClock.elapsedRealtime() - started)).setDuration(240)
+        name.setTranslationY(14 * density);
+        // A single centered vertical group guarantees that the name stays below
+        // the emblem, including after Android relayouts the native launch icon.
+        overlay.addView(brand, new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        int width = host.getWidth() > 0 ? host.getWidth() : activity.getResources().getDisplayMetrics().widthPixels;
+        int height = host.getHeight() > 0 ? host.getHeight() : activity.getResources().getDisplayMetrics().heightPixels;
+        LaunchLayout layout = new LaunchLayout(width, height, density);
+        brand.addView(logo, new LinearLayout.LayoutParams(layout.logoWidth, layout.logoHeight));
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(layout.nameWidth, layout.nameHeight);
+        nameParams.topMargin = layout.gap;
+        brand.addView(name, nameParams);
+        logo.setTranslationY((layout.gap + layout.nameHeight) / 2f);
+        host.addView(overlay, new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        provider.remove();
+        overlay.post(() -> {
+            if (!overlay.isAttachedToWindow()) return;
+            logo.animate().translationY(0f).setDuration(LaunchTiming.REVEAL_MS)
+                .setInterpolator(new DecelerateInterpolator()).start();
+            name.animate().alpha(1f).translationY(0f).setDuration(LaunchTiming.REVEAL_MS)
                 .setInterpolator(new DecelerateInterpolator())
-                .withEndAction(() -> splash.postDelayed(() -> finishWhenReady(provider, started, ready), 2000))
+                .withEndAction(() -> overlay.animate().alpha(0f).setStartDelay(LaunchTiming.HOLD_MS)
+                    .setDuration(LaunchTiming.FADE_MS).withEndAction(() -> host.removeView(overlay)).start())
                 .start();
         });
-    }
-
-    private static void finishWhenReady(SplashScreenViewProvider provider, long started, BooleanSupplier ready) {
-        View view = provider.getView();
-        if (!view.isAttachedToWindow()) { provider.remove(); return; }
-        if (LaunchTiming.canExit(ready.getAsBoolean(), SystemClock.elapsedRealtime() - started)) {
-            view.animate().alpha(0f).setDuration(180).withEndAction(provider::remove).start();
-        } else {
-            view.postDelayed(() -> finishWhenReady(provider, started, ready), 100);
-        }
     }
 }

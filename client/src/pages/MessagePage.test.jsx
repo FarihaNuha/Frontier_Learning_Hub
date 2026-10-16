@@ -3,12 +3,13 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useAuth } from "../contexts/AuthContext";
 import MessagePage from "./MessagePage";
 import { communityApi } from "../services/communityApi";
+import { getChatNotificationSettings, setChatMuted } from "../services/chatNotifications";
 jest.mock("react-router-dom", () => ({ useParams: () => ({ userId: "friend" }), useNavigate: () => jest.fn(), useSearchParams: () => [new URLSearchParams()] }));
 jest.mock("../contexts/AuthContext", () => { const auth = { user: { id: "me", role: "student", name: "Me" }, socket: null, onlineUsers: [] }; return { useAuth: () => auth }; });
 jest.mock("../contexts/CallContext", () => ({ useCall: () => ({ startCall: jest.fn() }) }));
 jest.mock("../components/TeacherSidebar", () => () => null);
 jest.mock("../components/StudentSidebar", () => () => null);
-jest.mock("../services/chatNotifications", () => ({ clearChatNotification: jest.fn(), setChatNotificationContext: jest.fn() }));
+jest.mock("../services/chatNotifications", () => ({ clearChatNotification: jest.fn(), setChatNotificationContext: jest.fn(), getChatNotificationSettings: jest.fn(async () => ({ supported: false, muted: false })), setChatMuted: jest.fn(async () => {}) }));
 jest.mock("../services/nativeFiles", () => ({ downloadFile: jest.fn(), openFile: jest.fn() }));
 jest.mock("../services/urls", () => ({ absoluteFileUrl: value => value }));
 jest.mock("../services/api", () => ({ __esModule: true, default: { defaults: { baseURL: "/api" } } }));
@@ -18,6 +19,8 @@ const message = { _id: "message-1", sender: friend, receiver: { _id: "me" }, con
 beforeEach(() => {
   clearConversations();
   jest.clearAllMocks();
+  getChatNotificationSettings.mockResolvedValue({ supported: false, muted: false });
+  setChatMuted.mockResolvedValue(undefined);
   useAuth().socket = null;
   Element.prototype.scrollIntoView = jest.fn();
   communityApi.getUsers.mockResolvedValue({ data: { users: [friend] } });
@@ -26,6 +29,15 @@ beforeEach(() => {
   communityApi.sendMessage.mockResolvedValue({ data: { message: { ...message, _id: "sent-ack", sender: { _id: "me" }, receiver: friend } } });
   communityApi.readMessages.mockResolvedValue({ data: { readThrough: 1234 } });
   Object.defineProperty(window, "crypto", { configurable: true, value: { randomUUID: () => "request-1" } });
+});
+test("a muted conversation can be unmuted and muted again without hiding messages", async () => {
+  getChatNotificationSettings.mockResolvedValue({ supported: true, muted: true });
+  render(<MessagePage />);
+  fireEvent.click(await screen.findByRole("button", { name: "Unmute message notifications" }));
+  await waitFor(() => expect(setChatMuted).toHaveBeenCalledWith("friend", false));
+  fireEvent.click(await screen.findByRole("button", { name: "Mute message notifications" }));
+  await waitFor(() => expect(setChatMuted).toHaveBeenCalledWith("friend", true));
+  expect(await screen.findByText("Question")).toBeTruthy();
 });
 test("tapping a message offers actions and reply submission retains its original id", async () => {
   render(<MessagePage />);

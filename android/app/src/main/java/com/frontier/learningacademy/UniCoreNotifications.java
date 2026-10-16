@@ -22,6 +22,28 @@ final class UniCoreNotifications {
     static volatile String activeThread = "";
     static SharedPreferences prefs(Context context) { return context.getSharedPreferences("unicore_notifications", Context.MODE_PRIVATE); }
     static int id(String key) { return key.hashCode() & 0x7fffffff; }
+    private static SharedPreferences mutePrefs(Context context) {
+        return context.getSharedPreferences("unicore_chat_mutes", Context.MODE_PRIVATE);
+    }
+    static boolean isMuted(Context context, String thread) {
+        String owner = prefs(context).getString("owner", "");
+        return !owner.isEmpty() && mutePrefs(context).getBoolean(owner + ":" + thread, false);
+    }
+    static synchronized void setMuted(Context context, String thread, boolean muted) {
+        String owner = prefs(context).getString("owner", "");
+        if (owner.isEmpty() || thread.isEmpty()) return;
+        // Separate, account-scoped preferences survive app restarts and sign-out.
+        SharedPreferences.Editor editor = mutePrefs(context).edit();
+        if (muted) editor.putBoolean(owner + ":" + thread, true);
+        else editor.remove(owner + ":" + thread);
+        editor.apply();
+        if (muted) {
+            prefs(context).edit().remove("thread:" + thread).apply();
+            NotificationManagerCompat.from(context).cancel("chat:" + thread, id(thread));
+            androidx.core.content.pm.ShortcutManagerCompat.removeLongLivedShortcuts(context,
+                java.util.Collections.singletonList("chat:" + thread));
+        }
+    }
     static synchronized void account(Context context, String owner) {
         SharedPreferences p = prefs(context);
         if (!owner.equals(p.getString("owner", ""))) {
@@ -89,7 +111,7 @@ final class UniCoreNotifications {
                 clear(context, thread, readThrough);
                 return;
             }
-            history.put("status", "like".equals(action) ? "Liked 👍" : "Reply sent");
+            history.put("status", "like".equals(action) ? "Liked" : "Reply sent");
             prefs(context).edit().putString("thread:" + thread, history.toString()).apply();
             if (!history.optBoolean("dismissed")) renderThread(context, thread, history, false);
         } catch (Exception ignored) { }
@@ -108,6 +130,7 @@ final class UniCoreNotifications {
         return PendingIntent.getBroadcast(context, id(thread + action), intent, flags);
     }
     private static void renderThread(Context context, String thread, JSONObject history, boolean alert) throws Exception {
+        if (isMuted(context, thread)) return;
         JSONArray messages = history.getJSONArray("messages");
         java.util.List<JSONObject> ordered = new java.util.ArrayList<>();
         for (int i = 0; i < messages.length(); i++) ordered.add(messages.getJSONObject(i));
@@ -140,10 +163,10 @@ final class UniCoreNotifications {
             androidx.core.app.RemoteInput input = new androidx.core.app.RemoteInput.Builder(ChatActionReceiver.REPLY).setLabel("Reply…").build();
             builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_stat_unicore, "Reply", action(context, thread, history, "reply"))
                 .addRemoteInput(input).setAllowGeneratedReplies(true).setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).build());
-            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_stat_unicore, "Like 👍", action(context, thread, history, "like"))
+            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_stat_unicore, "Like", action(context, thread, history, "like"))
                 .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_THUMBS_UP).build());
         }
-        builder.addAction(R.drawable.ic_stat_unicore, "Dismiss", action(context, thread, history, "dismiss"));
+        builder.addAction(R.drawable.ic_stat_unicore, "Mute", action(context, thread, history, "mute"));
         if (alert) builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         NotificationManagerCompat.from(context).notify("chat:" + thread, id(thread), builder.build());
     }
@@ -166,7 +189,7 @@ final class UniCoreNotifications {
             recent.put(event);
             p.edit().putString("seen", recent.toString()).apply();
             boolean chat = !thread.isEmpty() && "chat_message".equals(data.get("type"));
-            if (chat && (time <= p.getLong("read:" + thread, 0) || (foreground && thread.equals(activeThread)))) return;
+            if (chat && (isMuted(context, thread) || time <= p.getLong("read:" + thread, 0) || (foreground && thread.equals(activeThread)))) return;
             String link = data.getOrDefault("link", "/notifications");
             if (!link.startsWith("/") || link.startsWith("//") || link.contains("\\")) return;
             String key = chat ? thread : event;

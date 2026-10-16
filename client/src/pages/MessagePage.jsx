@@ -10,13 +10,15 @@ import { useAuth } from "../contexts/AuthContext";
 import { communityApi } from "../services/communityApi";
 import api from "../services/api";
 import { useCall } from "../contexts/CallContext";
-import { clearChatNotification, setChatNotificationContext } from "../services/chatNotifications";
+import { clearChatNotification, setChatNotificationContext, getChatNotificationSettings, setChatMuted } from "../services/chatNotifications";
 import TeacherSidebar from "../components/TeacherSidebar";
 import StudentSidebar from "../components/StudentSidebar";
 import toast from "react-hot-toast";
 import {
   FiDownload,
   FiEye,
+  FiBell,
+  FiBellOff,
   FiArrowLeft,
   FiSend,
   FiUser,
@@ -82,6 +84,30 @@ export default function MessagePage() {
   const preserveScroll = useRef(false);
   const lastRenderedMessage = useRef(null);
   const chatId = userId || selectedUser?._id || selectedUser?.id;
+  const [muteSettings, setMuteSettings] = useState(null);
+  const [changingMute, setChangingMute] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    setMuteSettings(null);
+    const refresh = () => getChatNotificationSettings(chatId).then(settings => {
+      if (!cancelled) setMuteSettings(settings.supported ? settings : null);
+    });
+    refresh();
+    document.addEventListener("visibilitychange", refresh);
+    return () => { cancelled = true; document.removeEventListener("visibilitychange", refresh); };
+  }, [chatId]);
+  const toggleChatMute = async () => {
+    if (changingMute || !muteSettings) return;
+    const target = chatId;
+    const next = !muteSettings.muted;
+    setChangingMute(true);
+    try {
+      await setChatMuted(target, next);
+      if (String(activeChatRef.current) === String(target)) setMuteSettings({ supported: true, muted: next });
+      toast.success(next ? "Message notifications muted on this phone until you unmute" : "Message notifications unmuted");
+    } catch { toast.error("Could not change notification settings. Update the app and try again."); }
+    finally { setChangingMute(false); }
+  };
   const ownMessage = msg => String(msg.sender?._id || msg.sender) === String(user?.id || user?._id);
   useEffect(() => {
     setReplying(null); setEditing(null); setActionMessage(null); sendId.current = null;
@@ -720,6 +746,15 @@ export default function MessagePage() {
 
                   {/* Header action buttons */}
                   <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    {muteSettings && (
+                      <button type="button" onClick={toggleChatMute} disabled={changingMute}
+                        aria-label={muteSettings.muted ? "Unmute message notifications" : "Mute message notifications"}
+                        aria-pressed={muteSettings.muted}
+                        title={muteSettings.muted ? "Unmute messages on this phone" : "Mute messages on this phone"}
+                        style={{ padding: 8, border: "1px solid #94a3b8", borderRadius: 8, color: muteSettings.muted ? "#b45309" : "#475569", background: "transparent", display: "flex", cursor: "pointer" }}>
+                        {muteSettings.muted ? <FiBellOff size={16} /> : <FiBell size={16} />}
+                      </button>
+                    )}
                     {/* Call buttons — only show when not locked */}
                     {!isMessagingLocked && (
                       <>

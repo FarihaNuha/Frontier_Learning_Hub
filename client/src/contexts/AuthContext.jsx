@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import api, { BACKEND_URL } from "../services/api";
 import { clearAllCache } from "../services/apiCache";
 import toast from "react-hot-toast";
-import { setChatNotificationContext } from "../services/chatNotifications";
+import { setChatNotificationContext, getChatNotificationSettings } from "../services/chatNotifications";
 import { io } from "socket.io-client";
 import { showNativeNotification, isNativePlatform, syncNativePushToken, disconnectNativePushToken } from "../services/nativeBridge";
 
@@ -267,7 +267,7 @@ export function AuthProvider({ children }) {
     };
 
     // 3. Community Hub Private Messages
-    const handleNewPrivateMessage = (payload) => {
+    const handleNewPrivateMessage = async (payload) => {
       if (!payload || !payload.message) return;
       const msg = payload.message;
       api.invalidateReadCache?.("/community/users");
@@ -275,6 +275,7 @@ export function AuthProvider({ children }) {
       const senderId = msg.sender?._id || msg.sender;
       if (String(senderId) === String(currentUserId)) return;
       if (document.visibilityState === "visible" && window.location.pathname.endsWith(`/messages/${senderId}`)) return;
+      if ((await getChatNotificationSettings(senderId)).muted) return;
 
       const senderName = msg.sender?.name || "Direct Message";
       const content = msg.content || (msg.attachments?.length ? "Sent an attachment" : "Sent a message");

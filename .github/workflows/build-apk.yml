@@ -67,7 +67,7 @@ jobs:
           npm --prefix server run test-push
           npm --prefix server run test-chat
           npm --prefix server run test-files
-          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/chatState.test.js
+          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/chatState.test.js src/services/chatNotifications.test.js
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -140,16 +140,17 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.3-apk
-          name: UniCore Mobile App v1.4.3 (Android test APK)
+          tag_name: v1.4.4-apk
+          name: UniCore Mobile App v1.4.4 (Android test APK)
           body: |
-            UniCore 1.4.3 adds a native launch splash screen with the current
-            UniCore emblem on a clean white background. The app name gently fades and
-            slides into view below the icon before fading into the app.
-            Respects disabled system animations and does not wait for the backend.
-            Includes all 1.4.1 performance, notification and mobile layout fixes.
+            Chat notification actions now show Reply, Like and Mute.
+            Mute stops this person's message notifications on this phone until
+            unmuted from the bell button in the conversation header. Messages
+            remain available in the app. Preferences are stored separately per
+            signed-in account and survive restarting the app or signing out.
+            Includes the animated UniCore splash and previous performance fixes.
 
-            Use UniCore-1.4.3.apk for the same local signing key as prior app updates.
+            Use UniCore-1.4.4.apk for the same local signing key as prior updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

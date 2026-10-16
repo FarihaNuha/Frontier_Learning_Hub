@@ -13,6 +13,7 @@ public class ChatActionReceiver extends BroadcastReceiver {
         String thread = intent.getStringExtra("thread"), owner = intent.getStringExtra("owner");
         if (thread == null || owner == null || !owner.equals(UniCoreNotifications.prefs(context).getString("owner", ""))) return;
         String action = intent.getAction();
+        if ("mute".equals(action)) { UniCoreNotifications.setMuted(context, thread, true); return; }
         if ("dismiss".equals(action)) { UniCoreNotifications.dismiss(context, thread); return; }
         if (!"reply".equals(action) && !"like".equals(action)) return;
         String messageId = intent.getStringExtra("messageId"), token = intent.getStringExtra("token");

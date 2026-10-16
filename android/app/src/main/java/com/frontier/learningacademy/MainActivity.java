@@ -10,10 +10,27 @@ import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import com.getcapacitor.BridgeActivity;
+import com.getcapacitor.WebViewListener;
+import androidx.core.splashscreen.SplashScreen;
+import android.os.SystemClock;
 
 public class MainActivity extends BridgeActivity {
+    private boolean launchContentReady;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        SplashScreen splash = SplashScreen.installSplashScreen(this);
+        long launchStarted = SystemClock.elapsedRealtime();
+        // Keep the native emblem visible while the bundled page starts, but
+        // never hide an error or wait for the network behind an endless splash.
+        splash.setKeepOnScreenCondition(() -> !launchContentReady
+            && SystemClock.elapsedRealtime() - launchStarted < 5000);
+        bridgeBuilder.addWebViewListener(new WebViewListener() {
+            @Override public void onPageLoaded(WebView view) { launchContentReady = true; }
+            @Override public void onReceivedError(WebView view) { launchContentReady = true; }
+        });
+        splash.setOnExitAnimationListener(provider -> provider.getView().animate()
+            .alpha(0f).setDuration(180).withEndAction(provider::remove).start());
         registerPlugin(UniCoreFilesPlugin.class);
         registerPlugin(UniCoreNotificationsPlugin.class);
         registerPlugin(UniCoreCallsPlugin.class);

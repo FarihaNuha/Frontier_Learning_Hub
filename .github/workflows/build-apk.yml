@@ -140,19 +140,16 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.1-apk
-          name: UniCore Mobile App v1.4.1 (Android test APK)
+          tag_name: v1.4.2-apk
+          name: UniCore Mobile App v1.4.2 (Android test APK)
           body: |
-            UniCore 1.4.1 adds paged chat history, people search and community feeds,
-            account-scoped read caching and deduplicated requests. Document parsers
-            load on demand. Messages appear immediately as Sending, with safe Retry
-            on failure and no duplicate bubble when the server confirms delivery.
-            Notification replies start a fresh unread batch without older replies.
-            Mobile menus lock background scrolling; material actions use compact,
-            accessible icons while keeping the material title and metadata visible.
-            Includes the circular UniCore logo and real invoice/transcript PDF export.
+            UniCore 1.4.2 adds a native launch splash screen with the current
+            UniCore emblem on a clean white background and a short fade into the app.
+            The splash follows local page readiness with an error/timeout fallback;
+            it does not add a fixed startup delay or wait for the backend.
+            Includes all 1.4.1 performance, notification and mobile layout fixes.
 
-            Use UniCore-1.4.1.apk for the same local signing key as prior app updates.
+            Use UniCore-1.4.2.apk for the same local signing key as prior app updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

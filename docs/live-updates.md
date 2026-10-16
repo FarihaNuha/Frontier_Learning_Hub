@@ -25,10 +25,10 @@ Its private PEM backup is in ignored `.system_generated/ota/signing-key.pem` on
 the development machine. Keep a secure backup; never commit or publish it.
 Only the public JWK is committed. Rotating trust keys requires a new APK.
 
-`live-update.yml` can publish a reviewed revision by manual workflow dispatch
-after the signing secret is configured. Automatic publication of UI commits is
-not enabled until storage of the private key in GitHub is explicitly approved.
-The local publishing command works without transferring the private key.
+`live-update.yml` publishes compatible UI changes pushed to `main` after tests
+and the production build pass. It also supports manual workflow dispatch.
+The repository signing secret was configured with explicit owner approval.
+The local publishing command also works without transferring the private key.
 Local publication after a production web build:
 
 ```powershell

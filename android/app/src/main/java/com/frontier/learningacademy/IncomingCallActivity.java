@@ -22,10 +22,8 @@ public class IncomingCallActivity extends Activity {
         else getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         String callId = getIntent().getStringExtra("callId");
-        long expires;
-        try { expires = Long.parseLong(getIntent().getStringExtra("expiresAt")); }
-        catch (Exception error) { finish(); return; }
-        if (expires <= System.currentTimeMillis() || UniCoreNotifications.prefs(this).contains("closed:" + callId)) { finish(); return; }
+        long remaining = UniCoreCallNotifications.remaining(this, callId, getIntent().getStringExtra("expiresAt"));
+        if (remaining <= 0 || UniCoreNotifications.prefs(this).contains("closed:" + callId)) { finish(); return; }
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL); layout.setGravity(Gravity.CENTER); layout.setPadding(40, 40, 40, 40);
         layout.setBackgroundColor(Color.rgb(16, 43, 62));
@@ -42,7 +40,7 @@ public class IncomingCallActivity extends Activity {
         decline.setOnClickListener(v -> { sendBroadcast(new Intent(this, CallActionReceiver.class).setAction("decline").putExtras(getIntent())); finish(); });
         layout.addView(answer); layout.addView(decline); setContentView(layout);
         ContextCompat.registerReceiver(this, closed, new IntentFilter(UniCoreCallNotifications.CLOSED), ContextCompat.RECEIVER_NOT_EXPORTED); registered = true;
-        timer.postDelayed(this::finish, Math.min(expires - System.currentTimeMillis(), 45000));
+        timer.postDelayed(this::finish, remaining);
     }
     @Override protected void onDestroy() { timer.removeCallbacksAndMessages(null); if (registered) unregisterReceiver(closed); super.onDestroy(); }
 }

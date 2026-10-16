@@ -3,6 +3,16 @@
 These web/signalling fixes target the existing OTA-enabled 1.4.11 APK; no native
 permissions, plugins or Android resources were changed.
 
+The follow-up 1.4.12 APK also corrects incoming Android notification expiry.
+The server sends a relative ringing lifetime for the web UI and its current
+time alongside the push expiry. Native notification receipt derives a bounded
+duration from those server timestamps, then uses elapsed realtime for the
+notification, incoming activity and Answer action. It does not compare server
+UTC against an incorrectly set device clock. FCM TTL and call-ended controls
+bound delayed pushes; the backend still validates that an answered call exists.
+Duplicate socket recovery events share one portal with Answer/Decline, and the
+independent AuthContext incoming-call toast listener has been removed.
+
 The web app owns one authenticated signalling connection per session. It asks
 the server for pending calls after reconnecting or returning to the foreground.
 Ringing sessions retain their 45-second expiry while a recipient's WebView is

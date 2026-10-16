@@ -17,9 +17,7 @@ public class UniCoreCallsPlugin extends Plugin {
         String callId = intent.getStringExtra("callId");
         String owner = UniCoreNotifications.prefs(getContext()).getString("owner", "");
         if (callId == null || owner.isEmpty() || !owner.equals(intent.getStringExtra("recipientId"))) return;
-        try {
-            if (Long.parseLong(intent.getStringExtra("expiresAt")) <= System.currentTimeMillis()) return;
-        } catch (Exception error) { return; }
+        if (UniCoreCallNotifications.remaining(getContext(), callId, intent.getStringExtra("expiresAt")) <= 0) return;
         pendingAction = new JSObject().put("callId", callId).put("action", "answer").put("recipientId", owner);
         intent.setAction(Intent.ACTION_MAIN);
         UniCoreCallNotifications.dismiss(getContext(), callId);

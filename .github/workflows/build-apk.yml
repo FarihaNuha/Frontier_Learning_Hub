@@ -103,7 +103,7 @@ jobs:
         working-directory: ./android
         run: |
           set -o pipefail
-          ./gradlew assembleDebug --stacktrace --no-daemon 2>&1 | tee ../gradle-build.log
+          ./gradlew assembleDebug testDebugUnitTest --stacktrace --no-daemon 2>&1 | tee ../gradle-build.log
 
       - name: Prepare APK Output
         run: |
@@ -150,15 +150,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.11-apk
-          name: UniCore Mobile App v1.4.11 (Android test APK)
+          tag_name: v1.4.12-apk
+          name: UniCore Mobile App v1.4.12 (Android test APK)
           body: |
-            Enables signed, self-hosted live UI updates through GitHub Releases.
-            Downloads compatible updates in the background and activates on process
-            restart, with native startup rollback protection. Includes App Updates
-            in Settings, developer credits and persistent restart caching.
+            Fixes incoming call screens being discarded by incorrect device clocks.
+            Uses server-relative ringing and monotonic native notification expiry.
+            Removes duplicate incoming-call toasts and isolates the Answer/Decline
+            screen from page layout. Includes signed OTA updates and system Back fixes.
 
-            Use UniCore-1.4.11.apk for the same local signing key as prior updates.
+            Use UniCore-1.4.12.apk for the same local signing key as prior updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

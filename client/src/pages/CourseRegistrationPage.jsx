@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -173,7 +174,7 @@ export default function CourseRegistrationPage() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading courses...</div>
+          <SkeletonLoader type="table" />
         ) : step === 1 ? (
           /* Step 1: Course Selection Page */
           <div style={{ background: "#ffffff", borderRadius: "18px", padding: "32px", boxShadow: "0 4px 24px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" }}>

@@ -1,3 +1,6 @@
+import { useCachedFetch } from "../services/apiCache";
+import SkeletonLoader from "../components/SkeletonLoader";
+import RouteSkeleton from "../components/RouteSkeleton";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -27,28 +30,10 @@ export default function CourseDashboard() {
   const { id } = useParams();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error } = useCachedFetch(`/courses/${id}`, { enabled: !!user });
+  const course = data?.course;
   const [activeTab, setActiveTab] = useState("lectures");
-
-  const fetchCourse = async () => {
-    try {
-      const res = await api.get(`/courses/${id}`);
-      setCourse(res.data.course);
-      console.log("Course loaded:", res.data.course.displayCode, "ID:", id);
-    } catch (error) {
-      toast.error("Course not found");
-      navigate("/courses");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchCourse();
-    }
-  }, [id, user?.id, user?._id]);
+  useEffect(() => { if (error) { toast.error("Course not found"); navigate("/courses"); } }, [error]);
 
   if (!user) return null;
 
@@ -81,16 +66,7 @@ export default function CourseDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="dashboard-container">
-        <div className="main-content">
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading course...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <RouteSkeleton />;
   }
 
   if (!course) return null;
@@ -104,7 +80,7 @@ export default function CourseDashboard() {
       )}
 
       <div className="main-content" style={{ padding: "0" }}>
-        <Suspense fallback={<p role="status" style={{ padding: 24 }}>Loading materials…</p>}>
+        <Suspense fallback={<SkeletonLoader type="section" />}>
         {activeTab === "lectures" && (
           <div className="course-tab-content">
             {user?.role === "teacher" ? (

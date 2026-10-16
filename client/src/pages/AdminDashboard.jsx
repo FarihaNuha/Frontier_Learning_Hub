@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
@@ -107,7 +108,7 @@ export default function AdminDashboard() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>Loading system statistics...</div>
+          <SkeletonLoader type="table" />
         ) : (
           <>
             {/* Top 4 Primary Counters */}

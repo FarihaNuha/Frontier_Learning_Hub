@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -5,6 +6,7 @@ import api from "../services/api";
 import { useLaunchReady } from "../services/launchScreen";
 import { readHomeSnapshot, saveHomeSnapshot } from "../services/homeSnapshot";
 import { fetchWithCache, invalidateCache } from "../services/apiCache";
+import { useCachedFetch, getCachedData } from "../services/apiCache";
 import toast from "react-hot-toast";
 import {
   FiPlus,
@@ -97,8 +99,17 @@ const getCourseBanner = (course) => {
 export default function CourseListPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [courses, setCourses] = useState(() => readHomeSnapshot(user, "courses") || []);
-  const [loading, setLoading] = useState(() => readHomeSnapshot(user, "courses") === null);
+  const [courses, setCourses] = useState(() => {
+    const saved = getCachedData("/courses/my") || readHomeSnapshot(user, "courses");
+    return Array.isArray(saved) ? saved : saved?.courses || [];
+  });
+  const { data: courseData, loading } = useCachedFetch("/courses/my", { initialData: readHomeSnapshot(user, "courses") });
+  useEffect(() => {
+    if (courseData !== null) {
+      const list = Array.isArray(courseData) ? courseData : courseData?.courses || [];
+      setCourses(list); saveHomeSnapshot(user, "courses", list);
+    }
+  }, [courseData, user?.id, user?._id]);
   useLaunchReady(!loading);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
@@ -267,11 +278,6 @@ export default function CourseListPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      fetchCourses();
-    }
-  }, [user?.id, user?._id]);
 
   if (!user) return null;
 
@@ -362,8 +368,6 @@ export default function CourseListPage() {
       saveHomeSnapshot(user, "courses", list);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -447,10 +451,7 @@ export default function CourseListPage() {
       <div className="dashboard-container">
         <Sidebar user={user} logout={logout} />
         <div className="main-content">
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading...</p>
-          </div>
+          <div className="loading-state"><SkeletonLoader type="section" /></div>
         </div>
       </div>
     );

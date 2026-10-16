@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
@@ -302,7 +303,7 @@ export default function AdminCalendarManagementPage() {
 
         {/* Official Academic Calendar Card Display */}
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading academic calendar...</div>
+          <SkeletonLoader type="table" />
         ) : (
           <OfficialAcademicCalendarCard
             customData={publishedCalendar}

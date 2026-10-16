@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { PUBLIC_APP_URL, absoluteFileUrl } from "../services/urls";
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -267,10 +268,7 @@ export default function CourseCommunity() {
         </div>
 
         {loading ? (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>Loading discussions...</p>
-          </div>
+          <SkeletonLoader type="list" />
         ) : posts.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">

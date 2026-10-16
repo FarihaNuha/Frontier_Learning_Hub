@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
@@ -129,7 +130,7 @@ export default function AdminRegistrationPaymentPage() {
 
         {/* Payments Table */}
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading registration payments...</div>
+          <SkeletonLoader type="table" />
         ) : (
           <div style={{ background: "#ffffff", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>

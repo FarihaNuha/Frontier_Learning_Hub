@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
@@ -394,7 +395,7 @@ export default function AdminRegistrationCalendar() {
         <div style={{ background: "#ffffff", padding: "24px", borderRadius: "14px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)", border: "1px solid #e2e8f0" }}>
           <h3 style={{ margin: "0 0 16px 0", color: "#0f172a" }}>Active Registration Window Rules</h3>
           {loading ? (
-            <div style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>Loading rules...</div>
+            <SkeletonLoader type="table" />
           ) : calendars.length === 0 ? (
             <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8" }}>No active registration window rules found.</div>
           ) : (

@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -77,7 +78,7 @@ export default function TeacherRetakeApprovalPage() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading retake requests...</div>
+          <SkeletonLoader type="section" />
         ) : requests.length === 0 ? (
           <div style={{ padding: "60px", background: "#ffffff", borderRadius: "14px", textAlign: "center", color: "#94a3b8" }}>
             <FiRefreshCw size={48} style={{ opacity: 0.3, marginBottom: "12px" }} />

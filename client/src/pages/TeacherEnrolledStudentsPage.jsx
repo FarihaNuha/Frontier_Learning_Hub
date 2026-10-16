@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { downloadFile } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -292,9 +293,7 @@ export default function TeacherEnrolledStudentsPage() {
         {/* Student Table */}
         <div style={{ background: "#ffffff", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
           {loading ? (
-            <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>
-              Loading enrolled students roster...
-            </div>
+            <SkeletonLoader type="section" />
           ) : filteredStudents.length === 0 ? (
             <div style={{ padding: "60px", textAlign: "center", color: "#94a3b8" }}>
               <FiUsers size={48} style={{ opacity: 0.3, marginBottom: "12px" }} />

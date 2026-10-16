@@ -15,8 +15,52 @@ test("repeat section reads share one request, remain account-scoped and expire",
   const second = cache.request(config); resolve(response({ count: 2 })); await second;
   expect(adapter).toHaveBeenCalledTimes(2);
   time = 31000;
-  const expired = cache.request(config); resolve(response({ count: 3 })); await expired;
+  const expired = cache.request(config); resolve(response({ count: 3 }));
+  expect((await expired).data.count).toBe(2);
+  expect(cache.peek(config).count).toBe(3);
   expect(adapter).toHaveBeenCalledTimes(3);
+});
+const memoryStorage = () => { const values = new Map(); return { getItem: key => values.get(key) || null, setItem: (key, value) => values.set(key, value), removeItem: key => values.delete(key), values }; };
+test("saved reads survive reopening without storing credentials or crossing accounts", async () => {
+  const storage = memoryStorage(), adapter = jest.fn(async () => ({ ...response(JSON.stringify({ courses: ["one"] })), headers: { Authorization: "secret-token" } }));
+  const config = { method: "get", baseURL: "/api", url: "/courses/my" };
+  await createReadCache(adapter, () => "student-a", Date.now, { storage }).request(config);
+  const reloaded = createReadCache(adapter, () => "student-a", Date.now, { storage });
+  expect(reloaded.peek(config)).toEqual({ courses: ["one"] });
+  await reloaded.request(config); expect(adapter).toHaveBeenCalledTimes(1);
+  expect([...storage.values.values()].join("")).not.toContain("secret-token");
+  await createReadCache(adapter, () => "student-b", Date.now, { storage }).request(config);
+  expect(adapter).toHaveBeenCalledTimes(2);
+  reloaded.clear(); expect(reloaded.peek(config)).toBeNull();
+});
+test("FCM sync and chat reads preserve academic cache; course writes invalidate it", async () => {
+  const adapter = jest.fn(async () => response({ courses: ["one"] }));
+  const cache = createReadCache(adapter, () => "student-a");
+  const config = { url: "/courses/my", method: "get" };
+  await cache.request(config);
+  await cache.request({ url: "/auth/fcm-token", method: "post" });
+  await cache.request({ url: "/community/conversation/peer/read", method: "post" });
+  await cache.request(config); expect(adapter).toHaveBeenCalledTimes(3);
+  await cache.request({ url: "/courses/join", method: "post" });
+  await cache.request(config); expect(adapter).toHaveBeenCalledTimes(5);
+});
+test("expired snapshots and live exam questions cannot bypass fresh requests", async () => {
+  let time = 0;
+  const adapter = jest.fn(async () => response({ value: time }));
+  const cache = createReadCache(adapter, () => "a", () => time);
+  await cache.request({ url: "/courses/my" });
+  time = 16 * 60000;
+  expect(cache.peek({ url: "/courses/my" })).toBeNull();
+  for (let i = 0; i < 2; i++) await cache.request({ url: "/exams/1234567890abcdef12345678" });
+  expect(adapter).toHaveBeenCalledTimes(3);
+});
+test("device cache stays within its disk budget", async () => {
+  const storage = memoryStorage();
+  const cache = createReadCache(async () => response({ text: "x".repeat(180000) }), () => "a", Date.now, { storage });
+  for (let i = 0; i < 30; i++) await cache.request({ url: `/courses/${i}` });
+  const index = JSON.parse(storage.getItem("unicore_reads_v3:index"));
+  expect(index.reduce((sum, item) => sum + item.bytes, 0)).toBeLessThanOrEqual(2000000);
+  expect(index.length).toBeLessThanOrEqual(50);
 });
 test("mutations invalidate old reads and late responses cannot repopulate stale cache", async () => {
   let resolve;

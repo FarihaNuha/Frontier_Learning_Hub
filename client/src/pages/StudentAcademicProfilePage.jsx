@@ -1,3 +1,5 @@
+import { useCachedFetch } from "../services/apiCache";
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect, useMemo } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -18,22 +20,9 @@ import StudentSidebar from "../components/StudentSidebar";
 import "../styles/dashboard.css";
 
 export default function StudentAcademicProfilePage() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error } = useCachedFetch("/academic/student/profile");
+  useEffect(() => { if (error) toast.error("Failed to load academic profile."); }, [error]);
 
-  useEffect(() => {
-    api
-      .get("/academic/student/profile")
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((err) => {
-        toast.error("Failed to load academic profile.", { id: "academic-profile-error" });
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
 
   const profile = data?.profile || {};
   const completedCourses = data?.completedCourses || [];
@@ -94,7 +83,7 @@ export default function StudentAcademicProfilePage() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b", fontSize: "15px" }}>Loading academic profile...</div>
+          <SkeletonLoader type="section" />
         ) : (
           <>
             {/* Student Identity Banner Card */}

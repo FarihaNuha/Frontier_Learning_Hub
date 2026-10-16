@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { renderWordPreview } from "../services/wordPreview";
 import { mergeMessages, cachedConversation, rememberConversation } from "../services/chatState";
 import { Capacitor } from "@capacitor/core";
@@ -827,7 +828,7 @@ export default function MessagePage() {
                 <div className="chat-messages">
                   {hasOlder && <button className="btn-secondary" disabled={loadingOlder} onClick={() => fetchConversation(chatId, true)}>{loadingOlder ? "Loading…" : "Load earlier messages"}</button>}
                   {loading ? (
-                    <div className="loading-state"><div className="loading-spinner"></div></div>
+                    <SkeletonLoader type="chat" />
                   ) : messages.length === 0 ? (
                     <div className="empty-chat"><FiMessageSquare size={48} /><p>No messages yet</p></div>
                   ) : (
@@ -1138,7 +1139,7 @@ export default function MessagePage() {
                 )}
               </div>
               {crLoading ? (
-                <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)" }}>Loading requests...</div>
+                <SkeletonLoader type="chat" />
               ) : pendingRequests.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)", background: "var(--bg-card)", borderRadius: "16px", border: "1px solid var(--border-color)" }}>
                   <FiInbox size={40} style={{ marginBottom: 12, opacity: 0.4 }} />
@@ -1249,7 +1250,7 @@ export default function MessagePage() {
           </div>
 
           {crLoading ? (
-            <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)" }}>Loading requests...</div>
+            <SkeletonLoader type="chat" />
           ) : contactRequests.filter((r) => user?.role === "teacher" ? r.status !== "pending" : true).length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)", background: "var(--bg-card)", borderRadius: "16px", border: "1px solid var(--border-color)" }}>
               <p style={{ margin: 0, fontSize: "14px" }}>No contact requests found.</p>

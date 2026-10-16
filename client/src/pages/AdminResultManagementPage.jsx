@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { downloadFile } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -885,7 +886,7 @@ export default function AdminResultManagementPage() {
 
             {/* Upload Batches Roster */}
             {loading ? (
-              <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading result batches...</div>
+              <SkeletonLoader type="table" />
             ) : filteredUploads.length === 0 ? (
               <div style={{ padding: "60px", background: "#ffffff", borderRadius: "14px", textAlign: "center", color: "#94a3b8" }}>
                 <FiAward size={44} style={{ opacity: 0.3, marginBottom: "10px" }} />

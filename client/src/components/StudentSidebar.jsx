@@ -1,3 +1,4 @@
+import { prefetchRoute } from "../services/routeModules";
 import useMobileDrawer from "../hooks/useMobileDrawer";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -141,6 +142,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           {/* 1. My Courses */}
           <button
             className={`nav-item ${currentPage === "my-courses" || currentPage === "courses" ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/courses")} onFocus={() => prefetchRoute("/courses")} onPointerDown={() => prefetchRoute("/courses")}
             onClick={() => navigate("/courses")}
           >
             <FiBookOpen size={18} />
@@ -150,6 +152,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           {/* 2. Academic Profile */}
           <button
             className={`nav-item ${currentPage === "academic-profile" || window.location.pathname.includes("/student/academic-profile") ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/student/academic-profile")} onFocus={() => prefetchRoute("/student/academic-profile")} onPointerDown={() => prefetchRoute("/student/academic-profile")}
             onClick={() => navigate("/student/academic-profile")}
           >
             <FiUser size={18} />
@@ -174,7 +177,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
                 <button
                   className={`nav-item ${currentPage === "course-registration" || window.location.pathname.includes("/student/course-registration") ? "active" : ""}`}
-                  onClick={() => navigate("/student/course-registration")}
+                  onPointerEnter={() => prefetchRoute("/student/course-registration")} onFocus={() => prefetchRoute("/student/course-registration")} onPointerDown={() => prefetchRoute("/student/course-registration")}
+            onClick={() => navigate("/student/course-registration")}
                   style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiCalendar size={15} />
@@ -182,7 +186,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
                 </button>
                 <button
                   className={`nav-item ${currentPage === "retake-registration" || window.location.pathname.includes("/student/retake-registration") ? "active" : ""}`}
-                  onClick={() => navigate("/student/retake-registration")}
+                  onPointerEnter={() => prefetchRoute("/student/retake-registration")} onFocus={() => prefetchRoute("/student/retake-registration")} onPointerDown={() => prefetchRoute("/student/retake-registration")}
+            onClick={() => navigate("/student/retake-registration")}
                   style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiRefreshCw size={15} />
@@ -190,7 +195,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
                 </button>
                 <button
                   className={`nav-item ${currentPage === "payments" || window.location.pathname.includes("/student/registration-payments") ? "active" : ""}`}
-                  onClick={() => navigate("/student/registration-payments")}
+                  onPointerEnter={() => prefetchRoute("/student/registration-payments")} onFocus={() => prefetchRoute("/student/registration-payments")} onPointerDown={() => prefetchRoute("/student/registration-payments")}
+            onClick={() => navigate("/student/registration-payments")}
                   style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiCreditCard size={15} />
@@ -203,6 +209,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           {/* 4. Assessment Marksheet */}
           <button
             className={`nav-item ${currentPage === "assessment" ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/student/assessment")} onFocus={() => prefetchRoute("/student/assessment")} onPointerDown={() => prefetchRoute("/student/assessment")}
             onClick={() => navigate("/student/assessment")}
           >
             <FiFileText size={18} />
@@ -212,6 +219,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           {/* 5. Result Publication */}
           <button
             className={`nav-item ${currentPage === "results" || window.location.pathname.includes("/student/results") ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/student/results")} onFocus={() => prefetchRoute("/student/results")} onPointerDown={() => prefetchRoute("/student/results")}
             onClick={() => navigate("/student/results")}
           >
             <FiAward size={18} />
@@ -221,6 +229,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           {/* 6. Academic Transcript */}
           <button
             className={`nav-item ${currentPage === "transcript" || window.location.pathname.includes("/student/transcript") ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/student/transcript")} onFocus={() => prefetchRoute("/student/transcript")} onPointerDown={() => prefetchRoute("/student/transcript")}
             onClick={() => navigate("/student/transcript")}
           >
             <FiFileText size={18} />
@@ -245,7 +254,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "2px 0 6px 0" }}>
                 <button
                   className={`nav-item ${window.location.pathname.includes("/community") ? "active" : ""}`}
-                  onClick={() => navigate("/community")}
+                  onPointerEnter={() => prefetchRoute("/community")} onFocus={() => prefetchRoute("/community")} onPointerDown={() => prefetchRoute("/community")}
+            onClick={() => navigate("/community")}
                   style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiMessageCircle size={15} />
@@ -253,7 +263,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
                 </button>
                 <button
                   className={`nav-item ${window.location.pathname.includes("/messages") && !window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate("/messages")}
+                  onPointerEnter={() => prefetchRoute("/messages")} onFocus={() => prefetchRoute("/messages")} onPointerDown={() => prefetchRoute("/messages")}
+            onClick={() => navigate("/messages")}
                   style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiMail size={15} />
@@ -261,7 +272,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
                 </button>
                 <button
                   className={`nav-item ${window.location.search.includes("tab=requests") ? "active" : ""}`}
-                  onClick={() => navigate("/messages?tab=requests")}
+                  onPointerEnter={() => prefetchRoute("/messages?tab=requests")} onFocus={() => prefetchRoute("/messages?tab=requests")} onPointerDown={() => prefetchRoute("/messages?tab=requests")}
+            onClick={() => navigate("/messages?tab=requests")}
                   style={{ paddingLeft: 32, fontSize: 13, fontWeight: 400 }}
                 >
                   <FiClock size={15} />
@@ -274,6 +286,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           {/* 8. Academic Calendar */}
           <button
             className={`nav-item ${currentPage === "calendar" || window.location.pathname.includes("/academic-calendar") ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/academic-calendar")} onFocus={() => prefetchRoute("/academic-calendar")} onPointerDown={() => prefetchRoute("/academic-calendar")}
             onClick={() => navigate("/academic-calendar")}
           >
             <FiCalendar size={18} />
@@ -283,6 +296,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           {/* 9. Notice Board (FiClipboard icon to prevent clash with FiBell) */}
           <button
             className={`nav-item ${currentPage === "notices" || window.location.pathname.includes("/student/notices") ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/student/notices")} onFocus={() => prefetchRoute("/student/notices")} onPointerDown={() => prefetchRoute("/student/notices")}
             onClick={() => navigate("/student/notices")}
           >
             <FiClipboard size={18} />
@@ -294,6 +308,7 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
           <div className="nav-divider" style={{ margin: "2px 0" }}></div>
           <button
             className={`nav-item ${currentPage === "settings" ? "active" : ""}`}
+            onPointerEnter={() => prefetchRoute("/settings")} onFocus={() => prefetchRoute("/settings")} onPointerDown={() => prefetchRoute("/settings")}
             onClick={() => navigate("/settings")}
           >
             <FiSettings size={18} />
@@ -480,7 +495,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
 
         {/* 8. Back to Courses */}
-        <button className="nav-item" onClick={() => navigate("/courses")}>
+        <button className="nav-item" onPointerEnter={() => prefetchRoute("/courses")} onFocus={() => prefetchRoute("/courses")} onPointerDown={() => prefetchRoute("/courses")}
+            onClick={() => navigate("/courses")}>
           <FiArrowLeft size={18} />
           <span>Back to Courses</span>
         </button>
@@ -488,7 +504,8 @@ export default function StudentSidebar({ currentPage, courseInfo, courseId }) {
         <div className="nav-divider" style={{ margin: "2px 0" }}></div>
         <button
           className={`nav-item ${currentPage === "settings" ? "active" : ""}`}
-          onClick={() => navigate("/settings")}
+          onPointerEnter={() => prefetchRoute("/settings")} onFocus={() => prefetchRoute("/settings")} onPointerDown={() => prefetchRoute("/settings")}
+            onClick={() => navigate("/settings")}
         >
           <FiSettings size={18} />
           <span>Settings</span>

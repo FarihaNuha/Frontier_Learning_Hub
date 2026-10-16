@@ -1,3 +1,4 @@
+import SkeletonLoader from "./SkeletonLoader";
 import { renderWordPreview } from "../services/wordPreview";
 import FittedDocument from "./FittedDocument";
 import React, { useState, useEffect, useRef } from "react";
@@ -243,10 +244,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
           }}
         >
           {loading ? (
-            <div style={{ textAlign: "center", color: "#64748b" }}>
-              <div className="spinner" style={{ margin: "0 auto 12px" }}></div>
-              <p style={{ fontWeight: 600 }}>Loading preview...</p>
-            </div>
+            <SkeletonLoader type="section" />
           ) : loadError ? (
             <p role="alert" style={{ padding: 20, color: "#b91c1c" }}>{loadError}</p>
           ) : fileCategory === "pdf" ? (

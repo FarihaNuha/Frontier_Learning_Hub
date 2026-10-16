@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
@@ -390,7 +391,7 @@ export default function AdminCourses() {
           </h3>
 
           {loading ? (
-            <div>Loading courses...</div>
+            <SkeletonLoader type="table" />
           ) : filteredCourses.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
               <FiAlertCircle size={36} style={{ marginBottom: "12px" }} />

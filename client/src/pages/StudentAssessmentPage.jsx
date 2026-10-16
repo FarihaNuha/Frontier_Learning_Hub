@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -345,9 +346,7 @@ export default function StudentAssessmentPage() {
           </div>
 
           {isDataLoading ? (
-            <div className="loading-state" style={{ padding: "40px 0" }}>
-              <div className="spinner" style={{ margin: "0 auto" }}></div>
-            </div>
+            <SkeletonLoader type="table" />
           ) : displayedAssessments.length === 0 ? (
             <div className="empty-state" style={{ padding: "60px 0" }}>
               <FiFileText size={48} color="#6B89A0" />

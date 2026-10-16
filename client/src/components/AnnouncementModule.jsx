@@ -1,3 +1,4 @@
+import SkeletonLoader from "./SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -186,7 +187,7 @@ export default function AnnouncementModule({ courseId, isTeacher }) {
 
       {/* Announcements List */}
       {loading ? (
-        <div style={{ padding: "30px", textAlign: "center", color: "#64748b" }}>Loading announcements...</div>
+        <SkeletonLoader type="list" />
       ) : announcements.length === 0 ? (
         <div style={{ padding: "40px 20px", textAlign: "center", color: "#94a3b8" }}>
           <FiBell size={40} style={{ opacity: 0.3, marginBottom: "8px" }} />

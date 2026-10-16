@@ -1,3 +1,5 @@
+import { useCachedFetch } from "../services/apiCache";
+import SkeletonLoader from "./SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -23,24 +25,11 @@ import { readHomeSnapshot, saveHomeSnapshot } from "../services/homeSnapshot";
 export default function TeacherHomeDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [data, setData] = useState(() => readHomeSnapshot(user, "teacher"));
-  const [loading, setLoading] = useState(() => readHomeSnapshot(user, "teacher") === null);
+  const { data, loading, error } = useCachedFetch("/courses/teacher-summary", { initialData: readHomeSnapshot(user, "teacher") });
   useLaunchReady(!loading);
+  useEffect(() => { if (data) saveHomeSnapshot(user, "teacher", data); }, [data, user?.id, user?._id]);
+  useEffect(() => { if (error) toast.error("Failed to load teacher dashboard data."); }, [error]);
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const res = await api.get("/courses/teacher-summary");
-        setData(res.data);
-        saveHomeSnapshot(user, "teacher", res.data);
-      } catch (err) {
-        toast.error("Failed to load teacher dashboard data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSummary();
-  }, []);
 
   const summary = data?.summary || {
     totalAssignedCourses: 0,
@@ -93,9 +82,7 @@ export default function TeacherHomeDashboard() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b", fontSize: "15px" }}>
-            Loading dashboard metrics...
-          </div>
+          <SkeletonLoader type="section" />
         ) : (
           <>
             {/* 1. Interactive 3 Primary Counter Cards */}

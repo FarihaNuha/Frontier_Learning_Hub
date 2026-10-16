@@ -25,6 +25,7 @@ require("./services/notificationDelivery").start();
 const compression = require("compression");
 
 const app = express();
+app.use(require("./services/courseReadCache").invalidateOnWrite);
 const server = http.createServer(app);
 
 // Enable Gzip/Brotli response compression for ultra-fast payloads

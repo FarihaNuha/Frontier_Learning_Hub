@@ -1,238 +1,63 @@
-import { clearConversations } from "./chatState";
-import { clearHomeSnapshots } from "./homeSnapshot";
-import { useState, useEffect, useCallback, useRef } from "react";
-import api from "./api";
+import { clearConversations } from './chatState';
+import { clearHomeSnapshots } from './homeSnapshot';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import api from './api';
 
-// In-memory cache map
-const memoryCache = new Map();
-const CACHE_PREFIX = "uftb_swr_cache_";
-const DEFAULT_TTL = 1000 * 60 * 15; // 15 minutes TTL by default
-
-/**
- * Scope cache key by current user ID to avoid cross-user data leakage
- */
-const getUserScopedKey = (key) => {
-  if (!key) return "";
-  try {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      const u = JSON.parse(userStr);
-      const uid = u.id || u._id;
-      if (uid) return `usr_${uid}_${key}`;
-    }
-  } catch (e) {}
-  return key;
-};
-
-/**
- * Clear all cache entries (used on login / logout)
- */
 export const clearAllCache = () => {
-  memoryCache.clear();
-  clearConversations();
-  clearHomeSnapshots();
-  api.clearReadCache?.();
-  try {
-    const keysToRemove = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const k = sessionStorage.key(i);
-      if (k && k.startsWith(CACHE_PREFIX)) {
-        keysToRemove.push(k);
-      }
-    }
-    keysToRemove.forEach((k) => sessionStorage.removeItem(k));
-  } catch (err) {}
+  clearConversations(); clearHomeSnapshots(); api.clearReadCache?.();
+  // Remove the obsolete, unbounded session cache on existing installations.
+  try { Object.keys(sessionStorage).filter(key => key.startsWith('uftb_swr_cache_')).forEach(key => sessionStorage.removeItem(key)); } catch { }
 };
-
-/**
- * Read cached item from memory or sessionStorage
- */
-export const getCachedData = (rawKey) => {
-  if (!rawKey) return null;
-  const key = getUserScopedKey(rawKey);
-  
-  // 1. Check in-memory Map
-  if (memoryCache.has(key)) {
-    const entry = memoryCache.get(key);
-    if (Date.now() - entry.timestamp < DEFAULT_TTL) {
-      return entry.data;
-    } else {
-      memoryCache.delete(key);
-    }
-  }
-
-  // 2. Check sessionStorage fallback
-  try {
-    const stored = sessionStorage.getItem(CACHE_PREFIX + key);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Date.now() - parsed.timestamp < DEFAULT_TTL) {
-        // Hydrate memory cache
-        memoryCache.set(key, parsed);
-        return parsed.data;
-      } else {
-        sessionStorage.removeItem(CACHE_PREFIX + key);
-      }
-    }
-  } catch (err) {
-    console.error("Cache read error:", err);
-  }
-
-  return null;
+export const getCachedData = (url, params) => api.peekReadCache?.(url, params) ?? null;
+export const setCachedData = () => { /* Successful reads are stored by the API adapter. */ };
+export const invalidateCache = pattern => {
+  if (!pattern) return;
+  api.invalidateReadCache?.(typeof pattern === 'string' ? pattern : '');
 };
+export const fetchWithCache = async (url, { forceRefresh = false, params } = {}) =>
+  (await api.get(url, { cache: !forceRefresh, params })).data;
 
-/**
- * Store item into memory and sessionStorage
- */
-export const setCachedData = (rawKey, data) => {
-  if (!rawKey || data === undefined) return;
-  const key = getUserScopedKey(rawKey);
-  const entry = { data, timestamp: Date.now() };
-
-  // 1. Store in memory
-  memoryCache.set(key, entry);
-
-  // 2. Store in sessionStorage for tab/refresh resilience
-  try {
-    sessionStorage.setItem(CACHE_PREFIX + key, JSON.stringify(entry));
-  } catch (err) {
-    // If storage full or quota exceeded, swallow error
-  }
-};
-
-/**
- * Invalidate cache by exact key or regex pattern match
- */
-export const invalidateCache = (keyOrPattern) => {
-  if (!keyOrPattern) return;
-
-  // Clear memory cache entries
-  for (const key of memoryCache.keys()) {
-    if (typeof keyOrPattern === "string" ? key.includes(keyOrPattern) : keyOrPattern.test(key)) {
-      memoryCache.delete(key);
+export function useCachedFetch(url, { enabled = true, initialData = null, params } = {}) {
+  const paramsKey = JSON.stringify(params || {});
+  const owner = api.readOwner?.() || '';
+  const [state, setState] = useState(() => ({ url, paramsKey, owner, data: enabled ? getCachedData(url, params) ?? initialData : initialData, loading: enabled && getCachedData(url, params) === null && initialData === null, error: null }));
+  const generation = useRef(0);
+  const published = useRef(0);
+  const paramsRef = useRef(params); paramsRef.current = params;
+  const run = useCallback(async (fresh = false) => {
+    if (!enabled || !url) return;
+    const request = ++generation.current;
+    const revision = published.current;
+    try {
+      const response = await api.get(url, { params: paramsRef.current, cache: !fresh });
+      if (generation.current === request && published.current === revision) setState({ url, paramsKey, owner, data: response.data, loading: false, error: null });
+    } catch (error) {
+      if (generation.current === request) setState(previous => ({ ...previous, url, paramsKey, owner, loading: false, error }));
     }
-  }
-
-  // Clear sessionStorage entries
-  try {
-    const keysToRemove = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      if (key && key.startsWith(CACHE_PREFIX)) {
-        const rawKey = key.slice(CACHE_PREFIX.length);
-        if (typeof keyOrPattern === "string" ? rawKey.includes(keyOrPattern) : keyOrPattern.test(rawKey)) {
-          keysToRemove.push(key);
-        }
-      }
-    }
-    keysToRemove.forEach((k) => sessionStorage.removeItem(k));
-  } catch (err) {
-    console.error("Cache invalidation error:", err);
-  }
-};
-
-/**
- * Helper for cached GET requests (Stale-While-Revalidate pattern)
- */
-export const fetchWithCache = async (url, options = {}) => {
-  const { forceRefresh = false } = options;
-  
-  if (!forceRefresh) {
-    const cached = getCachedData(url);
-    if (cached !== null) {
-      // Fire background revalidation
-      api.get(url).then((res) => {
-        setCachedData(url, res.data);
-      }).catch(() => {});
-      return cached;
-    }
-  }
-
-  const res = await api.get(url, { cache: !forceRefresh });
-  setCachedData(url, res.data);
-  return res.data;
-};
-
-/**
- * Custom React Hook for Stale-While-Revalidate (SWR) fetching
- */
-export function useCachedFetch(url, config = {}) {
-  const { enabled = true, initialData = null } = config;
-  const cacheKey = url;
-
-  // Initialize state synchronously with cached data if available
-  const [data, setData] = useState(() => {
-    if (!enabled || !url) return initialData;
-    const cached = getCachedData(cacheKey);
-    return cached !== null ? cached : initialData;
-  });
-
-  const [loading, setLoading] = useState(() => {
-    if (!enabled || !url) return false;
-    const cached = getCachedData(cacheKey);
-    return cached === null;
-  });
-
-  const [error, setError] = useState(null);
-  const isMounted = useRef(true);
-
-  const fetchData = useCallback(
-    async (showLoadingIfNoCache = true) => {
-      if (!url || !enabled) return;
-
-      const cached = getCachedData(cacheKey);
-      if (!cached && showLoadingIfNoCache) {
-        setLoading(true);
-      }
-
-      try {
-        const res = await api.get(url);
-        const freshData = res.data;
-
-        if (isMounted.current) {
-          setData(freshData);
-          setLoading(false);
-          setError(null);
-          setCachedData(cacheKey, freshData);
-        }
-      } catch (err) {
-        if (isMounted.current) {
-          setError(err);
-          setLoading(false);
-        }
-      }
-    },
-    [url, enabled, cacheKey]
-  );
-
+  }, [url, enabled, paramsKey, owner]);
   useEffect(() => {
-    isMounted.current = true;
-
-    const cached = getCachedData(cacheKey);
-    if (cached !== null) {
-      setData(cached);
-      setLoading(false);
-    } else {
-      setLoading(true);
-    }
-
-    fetchData(cached === null);
-
-    return () => {
-      isMounted.current = false;
-    };
-  }, [url, enabled, cacheKey, fetchData]);
-
-  const mutate = useCallback(
-    (newData, shouldRevalidate = true) => {
-      setData(newData);
-      setCachedData(cacheKey, newData);
-      if (shouldRevalidate) {
-        fetchData(false);
-      }
-    },
-    [cacheKey, fetchData]
-  );
-
-  return { data, loading, error, refetch: () => fetchData(false), mutate };
+    if (!enabled || !url) { setState({ url, paramsKey, owner, data: initialData, loading: false, error: null }); return; }
+    const saved = getCachedData(url, paramsRef.current);
+    setState({ url, paramsKey, owner, data: saved ?? initialData, loading: saved === null && initialData === null, error: null });
+    const unsubscribe = api.subscribeReads?.(event => {
+      if (event.owner !== owner) return;
+      if (event.url === url && JSON.stringify(event.params || {}) === paramsKey) {
+        published.current++;
+        setState({ url, paramsKey, owner, data: event.data, loading: false, error: null });
+      } else if (event.invalidated !== undefined && (!event.invalidated || url.includes(event.invalidated))) run(true);
+    });
+    run();
+    const focus = () => { if (document.visibilityState === 'visible') run(true); };
+    window.addEventListener('online', focus); document.addEventListener('visibilitychange', focus);
+    return () => { generation.current++; unsubscribe?.(); window.removeEventListener('online', focus); document.removeEventListener('visibilitychange', focus); };
+  }, [url, enabled, paramsKey, owner, run]);
+  const matching = state.url === url && state.paramsKey === paramsKey && state.owner === owner;
+  const saved = matching ? null : getCachedData(url, paramsRef.current);
+  return {
+    data: matching ? state.data : saved ?? initialData,
+    loading: matching ? state.loading : enabled && saved === null,
+    error: matching ? state.error : null,
+    refetch: () => run(true),
+    mutate: (value, revalidate = true) => { setState(previous => ({ ...previous, data: value, loading: false })); if (revalidate) run(true); },
+  };
 }

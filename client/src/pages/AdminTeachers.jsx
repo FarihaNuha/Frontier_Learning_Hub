@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -615,7 +616,7 @@ export default function AdminTeachers() {
           </h3>
 
           {loading ? (
-            <div>Loading teachers list...</div>
+            <SkeletonLoader type="table" />
           ) : filteredTeachers.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
               <FiAlertCircle size={36} style={{ marginBottom: "12px" }} />

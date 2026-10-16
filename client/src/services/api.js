@@ -1,7 +1,6 @@
 import { createReadCache } from "./requestCache";
 import axios from "axios";
 import { Capacitor } from "@capacitor/core";
-import { invalidateCache } from "./apiCache";
 
 const getBackendUrl = () => {
   if (process.env.REACT_APP_API_URL) {
@@ -47,10 +46,21 @@ const api = axios.create({
   timeout: 60000,
 });
 
-const reads = createReadCache(axios.getAdapter(api.defaults.adapter), () => localStorage.getItem("token") || "anonymous");
+const readOwner = () => {
+  try { const user = JSON.parse(localStorage.getItem("user") || "null"); return localStorage.getItem("token") && (user?.id || user?._id) ? `${user.id || user._id}:${user.role}` : "anonymous"; } catch { return "anonymous"; }
+};
+const reads = createReadCache(axios.getAdapter(api.defaults.adapter), readOwner, Date.now, {
+  storage: window.localStorage,
+  onAuthError: error => {
+    if (error.response?.status === 401) { localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href = "/auth"; }
+  },
+});
 api.defaults.adapter = reads.request;
 api.clearReadCache = reads.clear;
 api.invalidateReadCache = reads.invalidate;
+api.peekReadCache = (url, params) => reads.peek({ baseURL: api.defaults.baseURL, url, params });
+api.subscribeReads = reads.subscribe;
+api.readOwner = readOwner;
 
 // Request interceptor - add token to every request
 api.interceptors.request.use(
@@ -67,20 +77,6 @@ api.interceptors.request.use(
 // Response interceptor - DON'T auto logout on 401 & auto-invalidate cache on mutations
 api.interceptors.response.use(
   (response) => {
-    const method = response.config?.method?.toLowerCase();
-    if (["post", "put", "delete", "patch"].includes(method)) {
-      const url = response.config?.url || "";
-      if (url.includes("lectures")) invalidateCache("lectures");
-      if (url.includes("community")) invalidateCache("community");
-      if (url.includes("assignments")) invalidateCache("assignments");
-      if (url.includes("assessments")) invalidateCache("assessments");
-      if (url.includes("exams")) invalidateCache("exams");
-      if (url.includes("courses")) invalidateCache("courses");
-      if (url.includes("results")) invalidateCache("results");
-      if (url.includes("attendance")) invalidateCache("attendance");
-      if (url.includes("academic")) invalidateCache("academic");
-      if (url.includes("notifications")) invalidateCache("notifications");
-    }
     return response;
   },
   (error) => {

@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook } from "../services/nativeFiles";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -1161,7 +1162,7 @@ export default function TeacherResultManagementPage() {
 
         {/* Grouped Department, Session, Level-Term Card Sections */}
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading result batches...</div>
+          <SkeletonLoader type="table" />
         ) : Object.keys(groupedSections).length === 0 ? (
           <div style={{ padding: "60px", background: "#ffffff", borderRadius: "14px", textAlign: "center", color: "#94a3b8" }}>
             <FiAward size={48} style={{ opacity: 0.3, marginBottom: "12px" }} />

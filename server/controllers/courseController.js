@@ -65,6 +65,9 @@ exports.getMyCourses = async (req, res) => {
         status: "Approved"
       }).lean();
 
+      const approvedLookup = await require("../services/approvedCourseLookup")({
+        Course, Enrollment, approvedRegs, studentProfile, userId, studentIdStr,
+      });
       for (const reg of approvedRegs) {
         for (const courseItem of reg.selectedCourses || []) {
           const codeStr = (courseItem.courseCode || courseItem.code || "").toUpperCase().trim();
@@ -75,7 +78,7 @@ exports.getMyCourses = async (req, res) => {
           const regSession = reg.session || studentProfile?.session || "";
           const lmsQuery = { displayCode: codeStr };
           if (regSession) lmsQuery.session = regSession;
-          let lmsCourse = await Course.findOne(lmsQuery);
+          let lmsCourse = approvedLookup.courseFor(codeStr, regSession);
           if (!lmsCourse) {
             let teacherId = null;
             if (reg.adviserEmail) {
@@ -105,7 +108,8 @@ exports.getMyCourses = async (req, res) => {
               joinCode,
               students: [userId]
             });
-          } else {
+            approvedLookup.rememberCourse(lmsCourse);
+          } else if (!(lmsCourse.students || []).some(student => String(student) === String(userId))) {
             await Course.updateOne(
               { _id: lmsCourse._id },
               { $addToSet: { students: userId } }
@@ -113,7 +117,7 @@ exports.getMyCourses = async (req, res) => {
           }
 
           // FIXED: Include session in upsert filter so each session gets its own Enrollment record
-          await Enrollment.findOneAndUpdate(
+          if (!approvedLookup.hasEnrollment(reg, courseItem, lmsCourse)) await Enrollment.findOneAndUpdate(
             {
               $or: [
                 { student: userId, courseCode: codeStr, session: reg.session },
@@ -1424,7 +1428,7 @@ exports.getCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id)
       .populate("teacher", "name email profilePicture department")
-      .populate("students", "name email studentId profilePicture department");
+      .populate("students", "name email studentId department");
 
     if (!course) {
       return res.status(404).json({ error: "Course not found" });

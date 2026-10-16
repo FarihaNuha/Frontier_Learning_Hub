@@ -1,3 +1,4 @@
+import { useCachedFetch, getCachedData } from "../services/apiCache";
 import { renderWordPreview } from "../services/wordPreview";
 import { createPortal } from "react-dom";
 import { Capacitor } from "@capacitor/core";
@@ -42,7 +43,9 @@ export default function TeacherDashboard({ courseId, courseCode }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [lectures, setLectures] = useState([]);
+  const [lectures, setLectures] = useState(() => getCachedData(`/lectures?courseId=${courseId}`)?.lectures || []);
+  const materialRead = useCachedFetch(`/lectures?courseId=${courseId}`, { enabled: !!courseId });
+  useEffect(() => { if (materialRead.data) setLectures(materialRead.data.lectures || []); }, [materialRead.data]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState(null);
@@ -185,7 +188,7 @@ export default function TeacherDashboard({ courseId, courseCode }) {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && courseId) {
       fetchLectures();
     }
   }, [user?.id, user?._id, courseId]);
@@ -643,7 +646,8 @@ export default function TeacherDashboard({ courseId, courseCode }) {
         )}
 
         {/* WEEKS VIEW */}
-        {!showForm && viewMode === "weeks" && (
+        {materialRead.loading && !showForm && <SkeletonLoader type="section" />}
+        {!materialRead.loading && !showForm && viewMode === "weeks" && (
           <div>
             <h2 style={{ marginBottom: 20 }}>Week-wise Lectures</h2>
             <div className="lectures-grid">

@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
@@ -174,7 +175,7 @@ export default function AdminNoticeManagementPage() {
 
         {/* Notices Grid */}
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading notices...</div>
+          <SkeletonLoader type="list" />
         ) : notices.length === 0 ? (
           <div style={{ padding: "60px", background: "#ffffff", borderRadius: "14px", textAlign: "center", color: "#94a3b8" }}>
             <FiClipboard size={48} style={{ opacity: 0.3, marginBottom: "12px" }} />

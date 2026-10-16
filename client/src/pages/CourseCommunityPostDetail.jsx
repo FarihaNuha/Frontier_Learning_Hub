@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -139,10 +140,7 @@ export default function CourseCommunityPostDetail() {
   if (loading) {
     return (
       <div className="post-detail-container">
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
-          <p>Loading post...</p>
-        </div>
+        <div className="loading-state"><SkeletonLoader type="list" /></div>
       </div>
     );
   }

@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -808,10 +809,7 @@ export default function CourseAnalyticsPage() {
     return (
       <div className="dashboard-container">
         <div className="main-content">
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading analytics dashboard...</p>
-          </div>
+          <div className="loading-state"><SkeletonLoader type="section" /></div>
         </div>
       </div>
     );

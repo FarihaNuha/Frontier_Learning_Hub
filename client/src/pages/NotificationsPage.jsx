@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -178,9 +179,7 @@ export default function NotificationsPage() {
 
         {/* Notifications List */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px", color: "var(--text-secondary)" }}>
-            Loading notifications...
-          </div>
+          <SkeletonLoader type="section" />
         ) : filteredNotifications.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px", background: "var(--bg-card)", borderRadius: "16px", border: "1px solid var(--border-color)" }}>
             <FiBell size={48} color="#94a3b8" style={{ marginBottom: 12, opacity: 0.4 }} />

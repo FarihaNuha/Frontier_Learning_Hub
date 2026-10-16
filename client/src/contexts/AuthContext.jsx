@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { setChatNotificationContext, getChatNotificationSettings } from "../services/chatNotifications";
 import { io } from "socket.io-client";
 import { prepareHome } from "../services/startup";
+import { invalidateNotificationReads } from "../services/notificationCache";
 import { showNativeNotification, isNativePlatform, syncNativePushToken, disconnectNativePushToken } from "../services/nativeBridge";
 
 const AuthContext = createContext();
@@ -24,8 +25,10 @@ const getActiveStatusSetting = () => {
 };
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    try { return localStorage.getItem("token") ? JSON.parse(localStorage.getItem("user") || "null") : null; } catch { return null; }
+  });
+  const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
@@ -222,6 +225,7 @@ export function AuthProvider({ children }) {
     // 1. Standard In-App / Academic / Community Notifications
     const handleNewNotification = (data) => {
       if (!data) return;
+      invalidateNotificationReads(data.type, data.link);
       console.log("🔔 [newNotification] socket event received:", data);
       if (data.type === "chat_message") return; // The private-message event owns chat toasts.
       const title = data.title || "UniCore Notification";

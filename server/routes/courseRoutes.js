@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { verifyToken, checkRole } = require("../middleware/authMiddleware");
 const ctrl = require("../controllers/courseController");
+const cachedCourseRead = require("../services/courseReadCache").middleware;
 
 // Teacher routes
 router.post(
@@ -25,11 +26,11 @@ router.get("/join-requests", verifyToken, checkRole("teacher"), ctrl.getJoinRequ
 router.post("/join-requests/:requestId/action", verifyToken, checkRole("teacher"), ctrl.handleJoinRequest);
 
 // Teacher Dashboard & Enrolled Students routes
-router.get("/teacher-summary", verifyToken, checkRole("teacher", "admin"), ctrl.getTeacherDashboardSummary);
+router.get("/teacher-summary", verifyToken, checkRole("teacher", "admin"), cachedCourseRead, ctrl.getTeacherDashboardSummary);
 router.get("/:courseId/enrolled-students", verifyToken, ctrl.getEnrolledStudentsForCourse);
 
 // Common routes
-router.get("/my", verifyToken, ctrl.getMyCourses);
+router.get("/my", verifyToken, cachedCourseRead, ctrl.getMyCourses);
 router.get("/:id", verifyToken, ctrl.getCourse);
 
 // Analytics routes

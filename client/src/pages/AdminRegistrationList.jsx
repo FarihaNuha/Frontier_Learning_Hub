@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
@@ -181,7 +182,7 @@ export default function AdminRegistrationList() {
         {/* Registrations Table */}
         <div style={{ background: "#ffffff", padding: "24px", borderRadius: "14px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)", border: "1px solid #e2e8f0" }}>
           {loading ? (
-            <div style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>Loading registration records...</div>
+            <SkeletonLoader type="table" />
           ) : filteredRegistrations.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8" }}>
               No registration records found matching the selected filters.

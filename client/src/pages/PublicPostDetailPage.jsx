@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { PUBLIC_APP_URL } from "../services/urls";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -101,10 +102,7 @@ export default function PublicPostDetailPage() {
 
   if (loading)
     return (
-      <div className="loading-state">
-        <div className="loading-spinner"></div>
-        <p>Loading...</p>
-      </div>
+      <div className="loading-state"><SkeletonLoader type="section" /></div>
     );
   if (!post) return null;
 

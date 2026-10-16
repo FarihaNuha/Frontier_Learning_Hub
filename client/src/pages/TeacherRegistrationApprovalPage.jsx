@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import TeacherSidebar from "../components/TeacherSidebar";
 import api from "../services/api";
@@ -103,7 +104,7 @@ export default function TeacherRegistrationApprovalPage() {
           </h3>
 
           {loading ? (
-            <div>Loading pending requests...</div>
+            <SkeletonLoader type="table" />
           ) : requests.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
               No pending course registration requests found for your assigned advising batch.

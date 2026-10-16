@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
@@ -350,9 +351,7 @@ export default function AdminProgressionPage() {
         )}
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>
-            Loading student progression roster...
-          </div>
+          <SkeletonLoader type="table" />
         ) : Object.keys(groupedBySession).length === 0 ? (
           <div
             style={{

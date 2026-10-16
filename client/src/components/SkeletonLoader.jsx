@@ -1,51 +1,16 @@
-import React from "react";
+import React from 'react';
+import '../styles/skeleton.css';
 
-export default function SkeletonLoader({ type = "page" }) {
-  const shimmerStyle = `
-    @keyframes skeleton-shimmer {
-      0% { background-position: -200px 0; }
-      100% { background-position: calc(200px + 100%) 0; }
-    }
-    .skeleton-box {
-      background: linear-gradient(90deg, #e2e8f0 0px, #f1f5f9 40px, #e2e8f0 80px);
-      background-size: 200px 100%;
-      animation: skeleton-shimmer 1.5s infinite ease-in-out;
-      border-radius: 8px;
-    }
-  `;
-
-  if (type === "card") {
-    return (
-      <div style={{ padding: "16px", borderRadius: "12px", background: "#ffffff", border: "1px solid #e2e8f0" }}>
-        <style>{shimmerStyle}</style>
-        <div className="skeleton-box" style={{ height: "24px", width: "60%", marginBottom: "12px" }}></div>
-        <div className="skeleton-box" style={{ height: "16px", width: "90%", marginBottom: "8px" }}></div>
-        <div className="skeleton-box" style={{ height: "16px", width: "40%" }}></div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ minHeight: "100vh", background: "#E8F4FD", padding: "32px 24px", display: "flex", gap: "24px" }}>
-      <style>{shimmerStyle}</style>
-      {/* Sidebar skeleton */}
-      <div style={{ width: "260px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div className="skeleton-box" style={{ height: "60px", width: "100%" }}></div>
-        <div className="skeleton-box" style={{ height: "120px", width: "100%" }}></div>
-        <div className="skeleton-box" style={{ height: "40px", width: "100%" }}></div>
-        <div className="skeleton-box" style={{ height: "40px", width: "100%" }}></div>
-        <div className="skeleton-box" style={{ height: "40px", width: "100%" }}></div>
-      </div>
-      {/* Main content skeleton */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "20px" }}>
-        <div className="skeleton-box" style={{ height: "48px", width: "40%" }}></div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
-          <div className="skeleton-box" style={{ height: "160px" }}></div>
-          <div className="skeleton-box" style={{ height: "160px" }}></div>
-          <div className="skeleton-box" style={{ height: "160px" }}></div>
-        </div>
-        <div className="skeleton-box" style={{ height: "240px", width: "100%" }}></div>
-      </div>
-    </div>
-  );
+export default function SkeletonLoader({ type = 'page', rows = 5 }) {
+  const row = <div className="skeleton-row"><span className="skeleton-box skeleton-avatar" /><div className="skeleton-lines"><span className="skeleton-box skeleton-line" /><span className="skeleton-box skeleton-line short" /></div></div>;
+  const content = <><div className="skeleton-heading"><span className="skeleton-box skeleton-title" /><span className="skeleton-box skeleton-line short" /></div>
+    {type === 'chat' ? <div className="skeleton-chat">{[0,1,2,3].map(i => <span key={i} className={`skeleton-box skeleton-bubble ${i % 2 ? 'outgoing' : ''}`} />)}</div>
+    : type === 'table' || type === 'list' ? <div className="skeleton-panel">{Array.from({length:rows},(_,i)=><React.Fragment key={i}>{row}</React.Fragment>)}</div>
+    : <><div className="skeleton-cards">{[0,1,2].map(i => <div className="skeleton-panel" key={i}><span className="skeleton-box skeleton-line" /><span className="skeleton-box skeleton-number" /><span className="skeleton-box skeleton-line short" /></div>)}</div><div className="skeleton-panel">{row}{row}</div></>}
+  </>;
+  if(type === 'card') return <div className="skeleton-panel" role="status" aria-label="Loading content">{row}</div>;
+  return <div className={`app-skeleton ${type === 'page' ? 'skeleton-page' : ''}`} role="status" aria-label="Loading content" aria-busy="true">
+    {type === 'page' && <><div className="skeleton-mobile-header"><span className="skeleton-box skeleton-avatar"/><span className="skeleton-box skeleton-line"/></div><aside className="skeleton-sidebar"><span className="skeleton-box skeleton-title"/>{Array.from({length:6},(_,i)=><span key={i} className="skeleton-box skeleton-line"/>)}</aside></>}
+    <div className="skeleton-content">{content}</div>
+  </div>;
 }

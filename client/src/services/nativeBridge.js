@@ -4,6 +4,7 @@ import { StatusBar, Style } from "@capacitor/status-bar";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import api from "./api";
+import { invalidateNotificationReads } from "./notificationCache";
 import { notificationMode, setChatNotificationContext } from "./chatNotifications";
 
 const CHANNEL_ID = "unicore_messages_channel";
@@ -32,6 +33,7 @@ export const setGlobalNavigate = (navigate) => { if (typeof navigate === "functi
 export const navigateTo = (link) => {
   // Notification links must remain inside this app.
   if (typeof link !== "string" || !link.startsWith("/") || link.startsWith("//") || link.includes("\\")) return;
+  invalidateNotificationReads("", link);
   if (!localStorage.getItem("token") && link !== "/auth") {
     sessionStorage.setItem("notification_link", link);
     if (navigateHandler) navigateHandler("/auth");
@@ -169,10 +171,11 @@ const installNotificationListeners = async () => {
     updateStatus({ registered: false, error: "This phone could not register for notifications. Check Google Play services and retry." });
   });
   await addListenerOnce("pushReceived", PushNotifications, "pushNotificationReceived", (notification) => {
-    if (notification.data?.nativeHandled === "true") return;
     const currentUser = JSON.parse(localStorage.getItem("user") || "null");
     if (!localStorage.getItem("token")) return;
     if (notification.data?.recipientId && notification.data.recipientId !== String(currentUser?.id || currentUser?._id)) return;
+    invalidateNotificationReads(notification.data?.type, notification.data?.link);
+    if (notification.data?.nativeHandled === "true") return;
     showNativeNotification({ title: notification.title, body: notification.body,
       link: notification.data?.link, id: notification.data?.notificationId || notification.id });
   });

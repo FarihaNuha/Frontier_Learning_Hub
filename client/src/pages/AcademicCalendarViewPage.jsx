@@ -1,3 +1,5 @@
+import { useCachedFetch } from "../services/apiCache";
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -10,24 +12,8 @@ import "../styles/dashboard.css";
 
 export default function AcademicCalendarViewPage() {
   const { user } = useAuth();
-  const [publishedCalendar, setPublishedCalendar] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api
-      .get("/service/calendar/published")
-      .then((res) => {
-        if (res.data?.publishedCalendar) {
-          setPublishedCalendar(res.data.publishedCalendar);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load published academic calendar.", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const { data, loading } = useCachedFetch("/service/calendar/published");
+  const publishedCalendar = data?.publishedCalendar || null;
 
   return (
     <div className="dashboard-container">
@@ -55,7 +41,7 @@ export default function AcademicCalendarViewPage() {
 
         {/* Official Academic Calendar Card Display */}
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading academic calendar...</div>
+          <SkeletonLoader type="section" />
         ) : (
           <OfficialAcademicCalendarCard
             customData={publishedCalendar}

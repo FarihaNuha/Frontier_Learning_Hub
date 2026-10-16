@@ -1,3 +1,5 @@
+import { useCachedFetch } from "../services/apiCache";
+import SkeletonLoader from "../components/SkeletonLoader";
 import { downloadTranscript } from "../services/academicPDF";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
@@ -13,22 +15,9 @@ import StudentSidebar from "../components/StudentSidebar";
 import "../styles/dashboard.css";
 
 export default function StudentTranscriptPage() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error } = useCachedFetch("/academic/student/transcript");
+  useEffect(() => { if (error) toast.error("Failed to load official transcript data."); }, [error]);
 
-  useEffect(() => {
-    api
-      .get("/academic/student/transcript")
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((err) => {
-        toast.error("Failed to load official transcript data.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
 
   const studentInfo = data?.studentInfo || {};
   const semesterBreakdown = data?.semesterBreakdown || [];
@@ -78,7 +67,7 @@ export default function StudentTranscriptPage() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading academic transcript...</div>
+          <SkeletonLoader type="table" />
         ) : (
           /* Official Transcript Document Container */
           <div

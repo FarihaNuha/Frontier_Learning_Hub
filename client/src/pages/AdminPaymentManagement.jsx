@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import api from "../services/api";
@@ -57,7 +58,7 @@ export default function AdminPaymentManagement() {
 
         <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
           {loading ? (
-            <div>Loading payment ledger...</div>
+            <SkeletonLoader type="table" />
           ) : payments.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>No payment records generated yet.</div>
           ) : (

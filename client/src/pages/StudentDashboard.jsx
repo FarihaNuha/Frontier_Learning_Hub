@@ -1,3 +1,5 @@
+import { useCachedFetch, getCachedData } from "../services/apiCache";
+import SkeletonLoader from "../components/SkeletonLoader";
 import { renderWordPreview } from "../services/wordPreview";
 import { createPortal } from "react-dom";
 import { Capacitor } from "@capacitor/core";
@@ -46,9 +48,13 @@ export default function StudentDashboard({
   // Get course ID from props (CourseDashboard) or URL
   const finalCourseId = propCourseId || urlCourseId;
 
-  const [courseInfo, setCourseInfo] = useState(null);
-  const [lectures, setLectures] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courseInfo, setCourseInfo] = useState(() => getCachedData(`/courses/${finalCourseId}`)?.course || null);
+  const [lectures, setLectures] = useState(() => getCachedData(`/lectures?courseId=${finalCourseId}`)?.lectures || []);
+  const courseRead = useCachedFetch(`/courses/${finalCourseId}`, { enabled: !!finalCourseId });
+  const materialRead = useCachedFetch(`/lectures?courseId=${finalCourseId}`, { enabled: !!finalCourseId });
+  const loading = courseRead.loading || materialRead.loading;
+  useEffect(() => { if (courseRead.data?.course) setCourseInfo(courseRead.data.course); }, [courseRead.data]);
+  useEffect(() => { if (materialRead.data) setLectures(materialRead.data.lectures || []); }, [materialRead.data]);
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [viewMode, setViewMode] = useState("weeks");
@@ -168,41 +174,8 @@ export default function StudentDashboard({
     };
   }, [previewSlides]);
 
-  useEffect(() => {
-    if (!user) return;
-    if (finalCourseId) {
-      fetchCourseInfo();
-      fetchLectures();
-    } else {
-      navigate("/courses");
-    }
-  }, [finalCourseId, user?.id, user?._id]);
-
+  useEffect(() => { if (user && !finalCourseId) navigate("/courses"); }, [finalCourseId, user?.id, user?._id]);
   if (!user) return null;
-
-  const fetchCourseInfo = async () => {
-    try {
-      const data = await fetchWithCache(`/courses/${finalCourseId}`);
-      setCourseInfo(data.course);
-    } catch (error) {
-      console.error(error);
-      toast.error("Course not found");
-      navigate("/courses");
-    }
-  };
-
-  const fetchLectures = async () => {
-    try {
-      const url = `/lectures?courseId=${finalCourseId}`;
-      const data = await fetchWithCache(url);
-      setLectures(data.lectures || []);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load materials");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getViewUrl = (id) => `${PUBLIC_APP_URL}/course/${finalCourseId || ""}?lectureId=${id}`;
   const getDownloadUrl = (id) =>
@@ -291,10 +264,7 @@ export default function StudentDashboard({
           courseId={finalCourseId}
         />
         <div className="main-content">
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading course materials...</p>
-          </div>
+          <div className="loading-state"><SkeletonLoader type="section" /></div>
         </div>
       </div>
     );
@@ -370,7 +340,7 @@ export default function StudentDashboard({
               <h1>Course Materials</h1>
             )}
           </div>
-          <button className="btn-primary" onClick={fetchLectures}>
+          <button className="btn-primary" onClick={materialRead.refetch}>
             <FiRefreshCw size={16} /> Refresh
           </button>
         </div>

@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -93,17 +94,7 @@ export default function AcademicRegistrationPage() {
         </div>
 
         {loading ? (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "300px",
-              color: "#64748b",
-            }}
-          >
-            Loading academic status...
-          </div>
+          <SkeletonLoader type="table" />
         ) : (
           <div
             style={{

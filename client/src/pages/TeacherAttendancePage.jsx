@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { exportWorkbook, exportPDF } from "../services/nativeFiles";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -1072,10 +1073,7 @@ export default function TeacherAttendancePage({
           courseId={courseId}
         />
         <div className="main-content">
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading course...</p>
-          </div>
+          <div className="loading-state"><SkeletonLoader type="table" /></div>
         </div>
       </div>
     );
@@ -1675,9 +1673,7 @@ export default function TeacherAttendancePage({
             </div>
 
             {loading ? (
-              <div className="loading-state">
-                <div className="spinner"></div>
-              </div>
+              <SkeletonLoader type="table" />
             ) : filteredRecords.length === 0 ? (
               <div className="empty-state">
                 <FiUser size={48} />
@@ -2021,9 +2017,7 @@ export default function TeacherAttendancePage({
               )}
             </div>
             {loading ? (
-              <div className="loading-state">
-                <div className="spinner"></div>
-              </div>
+              <SkeletonLoader type="table" />
             ) : gridData.students.length === 0 ? (
               <div className="empty-state">
                 <h3>No data found</h3>

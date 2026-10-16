@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -213,9 +214,7 @@ export default function StudentAttendancePage({
           courseId={finalCourseId}
         />
         <div className="main-content">
-          <div className="loading-state">
-            <p>Loading attendance...</p>
-          </div>
+          <div className="loading-state"><SkeletonLoader type="table" /></div>
         </div>
       </div>
     );
@@ -230,10 +229,7 @@ export default function StudentAttendancePage({
           courseId={finalCourseId}
         />
         <div className="main-content">
-          <div className="loading-state" style={{ padding: "60px 0" }}>
-            <div className="spinner" style={{ margin: "0 auto" }}></div>
-            <p style={{ marginTop: "12px", color: "#6B89A0" }}>Loading attendance...</p>
-          </div>
+          <div className="loading-state" style={{ padding: "60px 0" }}><SkeletonLoader type="table" /></div>
         </div>
       </div>
     );

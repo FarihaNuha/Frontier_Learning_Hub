@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import StudentSidebar from "../components/StudentSidebar";
 import api from "../services/api";
@@ -184,7 +185,7 @@ export default function StudentRegistrationPaymentPage() {
         )}
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b", fontSize: "15px" }}>Loading registration payment history...</div>
+          <SkeletonLoader type="table" />
         ) : payments.length === 0 ? (
           <div style={{ padding: "60px", background: "#ffffff", borderRadius: "16px", textAlign: "center", color: "#94a3b8", border: "1px solid #cbd5e1" }}>
             <FiCreditCard size={48} style={{ opacity: 0.4, marginBottom: "12px" }} />

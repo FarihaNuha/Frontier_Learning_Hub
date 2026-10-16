@@ -1,3 +1,4 @@
+import SkeletonLoader from "./SkeletonLoader";
 import { createPortal } from "react-dom";
 import { downloadInvoice } from "../services/academicPDF";
 import React, { useState, useEffect } from "react";
@@ -188,7 +189,7 @@ export default function RegistrationInvoiceModal({
           </div>
 
           {loading ? (
-            <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading invoice details...</div>
+            <SkeletonLoader type="table" />
           ) : !invoice ? (
             <div style={{ padding: "50px", textAlign: "center", color: "#ef4444" }}>Invoice details unavailable.</div>
           ) : (

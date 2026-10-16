@@ -1,3 +1,5 @@
+import { loadRouteModule, warmRoutes } from "./services/routeModules";
+import RouteSkeleton from "./components/RouteSkeleton";
 import { CallProvider } from "./contexts/CallContext";
 import { setChatNotificationContext } from "./services/chatNotifications";
 import React, { useEffect, lazy, Suspense } from "react";
@@ -15,64 +17,64 @@ import AuthPage from "./pages/AuthPage";
 import { loadTeacherHome, loadCourseHome } from "./services/startup";
 import { useLaunchReady } from "./services/launchScreen";
 const TeacherHomeDashboard = lazy(loadTeacherHome);
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const AdminStudents = lazy(() => import("./pages/AdminStudents"));
-const AdminTeachers = lazy(() => import("./pages/AdminTeachers"));
-const AdminCourses = lazy(() => import("./pages/AdminCourses"));
-const AdminAdvisers = lazy(() => import("./pages/AdminAdvisers"));
-const AdminSettings = lazy(() => import("./pages/AdminSettings"));
-const StudentAssignmentPage = lazy(() => import("./pages/StudentAssignmentPage"));
-const TeacherAssignmentPage = lazy(() => import("./pages/TeacherAssignmentPage"));
-const TeacherAttendancePage = lazy(() => import("./pages/TeacherAttendancePage"));
-const StudentAttendancePage = lazy(() => import("./pages/StudentAttendancePage"));
-const TeacherExamPage = lazy(() => import("./pages/TeacherExamPage"));
-const StudentExamPage = lazy(() => import("./pages/StudentExamPage"));
+const AdminDashboard = lazy(() => loadRouteModule("AdminDashboard"));
+const AdminStudents = lazy(() => loadRouteModule("AdminStudents"));
+const AdminTeachers = lazy(() => loadRouteModule("AdminTeachers"));
+const AdminCourses = lazy(() => loadRouteModule("AdminCourses"));
+const AdminAdvisers = lazy(() => loadRouteModule("AdminAdvisers"));
+const AdminSettings = lazy(() => loadRouteModule("AdminSettings"));
+const StudentAssignmentPage = lazy(() => loadRouteModule("StudentAssignmentPage"));
+const TeacherAssignmentPage = lazy(() => loadRouteModule("TeacherAssignmentPage"));
+const TeacherAttendancePage = lazy(() => loadRouteModule("TeacherAttendancePage"));
+const StudentAttendancePage = lazy(() => loadRouteModule("StudentAttendancePage"));
+const TeacherExamPage = lazy(() => loadRouteModule("TeacherExamPage"));
+const StudentExamPage = lazy(() => loadRouteModule("StudentExamPage"));
 const CourseListPage = lazy(loadCourseHome);
-const CourseDashboard = lazy(() => import("./pages/CourseDashboard"));
-const CommunityHub = lazy(() => import("./pages/CommunityHub"));
-const PublicPostDetailPage = lazy(() => import("./pages/PublicPostDetailPage"));
-const MessagePage = lazy(() => import("./pages/MessagePage"));
-const CourseCommunity = lazy(() => import("./pages/CourseCommunity"));
-const CourseCommunityPostDetail = lazy(() => import("./pages/CourseCommunityPostDetail"));
-const TeacherAssessmentPage = lazy(() => import("./pages/TeacherAssessmentPage"));
-const StudentAssessmentPage = lazy(() => import("./pages/StudentAssessmentPage"));
-const SettingsPage = lazy(() => import("./pages/SettingsPage"));
-const CourseAnalyticsPage = lazy(() => import("./pages/CourseAnalyticsPage"));
-const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const CourseDashboard = lazy(() => loadRouteModule("CourseDashboard"));
+const CommunityHub = lazy(() => loadRouteModule("CommunityHub"));
+const PublicPostDetailPage = lazy(() => loadRouteModule("PublicPostDetailPage"));
+const MessagePage = lazy(() => loadRouteModule("MessagePage"));
+const CourseCommunity = lazy(() => loadRouteModule("CourseCommunity"));
+const CourseCommunityPostDetail = lazy(() => loadRouteModule("CourseCommunityPostDetail"));
+const TeacherAssessmentPage = lazy(() => loadRouteModule("TeacherAssessmentPage"));
+const StudentAssessmentPage = lazy(() => loadRouteModule("StudentAssessmentPage"));
+const SettingsPage = lazy(() => loadRouteModule("SettingsPage"));
+const CourseAnalyticsPage = lazy(() => loadRouteModule("CourseAnalyticsPage"));
+const NotificationsPage = lazy(() => loadRouteModule("NotificationsPage"));
 
 // Phase 2 & 3 Pages
-const StudentLevelTermPage = lazy(() => import("./pages/StudentLevelTermPage"));
-const CourseRegistrationPage = lazy(() => import("./pages/CourseRegistrationPage"));
-const AcademicRegistrationPage = lazy(() => import("./pages/AcademicRegistrationPage"));
-const TeacherRegistrationApprovalPage = lazy(() => import("./pages/TeacherRegistrationApprovalPage"));
-const TeacherEnrolledStudentsPage = lazy(() => import("./pages/TeacherEnrolledStudentsPage"));
-const AdminRegistrationCalendar = lazy(() => import("./pages/AdminRegistrationCalendar"));
-const AdminPaymentManagement = lazy(() => import("./pages/AdminPaymentManagement"));
-const AdminRegistrationList = lazy(() => import("./pages/AdminRegistrationList"));
+const StudentLevelTermPage = lazy(() => loadRouteModule("StudentLevelTermPage"));
+const CourseRegistrationPage = lazy(() => loadRouteModule("CourseRegistrationPage"));
+const AcademicRegistrationPage = lazy(() => loadRouteModule("AcademicRegistrationPage"));
+const TeacherRegistrationApprovalPage = lazy(() => loadRouteModule("TeacherRegistrationApprovalPage"));
+const TeacherEnrolledStudentsPage = lazy(() => loadRouteModule("TeacherEnrolledStudentsPage"));
+const AdminRegistrationCalendar = lazy(() => loadRouteModule("AdminRegistrationCalendar"));
+const AdminPaymentManagement = lazy(() => loadRouteModule("AdminPaymentManagement"));
+const AdminRegistrationList = lazy(() => loadRouteModule("AdminRegistrationList"));
 
 // Phase 4 Pages
-const TeacherResultManagementPage = lazy(() => import("./pages/TeacherResultManagementPage"));
-const AdminResultManagementPage = lazy(() => import("./pages/AdminResultManagementPage"));
-const StudentAcademicResultsPage = lazy(() => import("./pages/StudentAcademicResultsPage"));
-const UnderDevelopmentPage = lazy(() => import("./pages/UnderDevelopmentPage"));
+const TeacherResultManagementPage = lazy(() => loadRouteModule("TeacherResultManagementPage"));
+const AdminResultManagementPage = lazy(() => loadRouteModule("AdminResultManagementPage"));
+const StudentAcademicResultsPage = lazy(() => loadRouteModule("StudentAcademicResultsPage"));
+const UnderDevelopmentPage = lazy(() => loadRouteModule("UnderDevelopmentPage"));
 
 // Phase 5 Pages
-const StudentAcademicProfilePage = lazy(() => import("./pages/StudentAcademicProfilePage"));
-const StudentTranscriptPage = lazy(() => import("./pages/StudentTranscriptPage"));
-const StudentRetakeRegistrationPage = lazy(() => import("./pages/StudentRetakeRegistrationPage"));
-const TeacherRetakeApprovalPage = lazy(() => import("./pages/TeacherRetakeApprovalPage"));
-const AdminProgressionPage = lazy(() => import("./pages/AdminProgressionPage"));
+const StudentAcademicProfilePage = lazy(() => loadRouteModule("StudentAcademicProfilePage"));
+const StudentTranscriptPage = lazy(() => loadRouteModule("StudentTranscriptPage"));
+const StudentRetakeRegistrationPage = lazy(() => loadRouteModule("StudentRetakeRegistrationPage"));
+const TeacherRetakeApprovalPage = lazy(() => loadRouteModule("TeacherRetakeApprovalPage"));
+const AdminProgressionPage = lazy(() => loadRouteModule("AdminProgressionPage"));
 
 // Service Modules Pages
-const AdminNoticeManagementPage = lazy(() => import("./pages/AdminNoticeManagementPage"));
-const TeacherNoticePage = lazy(() => import("./pages/TeacherNoticePage"));
-const StudentNoticePage = lazy(() => import("./pages/StudentNoticePage"));
-const AdminCalendarManagementPage = lazy(() => import("./pages/AdminCalendarManagementPage"));
-const AcademicCalendarViewPage = lazy(() => import("./pages/AcademicCalendarViewPage"));
+const AdminNoticeManagementPage = lazy(() => loadRouteModule("AdminNoticeManagementPage"));
+const TeacherNoticePage = lazy(() => loadRouteModule("TeacherNoticePage"));
+const StudentNoticePage = lazy(() => loadRouteModule("StudentNoticePage"));
+const AdminCalendarManagementPage = lazy(() => loadRouteModule("AdminCalendarManagementPage"));
+const AcademicCalendarViewPage = lazy(() => loadRouteModule("AcademicCalendarViewPage"));
 
 // Registration Payment Pages
-const StudentRegistrationPaymentPage = lazy(() => import("./pages/StudentRegistrationPaymentPage"));
-const AdminRegistrationPaymentPage = lazy(() => import("./pages/AdminRegistrationPaymentPage"));
+const StudentRegistrationPaymentPage = lazy(() => loadRouteModule("StudentRegistrationPaymentPage"));
+const AdminRegistrationPaymentPage = lazy(() => loadRouteModule("AdminRegistrationPaymentPage"));
 
 // Fixed ProtectedRoute - checks token and user state
 function ProtectedRoute({ children }) {
@@ -87,19 +89,7 @@ function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          background: "#E8F4FD",
-          color: "#2C4B66",
-          fontSize: "18px",
-        }}
-      >
-        Loading...
-      </div>
+      <RouteSkeleton />
     );
   }
 
@@ -119,20 +109,7 @@ function RootRedirect() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          background: "#E8F4FD",
-          color: "#2C4B66",
-          fontSize: "18px",
-          fontWeight: "600",
-        }}
-      >
-        Loading UniCore...
-      </div>
+      <RouteSkeleton />
     );
   }
 
@@ -166,10 +143,8 @@ function AppContent() {
 
   useEffect(() => { setChatNotificationContext(); if (user) restoreNotificationNavigation(); }, [user]);
   useEffect(() => {
-    if (!user || !["student", "teacher"].includes(user.role)) return;
-    const warm = () => { Promise.allSettled([import("./pages/MessagePage"), import("./pages/CourseListPage")]); };
-    const idle = window.requestIdleCallback ? window.requestIdleCallback(warm, { timeout: 2500 }) : setTimeout(warm, 1500);
-    return () => { if (window.cancelIdleCallback) window.cancelIdleCallback(idle); else clearTimeout(idle); };
+    if (!user) return;
+    return warmRoutes(user.role);
   }, [user?.id, user?._id, user?.role]);
 
 
@@ -190,7 +165,7 @@ function AppContent() {
           <GlobalSettingsPortal />
         </>
       )}
-      <Suspense fallback={<SkeletonLoader />}>
+      <Suspense fallback={<RouteSkeleton />}>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
 

@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -274,9 +275,7 @@ export default function TeacherNoticePage() {
 
         {/* Notices List */}
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>
-            Loading notices...
-          </div>
+          <SkeletonLoader type="list" />
         ) : activeNotices.length === 0 ? (
           <div
             style={{

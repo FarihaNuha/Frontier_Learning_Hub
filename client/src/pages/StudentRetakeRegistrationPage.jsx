@@ -1,3 +1,4 @@
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -114,7 +115,7 @@ export default function StudentRetakeRegistrationPage() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading failed courses...</div>
+          <SkeletonLoader type="table" />
         ) : (
           <>
             {/* Failed Courses for Retake */}

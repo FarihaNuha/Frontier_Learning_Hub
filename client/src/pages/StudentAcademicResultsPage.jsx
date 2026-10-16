@@ -1,3 +1,5 @@
+import { useCachedFetch } from "../services/apiCache";
+import SkeletonLoader from "../components/SkeletonLoader";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -21,8 +23,7 @@ import "../styles/dashboard.css";
 
 export default function StudentAcademicResultsPage() {
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error } = useCachedFetch("/results/student");
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [resultTypeTab, setResultTypeTab] = useState("Midterm"); // "Midterm" or "Final"
 
@@ -74,22 +75,6 @@ export default function StudentAcademicResultsPage() {
   const [studentRegistrationData, setStudentRegistrationData] = useState(null);
 
   useEffect(() => {
-    api
-      .get("/results/student")
-      .then((res) => {
-        setData(res.data);
-        const keys = Object.keys(res.data.resultsByLevelTerm || {});
-        if (keys.length > 0) {
-          setSelectedSemester(keys[0]);
-        }
-      })
-      .catch((err) => {
-        toast.error("Failed to load published academic results.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
     api.get("/registration/my-status")
       .then((res) => {
         if (res.data) {
@@ -98,6 +83,9 @@ export default function StudentAcademicResultsPage() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => { if (error) toast.error("Failed to load published academic results."); }, [error]);
+  useEffect(() => { const keys = Object.keys(data?.resultsByLevelTerm || {}); if (keys.length) setSelectedSemester(previous => keys.includes(previous) ? previous : keys[0]); }, [data]);
 
   const resultsByLevelTerm = data?.resultsByLevelTerm || {};
 
@@ -255,7 +243,7 @@ export default function StudentAcademicResultsPage() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "60px", textAlign: "center", color: "#64748b" }}>Loading published academic results...</div>
+          <SkeletonLoader type="table" />
         ) : (
           <>
             {/* 1. Level-Term Cards Grid */}

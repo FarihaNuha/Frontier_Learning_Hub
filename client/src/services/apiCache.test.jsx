@@ -54,3 +54,18 @@ test("background metadata refresh updates legacy sections and late setters canno
   act(() => publish({ owner: "me", url: "/courses/b", data: { name: "Fresh B" } }));
   expect(view.result.current[0]).toBe("Fresh B");
 });
+
+test('notification invalidation refreshes a visible legacy section without erasing its saved rows', () => {
+  const { useReadState } = require('./apiCache');
+  let publish;
+  api.get.mockClear(); api.get.mockImplementation(() => new Promise(() => {}));
+  api.peekReadCache.mockReturnValue({ name: 'Saved' });
+  api.subscribeReads.mockImplementation(listener => { publish = listener; return () => {}; });
+  const view = renderHook(() => useReadState('/lectures?courseId=c', data => data.name, ''));
+  act(() => publish({ owner: 'me', invalidated: '/lectures' }));
+  expect(view.result.current[0]).toBe('Saved');
+  expect(api.get).toHaveBeenCalledWith('/lectures?courseId=c', { cache: false });
+  api.get.mockClear();
+  act(() => publish({ owner: 'me', invalidated: '', discarded: true }));
+  expect(api.get).not.toHaveBeenCalled();
+});

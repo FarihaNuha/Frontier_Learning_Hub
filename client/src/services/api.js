@@ -1,4 +1,5 @@
 import { createReadCache, readAddress } from "./requestCache";
+import { persistentReads } from "./persistentReads";
 import axios from "axios";
 import { Capacitor } from "@capacitor/core";
 
@@ -50,7 +51,7 @@ const readOwner = () => {
   try { const user = JSON.parse(localStorage.getItem("user") || "null"); return localStorage.getItem("token") && (user?.id || user?._id) ? `${user.id || user._id}:${user.role}` : "anonymous"; } catch { return "anonymous"; }
 };
 const reads = createReadCache(axios.getAdapter(api.defaults.adapter), readOwner, Date.now, {
-  storage: window.localStorage,
+  storage: persistentReads,
   onAuthError: error => {
     if (error.response?.status === 401) { localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href = "/auth"; }
   },

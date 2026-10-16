@@ -49,7 +49,7 @@ test("expired snapshots and live exam questions cannot bypass fresh requests", a
   const adapter = jest.fn(async () => response({ value: time }));
   const cache = createReadCache(adapter, () => "a", () => time);
   await cache.request({ url: "/courses/my" });
-  time = 16 * 60000;
+  time = 8 * 86400000;
   expect(cache.peek({ url: "/courses/my" })).toBeNull();
   for (let i = 0; i < 2; i++) await cache.request({ url: "/exams/1234567890abcdef12345678" });
   expect(adapter).toHaveBeenCalledTimes(3);
@@ -104,4 +104,21 @@ test("metadata over the old 1 MB cutoff stays cached, including after app restar
   expect(restarted.peek({ url: "/courses/my" }).courses[0].name).toBe("Large course");
   await restarted.request({ url: "/courses/my" });
   expect(adapter).toHaveBeenCalledTimes(1);
+});
+
+test('an invalidated section remains displayable after restart and refreshes without blocking', async () => {
+  const storage = memoryStorage(); let time = 1000;
+  const config = { url: '/lectures?courseId=c' };
+  const first = createReadCache(async () => response({ lectures: ['saved'] }), () => 'a', () => time, { storage });
+  await first.request(config);
+  first.invalidate('/lectures');
+  let fresh;
+  const adapter = jest.fn(() => new Promise(resolve => { fresh = resolve; }));
+  time += 86400000;
+  const restarted = createReadCache(adapter, () => 'a', () => time, { storage });
+  expect(restarted.peek(config)).toEqual({ lectures: ['saved'] });
+  expect((await restarted.request(config)).data.lectures).toEqual(['saved']);
+  fresh(response({ lectures: ['new'] })); await Promise.resolve();
+  expect(restarted.peek(config)).toEqual({ lectures: ['new'] });
+  restarted.clear(); expect(restarted.peek(config)).toBeNull();
 });

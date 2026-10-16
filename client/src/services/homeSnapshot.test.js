@@ -12,7 +12,7 @@ test("home snapshots survive a new render but stay scoped to the signed-in accou
 test("expired or corrupted snapshots fall back to loading, and logout clears saved home screens", () => {
   const clock = jest.spyOn(Date, "now").mockReturnValue(1000000);
   saveHomeSnapshot(student, "courses", []);
-  clock.mockReturnValue(1300001);
+  clock.mockReturnValue(1000000 + 8 * 86400000);
   expect(readHomeSnapshot(student, "courses")).toBeNull();
   saveHomeSnapshot(student, "courses", [{ _id: "new" }]);
   clearHomeSnapshots();

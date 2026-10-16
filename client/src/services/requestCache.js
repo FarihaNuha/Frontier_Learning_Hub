@@ -1,5 +1,6 @@
 // Shared, bounded read-through cache. Live actions and document binaries bypass it.
 const PREFIX = 'unicore_reads_v3:';
+const MAX_SNAPSHOT_AGE = 7 * 24 * 60 * 60000;
 export const readAddress = ({ url = '', params = {} }) => {
   const [path, query = ''] = url.split('?');
   const search = new URLSearchParams(query);
@@ -26,7 +27,7 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
     entry.bytes = entry.bytes || JSON.stringify(entry.data).length;
     entries.delete(key);
     let bytes = [...entries.values()].reduce((sum, item) => sum + (item.bytes || 0), 0);
-    while (entries.size >= 60 || bytes + entry.bytes > 6000000) {
+    while (entries.size >= 100 || bytes + entry.bytes > 20000000) {
       const first = entries.keys().next().value;
       if (first === undefined) break;
       bytes -= entries.get(first).bytes || 0; entries.delete(first);
@@ -37,16 +38,21 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
   const index = () => { try { return JSON.parse(storage?.getItem(PREFIX + 'index') || '[]'); } catch { return []; } };
   const removeDisk = predicate => {
     if (!storage) return;
-    try { const kept = index().filter(item => { if (!predicate(item.key)) return true; storage.removeItem(item.key); return false; }); storage.setItem(PREFIX + 'index', JSON.stringify(kept)); } catch { }
+    try {
+      const items = index();
+      const keys = new Set([...items.map(item => item.key), ...(storage.keys?.() || []).filter(key => key.startsWith(PREFIX) && key !== PREFIX + 'index')]);
+      for (const key of keys) if (predicate(key)) storage.removeItem(key);
+      storage.setItem(PREFIX + 'index', JSON.stringify(items.filter(item => !predicate(item.key))));
+    } catch { }
   };
   const persist = (key, entry) => {
     if (!storage) return;
     try {
       const encoded = JSON.stringify(entry);
-      if (encoded.length > 1500000) { removeDisk(candidate => candidate === key); return; }
+      if (encoded.length > (storage.entryBytes || 1500000)) { removeDisk(candidate => candidate === key); return; }
       let items = index().filter(item => item.key !== key);
       let bytes = items.reduce((sum, item) => sum + item.bytes, 0);
-      while (items.length >= 50 || bytes + encoded.length > 2000000) {
+      while (items.length >= (storage.maxEntries || 50) || bytes + encoded.length > (storage.budgetBytes || 2000000)) {
         const oldest = items.shift(); if (!oldest) break;
         storage.removeItem(oldest.key); bytes -= oldest.bytes;
       }
@@ -59,20 +65,29 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
     const key = keyFor(config);
     let entry = entries.get(key);
     if (!entry && storage) { try { entry = JSON.parse(storage.getItem(key) || 'null'); } catch { } }
-    if (!entry || now() - entry.savedAt > 15 * 60000 || entry.savedAt > now()) return null;
+    if (!entry || !Number.isFinite(entry.savedAt) || now() - entry.savedAt > MAX_SNAPSHOT_AGE || entry.savedAt > now()) return null;
     remember(key, entry);
     return entry;
   };
   const emit = event => { for (const listener of listeners) { try { listener(event); } catch { } } };
-  const invalidate = (prefix = '', notify = true) => {
+  const invalidate = (prefix = '', notify = true, discard = false) => {
     generation++;
     const match = key => !prefix || key.includes(prefix);
-    for (const key of entries.keys()) if (match(key)) entries.delete(key);
+    for (const [key, entry] of entries) if (match(key)) {
+      if (discard) entries.delete(key); else entry.stale = true;
+    }
     for (const key of pending.keys()) if (match(key)) pending.delete(key);
-    removeDisk(match);
-    if (notify) emit({ invalidated: prefix, owner: owner() });
+    if (discard) removeDisk(match);
+    else if (storage) {
+      // Keep the last displayable version across restarts. It cannot satisfy a
+      // fresh read: the stale flag always schedules a background revalidation.
+      for (const item of index()) if (match(item.key)) {
+        try { const entry = JSON.parse(storage.getItem(item.key)); if (entry) { entry.stale = true; persist(item.key, entry); } } catch { }
+      }
+    }
+    if (notify) emit({ invalidated: prefix, owner: owner(), discarded: discard });
   };
-  const clear = () => invalidate('');
+  const clear = () => invalidate('', true, true);
   const domains = url => {
     if (/^\/auth\/(fcm-token|push-test)/.test(url) || /^\/community\/(conversation\/.*\/read|messages(?:\/|$))/.test(url)) return [];
     if (url.includes('/notifications')) return [];
@@ -117,9 +132,9 @@ export function createReadCache(adapter, owner, now = Date.now, options = {}) {
     const cached = config.cache === false ? null : read(config);
     if (cached) {
       // Paint saved content immediately; silently refresh stale reads.
-      if (now() - cached.savedAt >= (config.cacheTtl || 30000)) load(config).catch(error => {
+      if (cached.stale || now() - cached.savedAt >= (config.cacheTtl || 30000)) load(config).catch(error => {
         // Authentication failures must still reach the API interceptor.
-        if ([401, 403].includes(error.response?.status)) { invalidate(''); options.onAuthError?.(error); }
+        if ([401, 403].includes(error.response?.status)) { clear(); options.onAuthError?.(error); }
       });
       return asResponse(cached, config);
     }

@@ -1,5 +1,5 @@
 const PREFIX = "unicore_home_";
-const MAX_AGE = 5 * 60 * 1000;
+const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const key = (user, page) => user && (user.id || user._id) ? `${PREFIX}${user.id || user._id}:${user.role}:${page}` : null;
 
 export function readHomeSnapshot(user, page) {

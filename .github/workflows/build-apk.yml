@@ -67,7 +67,7 @@ jobs:
           npm --prefix server run test-push
           npm --prefix server run test-chat
           npm --prefix server run test-files
-          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/apiCache.test.jsx src/pages/CachedNavigation.test.jsx src/services/chatState.test.js src/services/chatNotifications.test.js src/services/homeSnapshot.test.js src/services/launchScreen.test.jsx
+          npm --prefix client test -- --watchAll=false --runInBand --runTestsByPath src/services/nativeBridge.test.js src/services/nativeFiles.test.js src/contexts/CallContext.test.jsx src/pages/MessagePage.test.jsx src/components/Sidebar.test.jsx src/services/academicPDF.test.js src/components/FilePreviewModal.test.jsx src/services/urls.test.js src/services/requestCache.test.js src/services/persistentReads.test.js src/services/apiCache.test.jsx src/pages/CachedNavigation.test.jsx src/services/chatState.test.js src/services/chatNotifications.test.js src/services/homeSnapshot.test.js src/services/launchScreen.test.jsx
 
       - name: Make Gradle executable & fix line endings
         run: |
@@ -140,15 +140,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: v1.4.8-apk
-          name: UniCore Mobile App v1.4.8 (Android test APK)
+          tag_name: v1.4.9-apk
+          name: UniCore Mobile App v1.4.9 (Android test APK)
           body: |
-            Fixes repeated loading on returning to course sections and registration pages.
-            Restores saved section content before first paint, normalizes cache query keys,
-            retains larger metadata responses and removes repeated unused inline avatars.
-            Loads Level-Term details concurrently without waiting for invoices.
+            Restores visited sections from IndexedDB before the app renders after restart.
+            Keeps bounded read snapshots for seven days and refreshes them in the background.
+            Notification invalidation preserves displayable snapshots. Recent confirmed chat
+            history also survives restart; logout clears saved account data.
 
-            Use UniCore-1.4.8.apk for the same local signing key as prior updates.
+            Use UniCore-1.4.9.apk for the same local signing key as prior updates.
             Install over the previous app; no uninstall is needed.
           files: release-output/UniCore-app.apk
           draft: false

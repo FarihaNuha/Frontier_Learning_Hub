@@ -30,6 +30,8 @@ export function useReadState(url, select, initialValue) {
     return api.subscribeReads?.(event => {
       if (event.owner === owner && readAddress(event) === readAddress({ url })) {
         update({ identity, value: selectRef.current(event.data) });
+      } else if (event.owner === owner && event.invalidated !== undefined && !event.discarded && (!event.invalidated || url.includes(event.invalidated))) {
+        api.get(url, { cache: false }).catch(() => {});
       }
     });
   }, [identity, url, owner]);
@@ -71,7 +73,7 @@ export function useCachedFetch(url, { enabled = true, initialData = null, params
       if (readAddress(event) === readAddress({ url, params: paramsRef.current })) {
         published.current++;
         setState({ url, paramsKey, owner, data: event.data, loading: false, error: null });
-      } else if (event.invalidated !== undefined && (!event.invalidated || url.includes(event.invalidated))) run(true);
+      } else if (event.invalidated !== undefined && !event.discarded && (!event.invalidated || url.includes(event.invalidated))) run(true);
     });
     run();
     const focus = () => { if (document.visibilityState === 'visible') run(true); };

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { openNotificationSettings } from "../services/nativeFiles";
 import { getCallSettings, openCallSettings } from "../services/callBridge";
+import { FiBell, FiCheckCircle, FiInfo, FiSmartphone, FiPhone, FiRefreshCw, FiSend } from "react-icons/fi";
+import { SettingsCard } from "./SettingsPrimitives";
 import {
   getNativeNotificationStatus, subscribeNativeNotificationStatus,
   enableNativeNotifications, refreshNativeNotificationStatus, testNativePushNotification,
@@ -40,24 +42,22 @@ export default function AppNotificationSettings() {
     : "This phone is registered. Send a test to check delivery.";
 
   return (
-    <section className="dashboard-card" style={{ padding: 24, borderRadius: 16 }} aria-labelledby="app-notifications-title">
-      <h3 id="app-notifications-title">App notifications</h3>
-      <p>Get phone alerts for messages, calls, community posts, lectures, assignments and exams.</p>
-      <p role="status">{summary}</p>
-      {status.error && <p role="alert">{status.error}</p>}
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <button className="btn-secondary" onClick={() => openNotificationSettings().catch(() => setMessage("Open your phone's Settings → Apps → UniCore → Notifications."))}>Phone notification settings</button>
-        <button className="btn-secondary" onClick={() => openCallSettings().catch(() => setMessage("Install the latest APK to enable the incoming-call screen."))}>Incoming call screen settings</button>
-        <button className="btn-primary" disabled={busy} onClick={() => run(false)}>
-          {busy ? "Please wait…" : "Enable / reconnect notifications"}
+    <SettingsCard title="Phone alerts" description="Messages, calls and academic updates on this device." icon={FiBell}>
+      <div className="settings-status" role="status">{status.registered && status.synced ? <FiCheckCircle aria-hidden="true" /> : <FiInfo aria-hidden="true" />}<span>{summary}</span></div>
+      {status.error && <p className="settings-help" role="alert">{status.error}</p>}
+      <div className="settings-notification-actions">
+        <button type="button" className="settings-button settings-button-secondary" onClick={() => openNotificationSettings().catch(() => setMessage("Open your phone's Settings → Apps → UniCore → Notifications."))}><FiSmartphone aria-hidden="true" /> Notification settings</button>
+        <button type="button" className="settings-button settings-button-secondary" onClick={() => openCallSettings().catch(() => setMessage("Install the latest APK to enable the incoming-call screen."))}><FiPhone aria-hidden="true" /> Incoming calls</button>
+        <button type="button" className="settings-button settings-button-primary" disabled={busy} onClick={() => run(false)}><FiRefreshCw aria-hidden="true" />
+          {busy ? "Please wait…" : "Enable / reconnect"}
         </button>
-        <button className="btn-secondary" disabled={busy || status.permission !== "granted" || !status.registered} onClick={() => run(true)}>
+        <button type="button" className="settings-button settings-button-secondary" disabled={busy || status.permission !== "granted" || !status.registered} onClick={() => run(true)}><FiSend aria-hidden="true" />
           Send test notification
         </button>
       </div>
-      {message && <p role="status">{message}</p>}
-      {callSettings?.fullScreenAllowed === false && <p>Allow full-screen incoming calls in your phone settings. Android may otherwise show Answer/Decline in a notification banner.</p>}
-      <p style={{ fontSize: 13, marginTop: 16 }}>If alerts are blocked, open your phone's Settings → Apps → UniCore → Notifications and allow notifications, sound and pop-up alerts.</p>
-    </section>
+      {message && <p className="settings-help" role="status">{message}</p>}
+      {callSettings?.fullScreenAllowed === false && <p className="settings-help">Allow full-screen incoming calls in your phone settings. Android may otherwise show Answer/Decline in a notification banner.</p>}
+      <details className="settings-troubleshooting"><summary>Not receiving alerts?</summary><p>Open Settings → Apps → UniCore → Notifications on your phone. Allow notifications, sound and pop-up alerts, then reconnect above.</p></details>
+    </SettingsCard>
   );
 }

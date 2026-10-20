@@ -1,6 +1,8 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { checkLiveUpdates, confirmUpdateReady, liveUpdatesAvailable, readUpdateState, subscribeUpdates } from '../services/liveUpdates';
+import { FiRefreshCw } from 'react-icons/fi';
+import { SettingsCard } from './SettingsPrimitives';
 
 export function LiveUpdateLifecycle() {
   useEffect(() => {
@@ -26,10 +28,10 @@ export default function AppUpdates() {
     error: 'Could not check or prepare the update. Your current app will keep working.',
   };
   const busy = ['checking', 'downloading'].includes(update.status);
-  return <section className="dashboard-card about-unicore" aria-labelledby="app-updates-heading">
-    <h2 id="app-updates-heading">App Updates</h2>
-    <p style={{ color: 'var(--text-gray)', fontSize: 14, lineHeight: 1.6 }}>Version {update.nativeVersion}</p>
-    <p role="status" aria-live="polite" style={{ color: 'var(--text-dark)', fontSize: 14, lineHeight: 1.6 }}>{available ? messages[update.status] : 'Automatic app updates are available in the Android app.'}</p>
-    <button type="button" disabled={!available || busy} onClick={checkLiveUpdates} style={{ padding: '10px 16px', marginTop: 14, borderRadius: 8, border: '1px solid var(--border-light)', background: 'var(--bg-white)', color: 'var(--text-dark)', cursor: available && !busy ? 'pointer' : 'default' }}>{busy ? 'Please wait…' : 'Check for updates'}</button>
-  </section>;
+  return <SettingsCard title="App updates" description={`Keep UniCore up to date · Version ${update.nativeVersion}`} icon={FiRefreshCw}>
+    <div className="settings-update-row">
+      <p role="status" aria-live="polite">{available ? messages[update.status] : 'Automatic app updates are available in the Android app.'}</p>
+      <button className="settings-button settings-button-secondary" type="button" disabled={!available || busy} onClick={checkLiveUpdates}>{busy ? 'Please wait…' : 'Check for updates'}</button>
+    </div>
+  </SettingsCard>;
 }
